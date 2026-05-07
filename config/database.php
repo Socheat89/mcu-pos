@@ -15,9 +15,9 @@ if ($isProduction) {
     // Production Credentials
     return [
         'host' => 'localhost',
-        'database' => 'mekongcy_mekong_saas',
-        'username' => 'mekongcy',
-        'password' => 'Socheat!@#$2026',
+        'database' => 'mekocclj_mekong_saas',
+        'username' => 'mekocclj_mekong_saas',
+        'password' => 'Socheat@2026',
         'charset' => 'utf8mb4'
     ];
 } else {

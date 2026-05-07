@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../../core/helpers/url.php';
+require_once __DIR__ . '/../../../../core/helpers/url.php';
 // modules/pos/views/settings/index.php
 $pageTitle = 'POS Settings';
 $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
