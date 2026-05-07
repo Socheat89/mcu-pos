@@ -39,7 +39,8 @@ if ($finalStatus !== 'NOT_FOUND') {
     } elseif ($finalStatus === 'REJECTED') {
         echo json_encode(['success' => true, 'status' => 'REJECTED', 'db' => $statusDb, 'json' => $statusJson]); 
     } else {
-        echo json_encode(['success' => true, 'status' => 'PENDING', 'db' => $statusDb, 'json' => $statusJson]);
+        // Return PENDING status as is
+        echo json_encode(['success' => true, 'status' => $finalStatus, 'db' => $statusDb, 'json' => $statusJson]);
     }
 } else {
     echo json_encode([
@@ -48,7 +49,8 @@ if ($finalStatus !== 'NOT_FOUND') {
         'debug' => [
             'path' => TransactionLogger::getPath(),
             'db_status' => $statusDb,
-            'json_status' => $statusJson
+            'json_status' => $statusJson,
+            'reference_id' => $md5
         ]
     ]);
 }

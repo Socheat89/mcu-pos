@@ -1022,10 +1022,12 @@
                     // Debug Status for dev
                     const statusEl = document.getElementById('apiStatus');
                     if (statusEl) {
-                        statusEl.textContent = `Local Status: ${result.status || 'Checking...'} (JSON: ${result.json || '?'}, DB: ${result.db || '?'})`;
+                        statusEl.textContent = `Local Status: ${result.status || 'Checking...'} (Success: ${result.success}, JSON: ${result.json || '?'}, DB: ${result.db || '?'})`;
                     }
 
-                    if (result.success && (result.status === 'SUCCESS' || result.status === 'APPROVED')) {
+                    // Check if approved (case-insensitive)
+                    const statusUpper = (result.status || '').toUpperCase();
+                    if (result.success && (statusUpper === 'SUCCESS' || statusUpper === 'APPROVED')) {
                         clearInterval(pollingInterval);
                         clearInterval(countdownInterval);
                         
@@ -1041,6 +1043,23 @@
                         setTimeout(() => {
                             window.location.href = `${basePublicUrl}setup.php?plan=${selectedPlan}&paid=true&ref=${md5}`;
                         }, 2000);
+                        return;
+                    }
+
+                    // Check if rejected
+                    if (result.success && statusUpper === 'REJECTED') {
+                        clearInterval(pollingInterval);
+                        clearInterval(countdownInterval);
+                        
+                        const waitingContent = document.querySelector('#waitingModal .modal-body');
+                        waitingContent.innerHTML = `
+                            <div style="text-align:center; color: #dc2626; padding: 15px;">
+                                <i class="ph-bold ph-x-circle" style="font-size: 5rem; margin-bottom: 20px;"></i>
+                                <h2 style="margin-bottom: 10px;">Payment Rejected</h2>
+                                <p style="color: #64748b; font-size: 1.1rem;">Please try again or contact support.</p>
+                                <button onclick="location.reload()" style="margin-top: 20px; padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">Try Again</button>
+                            </div>
+                        `;
                         return;
                     }
 

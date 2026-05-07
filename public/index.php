@@ -1097,7 +1097,10 @@ $structuredData = [
                     const response = await fetch(`${projectPath}api/check_approval.php?ref=${ref}`);
                     const result = await response.json();
 
-                    if (result.success && (result.status === 'SUCCESS' || result.status === 'APPROVED')) {
+                    // Make status check case-insensitive
+                    const statusUpper = (result.status || '').toUpperCase();
+                    
+                    if (result.success && (statusUpper === 'SUCCESS' || statusUpper === 'APPROVED')) {
                         clearInterval(pollingInterval);
                         clearInterval(countdownInterval);
                         
@@ -1114,7 +1117,7 @@ $structuredData = [
                         setTimeout(() => {
                             window.location.href = `${projectPath}setup.php?plan=${currentPlan}&paid=true&ref=${ref}`;
                         }, 2000);
-                    } else if (result.success && result.status === 'rejected') {
+                    } else if (result.success && statusUpper === 'REJECTED') {
                         clearInterval(pollingInterval);
                         clearInterval(countdownInterval);
                         alert('Payment was rejected. Please contact support.');

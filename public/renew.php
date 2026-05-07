@@ -228,7 +228,9 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                     
                     document.getElementById('apiStatus').textContent = `Status: ${data.status}`;
 
-                    if (data.status === 'SUCCESS' || data.status === 'APPROVED') {
+                    // Case-insensitive status check
+                    const statusUpper = (data.status || '').toUpperCase();
+                    if (data.success && (statusUpper === 'SUCCESS' || statusUpper === 'APPROVED')) {
                         clearInterval(pollingInterval);
                         window.location.href = `renew_process.php?ref=${currentMd5}&months=${document.getElementById('duration').value}&plan_id=${selectedPlanId}`;
                     }
