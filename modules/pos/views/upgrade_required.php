@@ -9,7 +9,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo __('upgrade_required_title'); ?> - Mekong CyberUnit</title>
     <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
-    <link href="/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="<?php echo $urlPrefix; ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {

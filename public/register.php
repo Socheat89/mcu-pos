@@ -731,6 +731,16 @@
                         <span id="waitingBadgeText">Waiting for manual approval...</span>
                     </div>
 
+                    <!-- LOCAL DEV MODE NOTICE -->
+                    <div id="localDevNotice" style="display:none; margin-top:12px; padding:12px; background:#fff3cd; border:1px solid #ffc107; border-radius:8px; font-size:0.82rem; color:#664d03; text-align:left; width:100%;">
+                        <b>⚠️ Local Dev Mode:</b> Telegram webhook cannot reach localhost.<br>
+                        After clicking <b>Approve</b> in Telegram, open the sync page below to process it:<br><br>
+                        <a href="api/sync_telegram.php" target="_blank" style="display:inline-block; background:#0088cc; color:white; padding:8px 14px; border-radius:6px; text-decoration:none; font-weight:700; font-size:0.85rem;">
+                            🔄 Sync Telegram Approval
+                        </a>
+                        <span style="margin-left:8px; font-size:0.78rem; color:#888;">Then wait 5 seconds for auto-detect.</span>
+                    </div>
+
                     <div id="apiStatus" style="font-size: 10px; color: #94a3b8; font-family: monospace; margin-top: 10px; background: #f8fafc; padding: 4px 8px; border-radius: 4px;">Status: Initializing...</div>
                 </div>
             </div>
@@ -754,6 +764,11 @@
         const payBtnText = document.getElementById('pay_btn_text');
         const paymentCta = document.getElementById('payment_cta');
         const stepperItems = document.querySelectorAll('.stepper-item');
+        
+        // Detect localhost / local dev mode
+        const isLocalMode = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+            || window.location.hostname.startsWith('192.168.')
+            || window.location.port !== '';
         
         let selectedPlan = null;
         let selectedPrice = 0;
@@ -989,6 +1004,12 @@
 
         function startApprovalPolling(md5) {
             if (pollingInterval) clearInterval(pollingInterval);
+            
+            // Show local dev helper
+            if (isLocalMode) {
+                const notice = document.getElementById('localDevNotice');
+                if (notice) notice.style.display = 'block';
+            }
             
             const startTime = Date.now();
             const waitingBadgeText = document.getElementById('waitingBadgeText');

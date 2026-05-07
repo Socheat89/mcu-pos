@@ -148,5 +148,65 @@
         "type": "renewal",
         "business_name": "Socheat Cofe",
         "tenant_id": 9
+    },
+    "e22c8e5f9ab86a4f59b8814a30d69f80": {
+        "amount": "10.00",
+        "plan": "pos_basic",
+        "method": "bakong",
+        "status": "PENDING",
+        "timestamp": 1774529002,
+        "ip": "::1",
+        "type": "registration",
+        "business_name": "New Customer",
+        "tenant_id": null
+    },
+    "ba39e31cced291b1ba6c827d99bc39ac": {
+        "amount": "10.00",
+        "plan": "pos_basic",
+        "method": "bakong",
+        "status": "PENDING",
+        "timestamp": 1774529423,
+        "ip": "::1",
+        "type": "registration",
+        "business_name": "New Customer",
+        "tenant_id": null
+    },
+    "04630696da98d8fb90203635ea693078": {
+        "amount": "10.00",
+        "plan": "pos_basic",
+        "method": "bakong",
+        "status": "PENDING",
+        "timestamp": 1774529433,
+        "ip": "::1",
+        "type": "registration",
+        "business_name": "New Customer",
+        "tenant_id": null
+    },
+    "abcdef123": {
+        "status": "APPROVED",
+        "processed_at": 1774529970
+    },
+    "fafb1c19819e0a8965f394b83da74bba": {
+        "amount": "10.00",
+        "plan": "pos_basic",
+        "method": "bakong",
+        "status": "PENDING",
+        "timestamp": 1774530093,
+        "ip": "::1",
+        "type": "registration",
+        "business_name": "New Customer",
+        "tenant_id": null
+    },
+    "b6fab4cca984b182771b34cea6b98401": {
+        "amount": "10.00",
+        "plan": "pos_basic",
+        "method": "bakong",
+        "status": "APPROVED",
+        "timestamp": 1774530849,
+        "ip": "::1",
+        "type": "registration",
+        "business_name": "New Customer",
+        "tenant_id": null,
+        "processed_at": 1774530861
     }
 }
