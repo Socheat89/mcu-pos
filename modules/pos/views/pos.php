@@ -15,444 +15,190 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
     <script src="<?php echo mc_base_path(); ?>/public/js/bakong-khqr.js?v=<?php echo time(); ?>"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Space Grotesk"', '"Battambang"', 'sans-serif'],
+                        display: ['"Space Grotesk"', '"Battambang"', 'sans-serif']
+                    },
+                    keyframes: {
+                        fadeUp: { '0%': { opacity: '0', transform: 'translateY(12px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideIn: { '0%': { opacity: '0', transform: 'translateX(32px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } }
+                    },
+                    animation: {
+                        fadeUp: 'fadeUp 0.45s ease-out both',
+                        fadeIn: 'fadeIn 0.6s ease-out both',
+                        slideIn: 'slideIn 0.35s ease-out both'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --pos-terminal-sidebar: 420px;
+            --pos-bg: #f6f4ef;
+            --pos-card: #ffffff;
+            --pos-text: #1f2937;
+            --pos-text-muted: #6b7280;
+            --pos-muted: #6b7280;
+            --pos-border: #e5e7eb;
+            --pos-border-light: rgba(148, 163, 184, 0.4);
+            --pos-primary: #0f766e;
+            --pos-primary-light: #ccfbf1;
+            --pos-secondary: #0ea5e9;
+            --pos-accent: #f59e0b;
+            --pos-success: #16a34a;
+            --pos-warning: #f59e0b;
+            --pos-danger: #ef4444;
+            --pos-brand-a: #0f766e;
+            --pos-brand-b: #f59e0b;
+            --pos-gradient-primary: linear-gradient(135deg, #0f766e 0%, #14b8a6 55%, #f59e0b 100%);
+            --pos-gradient-surface: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            --pos-gradient-glass: linear-gradient(140deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.35));
+            --pos-gradient-indigo: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
         }
 
         body.pos-app {
-            background-color: var(--pos-bg);
-            font-family: 'Battambang', 'Inter', sans-serif;
-            color: var(--pos-text);
-            margin: 0;
-            overflow: hidden;
-        }
-
-        /* Layout */
-        .pos-terminal {
-            display: grid;
-            grid-template-columns: 1fr var(--pos-terminal-sidebar);
-            height: calc(100vh - var(--pos-topbar-h));
-            overflow: hidden;
-        }
-
-        .pos-terminal__products {
-            padding: 32px;
-            overflow-y: auto;
-            background: #f8fafc;
-        }
-
-        .pos-terminal__cart {
-            background: white;
-            border-left: 1px solid var(--pos-border);
-            display: flex;
-            flex-direction: column;
-            box-shadow: -20px 0 60px rgba(0,0,0,0.02);
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Search Section */
-        .pos-terminal-header {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 32px;
-            align-items: center;
-        }
-
-        .pos-search-box {
-            flex: 1;
-            position: relative;
-        }
-
-        .pos-search-box i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--pos-primary);
-            font-size: 18px;
-        }
-
-        .pos-search-box input {
-            width: 100%;
-            padding: 16px 20px 16px 54px;
-            border-radius: 18px;
-            border: 1.5px solid var(--pos-border);
-            background: white;
-            font-size: 16px;
-            font-weight: 600;
-            outline: none;
-            transition: all 0.2s;
-            box-shadow: var(--pos-shadow-sm);
-        }
-
-        .pos-search-box input:focus {
-            border-color: var(--pos-primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        /* Product Cards */
-        .pos-prod-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 24px;
-            padding-bottom: 32px;
-        }
-
-        .pos-prod-card {
-            background: white;
-            border-radius: 24px;
-            padding: 12px;
-            border: 1.2px solid var(--pos-border);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pos-prod-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--pos-primary);
-            box-shadow: var(--pos-shadow-xl);
-        }
-
-        .pos-prod-card__img {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 20px;
-            background: #f1f5f9;
-            overflow: hidden;
-            border: 1px solid var(--pos-border);
-            display: grid;
-            place-items: center;
-        }
-
-        .pos-prod-card__img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .pos-prod-card__info {
-            padding: 12px 6px 4px;
-        }
-
-        .pos-prod-card__name {
-            font-weight: 800;
-            font-size: 15px;
-            color: var(--pos-text);
-            margin-bottom: 6px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            height: 42px;
-        }
-
-        .pos-prod-card__price {
-            font-weight: 900;
-            font-size: 18px;
-            color: var(--pos-primary);
-        }
-
-        .pos-prod-card__stock {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            padding: 4px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--pos-text-muted);
-            border: 1px solid var(--pos-border);
-            z-index: 2;
-        }
-
-        /* Cart */
-        .pos-cart-header {
-            padding: 32px 24px 24px;
-            border-bottom: 1px solid var(--pos-border);
-        }
-
-        .pos-cart-header h2 { font-size: 24px; font-weight: 900; margin: 0; }
-
-        .pos-cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .pos-cart-item {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            padding: 16px;
-            background: white;
-            border-radius: 20px;
-            border: 1.5px solid var(--pos-border);
-            transition: all 0.2s;
-        }
-
-        .pos-cart-item:hover { border-color: var(--pos-primary); box-shadow: var(--pos-shadow-md); }
-
-        .pos-cart-item__img {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            background: #f8fafc;
-            border: 1px solid var(--pos-border);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .pos-cart-item__info { flex: 1; min-width: 0; }
-        .pos-cart-item__name { font-weight: 800; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .pos-cart-item__price { font-weight: 900; font-size: 13px; color: var(--pos-primary); }
-
-        .pos-cart-qty {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 14px;
-        }
-
-        .pos-cart-qty button {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            border: none;
-            background: white;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            font-weight: 800;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-        }
-
-        .pos-cart-qty button:hover { background: var(--pos-primary); color: white; }
-        .pos-cart-qty span { font-weight: 900; font-size: 14px; min-width: 24px; text-align: center; }
-
-        /* Footer */
-        .pos-cart-footer {
-            padding: 24px;
-            background: #ffffff;
-            border-top: 1px solid var(--pos-border);
-        }
-
-        .pos-totals {
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 20px;
-            margin-bottom: 24px;
-            border: 1px solid var(--pos-border);
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--pos-text-muted);
-        }
-
-        .total-row.grand {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1.5px dashed var(--pos-border);
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--pos-text);
-        }
-
-        .total-row.grand span:last-child { color: var(--pos-primary); }
-
-        .btn-pay {
-            width: 100%;
-            padding: 20px;
-            border-radius: 20px;
-            background: var(--pos-gradient-primary);
-            color: white;
-            border: none;
-            font-size: 18px;
-            font-weight: 900;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
-            transition: all 0.3s;
-        }
-
-        .btn-pay:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
-        }
-
-        @media (max-width: 1200px) {
-            .pos-terminal { grid-template-columns: 1fr; }
-            .pos-terminal__cart { position: fixed; right: 0; top: var(--pos-topbar-h); bottom: 0; width: 400px; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-            .pos-terminal__cart.active { transform: translateX(0); }
-        }
-
-
-        /* Modal Enhancements */
-        .pos-modal-overlay {
-            background: rgba(15, 23, 42, 0.8) !important;
-            backdrop-filter: blur(12px) !important;
-        }
-
-        .pos-modal {
-            background: white !important;
-            border-radius: 32px !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4) !important;
-            border: none !important;
-            overflow: visible !important;
-        }
-
-        .pos-modal__header {
-            padding: 30px 30px 20px !important;
-            border: none !important;
-        }
-
-        .pos-modal__icon {
-            width: 56px !important;
-            height: 56px !important;
-            border-radius: 18px !important;
-            background: var(--pos-primary-light) !important;
-            color: var(--pos-primary) !important;
-        }
-
-        .pos-modal__title h3 {
-            font-size: 24px !important;
-            font-weight: 800 !important;
-        }
-
-        .pos-modal__body {
-            padding: 0 30px 30px !important;
-        }
-
-        .payment-method-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .payment-method-item {
-            border: 2px solid var(--pos-border);
-            border-radius: 20px;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #f8fafc;
-        }
-
-        .payment-method-item.active {
-            border-color: var(--pos-primary);
-            background: var(--pos-primary-light);
-            color: var(--pos-primary);
-        }
-
-        .payment-method-item i {
-            display: block;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .payment-method-item span {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(30px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @media (max-width: 1024px) {
-            .pos-terminal { flex-direction: column; height: auto; overflow: visible; }
-            .pos-terminal__cart { width: 100%; border-left: none; position: fixed; bottom: 0; max-height: 80vh; transform: translateY(calc(100% - 140px)); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
-            .pos-terminal__cart.expanded { transform: translateY(0); }
-            .pos-terminal__products { padding-bottom: 160px; }
+            font-family: 'Space Grotesk', 'Battambang', sans-serif;
+            background: var(--pos-bg);
         }
     </style>
 
 </head>
 <body class="pos-app">
     <?php $activeNav = 'pos'; include __DIR__ . '/partials/navbar.php'; ?>
+    <?php
+        $productCount = is_array($products) ? count($products) : 0;
+        $lowStockCount = 0;
+        if (is_array($products)) {
+            foreach ($products as $productRow) {
+                $qty = (int)($productRow['stock_quantity'] ?? 0);
+                if ($qty > 0 && $qty <= 5) {
+                    $lowStockCount++;
+                }
+            }
+        }
+    ?>
 
-    <div class="pos-terminal">
-        <div class="pos-terminal__products">
-            <div class="pos-terminal-header">
-                <div class="pos-search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="search" placeholder="<?php echo __('search_placeholder'); ?>" autocomplete="off">
-                </div>
-                <select id="category" class="pos-form-control pos-form-select" style="max-width: 220px; background-color: white;">
-                    <option value=""><?php echo __('all_categories'); ?></option>
-                </select>
+    <div class="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-amber-50 via-white to-emerald-50 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)] animate-fadeIn">
+        <div class="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl"></div>
+        <div class="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-amber-200/40 blur-3xl"></div>
 
-                <!-- Menu Orders Button -->
-                <button class="pos-icon-btn" style="position: relative; width: auto; padding: 0 20px; gap: 8px; border-color: var(--pos-primary); color: var(--pos-primary);" onclick="toggleMenuOrders()">
-                    <i class="fas fa-list-check"></i>
-                    <span style="font-weight: 800;"><?php echo __('pending_orders'); ?></span>
-                    <?php if (count($pendingMenuOrders) > 0): ?>
-                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 99px; font-size: 11px; margin-left: 4px;"><?php echo count($pendingMenuOrders); ?></span>
-                    <?php endif; ?>
-                </button>
-            </div>
-
-            <?php if (isset($resumeOrder) && $resumeOrder): ?>
-                <div style="background: #eef2ff; border: 1.5px solid #c7d2fe; border-radius: 20px; padding: 16px 24px; margin-bottom: 32px; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--pos-primary); color: white; display: grid; place-items: center; font-size: 18px;">
-                        <i class="fas fa-history"></i>
+        <div class="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+            <section class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative flex-1 min-w-[240px]">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"></i>
+                        <input type="text" id="search" placeholder="<?php echo __('search_placeholder'); ?>" autocomplete="off" class="w-full rounded-2xl border border-slate-200 bg-white/80 py-3 pl-11 pr-4 text-sm font-semibold text-slate-800 shadow-sm transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
                     </div>
-                    <div>
-                        <div style="font-size: 12px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 1px;">Continuing Order</div>
-                        <div style="font-size: 16px; font-weight: 900; color: #1e1b4b; margin-top: 2px;">Reference #<?php echo (int)$resumeOrder['id']; ?></div>
+                    <div class="relative min-w-[180px]">
+                        <select id="category" class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/80 py-3 pl-4 pr-10 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                            <option value=""><?php echo __('all_categories'); ?></option>
+                        </select>
+                        <i class="fas fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
                     </div>
+                    <button class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-100" onclick="toggleMenuOrders()">
+                        <i class="fas fa-list-check"></i>
+                        <span><?php echo __('pending_orders'); ?></span>
+                        <?php if (count($pendingMenuOrders) > 0): ?>
+                            <span class="rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-bold text-white"><?php echo count($pendingMenuOrders); ?></span>
+                        <?php endif; ?>
+                    </button>
                 </div>
-            <?php endif; ?>
 
-            <div id="products" class="pos-prod-grid"></div>
-        </div>
-
-        <div class="pos-terminal__cart">
-            <div class="pos-cart-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h2><?php echo __('billing_cart'); ?></h2>
-                <span id="cartCount" class="badge badge-primary" style="font-size: 12px; font-weight: 800; padding: 6px 14px;">0 <?php echo __('items'); ?></span>
-            </div>
-
-            <div id="cart" class="pos-cart-items">
-                <!-- Cart items injected via JS -->
-                 <div style="height: 100%; display: grid; place-items: center; text-align: center; opacity: 0.5;">
-                    <div>
-                        <div style="width: 100px; height: 100px; background: #f1f5f9; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 24px;">
-                            <i class="fas fa-shopping-basket" style="font-size: 40px; color: #cbd5e1;"></i>
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur animate-fadeUp">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Products</div>
+                                <div class="mt-1 text-2xl font-extrabold text-slate-900"><?php echo (int)$productCount; ?></div>
+                            </div>
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                                <i class="fas fa-cubes"></i>
+                            </div>
                         </div>
-                        <h3 style="font-weight: 800; color: var(--pos-text);"><?php echo __('cart_empty'); ?></h3>
-                        <p style="font-size: 14px; color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('select_products'); ?></p>
                     </div>
-                 </div>
-            </div>
 
-            <div class="pos-cart-footer">
-                <form id="checkoutForm" method="POST" action="<?php echo mc_url($subdomain . '/pos/orders/create'); ?>">
+                    <div class="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur animate-fadeUp" style="animation-delay:.04s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Cart items</div>
+                                <div id="cartMetric" class="mt-1 text-2xl font-extrabold text-slate-900">0</div>
+                            </div>
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                                <i class="fas fa-bag-shopping"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur animate-fadeUp" style="animation-delay:.08s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Low stock</div>
+                                <div class="mt-1 text-2xl font-extrabold text-slate-900"><?php echo (int)$lowStockCount; ?></div>
+                            </div>
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                                <i class="fas fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur animate-fadeUp" style="animation-delay:.12s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Terminal</div>
+                                <div class="mt-1 text-lg font-extrabold text-slate-900">Ready</div>
+                            </div>
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <?php if (isset($resumeOrder) && $resumeOrder): ?>
+                    <div class="flex flex-wrap items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 shadow-sm animate-fadeUp">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700">Continuing Order</div>
+                            <div class="text-base font-extrabold text-slate-900">Reference #<?php echo (int)$resumeOrder['id']; ?></div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div id="products" class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"></div>
+            </section>
+
+            <aside class="relative flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.12)] backdrop-blur-md xl:sticky xl:top-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400"><?php echo __('billing_cart'); ?></p>
+                        <h2 class="text-xl font-extrabold text-slate-900"><?php echo __('billing_cart'); ?></h2>
+                    </div>
+                    <span id="cartCount" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">0 <?php echo __('items'); ?></span>
+                </div>
+
+                <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2">
+                        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Subtotal</div>
+                        <div id="cartMetricSubtotal" class="mt-1 font-extrabold text-slate-900">$0.00</div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2">
+                        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Quick mode</div>
+                        <div class="mt-1 font-extrabold text-emerald-700">Cash</div>
+                    </div>
+                </div>
+
+                <div id="cart" class="mt-4 flex min-h-[220px] flex-1 flex-col gap-3 overflow-y-auto pr-1"></div>
+
+                <form id="checkoutForm" method="POST" action="<?php echo mc_url($subdomain . '/pos/orders/create'); ?>" class="mt-6 space-y-4">
                     <?php if (isset($resumeOrder) && $resumeOrder): ?>
                         <input type="hidden" name="resume_order_id" value="<?php echo (int)$resumeOrder['id']; ?>">
                     <?php endif; ?>
@@ -461,184 +207,190 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     <input type="hidden" name="payment_method" id="payment_method" value="cash">
                     <input type="hidden" name="cash_given" id="cash_given" value="">
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                        <div class="pos-form-group" style="margin: 0;">
-                            <label class="pos-form-label" style="font-size: 11px;"><?php echo __('customer'); ?></label>
-                            <select name="customer_id" id="customer" class="pos-form-control pos-form-select" style="background-color: white; padding: 12px 16px;">
-                                <option value=""><?php echo __('walk_in_customer'); ?></option>
-                                <?php foreach ($customers as $customer1): ?>
-                                    <option value="<?php echo (int)$customer1['id']; ?>"><?php echo htmlspecialchars($customer1['name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400"><?php echo __('customer'); ?></label>
+                            <div class="relative mt-2">
+                                <select name="customer_id" id="customer" class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                                    <option value=""><?php echo __('walk_in_customer'); ?></option>
+                                    <?php foreach ($customers as $customer1): ?>
+                                        <option value="<?php echo (int)$customer1['id']; ?>"><?php echo htmlspecialchars($customer1['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <i class="fas fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                            </div>
                         </div>
-                        <div class="pos-form-group" style="margin: 0;">
-                            <label class="pos-form-label" style="font-size: 11px;"><?php echo __('order_type'); ?></label>
-                            <select id="terminal_order_status" class="pos-form-control pos-form-select" style="background-color: white; padding: 12px 16px;">
-                                <option value="completed"><?php echo __('sale'); ?></option>
-                                <option value="pending"><?php echo __('hold'); ?></option>
-                            </select>
+                        <div>
+                            <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400"><?php echo __('order_type'); ?></label>
+                            <div class="relative mt-2">
+                                <select id="terminal_order_status" class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                                    <option value="completed"><?php echo __('sale'); ?></option>
+                                    <option value="pending"><?php echo __('hold'); ?></option>
+                                </select>
+                                <i class="fas fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="pos-totals">
-                        <div class="total-row">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                        <div class="flex items-center justify-between text-sm font-semibold text-slate-500">
                             <span><?php echo __('subtotal'); ?></span>
                             <span id="subtotal_pre">$0.00</span>
                         </div>
-                        <div class="total-row">
+                        <div class="mt-2 flex items-center justify-between text-sm font-semibold text-slate-500">
                             <span><?php echo __('tax'); ?></span>
                             <span>$0.00</span>
                         </div>
-                        <div class="total-row grand">
+                        <div class="mt-3 flex items-center justify-between border-t border-dashed border-slate-200 pt-3 text-lg font-extrabold text-slate-900">
                             <span><?php echo __('grand_total'); ?></span>
-                            <span id="subtotal">$0.00</span>
+                            <span id="subtotal" class="text-emerald-700">$0.00</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 12px;">
-                        <button class="pos-icon-btn" type="button" style="width: 64px; height: 64px; border-radius: 20px; color: var(--pos-danger); border-color: #fee2e2; background: #fef2f2;" onclick="clearCart()" title="<?php echo __('cancel'); ?>">
-                            <i class="fas fa-trash-alt" style="font-size: 18px;"></i>
+                    <div class="flex items-center gap-3">
+                        <button class="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-100" type="button" onclick="clearCart()" title="<?php echo __('cancel'); ?>">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button class="btn-pay" type="button" id="btnPay">
-                             <?php echo __('complete_checkout'); ?> <i class="fas fa-arrow-right"></i>
+                        <button class="group flex flex-1 items-center justify-between rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-500 px-5 py-4 text-base font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50" type="button" id="btnPay">
+                             <span><?php echo __('complete_checkout'); ?></span>
+                             <i class="fas fa-arrow-right transition group-hover:translate-x-1"></i>
                         </button>
                     </div>
                 </form>
-            </div>
+            </aside>
         </div>
     </div>
 
 
     <div id="paymentModal" class="pos-modal-overlay">
-        <div class="pos-modal pos-modal--small">
-            <div class="pos-modal__header" style="border: none; padding: 32px 32px 16px;">
-                <div class="pos-modal__title">
-                    <div class="pos-modal__icon" style="background: var(--pos-gradient-primary); color: white;">
+        <div class="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white/95 p-6 shadow-2xl backdrop-blur">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow">
                         <i class="fas fa-receipt"></i>
                     </div>
                     <div>
-                        <h3 style="font-weight: 900; letter-spacing: -0.5px;"><?php echo __('checkout_summary'); ?></h3>
-                        <p style="font-weight: 600;"><?php echo __('secure_checkout_msg'); ?></p>
+                        <h3 class="text-lg font-extrabold text-slate-900"><?php echo __('checkout_summary'); ?></h3>
+                        <p class="text-xs font-semibold text-slate-500"><?php echo __('secure_checkout_msg'); ?></p>
                     </div>
                 </div>
-                <button class="pos-modal__close" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
+                <button class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-100" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="pos-modal__body" style="padding: 0 32px 32px;">
-                <div style="background: rgba(255,255,255,0.5); border-radius: 24px; padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; border: 1.5px solid rgba(255,255,255,0.6); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+            <div class="mt-6 space-y-4">
+                <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                     <div>
-                        <div style="font-size: 11px; font-weight: 900; color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;"><?php echo __('total_payable'); ?></div>
-                        <div id="modal_subtotal" style="font-size: 32px; font-weight: 950; color: var(--pos-text);">$0.00</div>
+                        <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400"><?php echo __('total_payable'); ?></div>
+                        <div id="modal_subtotal" class="text-2xl font-extrabold text-slate-900">$0.00</div>
                     </div>
-                    <div style="text-align: right;">
-                        <div id="clock_now" style="font-size: 13px; font-weight: 800; color: var(--pos-primary); background: var(--pos-primary-light); padding: 4px 12px; border-radius: 10px;"></div>
+                    <div class="text-right">
+                        <div id="clock_now" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"></div>
                     </div>
                 </div>
 
-                <div class="pos-form-group">
-                    <label class="pos-form-label" style="font-size: 11px;"><?php echo __('payment_instrument'); ?></label>
-                    <div class="payment-method-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <div>
+                    <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400"><?php echo __('payment_instrument'); ?></label>
+                    <div class="mt-3 grid grid-cols-3 gap-3">
                         <?php if ($settings['pos_method_cash_enabled'] == '1'): ?>
-                        <div class="payment-method-item active" data-method="cash" onclick="selectPaymentMethod('cash')" style="padding: 12px; border-radius: 16px;">
-                            <i class="fas fa-wallet" style="font-size: 18px;"></i>
-                            <span style="font-size: 12px;"><?php echo __('cash'); ?></span>
+                        <div class="payment-method-item flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50" data-method="cash" onclick="selectPaymentMethod('cash')">
+                            <i class="fas fa-wallet text-lg"></i>
+                            <span><?php echo __('cash'); ?></span>
                         </div>
                         <?php endif; ?>
-                        
+
                         <?php if ($settings['pos_method_khqr_enabled'] == '1'): ?>
-                        <div class="payment-method-item" data-method="khqr" onclick="selectPaymentMethod('khqr')" style="padding: 12px; border-radius: 16px;">
-                            <i class="fas fa-qrcode" style="font-size: 18px;"></i>
-                            <span style="font-size: 12px;"><?php echo __('khqr'); ?></span>
+                        <div class="payment-method-item flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50" data-method="khqr" onclick="selectPaymentMethod('khqr')">
+                            <i class="fas fa-qrcode text-lg"></i>
+                            <span><?php echo __('khqr'); ?></span>
                         </div>
                         <?php endif; ?>
-                        
+
                         <?php if ($settings['pos_method_card_enabled'] == '1'): ?>
-                        <div class="payment-method-item" data-method="card" onclick="selectPaymentMethod('card')" style="padding: 12px; border-radius: 16px;">
-                            <i class="fas fa-credit-card" style="font-size: 18px;"></i>
-                            <span style="font-size: 12px;"><?php echo __('card'); ?></span>
+                        <div class="payment-method-item flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50" data-method="card" onclick="selectPaymentMethod('card')">
+                            <i class="fas fa-credit-card text-lg"></i>
+                            <span><?php echo __('card'); ?></span>
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div id="cashAmountGroup">
-                    <div class="pos-form-group">
-                        <label class="pos-form-label" style="font-size: 11px;"><?php echo __('cash_received'); ?></label>
-                        <div style="position: relative;">
-                            <span style="position: absolute; left: 16px; top: 16px; font-weight: 900; color: var(--pos-text-muted); font-size: 18px;">$</span>
-                            <input id="modal_cash_given" class="pos-form-control" type="number" step="0.01" min="0" placeholder="0.00" style="padding: 16px 16px 16px 36px; font-size: 20px; font-weight: 900; background: white; border-radius: 16px;">
+                <div id="cashAmountGroup" class="space-y-3">
+                    <div>
+                        <label class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400"><?php echo __('cash_received'); ?></label>
+                        <div class="relative mt-2">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-slate-500">$</span>
+                            <input id="modal_cash_given" class="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-8 pr-4 text-lg font-bold text-slate-800 shadow-sm transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" type="number" step="0.01" min="0" placeholder="0.00">
                         </div>
                     </div>
-                    
-                    <div id="changeGroup" style="margin-top: 16px; background: #f0fdf4; padding: 16px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #dcfce7;">
-                        <span style="font-weight: 800; color: #166534; font-size: 13px; text-transform: uppercase;"><?php echo __('balance_change'); ?></span>
-                        <span id="modal_change" style="font-size: 24px; font-weight: 950; color: #15803d;">$0.00</span>
-                    </div>
-                </div>
-                
-                <div id="khqrGroup" style="display: none; text-align: center; background: white; padding: 24px; border-radius: 20px; border: 1.5px solid var(--pos-border);">
-                    <div id="qrcode_container" style="background: white; padding: 12px; border-radius: 16px; border: 1px solid var(--pos-border); display: inline-block;"></div>
-                    <div style="margin-top: 20px;">
-                        <div style="font-weight: 900; color: #b91c1c; font-size: 14px; letter-spacing: 1px;"><?php echo __('waiting_for_scan'); ?></div>
+
+                    <div id="changeGroup" class="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3">
+                        <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700"><?php echo __('balance_change'); ?></span>
+                        <span id="modal_change" class="text-xl font-extrabold text-emerald-700">$0.00</span>
                     </div>
                 </div>
 
-                <div id="cardGroup" style="display: none; text-align: center; padding: 40px 20px; background: white; border-radius: 20px; border: 1.5px solid var(--pos-border);">
-                    <i class="fas fa-terminal" style="font-size: 32px; color: var(--pos-primary); margin-bottom: 16px;"></i>
-                    <p style="font-weight: 800; color: var(--pos-text); font-size: 14px; margin: 0;"><?php echo __('connect_terminal_msg'); ?></p>
+                <div id="khqrGroup" class="hidden rounded-2xl border border-slate-200 bg-white p-5 text-center">
+                    <div id="qrcode_container" class="mx-auto inline-block rounded-2xl border border-slate-200 bg-white p-3"></div>
+                    <div class="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-rose-600"><?php echo __('waiting_for_scan'); ?></div>
+                </div>
+
+                <div id="cardGroup" class="hidden rounded-2xl border border-slate-200 bg-white p-6 text-center">
+                    <i class="fas fa-terminal text-2xl text-emerald-600"></i>
+                    <p class="mt-3 text-sm font-semibold text-slate-600"><?php echo __('connect_terminal_msg'); ?></p>
                 </div>
             </div>
 
-            <div class="pos-modal__actions" style="padding: 0 32px 32px; background: transparent; border: none; flex-direction: column; gap: 12px;">
-                <button class="btn btn-primary" onclick="confirmPayment()" style="width: 100%; padding: 18px; border-radius: 18px; font-size: 16px; font-weight: 900;">
-                    <?php echo __('complete_payment'); ?> <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+            <div class="mt-6 flex flex-col gap-3">
+                <button class="w-full rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl" onclick="confirmPayment()">
+                    <?php echo __('complete_payment'); ?> <i class="fas fa-arrow-right ml-2"></i>
                 </button>
-                <button class="btn btn-outline" onclick="closePaymentModal()" style="width: 100%; padding: 14px; border-radius: 18px; border: none; color: var(--pos-text-muted); font-size: 13px; font-weight: 700;"><?php echo __('discard_checkout'); ?></button>
+                <button class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition hover:bg-slate-50" onclick="closePaymentModal()"><?php echo __('discard_checkout'); ?></button>
             </div>
         </div>
     </div>
 
     <!-- Menu Orders Side Panel -->
-    <div id="menuOrdersPanel" class="pos-modal-overlay" style="justify-content: flex-end; padding: 0;">
-        <div style="width: 100%; max-width: 450px; height: 100%; background: white; animation: slideInRight 0.4s ease; display: flex; flex-direction: column;">
-            <div class="pos-modal__header" style="padding: 32px;">
-                <h3 style="font-weight: 900; margin: 0;"><?php echo __('pending_orders'); ?></h3>
-                <button class="qty-btn" onclick="toggleMenuOrders()"><i class="fas fa-times"></i></button>
+    <div id="menuOrdersPanel" class="pos-modal-overlay items-stretch justify-end p-0">
+        <div class="flex h-full w-full max-w-[440px] flex-col bg-white shadow-2xl animate-slideIn">
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                <h3 class="text-lg font-extrabold text-slate-900"><?php echo __('pending_orders'); ?></h3>
+                <button class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-100" onclick="toggleMenuOrders()"><i class="fas fa-times"></i></button>
             </div>
             
-            <div style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="flex-1 space-y-3 overflow-y-auto p-5">
                 <?php if (empty($pendingMenuOrders)): ?>
-                    <div style="text-align: center; padding: 60px 20px; color: var(--pos-text-muted);">
-                        <i class="fas fa-inbox fa-3x" style="opacity: 0.2; margin-bottom: 16px;"></i>
-                        <p style="font-weight: 700;">No pending orders</p>
+                    <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm font-semibold text-slate-500">
+                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-200/70 text-slate-500">
+                            <i class="fas fa-inbox text-xl"></i>
+                        </div>
+                        <p>No pending orders</p>
                     </div>
                 <?php else: ?>
                     <?php foreach ($pendingMenuOrders as $mo): ?>
-                        <div style="background: #f8fafc; border: 1.5px solid var(--pos-border); border-radius: 20px; padding: 20px; transition: all 0.2s; cursor: pointer;" 
-                             onclick="window.location.href='?resume=<?php echo $mo['id']; ?>'">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div class="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg" onclick="window.location.href='?resume=<?php echo $mo['id']; ?>'">
+                            <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <span style="font-weight: 950; font-size: 16px; color: var(--pos-text);">#<?php echo $mo['id']; ?></span>
-                                    <div style="font-size: 12px; font-weight: 800; color: var(--pos-primary); margin-top: 4px;">
+                                    <span class="text-base font-extrabold text-slate-900">#<?php echo $mo['id']; ?></span>
+                                    <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">
                                         <i class="fas fa-clock"></i> <?php echo date('H:i', strtotime($mo['created_at'])); ?>
                                     </div>
                                 </div>
-                                <div style="font-weight: 900; font-size: 18px; color: var(--pos-text);">$<?php echo number_format($mo['total'], 2); ?></div>
+                                <div class="text-lg font-extrabold text-slate-900">$<?php echo number_format($mo['total'], 2); ?></div>
                             </div>
                             
                             <?php if (!empty($mo['notes'])): ?>
-                                <div style="background: rgba(99, 102, 241, 0.08); padding: 8px 12px; border-radius: 10px; margin-bottom: 15px;">
-                                    <div style="font-size: 11px; font-weight: 800; color: var(--pos-primary); text-transform: uppercase;">Location/Note</div>
-                                    <div style="font-size: 14px; font-weight: 700; color: var(--pos-text);"><?php echo htmlspecialchars($mo['notes']); ?></div>
+                                <div class="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/70 px-3 py-2">
+                                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">Location/Note</div>
+                                    <div class="text-sm font-semibold text-slate-800"><?php echo htmlspecialchars($mo['notes']); ?></div>
                                 </div>
                             <?php endif; ?>
 
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--pos-text-muted);">
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="text-xs font-semibold text-slate-500">
                                     <?php echo (int)$mo['item_lines']; ?> Items
                                 </div>
-                                <button class="btn btn-primary" style="padding: 10px 20px; font-size: 12px;">
-                                    Resume Sale <i class="fas fa-arrow-right" style="margin-left: 6px;"></i>
+                                <button class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-white shadow transition hover:bg-emerald-700">
+                                    Resume Sale <i class="fas fa-arrow-right ml-2"></i>
                                 </button>
                             </div>
                         </div>
@@ -646,8 +398,8 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                 <?php endif; ?>
             </div>
             
-            <div style="padding: 32px; border-top: 1px solid #f1f5f9;">
-                <button class="btn btn-outline w-100" onclick="toggleMenuOrders()">Close View</button>
+            <div class="border-t border-slate-200 px-6 py-5">
+                <button class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition hover:bg-slate-50" onclick="toggleMenuOrders()">Close View</button>
             </div>
         </div>
     </div>
@@ -698,6 +450,8 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             subtotal: document.getElementById('subtotal'),
             subtotalPre: document.getElementById('subtotal_pre'),
             cartCount: document.getElementById('cartCount'),
+            cartMetric: document.getElementById('cartMetric'),
+            cartMetricSubtotal: document.getElementById('cartMetricSubtotal'),
             orderStatus: document.getElementById('order_status'),
             terminalOrderStatus: document.getElementById('terminal_order_status'),
             paymentMethod: document.getElementById('payment_method'),
@@ -753,36 +507,62 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             els.products.innerHTML = '';
 
             if (!list.length) {
-                els.products.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--pos-muted); font-weight: 700;">No products found with those filters.</div>';
+                els.products.innerHTML = `
+                    <div class="col-span-full rounded-3xl border border-dashed border-slate-300 bg-white/60 p-10 text-center text-sm font-semibold text-slate-500">
+                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                            <i class="fas fa-box-open text-xl"></i>
+                        </div>
+                        No products found with those filters.
+                    </div>
+                `;
                 return;
             }
 
-            for (const p of list) {
+            list.forEach((p, index) => {
                 const div = document.createElement('div');
-                div.className = 'pos-prod-card';
+                div.className = 'group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl';
+                div.classList.add('animate-fadeUp');
+                div.style.animationDelay = `${Math.min(index * 0.03, 0.4)}s`;
+
                 const disabled = p.stock <= 0;
+                const stockClasses = disabled
+                    ? 'border-rose-200 bg-rose-50 text-rose-600'
+                    : 'border-slate-200 bg-white/90 text-slate-500';
+                const meta = p.sku ? escapeHtml(p.sku) : (p.category ? escapeHtml(p.category) : '');
 
                 div.innerHTML = `
-                    <div class="pos-prod-card__stock" style="${disabled ? 'color: #ef4444;' : ''}">
+                    <span class="absolute right-3 top-3 rounded-full border ${stockClasses} px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em]">
                         ${disabled ? '<?php echo __('out_of_stock'); ?>' : p.stock + ' <?php echo __('in_stock'); ?>'}
+                    </span>
+                    <div class="aspect-square w-full overflow-hidden rounded-2xl bg-slate-100/80 ring-1 ring-inset ring-slate-200/70">
+                        ${p.image && !p.image.includes('no-image.svg')
+                            ? `<img src="${p.image}" alt="${escapeHtml(p.name)}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]">`
+                            : `<div class="flex h-full w-full items-center justify-center text-slate-300"><i class="fas fa-image text-2xl"></i></div>`
+                        }
                     </div>
-                    <div class="pos-prod-card__img">
-                        ${p.image && !p.image.includes('no-image.svg') ? `<img src="${p.image}" alt="${escapeHtml(p.name)}">` : `<i class="fas fa-image" style="font-size: 32px; color: #cbd5e1;"></i>`}
-                    </div>
-                    <div class="pos-prod-card__info">
-                        <div class="pos-prod-card__name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
-                        <div class="pos-prod-card__price">${money(p.price)}</div>
+                    <div class="flex flex-1 flex-col px-1 pb-3 pt-3">
+                        <div class="min-h-[40px] text-sm font-semibold leading-snug text-slate-800">${escapeHtml(p.name)}</div>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-lg font-black text-emerald-700">${money(p.price)}</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">${meta || ''}</span>
+                        </div>
                     </div>
                 `;
 
                 if (!disabled) {
+                    div.classList.add('cursor-pointer');
                     div.addEventListener('click', () => addToCart(p.id, 1));
                 } else {
-                    div.style.opacity = '0.6';
-                    div.style.cursor = 'not-allowed';
+                    div.classList.add('opacity-60', 'cursor-not-allowed');
                 }
                 els.products.appendChild(div);
-            }
+            });
+        }
+
+        function setPayEnabled(enabled) {
+            if (!els.btnPay) return;
+            els.btnPay.disabled = !enabled;
+            els.btnPay.setAttribute('aria-disabled', enabled ? 'false' : 'true');
         }
 
         function renderCart() {
@@ -790,36 +570,38 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
             if (!cart.size) {
                 els.cart.innerHTML = `
-                    <div style="height: 100%; display: grid; place-items: center; text-align: center; color: var(--pos-muted);">
-                        <div>
-                            <i class="fas fa-shopping-cart" style="font-size: 40px; opacity: 0.1; margin-bottom: 16px;"></i>
-                            <p style="font-weight: 700; font-size: 14px;"><?php echo __('cart_empty'); ?></p>
+                    <div class="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center">
+                        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                            <i class="fas fa-basket-shopping text-xl"></i>
                         </div>
+                        <p class="text-sm font-semibold text-slate-600"><?php echo __('cart_empty'); ?></p>
+                        <p class="mt-1 text-xs text-slate-400"><?php echo __('select_products'); ?></p>
                     </div>
                 `;
-                els.btnPay.style.opacity = '0.6';
-                els.btnPay.style.cursor = 'not-allowed';
+                setPayEnabled(false);
             } else {
-                els.btnPay.style.opacity = '';
-                els.btnPay.style.cursor = '';
+                setPayEnabled(true);
                 for (const [productId, entry] of cart.entries()) {
                     const p = entry.product;
                     const qty = entry.qty;
 
                     const item = document.createElement('div');
-                    item.className = 'pos-cart-item';
+                    item.className = 'flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm';
                     item.innerHTML = `
-                        <div class="pos-cart-item__img">
-                            ${p.image && !p.image.includes('no-image.svg') ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `<i class="fas fa-image" style="color: #cbd5e1; padding: 12px; font-size: 16px;"></i>`}
+                        <div class="h-12 w-12 overflow-hidden rounded-xl bg-slate-100 ring-1 ring-inset ring-slate-200">
+                            ${p.image && !p.image.includes('no-image.svg')
+                                ? `<img src="${p.image}" class="h-full w-full object-cover">`
+                                : `<div class="flex h-full w-full items-center justify-center text-slate-300"><i class="fas fa-image text-sm"></i></div>`
+                            }
                         </div>
-                        <div class="pos-cart-item__info">
-                            <div class="pos-cart-item__name">${escapeHtml(p.name)}</div>
-                            <div class="pos-cart-item__price">${money(p.price)}</div>
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate text-sm font-semibold text-slate-800">${escapeHtml(p.name)}</div>
+                            <div class="text-xs font-bold text-emerald-700">${money(p.price)}</div>
                         </div>
-                        <div class="pos-cart-qty">
-                            <button type="button" class="minus">-</button>
-                            <span>${qty}</span>
-                            <button type="button" class="plus">+</button>
+                        <div class="flex items-center gap-2 rounded-full bg-slate-100 px-2 py-1">
+                            <button type="button" class="minus flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition hover:bg-emerald-600 hover:text-white">-</button>
+                            <span class="w-6 text-center text-sm font-semibold text-slate-700">${qty}</span>
+                            <button type="button" class="plus flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm transition hover:bg-emerald-600 hover:text-white">+</button>
                         </div>
                     `;
 
@@ -836,6 +618,8 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
             const itemCount = Array.from(cart.values()).reduce((acc, x) => acc + x.qty, 0);
             if (els.cartCount) els.cartCount.textContent = itemCount + ' <?php echo __('items'); ?>';
+            if (els.cartMetric) els.cartMetric.textContent = itemCount;
+            if (els.cartMetricSubtotal) els.cartMetricSubtotal.textContent = money(subtotal);
 
             syncFormItems();
         }
@@ -909,17 +693,25 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             }
         }
 
+        const activeMethodClasses = ['border-emerald-400', 'bg-emerald-50', 'text-emerald-700', 'ring-2', 'ring-emerald-200'];
+        const inactiveMethodClasses = ['border-slate-200', 'bg-slate-50', 'text-slate-600'];
+
         function selectPaymentMethod(method) {
-            // Update UI
             document.querySelectorAll('.payment-method-item').forEach(el => {
-                el.classList.remove('active');
-                if (el.dataset.method === method) el.classList.add('active');
+                el.classList.remove(...activeMethodClasses);
+                el.classList.add(...inactiveMethodClasses);
+
+                if (el.dataset.method === method) {
+                    el.classList.remove(...inactiveMethodClasses);
+                    el.classList.add(...activeMethodClasses);
+                    el.setAttribute('aria-pressed', 'true');
+                } else {
+                    el.setAttribute('aria-pressed', 'false');
+                }
             });
 
-            // Set hidden field
             els.paymentMethod.value = method;
 
-            // Toggle groups
             const cashGroup = document.getElementById('cashAmountGroup');
             const khqrGroup = document.getElementById('khqrGroup');
             const cardGroup = document.getElementById('cardGroup');

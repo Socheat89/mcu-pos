@@ -77,6 +77,27 @@ $activeClass = function (string $key) use ($activeNav): string {
                     <span class="pos-brand__sub"><?php echo __('cyber_unit_pos'); ?></span>
                 </div>
             </a>
+
+            <?php $sidebarUser = Auth::user(); ?>
+            <div class="pos-sidebar__summary">
+                <div class="pos-sidebar__summary-top">
+                    <div class="pos-sidebar__summary-title"><?php echo htmlspecialchars($tenantName); ?></div>
+                    <div class="pos-sidebar__summary-badge">
+                        <i class="fas fa-signal"></i>
+                        Live
+                    </div>
+                </div>
+                <div class="pos-sidebar__summary-grid">
+                    <div class="pos-sidebar__summary-card">
+                        <span class="k"><?php echo __('mode'); ?></span>
+                        <span class="v"><?php echo __('terminal'); ?></span>
+                    </div>
+                    <div class="pos-sidebar__summary-card">
+                        <span class="k"><?php echo __('role'); ?></span>
+                        <span class="v"><?php echo htmlspecialchars($sidebarUser['role_name'] ?? 'POS'); ?></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <nav class="pos-side-nav">
@@ -113,7 +134,7 @@ $activeClass = function (string $key) use ($activeNav): string {
             $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings') || $hasFeature('pos', 'digital_menu');
             if ($canManage): 
             ?>
-                <div class="pos-nav-header" style="margin: 24px 16px 8px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 1.5px;"><?php echo __('management'); ?></div>
+                <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
                 <?php if ($hasFeature('pos', 'inventory')): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
@@ -186,24 +207,26 @@ $activeClass = function (string $key) use ($activeNav): string {
                         align-items: center;
                     }
                     .pos-lang-btn {
-                        background: #f1f5f9;
-                        border: 1.5px solid #e2e8f0;
-                        padding: 8px 12px;
-                        border-radius: 12px;
+                        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+                        border: 1px solid rgba(226, 232, 240, 0.95);
+                        padding: 10px 14px;
+                        border-radius: 16px;
                         font-weight: 800;
-                        font-family: 'Outfit', sans-serif;
+                        font-family: 'Space Grotesk', 'Battambang', sans-serif;
                         font-size: 13px;
-                        color: #475569;
+                        color: #334155;
                         cursor: pointer;
                         display: flex;
                         align-items: center;
                         gap: 8px;
+                        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
                         transition: all 0.2s;
                     }
                     .pos-lang-btn:hover {
-                        border-color: #6366f1;
-                        background: #eff6ff;
-                        color: #6366f1;
+                        border-color: rgba(99, 102, 241, 0.25);
+                        background: #ffffff;
+                        color: #4f46e5;
+                        transform: translateY(-1px);
                     }
                     .pos-lang-dropdown { 
                         position: absolute;
@@ -216,9 +239,9 @@ $activeClass = function (string $key) use ($activeNav): string {
                     }
                     .pos-lang-dropdown-inner {
                         background: white;
-                        border-radius: 16px;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-                        border: 1px solid #e2e8f0;
+                        border-radius: 18px;
+                        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
+                        border: 1px solid rgba(226, 232, 240, 0.95);
                         min-width: 160px;
                         padding: 6px;
                         overflow: hidden;
@@ -236,20 +259,20 @@ $activeClass = function (string $key) use ($activeNav): string {
                         color: #475569;
                         font-size: 13px;
                         font-weight: 700;
-                        border-radius: 10px;
+                        border-radius: 12px;
                         transition: all 0.2s;
                     }
                     .pos-lang-item:hover {
-                        background: #f1f5f9;
-                        color: #6366f1;
+                        background: #f8fafc;
+                        color: #4f46e5;
                     }
                     .pos-lang-item.active {
-                        background: #eff6ff;
-                        color: #6366f1;
+                        background: #eef2ff;
+                        color: #4f46e5;
                     }
                 </style>
                 <div class="pos-lang-switcher" id="posLangSwitcher">
-                    <button class="pos-lang-btn" onclick="togglePosLang(event)">
+                    <button class="pos-lang-btn" type="button" onclick="togglePosLang(event)">
                         <i class="fas fa-globe"></i>
                         <?php 
                         $curr = Language::getCurrentLang();
