@@ -8,6 +8,6 @@ return [
     'bot_token'    => '7704406393:AAF27v7soy5S-hlnWrRTiURCT8Bk_lhALjE',
     'chat_id'      => '7372079283',
     // Local = empty (use polling/sync_telegram.php), Live = webhook URL
-    'callback_url' => $isLocal ? '' : 'https://mekongcyberunit.app/public/api/telegram_callback.php',
+    'callback_url' => $isLocal ? '' : 'https://mcu-pos.me/public/api/telegram_callback.php',
     'is_local'     => $isLocal,
 ];
