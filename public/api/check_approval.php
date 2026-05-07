@@ -5,7 +5,8 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *'); 
 error_reporting(0); 
 
-$md5 = $_GET['md5'] ?? '';
+// Accept both 'md5' and 'ref' parameters for compatibility
+$md5 = $_GET['md5'] ?? $_GET['ref'] ?? '';
 
 if (empty($md5)) {
     echo json_encode(['success' => false, 'status' => 'INVALID']);

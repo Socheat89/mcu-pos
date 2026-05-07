@@ -1097,7 +1097,7 @@ $structuredData = [
                     const response = await fetch(`${projectPath}api/check_approval.php?ref=${ref}`);
                     const result = await response.json();
 
-                    if (result.success && result.status === 'approved') {
+                    if (result.success && (result.status === 'SUCCESS' || result.status === 'APPROVED')) {
                         clearInterval(pollingInterval);
                         clearInterval(countdownInterval);
                         
