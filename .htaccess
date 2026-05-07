@@ -9,7 +9,7 @@ RewriteEngine On
 # We auto-set it based on the server name.
 # If you deploy to root on live, change to: RewriteBase /
 
-RewriteBase /Mekong_CyberUnit/
+RewriteBase /
 
 # SEO endpoints
 RewriteRule ^sitemap\.xml$ public/sitemap.php [L]
@@ -35,4 +35,4 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule . - [L]
 
 # Route EVERYTHING else to index.php
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^(.*)$ index.php [QSA,L]
