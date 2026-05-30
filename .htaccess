@@ -18,8 +18,17 @@ RewriteRule ^robots\.txt$ public/robots.php [L]
 # Favicon shortcuts
 RewriteRule ^favicon\.(ico|png)$ public/images/logo.png [L]
 
-# Redirect root to public folder
-RewriteRule ^$ public/ [L,R=301]
+# Internally rewrite root to public folder
+RewriteRule ^$ public/ [L]
+
+# If request is not for public/, check if it exists in public/ and rewrite internally
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/mcu-pos/public/$1 -f [OR]
+RewriteCond %{DOCUMENT_ROOT}/Mekong_CyberUnit/public/$1 -f [OR]
+RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+RewriteRule ^(.*)$ public/$1 [L]
 
 # Security: Block direct access to core system folders
 RewriteRule ^(config|core|middleware|database|logs|vendor|modules)/(.*)$ - [F,L]
