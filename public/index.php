@@ -608,6 +608,8 @@ $structuredData = [
                 <a href="#about" class="nav-item">About Me</a>
                 <a href="#features" class="nav-item">Features</a>
                 <a href="#pricing" class="nav-item">Pricing</a>
+                <a href="#faq" class="nav-item">FAQ</a>
+                <a href="#contact" class="nav-item">Contact</a>
             </nav>
             
             <div class="flex items-center gap-4 nav-actions">
@@ -626,6 +628,8 @@ $structuredData = [
             <a href="#about" class="nav-item" onclick="closeMobileDrawer()">About Me</a>
             <a href="#features" class="nav-item" onclick="closeMobileDrawer()">Features</a>
             <a href="#pricing" class="nav-item" onclick="closeMobileDrawer()">Pricing</a>
+            <a href="#faq" class="nav-item" onclick="closeMobileDrawer()">FAQ</a>
+            <a href="#contact" class="nav-item" onclick="closeMobileDrawer()">Contact</a>
         </nav>
         <div class="mobile-cta">
             <a href="login.php" class="btn btn-outline" onclick="closeMobileDrawer(); openAuthModal();">Sign In</a>
@@ -808,6 +812,70 @@ $structuredData = [
             </div>
     </section>
 
+    <!-- Features Section -->
+    <section id="features" class="features-section" style="padding: 100px 0; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-pill" style="margin-bottom: 1rem;">
+                    <i class="ph-bold ph-sparkle" style="margin-right: 6px;"></i> Platform Highlights
+                </div>
+                <h2>Packed with Enterprise-grade Features</h2>
+                <p>Everything you need to scale your retail, cafe, or restaurant business in Cambodia.</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                    </div>
+                    <h3>Real-time Cloud Sync / ការសមកាលកម្មពេលវេលាជាក់ស្តែង</h3>
+                    <p>Transactions and stock updates sync instantly across all devices. Never worry about losing data even if your connection drops.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-translate"></i>
+                    </div>
+                    <h3>Bilingual Khmer & English / គាំទ្រពីរភាសា ខ្មែរ និង អង់គ្លេស</h3>
+                    <p>Designed with Khmer-first usability. Seamlessly toggle languages to support local cashiers and international managers.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-qr-code"></i>
+                    </div>
+                    <h3>Bakong KHQR Payments / ការទូទាត់តាម KHQR បាគង</h3>
+                    <p>Generate dynamic KHQR codes for instant customer scanning. Automatically verifies payments with real-time notifications.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-package"></i>
+                    </div>
+                    <h3>Smart Inventory Control / ការគ្រប់គ្រងសារពើភ័ណ្ឌឆ្លាតវៃ</h3>
+                    <p>Track raw ingredients and products. Receive automated low-stock warnings and manage purchase orders easily.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-chart-line-up"></i>
+                    </div>
+                    <h3>Sales & Analytics / របាយការណ៍លក់លម្អិត</h3>
+                    <p>Access deep sales performance charts, top-selling items, and profit margin analysis anywhere, anytime.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-bold ph-storefront"></i>
+                    </div>
+                    <h3>Multi-outlet Management / គ្រប់គ្រងសាខាច្រើន</h3>
+                    <p>Manage multiple branch locations, centralize warehouse stock, and compare store performances from a single dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- About Me Section -->
     <section id="about" class="about-section">
         <div class="container">
@@ -950,6 +1018,215 @@ $structuredData = [
                            </div>';
                 }
                 ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-pill" style="margin-bottom: 1rem;">
+                    <i class="ph-bold ph-chats" style="margin-right: 6px;"></i> Customer Reviews
+                </div>
+                <h2>Loved by Operators Across Cambodia</h2>
+                <p>See how local cafes, retail stores, and pharmacies scale their businesses with Mekong CyberUnit.</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        "Mekong CyberUnit changed the way we handle morning rushes. Toggling between Khmer and English works perfectly for our baristas, and the KHQR Bakong integration means we don't have to check manual bank slips anymore."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">☕</div>
+                        <div class="testimonial-info">
+                            <h4>Sokha Pich / ពេជ្រ សុខា</h4>
+                            <p>Owner, Brown & Bloom Cafe (Phnom Penh)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        "Managing three outlets from my phone is a breeze. The smart inventory alerts help us restock before running out. The offline mode saved us multiple times during internet outages."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">🛍️</div>
+                        <div class="testimonial-info">
+                            <h4>Piseth Vong / វង្ស ពិសិដ្ឋ</h4>
+                            <p>Founder, Kravan Retail Shop (Siem Reap)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        "We were searching for a POS Khmer solution that can manage thousands of item SKUs. The cloud sync is instantaneous, and the automated reports give us exact daily margin insights."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">💊</div>
+                        <div class="testimonial-info">
+                            <h4>Chantrea Keo / កែវ ចាន់ទ្រា</h4>
+                            <p>General Manager, Angkor Pharmacy (Battambang)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-pill" style="margin-bottom: 1rem;">
+                    <i class="ph-bold ph-question" style="margin-right: 6px;"></i> Frequently Asked Questions
+                </div>
+                <h2>Got Questions? We Have Answers</h2>
+                <p>Everything you need to know about setting up and using Mekong CyberUnit POS.</p>
+            </div>
+            
+            <div class="faq-container">
+                <!-- FAQ 1 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How long does the initial setup take? / តើការតំឡើងដំបូងចំណាយពេលប៉ុន្មាន?</span>
+                        <i class="ph-bold ph-caret-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            Setting up your workspace is instant! After registration, you can configure your menu items, import products via CSV, and start selling in under 10 minutes.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What hardware is compatible? / តើឧបករណ៍ណាខ្លះដែលអាចប្រើប្រាស់បាន?</span>
+                        <i class="ph-bold ph-caret-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            Mekong CyberUnit POS is cloud-based and runs on any modern browser. It is compatible with iPad, Android tablets, Windows PCs, and macOS. It also connects to standard Bluetooth/USB receipt printers and cash drawers.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Does it support offline sales? / តើវាគាំទ្រការលក់ក្រៅប្រព័ន្ធ (Offline) ដែរឬទេ?</span>
+                        <i class="ph-bold ph-caret-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            Yes! Our offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How does the Bakong KHQR integration work? / តើការទូទាត់តាម KHQR បាគងដំណើរការដូចម្តេច?</span>
+                        <i class="ph-bold ph-caret-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-pill" style="margin-bottom: 1rem;">
+                    <i class="ph-bold ph-envelope" style="margin-right: 6px;"></i> Contact Us
+                </div>
+                <h2>Get in Touch with Our Team</h2>
+                <p>Have questions about pricing, features, or custom integrations? We're here to help.</p>
+            </div>
+            
+            <div class="contact-grid">
+                <!-- Contact Info Card -->
+                <div class="contact-info-card">
+                    <h3>Contact Information</h3>
+                    <p>Reach out to us directly or visit our office. We usually respond within a few hours.</p>
+                    
+                    <ul class="contact-method-list">
+                        <!-- Email -->
+                        <li class="contact-method-item">
+                            <div class="contact-method-icon">
+                                <i class="ph-bold ph-envelope-simple"></i>
+                            </div>
+                            <div class="contact-method-text">
+                                <h4>Email Support</h4>
+                                <p>support@mekongcyberunit.app</p>
+                            </div>
+                        </li>
+                        
+                        <!-- Telegram -->
+                        <li class="contact-method-item">
+                            <div class="contact-method-icon">
+                                <i class="ph-bold ph-telegram-logo"></i>
+                            </div>
+                            <div class="contact-method-text">
+                                <h4>Telegram Channels</h4>
+                                <p><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" style="color: #22d3ee; text-decoration: underline;">@SOCHEAT_DOEM</a></p>
+                            </div>
+                        </li>
+                        
+                        <!-- Office Location -->
+                        <li class="contact-method-item">
+                            <div class="contact-method-icon">
+                                <i class="ph-bold ph-map-pin"></i>
+                            </div>
+                            <div class="contact-method-text">
+                                <h4>Phnom Penh Headquarters</h4>
+                                <p>Sensok District, Phnom Penh, Cambodia</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Form Card -->
+                <div class="contact-form-card">
+                    <form class="contact-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Thank you for contacting us! We will get back to you shortly.'); this.reset();">
+                        <div class="contact-form-group">
+                            <label for="contact-firstname">First Name</label>
+                            <input type="text" id="contact-firstname" name="firstname" placeholder="John" required>
+                        </div>
+                        
+                        <div class="contact-form-group">
+                            <label for="contact-lastname">Last Name</label>
+                            <input type="text" id="contact-lastname" name="lastname" placeholder="Doe" required>
+                        </div>
+                        
+                        <div class="contact-form-group full-width">
+                            <label for="contact-email">Email Address</label>
+                            <input type="email" id="contact-email" name="email" placeholder="john.doe@example.com" required>
+                        </div>
+                        
+                        <div class="contact-form-group full-width">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" name="message" rows="5" placeholder="How can we help your business?" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary full-width" style="grid-column: 1 / -1; margin-top: 1rem; width: 100%;">
+                            Send Message <i class="ph-bold ph-paper-plane-right" style="margin-left: 8px;"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
@@ -1436,6 +1713,23 @@ $structuredData = [
                 if (countdownInterval) clearInterval(countdownInterval);
             }
         };
+
+        // FAQ Accordion Toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                
+                // Toggle current item
+                item.classList.toggle('active');
+                
+                // Close other items
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+            });
+        });
 
         window.onclick = function(event) {
             if (event.target == modal) {
