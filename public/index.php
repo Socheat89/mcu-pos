@@ -456,6 +456,30 @@ $structuredData = [
             flex-direction: column;
             gap: 0.2rem;
         }
+        
+        /* Premium Mockup and UI additions */
+        .mockup-container {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(0);
+        }
+        .mockup-container:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 35px 80px -15px rgba(15, 23, 42, 0.3) !important;
+        }
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.1)); }
+            50% { filter: drop-shadow(0 0 30px rgba(20, 184, 166, 0.25)); }
+        }
+        .animate-glow {
+            animation: glowPulse 4s infinite ease-in-out;
+        }
+        @keyframes badgeRipple {
+            0% { box-shadow: 0 0 0 0px rgba(124, 58, 237, 0.4); }
+            100% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+        }
+        .badge-pulse {
+            animation: badgeRipple 2s infinite ease-out;
+        }
     </style>
     
     <!-- Payment Success Modal -->
@@ -612,7 +636,7 @@ $structuredData = [
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="hero-pill">
+            <div class="hero-pill badge-pulse">
                 <i class="ph-fill ph-sparkle" style="margin-right: 6px;"></i> v2.0 is now live
             </div>
             <h1>
@@ -628,31 +652,166 @@ $structuredData = [
                 </a>
             </div>
             
-            <!-- Dashboard Preview / Mockup would go here -->
-            <div style="margin-top: 4rem; position: relative;">
-                <div style="background: white; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; overflow: hidden; max-width: 1000px; margin: 0 auto; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
-                    <div style="text-align: center; color: #94a3b8;">
-                         <!-- Abstract UI Representation -->
-                         <div style="display: grid; grid-template-columns: 200px 1fr; gap: 0; height: 100%; width: 100%; text-align: left;">
-                             <div style="background: #1e293b; padding: 20px;">
-                                 <div style="height: 30px; width: 30px; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 30px;"></div>
-                                 <div style="height: 10px; width: 60%; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 15px;"></div>
-                                 <div style="height: 10px; width: 80%; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 15px;"></div>
-                                 <div style="height: 10px; width: 70%; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 15px;"></div>
-                             </div>
-                             <div style="background: white; padding: 30px;">
-                                 <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
-                                     <div style="height: 20px; width: 200px; background: #f1f5f9; border-radius: 6px;"></div>
-                                     <div style="height: 30px; width: 100px; background: #2563eb; border-radius: 6px;"></div>
-                                 </div>
-                                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                                     <div style="height: 120px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;"></div>
-                                     <div style="height: 120px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;"></div>
-                                     <div style="height: 120px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;"></div>
-                                 </div>
-                             </div>
-                         </div>
+            <!-- Premium Dashboard Preview / Mockup -->
+            <div class="mockup-container relative mt-16 mx-auto max-w-5xl rounded-3xl border border-slate-200/40 bg-slate-900/5 p-3 shadow-2xl backdrop-blur-md">
+                <div class="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl"></div>
+                <div class="absolute -left-16 bottom-0 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl"></div>
+                
+                <div class="relative overflow-hidden rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl text-slate-200 aspect-[16/9] flex flex-col font-sans select-none" style="min-height: 480px;">
+                    
+                    <!-- Mockup Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e293b; background: rgba(15, 23, 42, 0.6); padding: 10px 20px; font-size: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="height: 10px; width: 10px; rounded: 50%; background: #ef4444; border-radius: 50%;"></span>
+                            <span style="height: 10px; width: 10px; rounded: 50%; background: #f59e0b; border-radius: 50%;"></span>
+                            <span style="height: 10px; width: 10px; rounded: 50%; background: #10b981; border-radius: 50%;"></span>
+                            <span style="margin-left: 8px; font-family: monospace; color: #64748b;">Mekong POS Terminal v2.0</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px; bg: rgba(16, 185, 129, 0.1); padding: 2px 10px; font-weight: 700; color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.1);">
+                                <span style="height: 6px; width: 6px; border-radius: 50%; background: #34d399; display: inline-block;"></span> Active Terminal 01
+                            </span>
+                            <span style="color: #94a3b8; font-family: monospace;">16:15:30</span>
+                        </div>
                     </div>
+
+                    <!-- Mockup Main Body -->
+                    <div style="display: grid; grid-template-columns: 70px 1fr; flex: 1; overflow: hidden; background: #020617;">
+                        
+                        {/* Mockup Sidebar */}
+                        <div style="border-right: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0;">
+                            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
+                                <div style="height: 36px; width: 36px; border-radius: 10px; background: linear-gradient(135deg, #0f766e, #14b8a6); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(15, 118, 110, 0.3);">MCU</div>
+                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-house"></i></div>
+                                <div style="height: 32px; width: 32px; border-radius: 8px; background: #0f766e; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4);"><i class="ph ph-shopping-cart"></i></div>
+                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-package"></i></div>
+                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-users"></i></div>
+                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-chart-bar"></i></div>
+                            </div>
+                            <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-gear"></i></div>
+                        </div>
+
+                        <!-- Mockup Content Area -->
+                        <div style="display: grid; grid-template-columns: 1fr 340px; overflow: hidden;">
+                            
+                            <!-- Products Grid -->
+                            <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow: hidden; border-right: 1px solid #1e293b;">
+                                <!-- Search -->
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="position: relative; flex: 1;">
+                                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                                        <div style="width: 100%; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 8px 12px 8px 36px; font-size: 0.75rem; color: #64748b;">Search coffee, drinks, snacks...</div>
+                                    </div>
+                                    <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 8px 12px; font-size: 0.75rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                                        All Categories <i class="ph ph-caret-down"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Cards -->
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; overflow: hidden;">
+                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
+                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(16, 185, 129, 0.1); color: #34d399; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.25);">15 In Stock</span>
+                                            ☕
+                                        </div>
+                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Espresso Single</div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$1.50</span>
+                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Coffee</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #0f766e; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
+                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(245, 158, 11, 0.1); color: #fbbf24; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(245, 158, 11, 0.25);">4 Low Stock</span>
+                                            🥤
+                                        </div>
+                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ice Latte Premium</div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$2.20</span>
+                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Coffee</span>
+                                        </div>
+                                        <span style="position: absolute; bottom: 8px; right: 8px; height: 16px; width: 16px; background: #0f766e; color: white; font-size: 9px; font-weight: 900; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</span>
+                                    </div>
+
+                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
+                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(16, 185, 129, 0.1); color: #34d399; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.25);">12 In Stock</span>
+                                            🥐
+                                        </div>
+                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Croissant Butter</div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$1.80</span>
+                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Bakery</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cart Info */}
+                            <div style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: rgba(15, 23, 42, 0.3);">
+                                <div style="display: flex; flex-direction: column; gap: 15px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-b: 1px solid #1e293b;">
+                                        <span style="font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 6px;"><i class="ph ph-shopping-bag text-emerald-500"></i> Active Cart</span>
+                                        <span style="background: #1e293b; padding: 1px 8px; border-radius: 99px; font-size: 9px; font-weight: 700;">1 Items</span>
+                                    </div>
+                                    
+                                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 10px;">
+                                        <div style="height: 32px; width: 32px; background: #020617; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem;">🥤</div>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <h6 style="font-size: 11px; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ice Latte Premium</h6>
+                                            <span style="font-size: 10px; color: #10b981; font-weight: 900; margin-top: 2px; display: block;">$2.20</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 6px; background: #020617; padding: 2px 6px; border-radius: 99px; border: 1px solid #1e293b; font-size: 9px; font-weight: 700;">
+                                            <span style="color: #64748b;">-</span>
+                                            <span>1</span>
+                                            <span style="color: #64748b;">+</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+                                        <div style="display: flex; justify-content: space-between; color: #64748b;">
+                                            <span>Subtotal</span>
+                                            <span>$2.20</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; color: #64748b;">
+                                            <span>Tax (0%)</span>
+                                            <span>$0.00</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-weight: 900; border-top: 1px dashed #1e293b; padding-top: 8px;">
+                                            <span>Total</span>
+                                            <span style="color: #34d399;">$2.20</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; gap: 8px;">
+                                        <button style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; display: flex; align-items: center; justify-content: center;"><i class="ph ph-trash"></i></button>
+                                        <button style="flex: 1; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #0f766e, #14b8a6); color: white; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; box-shadow: 0 4px 10px rgba(20, 184, 166, 0.2);">Checkout <i class="ph ph-arrow-right"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulated KHQR Overlay Preview -->
+                    <div style="position: absolute; inset: 0; background: rgba(2, 6, 23, 0.7); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 30;">
+                        <div style="width: 250px; background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px;" class="animate-pulse">
+                            <div style="display: flex; align-items: center; gap: 6px; justify-content: center; padding-bottom: 8px; border-bottom: 1px solid #1e293b;">
+                                <span style="background: #ef4444; color: white; height: 18px; width: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem;"><i class="ph-bold ph-qr-code"></i></span>
+                                <span style="font-size: 9px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.02em;">Scan to Pay (Bakong)</span>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 900; color: #34d399;">$2.20</div>
+                            <div style="background: white; padding: 8px; border-radius: 8px; display: inline-block; margin: 0 auto; border: 1px solid #1e293b;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=simulate_khqr_pay" alt="Mock QR" style="height: 100px; width: 100px; display: block;" />
+                            </div>
+                            <div style="font-size: 8px; font-weight: 800; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.15em; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <span style="height: 6px; width: 6px; border-radius: 50%; background: #f43f5e; display: inline-block;"></span> Awaiting Approval...
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
