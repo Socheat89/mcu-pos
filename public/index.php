@@ -64,7 +64,7 @@ $structuredData = [
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/landing.css?v=2.2">
     
     <!-- Favicon -->
     <link rel="icon" href="images/logo.png" type="image/png">
@@ -678,13 +678,13 @@ $structuredData = [
                         <div class="mock-sidebar">
                             <div class="mock-sidebar-top">
                                 <div class="mock-logo">MCU</div>
-                                <div class="mock-sidebar-item"><i class="ph ph-house"></i></div>
-                                <div class="mock-sidebar-item active"><i class="ph ph-shopping-cart"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph ph-package"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph ph-users"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph ph-chart-bar"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph-bold ph-house"></i></div>
+                                <div class="mock-sidebar-item active"><i class="ph-bold ph-shopping-cart"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph-bold ph-package"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph-bold ph-users"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph-bold ph-chart-bar"></i></div>
                             </div>
-                            <div class="mock-sidebar-item"><i class="ph ph-gear"></i></div>
+                            <div class="mock-sidebar-item"><i class="ph-bold ph-gear"></i></div>
                         </div>
 
                         <!-- Mockup Content Area -->
@@ -695,11 +695,11 @@ $structuredData = [
                                 <!-- Search -->
                                 <div class="mock-search-bar">
                                     <div class="mock-search-wrapper">
-                                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                                        <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
                                         <input type="text" class="mock-search-input" placeholder="Search coffee, drinks, snacks..." readonly>
                                     </div>
                                     <div class="mock-filter-btn">
-                                        All Categories <i class="ph ph-caret-down"></i>
+                                        All Categories <i class="ph-bold ph-caret-down"></i>
                                     </div>
                                 </div>
 
@@ -747,7 +747,7 @@ $structuredData = [
                             <!-- Cart Info -->
                             <div class="mock-cart">
                                 <div class="mock-cart-header">
-                                    <span class="mock-cart-title"><i class="ph ph-shopping-bag" style="color: #10b981;"></i> Active Cart</span>
+                                    <span class="mock-cart-title"><i class="ph-bold ph-shopping-bag" style="color: #10b981;"></i> Active Cart</span>
                                     <span class="mock-cart-count">1 Items</span>
                                 </div>
                                 
@@ -779,8 +779,8 @@ $structuredData = [
                                     </div>
 
                                     <div class="mock-checkout-btn-group">
-                                        <button class="mock-btn-trash" type="button"><i class="ph ph-trash"></i></button>
-                                        <button class="mock-btn-checkout" type="button">Checkout <i class="ph ph-arrow-right"></i></button>
+                                        <button class="mock-btn-trash" type="button"><i class="ph-bold ph-trash"></i></button>
+                                        <button class="mock-btn-checkout" type="button">Checkout <i class="ph-bold ph-arrow-right"></i></button>
                                     </div>
                                 </div>
                             </div>
