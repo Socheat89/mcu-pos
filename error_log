@@ -1,0 +1,20 @@
+[07-May-2026 11:05:54 Asia/Phnom_Penh] PHP Warning:  Undefined variable $urlPrefix in /home/mekocclj/public_html/modules/pos/views/holds.php on line 7
+[07-May-2026 11:06:49 Asia/Phnom_Penh] PHP Warning:  Undefined variable $urlPrefix in /home/mekocclj/public_html/modules/pos/views/customers.php on line 7
+[07-May-2026 11:07:04 Asia/Phnom_Penh] PHP Warning:  Undefined variable $urlPrefix in /home/mekocclj/public_html/modules/pos/views/reports.php on line 7
+[07-May-2026 11:07:04 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:07:04 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:07:04 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:07:04 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:07:15 Asia/Phnom_Penh] PHP Warning:  require_once(/home/mekocclj/public_html/modules/pos/views/settings/../../../core/helpers/url.php): Failed to open stream: No such file or directory in /home/mekocclj/public_html/modules/pos/views/settings/index.php on line 2
+[07-May-2026 11:13:19 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:13:19 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:13:19 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:13:19 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:13:23 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:13:23 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:13:23 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:13:23 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:14:51 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:14:51 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 124
+[07-May-2026 11:14:51 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
+[07-May-2026 11:14:51 Asia/Phnom_Penh] PHP Warning:  Undefined array key "lang" in /home/mekocclj/public_html/modules/pos/views/reports.php on line 166
