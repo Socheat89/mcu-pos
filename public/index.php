@@ -581,7 +581,7 @@ $structuredData = [
     <!-- Icons (Phosphor Icons for a premium look) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
+<body class="landing-page">
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -651,144 +651,136 @@ $structuredData = [
                     Start Free Trial <i class="ph-bold ph-arrow-right" style="margin-left: 8px;"></i>
                 </a>
             </div>
-            
-            <!-- Premium Dashboard Preview / Mockup -->
-            <div class="mockup-container relative mt-16 mx-auto max-w-5xl rounded-3xl border border-slate-200/40 bg-slate-900/5 p-3 shadow-2xl backdrop-blur-md">
-                <div class="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl"></div>
-                <div class="absolute -left-16 bottom-0 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl"></div>
-                
-                <div class="relative overflow-hidden rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl text-slate-200 aspect-[16/9] flex flex-col font-sans select-none" style="min-height: 480px;">
+               <!-- Premium Dashboard Preview / Mockup -->
+            <div class="mockup-container">
+                <div class="mock-dashboard">
                     
                     <!-- Mockup Header -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e293b; background: rgba(15, 23, 42, 0.6); padding: 10px 20px; font-size: 0.75rem;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="height: 10px; width: 10px; rounded: 50%; background: #ef4444; border-radius: 50%;"></span>
-                            <span style="height: 10px; width: 10px; rounded: 50%; background: #f59e0b; border-radius: 50%;"></span>
-                            <span style="height: 10px; width: 10px; rounded: 50%; background: #10b981; border-radius: 50%;"></span>
+                    <div class="mock-header">
+                        <div class="mock-header-left">
+                            <span class="mock-dot red"></span>
+                            <span class="mock-dot yellow"></span>
+                            <span class="mock-dot green"></span>
                             <span style="margin-left: 8px; font-family: monospace; color: #64748b;">Mekong POS Terminal v2.0</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 15px;">
-                            <span style="display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px; bg: rgba(16, 185, 129, 0.1); padding: 2px 10px; font-weight: 700; color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.1);">
-                                <span style="height: 6px; width: 6px; border-radius: 50%; background: #34d399; display: inline-block;"></span> Active Terminal 01
+                            <span class="mock-badge-active">
+                                <span class="mock-badge-dot"></span> Active Terminal 01
                             </span>
                             <span style="color: #94a3b8; font-family: monospace;">16:15:30</span>
                         </div>
                     </div>
 
                     <!-- Mockup Main Body -->
-                    <div style="display: grid; grid-template-columns: 70px 1fr; flex: 1; overflow: hidden; background: #020617;">
+                    <div class="mock-body">
                         
-                        {/* Mockup Sidebar */}
-                        <div style="border-right: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0;">
-                            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
-                                <div style="height: 36px; width: 36px; border-radius: 10px; background: linear-gradient(135deg, #0f766e, #14b8a6); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(15, 118, 110, 0.3);">MCU</div>
-                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-house"></i></div>
-                                <div style="height: 32px; width: 32px; border-radius: 8px; background: #0f766e; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4);"><i class="ph ph-shopping-cart"></i></div>
-                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-package"></i></div>
-                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-users"></i></div>
-                                <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-chart-bar"></i></div>
+                        <!-- Mockup Sidebar -->
+                        <div class="mock-sidebar">
+                            <div class="mock-sidebar-top">
+                                <div class="mock-logo">MCU</div>
+                                <div class="mock-sidebar-item"><i class="ph ph-house"></i></div>
+                                <div class="mock-sidebar-item active"><i class="ph ph-shopping-cart"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph ph-package"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph ph-users"></i></div>
+                                <div class="mock-sidebar-item"><i class="ph ph-chart-bar"></i></div>
                             </div>
-                            <div style="height: 32px; width: 32px; border-radius: 8px; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph ph-gear"></i></div>
+                            <div class="mock-sidebar-item"><i class="ph ph-gear"></i></div>
                         </div>
 
                         <!-- Mockup Content Area -->
-                        <div style="display: grid; grid-template-columns: 1fr 340px; overflow: hidden;">
+                        <div class="mock-main-content">
                             
                             <!-- Products Grid -->
-                            <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow: hidden; border-right: 1px solid #1e293b;">
+                            <div class="mock-products-grid">
                                 <!-- Search -->
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <div style="position: relative; flex: 1;">
+                                <div class="mock-search-bar">
+                                    <div class="mock-search-wrapper">
                                         <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                                        <div style="width: 100%; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 8px 12px 8px 36px; font-size: 0.75rem; color: #64748b;">Search coffee, drinks, snacks...</div>
+                                        <input type="text" class="mock-search-input" placeholder="Search coffee, drinks, snacks..." readonly>
                                     </div>
-                                    <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 8px 12px; font-size: 0.75rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                                    <div class="mock-filter-btn">
                                         All Categories <i class="ph ph-caret-down"></i>
                                     </div>
                                 </div>
 
                                 <!-- Cards -->
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; overflow: hidden;">
-                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
-                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
-                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(16, 185, 129, 0.1); color: #34d399; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.25);">15 In Stock</span>
+                                <div class="mock-grid">
+                                    <div class="mock-card mock-product-card">
+                                        <div class="mock-card-img">
+                                            <span class="mock-card-badge">15 In Stock</span>
                                             ☕
                                         </div>
-                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Espresso Single</div>
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$1.50</span>
-                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Coffee</span>
+                                        <div class="mock-card-title">Espresso Single</div>
+                                        <div class="mock-card-footer">
+                                            <span class="mock-card-price">$1.50</span>
+                                            <span class="mock-card-category">Coffee</span>
                                         </div>
                                     </div>
 
-                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #0f766e; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
-                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
-                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(245, 158, 11, 0.1); color: #fbbf24; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(245, 158, 11, 0.25);">4 Low Stock</span>
+                                    <div class="mock-card selected mock-product-card">
+                                        <div class="mock-card-img">
+                                            <span class="mock-card-badge low">4 Low Stock</span>
                                             🥤
                                         </div>
-                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ice Latte Premium</div>
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$2.20</span>
-                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Coffee</span>
+                                        <div class="mock-card-title">Ice Latte Premium</div>
+                                        <div class="mock-card-footer">
+                                            <span class="mock-card-price">$2.20</span>
+                                            <span class="mock-card-category">Coffee</span>
                                         </div>
-                                        <span style="position: absolute; bottom: 8px; right: 8px; height: 16px; width: 16px; background: #0f766e; color: white; font-size: 9px; font-weight: 900; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</span>
+                                        <span class="mock-selected-count">1</span>
                                     </div>
 
-                                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
-                                        <div style="aspect-ratio: 1; border-radius: 8px; background: #020617; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 8px; position: relative;">
-                                            <span style="position: absolute; right: 6px; top: 6px; background: rgba(16, 185, 129, 0.1); color: #34d399; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.25);">12 In Stock</span>
+                                    <div class="mock-card mock-product-card">
+                                        <div class="mock-card-img">
+                                            <span class="mock-card-badge">12 In Stock</span>
                                             🥐
                                         </div>
-                                        <div style="font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Croissant Butter</div>
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                                            <span style="font-size: 0.8rem; font-weight: 900; color: #10b981;">$1.80</span>
-                                            <span style="font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Bakery</span>
+                                        <div class="mock-card-title">Croissant Butter</div>
+                                        <div class="mock-card-footer">
+                                            <span class="mock-card-price">$1.80</span>
+                                            <span class="mock-card-category">Bakery</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Cart Info */}
-                            <div style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: rgba(15, 23, 42, 0.3);">
-                                <div style="display: flex; flex-direction: column; gap: 15px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-b: 1px solid #1e293b;">
-                                        <span style="font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 6px;"><i class="ph ph-shopping-bag text-emerald-500"></i> Active Cart</span>
-                                        <span style="background: #1e293b; padding: 1px 8px; border-radius: 99px; font-size: 9px; font-weight: 700;">1 Items</span>
+                            <!-- Cart Info -->
+                            <div class="mock-cart">
+                                <div class="mock-cart-header">
+                                    <span class="mock-cart-title"><i class="ph ph-shopping-bag" style="color: #10b981;"></i> Active Cart</span>
+                                    <span class="mock-cart-count">1 Items</span>
+                                </div>
+                                
+                                <div class="mock-cart-item">
+                                    <div class="mock-cart-item-thumb">🥤</div>
+                                    <div class="mock-cart-item-info">
+                                        <h6 class="mock-cart-item-name">Ice Latte Premium</h6>
+                                        <span class="mock-cart-item-price">$2.20</span>
                                     </div>
-                                    
-                                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 10px;">
-                                        <div style="height: 32px; width: 32px; background: #020617; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem;">🥤</div>
-                                        <div style="flex: 1; min-width: 0;">
-                                            <h6 style="font-size: 11px; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ice Latte Premium</h6>
-                                            <span style="font-size: 10px; color: #10b981; font-weight: 900; margin-top: 2px; display: block;">$2.20</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 6px; background: #020617; padding: 2px 6px; border-radius: 99px; border: 1px solid #1e293b; font-size: 9px; font-weight: 700;">
-                                            <span style="color: #64748b;">-</span>
-                                            <span>1</span>
-                                            <span style="color: #64748b;">+</span>
-                                        </div>
+                                    <div class="mock-qty-selector">
+                                        <span style="color: #64748b; cursor: pointer;">-</span>
+                                        <span>1</span>
+                                        <span style="color: #64748b; cursor: pointer;">+</span>
                                     </div>
                                 </div>
 
-                                <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #1e293b; padding-top: 15px;">
-                                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
-                                        <div style="display: flex; justify-content: space-between; color: #64748b;">
-                                            <span>Subtotal</span>
-                                            <span>$2.20</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; color: #64748b;">
-                                            <span>Tax (0%)</span>
-                                            <span>$0.00</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; font-weight: 900; border-top: 1px dashed #1e293b; padding-top: 8px;">
-                                            <span>Total</span>
-                                            <span style="color: #34d399;">$2.20</span>
-                                        </div>
+                                <div class="mock-cart-summary">
+                                    <div class="mock-summary-line">
+                                        <span>Subtotal</span>
+                                        <span>$2.20</span>
+                                    </div>
+                                    <div class="mock-summary-line">
+                                        <span>Tax (0%)</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                    <div class="mock-summary-line total">
+                                        <span>Total</span>
+                                        <span style="color: #34d399;">$2.20</span>
                                     </div>
 
-                                    <div style="display: flex; gap: 8px;">
-                                        <button style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; display: flex; align-items: center; justify-content: center;"><i class="ph ph-trash"></i></button>
-                                        <button style="flex: 1; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #0f766e, #14b8a6); color: white; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; box-shadow: 0 4px 10px rgba(20, 184, 166, 0.2);">Checkout <i class="ph ph-arrow-right"></i></button>
+                                    <div class="mock-checkout-btn-group">
+                                        <button class="mock-btn-trash" type="button"><i class="ph ph-trash"></i></button>
+                                        <button class="mock-btn-checkout" type="button">Checkout <i class="ph ph-arrow-right"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -796,25 +788,24 @@ $structuredData = [
                     </div>
 
                     <!-- Simulated KHQR Overlay Preview -->
-                    <div style="position: absolute; inset: 0; background: rgba(2, 6, 23, 0.7); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 30;">
-                        <div style="width: 250px; background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px;" class="animate-pulse">
-                            <div style="display: flex; align-items: center; gap: 6px; justify-content: center; padding-bottom: 8px; border-bottom: 1px solid #1e293b;">
-                                <span style="background: #ef4444; color: white; height: 18px; width: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem;"><i class="ph-bold ph-qr-code"></i></span>
-                                <span style="font-size: 9px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.02em;">Scan to Pay (Bakong)</span>
+                    <div class="mock-khqr-overlay">
+                        <div class="mock-khqr-card animate-pulse">
+                            <div class="mock-khqr-header">
+                                <span class="mock-khqr-badge"><i class="ph-bold ph-qr-code"></i></span>
+                                <span class="mock-khqr-title">Scan to Pay (Bakong)</span>
                             </div>
-                            <div style="font-size: 14px; font-weight: 900; color: #34d399;">$2.20</div>
-                            <div style="background: white; padding: 8px; border-radius: 8px; display: inline-block; margin: 0 auto; border: 1px solid #1e293b;">
+                            <div class="mock-khqr-amount">$2.20</div>
+                            <div class="mock-khqr-qr">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=simulate_khqr_pay" alt="Mock QR" style="height: 100px; width: 100px; display: block;" />
                             </div>
-                            <div style="font-size: 8px; font-weight: 800; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.15em; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                            <div class="mock-khqr-status">
                                 <span style="height: 6px; width: 6px; border-radius: 50%; background: #f43f5e; display: inline-block;"></span> Awaiting Approval...
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
+            </div>
     </section>
 
     <!-- About Me Section -->
@@ -887,7 +878,7 @@ $structuredData = [
     </section>
 
     <!-- Cloud POS Pricing Section -->
-    <section class="pricing-section" id="pricing" style="padding: 80px 0; background: #fff;">
+    <section class="pricing-section" id="pricing">
         <div class="container">
             <div class="section-header">
                 <div class="hero-pill" style="margin-bottom: 1rem;">Cloud POS Plans</div>
@@ -895,15 +886,15 @@ $structuredData = [
                 <p>Choose the right plan for your business needs.</p>
             </div>
             
-            <div class="systems-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            <div class="systems-grid">
                 <?php
                 try {
                 $db = Database::getInstance();
                 $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
                 if (empty($plans)) {
-                    echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: #fff5f5; border-radius: 1rem; border: 1px dashed #feb2b2; color: #c53030;">
-                            <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                            No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700;">Admin Panel</a>.
+                    echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 1rem; border: 1px dashed rgba(99, 102, 241, 0.3); color: #cbd5e1;">
+                            <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--accent);"></i>
+                            No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700; color: var(--primary);">Admin Panel</a>.
                           </div>';
                 } else {
                 foreach ($plans as $index => $plan):
@@ -913,47 +904,50 @@ $structuredData = [
                     // Fetch linked modules for this plan
                     $modules = $db->fetchAll("SELECT module_name FROM system_modules WHERE system_id = ?", [$plan['id']]);
                 ?>
-                <div class="system-card" style="border-top: 4px solid <?php echo $isPopular ? 'var(--primary)' : 'var(--border-color)'; ?>; <?php echo $isPopular ? 'transform: scale(1.05); box-shadow: var(--shadow-xl); z-index: 1;' : ''; ?>">
+                <div class="system-card <?php echo $isPopular ? 'popular-card border-pulse' : ''; ?>" <?php echo $isPopular ? 'style="transform: scale(1.03); z-index: 1;"' : ''; ?>>
                     <?php if ($isPopular): ?>
-                    <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-bottom-left-radius: 0.5rem;">POPULAR</div>
+                    <div style="position: absolute; top: 0; right: 0; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 0.35rem 1rem; font-size: 0.75rem; font-weight: 700; border-bottom-left-radius: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">POPULAR</div>
                     <?php endif; ?>
                     
-                    <h3 class="system-title" style="margin-bottom: 0.5rem;"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                    <p class="system-desc" style="margin-bottom: 1rem; min-height: auto;"><?php echo htmlspecialchars($plan['description']); ?></p>
+                    <h3 class="system-title" style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 800;"><?php echo htmlspecialchars($plan['name']); ?></h3>
+                    <p class="system-desc" style="margin-bottom: 1.5rem; min-height: 50px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;"><?php echo htmlspecialchars($plan['description']); ?></p>
                     
-                    <div class="price-tag" style="margin-bottom: 2rem;">
-                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
-                        <span class="price-period">/month</span>
+                    <div class="price-tag" style="margin-bottom: 2rem; display: flex; align-items: baseline; gap: 4px;">
+                        <span class="price-amount" style="font-size: 2.25rem; font-weight: 800; color: #f8fafc;">$<?php echo number_format($plan['price'], 2); ?></span>
+                        <span class="price-period" style="color: var(--text-muted); font-size: 0.9rem;">/month</span>
                     </div>
                     
-                    <ul style="list-style: none; padding: 0; margin-bottom: 2rem; color: var(--text-muted); text-align: left;">
+                    <ul style="list-style: none; padding: 0; margin: 0 0 2rem 0; color: var(--text-muted); text-align: left; display: flex; flex-direction: column; gap: 0.75rem;">
                         <?php if (empty($modules)): ?>
-                            <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="ph-bold ph-info" style="color: var(--secondary);"></i> Basic Platform Access
+                            <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                <i class="ph-bold ph-info" style="color: var(--secondary); font-size: 1.1rem;"></i> Basic Platform Access
                             </li>
                         <?php else: ?>
                             <?php foreach ($modules as $mod): ?>
-                            <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="ph-bold ph-check" style="color: var(--primary);"></i> 
-                                <span style="text-transform: uppercase; font-weight: 500; font-size: 0.85rem;"><?php echo htmlspecialchars($mod['module_name']); ?></span> Module Included
+                            <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
+                                <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> 
+                                <span style="text-transform: uppercase; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.03em;"><?php echo htmlspecialchars($mod['module_name']); ?></span> Module
                             </li>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                        <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="ph-bold ph-check" style="color: var(--primary);"></i> Cloud Storage
+                        <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
+                            <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> Cloud Storage
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
+                            <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> 24/7 Priority Support
                         </li>
                     </ul>
                     
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?>" style="width: 100%; text-align: center; text-decoration: none; display: block;">
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?>" style="width: 100%; text-align: center; text-decoration: none; display: block; padding: 0.75rem 1.5rem; font-weight: 700;">
                         Choose <?php echo htmlspecialchars($plan['name']); ?>
                     </a>
                 </div>
                 <?php endforeach; ?>
                 <?php } 
                 } catch (Exception $e) {
-                    echo '<div style="grid-column: 1/-1; color: red; padding: 1rem; border: 1px solid red; border-radius: 0.5rem; background: #fff1f2;">
+                    echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
                             <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
-                          </div>';
+                           </div>';
                 }
                 ?>
             </div>
