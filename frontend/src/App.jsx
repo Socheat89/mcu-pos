@@ -11,7 +11,6 @@ import {
   X,
   ChevronDown,
   Check,
-  RotateCcw,
   Plus,
   Minus,
   Info,
@@ -24,7 +23,11 @@ import {
   AlertTriangle,
   Moon,
   Sun,
-  LayoutGrid
+  LayoutGrid,
+  CheckCircle2,
+  Activity,
+  Layers,
+  ArrowUpRight
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -33,10 +36,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
   AreaChart,
   Area
 } from 'recharts';
@@ -186,6 +185,15 @@ export default function App() {
 
   // Form submit ref
   const formRef = useRef(null);
+
+  // Sync Tailwind class on html root element
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   // Sync Clock
   useEffect(() => {
@@ -340,13 +348,11 @@ export default function App() {
     } else if (paymentMethod === 'card') {
       startCardSimulation();
     } else if (paymentMethod === 'khqr') {
-      // Simulate checking payments
       submitCheckout();
     }
   };
 
   const submitCheckout = () => {
-    // Blast confetti!
     confetti({
       particleCount: 150,
       spread: 80,
@@ -355,7 +361,6 @@ export default function App() {
 
     showToast('success', 'Transaction Successful', 'Processing transaction and loading receipt...');
     
-    // Brief delay for visuals, then submit the underlying HTML form to PHP backend
     setTimeout(() => {
       if (formRef.current) {
         formRef.current.submit();
@@ -392,7 +397,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
+    <div className={`min-h-screen font-sans transition-colors duration-350 ${darkMode ? 'bg-brand-bgDark text-slate-100' : 'bg-brand-bgLight text-slate-800'}`}>
       
       {/* Hidden legacy checkout form for PHP submission */}
       <form ref={formRef} id="checkoutForm" method="POST" action={`${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/orders/create`} style={{ display: 'none' }}>
@@ -411,8 +416,8 @@ export default function App() {
 
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed right-6 top-6 z-50 animate-bounce flex items-center gap-3 rounded-2xl border border-white/20 bg-emerald-600 p-4 text-white shadow-2xl backdrop-blur-md">
-          <Sparkles className="h-6 w-6" />
+        <div className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-2xl border border-white/20 bg-gradient-to-r from-blue-600 to-brand-secondary p-4 text-white shadow-2xl backdrop-blur-xl animate-fade-in">
+          <Sparkles className="h-5 w-5 text-amber-300 animate-pulse" />
           <div>
             <div className="font-extrabold text-sm">{toast.title}</div>
             <div className="text-xs opacity-90">{toast.message}</div>
@@ -420,37 +425,46 @@ export default function App() {
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+      {/* Viewport content container */}
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-6 space-y-6">
         
-        {/* Modern Glassmorphic Header */}
-        <header className="relative mb-6 overflow-hidden rounded-[32px] border border-white/20 bg-gradient-to-r from-teal-700/80 via-emerald-600/80 to-amber-500/80 p-6 text-white shadow-xl backdrop-blur">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-300/30 blur-3xl"></div>
-          <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-emerald-400/30 blur-3xl"></div>
+        {/* Apple-level Minimalist Glass Header */}
+        <header className="relative overflow-hidden rounded-[24px] border border-slate-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-6 text-slate-850 dark:text-white shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl transition-all duration-300">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 dark:bg-blue-500/5 blur-3xl"></div>
+          <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-3xl"></div>
           
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-[0.3em] opacity-80">{settings.store_label}</div>
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">Mekong POS Terminal</h1>
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+                <Layers className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">{settings.store_label}</div>
+                <h1 className="text-xl md:text-2xl font-black tracking-tight mt-0.5 bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">Mekong POS Terminal</h1>
+              </div>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
               <button 
                 onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)} 
-                className="flex items-center gap-2 rounded-2xl bg-white/20 hover:bg-white/30 px-4 py-2.5 text-sm font-bold shadow transition backdrop-blur-md"
+                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold shadow-sm transition-all duration-300 active:scale-95 border border-slate-200/60 dark:border-white/10 ${
+                  analyticsViewOpen 
+                    ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-transparent' 
+                    : 'bg-white/80 dark:bg-slate-850/80 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
               >
                 <BarChart2 className="h-4 w-4" />
-                <span>{analyticsViewOpen ? 'Cashier Mode' : 'Analytics & Charts'}</span>
+                <span>{analyticsViewOpen ? 'លក់ទំនិញ Cashier Mode' : 'របាយការណ៍ Analytics'}</span>
               </button>
 
               <button 
                 onClick={() => setPendingOrdersOpen(true)} 
-                className="relative flex items-center gap-2 rounded-2xl bg-white/20 hover:bg-white/30 px-4 py-2.5 text-sm font-bold shadow transition backdrop-blur-md"
+                className="relative flex items-center gap-2 rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-850/80 hover:bg-slate-50 dark:hover:bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all duration-300 active:scale-95"
               >
-                <Clock className="h-4 w-4" />
-                <span>Holds</span>
+                <Clock className="h-4 w-4 text-brand-secondary" />
+                <span>បញ្ជាទិញរង់ចាំ Holds</span>
                 {pendingOrders.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white rounded-full text-[10px] font-bold px-2 py-0.5 animate-pulse">
+                  <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[10px] font-bold px-2 py-0.5 animate-pulse">
                     {pendingOrders.length}
                   </span>
                 )}
@@ -458,86 +472,122 @@ export default function App() {
 
               <button 
                 onClick={() => setDarkMode(!darkMode)} 
-                className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 hover:bg-white/30 transition shadow backdrop-blur-md"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-850/80 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm active:scale-95"
               >
-                {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {darkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-500" />}
               </button>
 
-              <div className="flex items-center gap-2 rounded-2xl bg-slate-900/40 px-4 py-2.5 text-sm font-semibold tracking-wider font-mono">
-                <Clock className="h-4 w-4 text-amber-300" />
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 dark:border-white/10 bg-slate-900/5 dark:bg-slate-900/40 px-4 py-2.5 text-xs font-bold tracking-wider font-mono">
+                <Clock className="h-4 w-4 text-brand-primary" />
                 <span>{timeStr}</span>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Dashboard Metric Summary Row */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-3xl border shadow-sm transition ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200'}`}>
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Total Products</div>
-            <div className="mt-1 text-2xl font-black">{products.length}</div>
-            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><LayoutGrid className="h-3 w-3" /> Catalog item count</div>
+        {/* Dashboard Metric summary widgets */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Catalog Size</div>
+            <div className="mt-2 text-2xl font-black tracking-tight">{products.length} Products</div>
+            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><LayoutGrid className="h-3.5 w-3.5" /> Total menu categories</div>
           </div>
-          <div className={`p-4 rounded-3xl border shadow-sm transition ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200'}`}>
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Cart Total</div>
-            <div className="mt-1 text-2xl font-black text-emerald-600">${getSubtotal().toFixed(2)}</div>
-            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><ShoppingBag className="h-3 w-3" /> {cart.length} active items</div>
+          
+          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Subtotal Active</div>
+            <div className="mt-2 text-2xl font-black text-brand-primary tracking-tight">${getSubtotal().toFixed(2)}</div>
+            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><ShoppingBag className="h-3.5 w-3.5" /> {cart.length} item lines</div>
           </div>
-          <div className={`p-4 rounded-3xl border shadow-sm transition ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200'}`}>
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Low Stock</div>
-            <div className={`mt-1 text-2xl font-black ${getLowStockCount() > 0 ? 'text-rose-500' : ''}`}>{getLowStockCount()}</div>
-            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Restock required</div>
+          
+          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Inventory Status</div>
+            <div className={`mt-2 text-2xl font-black tracking-tight ${getLowStockCount() > 0 ? 'text-brand-danger' : 'text-brand-success'}`}>
+              {getLowStockCount()} Low Stock
+            </div>
+            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> Items requiring restock</div>
           </div>
-          <div className={`p-4 rounded-3xl border shadow-sm transition ${darkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white border-slate-200'}`}>
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Register Station</div>
-            <div className="mt-1 text-lg font-extrabold text-teal-600">Online</div>
-            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1"><SettingsIcon className="h-3 w-3" /> Terminal #01</div>
+          
+          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Terminal Node</div>
+            <div className="mt-2 text-2xl font-black text-brand-success tracking-tight flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-brand-success inline-block animate-ping"></span>
+              <span>PP-01 Online</span>
+            </div>
+            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><Activity className="h-3.5 w-3.5" /> Active workspace</div>
           </div>
         </section>
 
-        {/* Dynamic Views: Cashier Mode vs Analytics Mode */}
+        {/* Dynamic content rendering */}
         {analyticsViewOpen ? (
-          /* --- Analytics View --- */
-          <div className={`p-6 rounded-[32px] border shadow-lg transition animate-fade-in ${darkMode ? 'bg-slate-800/90 border-slate-700' : 'bg-white border-slate-200'}`}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-extrabold flex items-center gap-2">
-                <TrendingUp className="h-6 w-6 text-emerald-500" />
-                <span>Sales Reports & Stock Analytics</span>
-              </h2>
+          /* --- Redesigned Premium Analytics Dashboard --- */
+          <div className="p-6 rounded-3xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl animate-fade-in space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-6 w-6 text-brand-primary" />
+                <h2 className="text-lg font-black tracking-tight">របាយការណ៍លក់ និងស្តុក (Analytics Overview)</h2>
+              </div>
               <button 
                 onClick={() => setAnalyticsViewOpen(false)} 
-                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600"
+                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
               >
-                Close Analytics
+                Close Report
               </button>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Category Sales Chart */}
-              <div className="p-4 rounded-2xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
-                <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-[0.1em]">Sales by Category (USD)</h3>
-                <div className="h-72">
+            <div className="grid md:grid-cols-3 gap-6">
+              
+              {/* Category Sales Chart (2 cols) */}
+              <div className="md:col-span-2 p-5 rounded-2xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30">
+                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-[0.1em]">Sales by Category (USD)</h3>
+                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={getCategorySalesData()}>
-                      <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                      <Tooltip />
-                      <Bar dataKey="sales" fill="#0f766e" radius={[8, 8, 0, 0]} />
+                      <XAxis dataKey="name" stroke="#888888" fontSize={11} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#888888" fontSize={11} tickLine={false} axisLine={false} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          background: 'rgba(15, 23, 42, 0.9)', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          borderRadius: '12px',
+                          color: '#fff' 
+                        }} 
+                      />
+                      <Bar dataKey="sales" fill="url(#bluePurpleGrad)" radius={[6, 6, 0, 0]}>
+                        {/* Define linear gradient inside Recharts svg */}
+                        <defs>
+                          <linearGradient id="bluePurpleGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#2563EB" />
+                            <stop offset="100%" stopColor="#7C3AED" />
+                          </linearGradient>
+                        </defs>
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              {/* Stock Inventory levels */}
-              <div className="p-4 rounded-2xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
-                <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-[0.1em]">Current Stock Quantities</h3>
-                <div className="h-72">
+              {/* Stock Inventory levels (1 col) */}
+              <div className="p-5 rounded-2xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30">
+                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-[0.1em]">Current Stock Quantities</h3>
+                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={getStockLevelsData()}>
-                      <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} />
-                      <YAxis stroke="#888888" fontSize={12} tickLine={false} />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="stock" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} />
+                      <defs>
+                        <linearGradient id="yellowGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.4} />
+                          <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="name" stroke="#888888" fontSize={9} tickLine={false} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          background: 'rgba(15, 23, 42, 0.9)', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          borderRadius: '12px',
+                          color: '#fff' 
+                        }} 
+                      />
+                      <Area type="monotone" dataKey="stock" stroke="#F59E0B" fill="url(#yellowGrad)" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -545,112 +595,116 @@ export default function App() {
             </div>
           </div>
         ) : (
-          /* --- Cashier POS Terminal --- */
+          /* --- Cashier POS Terminal Redesigned --- */
           <div className="grid md:grid-cols-12 gap-6 items-start">
             
-            {/* Products catalog section (7 cols) */}
+            {/* Products grid section */}
             <main className="md:col-span-8 space-y-6">
               
               {/* Filter controls */}
               <div className="flex flex-wrap items-center gap-3">
                 
-                {/* Search */}
+                {/* Search Menu Input */}
                 <div className="relative flex-1 min-w-[240px]">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-600" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-primary" />
                   <input 
                     type="text" 
-                    placeholder="Search product SKU, name or barcode..." 
+                    placeholder="ស្វែងរកទំនិញ Search barcode, SKU, or item name..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleQuickAdd}
-                    className={`w-full py-3 pl-12 pr-4 text-sm font-semibold rounded-2xl border shadow-sm outline-none transition focus:ring-4 ${
+                    className={`w-full py-3.5 pl-11 pr-4 text-sm font-semibold rounded-2xl border outline-none shadow-sm transition-all duration-300 focus:ring-4 ${
                       darkMode 
-                        ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500 focus:ring-emerald-950' 
-                        : 'bg-white border-slate-200 focus:border-emerald-500 focus:ring-emerald-100'
+                        ? 'bg-slate-900 border-slate-800 text-white focus:border-brand-primary focus:ring-blue-950/30' 
+                        : 'bg-white border-slate-200 focus:border-brand-primary focus:ring-blue-100/50'
                     }`}
                   />
                 </div>
 
-                {/* Category Selection Dropdown */}
-                <div className="relative min-w-[160px]">
-                  <select 
-                    value={selectedCategory} 
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className={`w-full appearance-none py-3 pl-4 pr-10 text-sm font-semibold rounded-2xl border shadow-sm outline-none transition ${
-                      darkMode 
-                        ? 'bg-slate-800 border-slate-700 text-white' 
-                        : 'bg-white border-slate-200'
-                    }`}
-                  >
-                    {getCategories().map(cat => (
-                      <option key={cat} value={cat === 'All' ? '' : cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                {/* Category Pills Scroller */}
+                <div className="flex items-center gap-2 overflow-x-auto py-1 pr-2 no-scrollbar">
+                  {getCategories().map(cat => {
+                    const isSelected = selectedCategory === cat || (cat === 'All' && selectedCategory === '');
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
+                        className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border transition-all duration-300 ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-transparent shadow-md'
+                            : 'bg-white dark:bg-slate-900 border-slate-200/50 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Products grid */}
+              {/* Products list grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {getFilteredProducts().length === 0 ? (
-                  <div className="col-span-full py-16 text-center rounded-[32px] border border-dashed border-slate-300">
-                    <LayoutGrid className="mx-auto h-12 w-12 text-slate-300 mb-3" />
-                    <p className="text-sm font-bold text-slate-400">No products found matching those parameters.</p>
+                  <div className="col-span-full py-20 text-center rounded-2xl border border-dashed border-slate-200/80 dark:border-slate-800">
+                    <LayoutGrid className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700 mb-3" />
+                    <p className="text-sm font-bold text-slate-400">រកមិនឃើញទំនិញទេ (No items matched filter)</p>
                   </div>
                 ) : (
                   getFilteredProducts().map(prod => {
                     const isOutOfStock = prod.stock <= 0;
                     const isLowStock = prod.stock > 0 && prod.stock <= 5;
-                    const stockText = isOutOfStock ? 'Out of Stock' : `${prod.stock} in stock`;
+                    const stockText = isOutOfStock ? 'អស់ស្តុក (Out of Stock)' : `${prod.stock} items`;
                     const hasInCart = cart.find(item => item.product.id === prod.id);
 
                     return (
                       <div 
                         key={prod.id}
                         onClick={() => addToCart(prod)}
-                        className={`group relative flex flex-col overflow-hidden rounded-2xl border shadow-sm transition hover:-translate-y-1 hover:shadow-xl cursor-pointer ${
-                          darkMode ? 'bg-slate-800 border-slate-700/80' : 'bg-white border-slate-200'
-                        } ${isOutOfStock ? 'opacity-55 cursor-not-allowed' : ''}`}
+                        className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 bg-white dark:bg-slate-900/60 border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark hover:translate-y-[-4px] hover:border-brand-primary/40 ${
+                          isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        }`}
                       >
-                        {/* Stock status badge */}
+                        {/* Status Stock Badge */}
                         <span className={`absolute right-3 top-3 z-10 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border ${
                           isOutOfStock 
-                            ? 'bg-rose-50 text-rose-600 border-rose-200' 
+                            ? 'bg-rose-500/10 text-brand-danger border-brand-danger/20' 
                             : isLowStock 
-                              ? 'bg-amber-50 text-amber-600 border-amber-200'
-                              : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                              ? 'bg-brand-warning/10 text-brand-warning border-brand-warning/20'
+                              : 'bg-brand-success/10 text-brand-success border-brand-success/20'
                         }`}>
                           {stockText}
                         </span>
 
-                        {/* Image area */}
-                        <div className={`aspect-square w-full relative flex items-center justify-center overflow-hidden bg-slate-100 ring-1 ring-inset ${
-                          darkMode ? 'bg-slate-900/50 ring-slate-800' : 'bg-slate-50 ring-slate-150'
+                        {/* Thumb Container */}
+                        <div className={`aspect-square w-full relative flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950/40 ring-1 ring-inset ${
+                          darkMode ? 'ring-white/5' : 'ring-slate-100'
                         }`}>
                           {prod.image ? (
                             <img 
                               src={prod.image} 
                               alt={prod.name} 
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                              className="h-full w-full object-cover transition-transform duration-350 group-hover:scale-105" 
                             />
                           ) : (
-                            <LayoutGrid className="h-10 w-10 text-slate-300 dark:text-slate-700" />
+                            <LayoutGrid className="h-10 w-10 text-slate-200 dark:text-slate-800" />
                           )}
+                          
+                          {/* Selection indicator overlay */}
                           {hasInCart && (
-                            <div className="absolute inset-0 bg-emerald-600/20 backdrop-blur-xs flex items-center justify-center">
-                              <span className="bg-emerald-600 text-white rounded-full font-bold px-3 py-1 text-xs shadow-md">
-                                {hasInCart.quantity} Selected
+                            <div className="absolute inset-0 bg-brand-primary/10 backdrop-blur-xs flex items-center justify-center">
+                              <span className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full font-extrabold px-3 py-1 text-xs shadow-md">
+                                {hasInCart.quantity}
                               </span>
                             </div>
                           )}
                         </div>
 
-                        {/* Text details */}
-                        <div className="p-3 flex-1 flex flex-col justify-between">
-                          <h4 className="font-semibold text-sm leading-snug truncate">{prod.name}</h4>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-base font-black text-emerald-600">${prod.price.toFixed(2)}</span>
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 truncate">
+                        {/* Card Info Details */}
+                        <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
+                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate leading-snug">{prod.name}</h4>
+                          <div className="flex items-center justify-between pt-1">
+                            <span className="text-base font-black text-brand-success">${prod.price.toFixed(2)}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 max-w-[80px] truncate">
                               {prod.sku || prod.category}
                             </span>
                           </div>
@@ -662,39 +716,34 @@ export default function App() {
               </div>
             </main>
 
-            {/* Shopping Cart checkout sidebar (4 cols) */}
-            <aside className={`md:col-span-4 p-5 rounded-3xl border shadow-xl sticky top-6 transition ${
-              darkMode ? 'bg-slate-800/90 border-slate-700' : 'bg-white border-slate-200'
-            }`}>
+            {/* Shopping Cart Drawer panel */}
+            <aside className="md:col-span-4 p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl sticky top-6 space-y-4">
               
-              {/* Sidebar Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="h-5 w-5 text-emerald-600" />
-                  <h3 className="font-extrabold text-base">Billing Cart</h3>
+                  <ShoppingBag className="h-5 w-5 text-brand-primary" />
+                  <h3 className="font-black text-sm">កន្ត្រកទំនិញ Active Cart</h3>
                 </div>
-                <span className="text-xs font-bold bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full">
+                <span className="text-[10px] font-black bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full text-slate-600 dark:text-slate-300">
                   {cart.reduce((sum, item) => sum + item.quantity, 0)} Items
                 </span>
               </div>
 
-              {/* Items scroll area */}
-              <div className="mt-4 space-y-3 min-h-[220px] max-h-[360px] overflow-y-auto pr-1">
+              {/* Items scroll list */}
+              <div className="space-y-3 min-h-[220px] max-h-[360px] overflow-y-auto pr-1">
                 {cart.length === 0 ? (
-                  <div className="h-[220px] flex flex-col items-center justify-center text-center">
-                    <ShoppingBag className="h-10 w-10 text-slate-300 dark:text-slate-700 mb-2" />
-                    <p className="text-xs font-bold text-slate-400">Your cart is empty.</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Select items to begin a sale.</p>
+                  <div className="h-[220px] flex flex-col items-center justify-center text-center space-y-1">
+                    <ShoppingBag className="h-8 w-8 text-slate-300 dark:text-slate-800" />
+                    <p className="text-xs font-bold text-slate-400">ទទេស្អាត (Cart is empty)</p>
+                    <p className="text-[10px] text-slate-400">Select items to begin checkout</p>
                   </div>
                 ) : (
                   cart.map(item => (
                     <div 
                       key={item.product.id}
-                      className={`flex items-center gap-3 p-2.5 rounded-xl border ${
-                        darkMode ? 'bg-slate-900/40 border-slate-700/50' : 'bg-slate-50 border-slate-150'
-                      }`}
+                      className="flex items-center gap-3 p-3 rounded-xl border bg-slate-50/50 dark:bg-slate-950/20 border-slate-200/50 dark:border-white/5"
                     >
-                      <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-200 flex-shrink-0 flex items-center justify-center">
+                      <div className="h-9 w-9 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-900 flex-shrink-0 flex items-center justify-center">
                         {item.product.image ? (
                           <img src={item.product.image} className="h-full w-full object-cover" />
                         ) : (
@@ -702,22 +751,22 @@ export default function App() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold truncate">{item.product.name}</div>
-                        <div className="text-xs font-extrabold text-emerald-600 mt-0.5">${item.product.price.toFixed(2)}</div>
+                        <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{item.product.name}</div>
+                        <div className="text-xs font-black text-brand-success mt-0.5">${item.product.price.toFixed(2)}</div>
                       </div>
                       
-                      {/* Plus/minus buttons */}
-                      <div className="flex items-center gap-1.5 rounded-full bg-white dark:bg-slate-800 p-1 border shadow-xs">
+                      {/* Plus/minus selectors */}
+                      <div className="flex items-center gap-1 rounded-full bg-white dark:bg-slate-900 p-0.5 border dark:border-white/5 shadow-sm">
                         <button 
                           onClick={() => updateCartQty(item.product.id, -1)}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-rose-500 hover:text-white transition text-slate-500 text-xs"
+                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-danger hover:text-white transition-all text-slate-500 text-xs"
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        <span className="w-5 text-center text-xs font-black">{item.quantity}</span>
+                        <span className="w-4 text-center text-xs font-bold">{item.quantity}</span>
                         <button 
                           onClick={() => updateCartQty(item.product.id, 1)}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-emerald-500 hover:text-white transition text-slate-500 text-xs"
+                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-success hover:text-white transition-all text-slate-500 text-xs"
                         >
                           <Plus className="h-3 w-3" />
                         </button>
@@ -727,35 +776,35 @@ export default function App() {
                 )}
               </div>
 
-              {/* Customer selection */}
-              <div className="mt-4 space-y-3">
+              {/* CRM Loyalty selector */}
+              <div className="space-y-3 pt-2">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-1.5">Select Customer</label>
+                  <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">ជ្រើសរើសអតិថិជន Customer</label>
                   <div className="relative">
                     <select 
                       value={selectedCustomerId}
                       onChange={(e) => setSelectedCustomerId(e.target.value)}
-                      className={`w-full appearance-none py-2.5 pl-3 pr-10 text-xs font-semibold rounded-xl border shadow-sm outline-none transition ${
-                        darkMode ? 'bg-slate-850 border-slate-700 text-white' : 'bg-white border-slate-200'
+                      className={`w-full appearance-none py-2.5 pl-3 pr-10 text-xs font-bold rounded-xl border outline-none shadow-sm transition ${
+                        darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200'
                       }`}
                     >
-                      <option value="">Walk-in Customer</option>
+                      <option value="">Walk-in Customer (អតិថិជនទូទៅ)</option>
                       {customers.map(c => (
                         <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-450 pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-1.5">Action Mode</label>
+                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Action Mode</label>
                     <select 
                       value={orderStatus} 
                       onChange={(e) => setOrderStatus(e.target.value)}
-                      className={`w-full py-2.5 px-3 text-xs font-semibold rounded-xl border shadow-sm outline-none transition ${
-                        darkMode ? 'bg-slate-850 border-slate-700 text-white' : 'bg-white border-slate-200'
+                      className={`w-full py-2.5 px-3 text-xs font-bold rounded-xl border outline-none shadow-sm transition ${
+                        darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200'
                       }`}
                     >
                       <option value="completed">Immediate Sale</option>
@@ -763,38 +812,38 @@ export default function App() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-1.5">Register Status</label>
-                    <div className="py-2.5 px-3 text-xs font-bold rounded-xl border border-emerald-150 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 text-center">
-                      Auto-Receipt
+                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Receipt Output</label>
+                    <div className="py-2.5 px-3 text-xs font-extrabold rounded-xl border border-brand-success/20 bg-brand-success/10 text-brand-success text-center">
+                      Auto-Print
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Receipt Total breakdown */}
-              <div className="mt-4 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-900/30">
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-400">
+              {/* Receipt Total values breakdown */}
+              <div className="p-4 rounded-xl border bg-slate-50/50 dark:bg-slate-950/20 border-slate-200/50 dark:border-white/5 space-y-2">
+                <div className="flex justify-between items-center text-xs font-bold text-slate-400">
                   <span>Subtotal</span>
                   <span>${getSubtotal().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-400 mt-2">
+                <div className="flex justify-between items-center text-xs font-bold text-slate-400">
                   <span>Sales Tax (0%)</span>
                   <span>$0.00</span>
                 </div>
-                <div className="flex justify-between items-center border-t border-dashed border-slate-200 dark:border-slate-700 pt-3 mt-3">
-                  <span className="text-sm font-black">Grand Total</span>
-                  <span className="text-lg font-black text-emerald-600">${getGrandTotal().toFixed(2)}</span>
+                <div className="flex justify-between items-center border-t border-dashed border-slate-200 dark:border-white/5 pt-2.5 mt-2.5">
+                  <span className="text-xs font-extrabold">Grand Total</span>
+                  <span className="text-base font-black text-brand-success">${getGrandTotal().toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* Main checkout buttons */}
-              <div className="mt-4 flex items-center gap-3">
+              {/* Checkout actions */}
+              <div className="flex items-center gap-2 pt-2">
                 <button 
                   onClick={clearCart}
                   title="Clear Cart"
-                  className="h-12 w-12 rounded-2xl flex items-center justify-center border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 transition shadow-sm"
+                  className="h-11 w-11 rounded-xl flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all shadow-sm"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4.5 w-4.5" />
                 </button>
                 <button 
                   disabled={cart.length === 0}
@@ -805,40 +854,39 @@ export default function App() {
                       setPaymentModalOpen(true);
                     }
                   }}
-                  className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-600 hover:from-teal-800 hover:to-emerald-700 text-white font-extrabold text-sm shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-extrabold text-xs shadow-md hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all duration-300"
                 >
-                  <span>{orderStatus === 'pending' ? 'Place Order on Hold' : 'Process Checkout'}</span>
+                  <span>{orderStatus === 'pending' ? 'Place Order on Hold' : 'ទូទាត់ប្រាក់ Process Checkout'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </aside>
           </div>
         )}
-
       </div>
 
       {/* --- Hold Orders Drawer (Modal style on right side) --- */}
       {pendingOrdersOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end">
-          <div className="w-full max-w-sm h-full bg-white dark:bg-slate-800 shadow-2xl flex flex-col p-6 animate-slideIn">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700">
-              <h3 className="text-lg font-extrabold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-emerald-600" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end animate-fade-in">
+          <div className="w-full max-w-sm h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-white/5 shadow-2xl flex flex-col p-6 space-y-4">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
+              <h3 className="text-base font-extrabold flex items-center gap-2">
+                <Clock className="h-5 w-5 text-brand-primary" />
                 <span>Pending Hold Orders</span>
               </h3>
               <button 
                 onClick={() => setPendingOrdersOpen(false)}
-                className="h-9 w-9 rounded-full flex items-center justify-center border border-slate-150 hover:bg-slate-50"
+                className="h-9 w-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-650"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto py-2 space-y-4">
               {pendingOrders.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <Clock className="h-10 w-10 text-slate-300 dark:text-slate-700 mb-2" />
-                  <p className="text-xs font-bold text-slate-400">No pending orders found.</p>
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-2">
+                  <Clock className="h-8 w-8 text-slate-300 dark:text-slate-800" />
+                  <p className="text-xs font-bold text-slate-450">No pending orders found.</p>
                 </div>
               ) : (
                 pendingOrders.map(order => (
@@ -847,31 +895,31 @@ export default function App() {
                     onClick={() => {
                       window.location.href = `?resume=${order.id}`;
                     }}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 cursor-pointer shadow-xs transition hover:shadow-md bg-slate-50/50 dark:bg-slate-900/20 group"
+                    className="p-4 rounded-xl border border-slate-200/50 dark:border-white/5 hover:border-brand-primary/40 cursor-pointer shadow-sm transition bg-slate-50/50 dark:bg-slate-900/30 group space-y-2"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="font-extrabold text-sm text-slate-700 dark:text-slate-350">Order #{order.id}</span>
-                        <div className="text-[10px] font-semibold text-slate-400 mt-1 flex items-center gap-1">
+                        <span className="font-extrabold text-xs text-slate-850 dark:text-slate-200">Order #{order.id}</span>
+                        <div className="text-[9px] font-bold text-slate-400 mt-1 flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                      <span className="text-sm font-black text-emerald-600">${parseFloat(order.total).toFixed(2)}</span>
+                      <span className="text-sm font-black text-brand-success">${parseFloat(order.total).toFixed(2)}</span>
                     </div>
 
                     {order.notes && (
-                      <div className="mt-2.5 p-2 bg-amber-50/50 dark:bg-amber-950/10 rounded-lg text-[10px] border border-amber-100/50">
-                        <span className="font-bold block text-amber-700 uppercase tracking-widest">Note:</span>
-                        <span className="text-slate-600 dark:text-slate-300 font-semibold">{order.notes}</span>
+                      <div className="p-2.5 bg-brand-warning/10 dark:bg-amber-950/10 rounded-lg text-[10px] border border-brand-warning/20">
+                        <span className="font-extrabold block text-brand-warning uppercase tracking-wider">Note:</span>
+                        <span className="text-slate-600 dark:text-slate-350 font-bold">{order.notes}</span>
                       </div>
                     )}
 
-                    <div className="mt-3 flex justify-between items-center border-t border-slate-100 dark:border-slate-700/60 pt-2.5">
-                      <span className="text-[10px] font-bold text-slate-400">{order.item_lines} items</span>
-                      <button className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 group-hover:text-emerald-700 flex items-center gap-1">
+                    <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2.5">
+                      <span className="text-[10px] font-bold text-slate-450">{order.item_lines} items</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-brand-primary group-hover:text-brand-secondary flex items-center gap-1">
                         Resume <ArrowRight className="h-3 w-3" />
-                      </button>
+                      </span>
                     </div>
                   </div>
                 ))
@@ -883,80 +931,78 @@ export default function App() {
 
       {/* --- Advanced Checkout Dialog Modal --- */}
       {paymentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className={`w-full max-w-lg rounded-[28px] border shadow-2xl p-6 relative transition ${
-            darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className={`w-full max-w-lg rounded-3xl border shadow-2xl p-6 relative transition bg-white dark:bg-slate-900 border-slate-200/50 dark:border-white/5 ${
+            darkMode ? 'text-white' : 'text-slate-850'
           }`}>
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary text-white flex items-center justify-center shadow">
                   <CreditCard className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-base">Checkout Processing</h3>
+                  <h3 className="font-black text-sm">ទូទាត់ប្រាក់ Checkout Processing</h3>
                   <p className="text-[10px] text-slate-400">Ensure security instruments are correctly routed</p>
                 </div>
               </div>
               <button 
                 onClick={() => setPaymentModalOpen(false)}
-                className="h-8 w-8 rounded-full flex items-center justify-center border border-slate-150 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="h-8 w-8 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Total display */}
-            <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-150 dark:border-slate-700 flex items-center justify-between">
+            <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/30 border border-slate-200/50 dark:border-white/5 flex items-center justify-between">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Total Payable</div>
-                <div className="text-2xl font-black text-emerald-600 mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                <div className="text-[9px] font-extrabold uppercase tracking-widest text-slate-450">Total Payable</div>
+                <div className="text-xl font-black text-brand-success mt-0.5">${getGrandTotal().toFixed(2)}</div>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 px-3 py-1 rounded-full tracking-wider">
-                  USD Active
-                </span>
-              </div>
+              <span className="text-[9px] font-black uppercase bg-brand-success/15 text-brand-success px-3 py-1 rounded-full tracking-wider border border-brand-success/20">
+                USD Active
+              </span>
             </div>
 
             {/* Instrument Selection Tab Row */}
-            <div className="mt-5">
-              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">Payment Instrument</label>
+            <div className="mt-5 space-y-2">
+              <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">Payment Instrument</label>
               <div className="grid grid-cols-3 gap-3">
                 {settings.pos_method_cash_enabled === '1' && (
                   <button 
                     onClick={() => setPaymentMethod('cash')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-1.5 transition ${
+                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'cash' 
-                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 font-extrabold' 
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-50'
+                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
+                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <Wallet className="h-5 w-5" />
-                    <span className="text-xs">Cash</span>
+                    <span className="text-xs">Cash/សាច់ប្រាក់</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
                   <button 
                     onClick={() => setPaymentMethod('khqr')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-1.5 transition ${
+                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'khqr' 
-                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 font-extrabold' 
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-50'
+                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
+                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <QrCode className="h-5 w-5" />
-                    <span className="text-xs">KHQR</span>
+                    <span className="text-xs">Dynamic KHQR</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
                   <button 
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-1.5 transition ${
+                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'card' 
-                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 font-extrabold' 
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-50'
+                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
+                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <CreditCard className="h-5 w-5" />
@@ -971,7 +1017,7 @@ export default function App() {
               {paymentMethod === 'cash' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-1.5">Cash Received</label>
+                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1.5">Cash Received</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">$</span>
                       <input 
@@ -980,17 +1026,19 @@ export default function App() {
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className={`w-full py-3 pl-8 pr-4 text-base font-black rounded-2xl border shadow-sm outline-none transition ${
-                          darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'
+                        className={`w-full py-3.5 pl-8 pr-4 text-base font-black rounded-xl border outline-none transition focus:ring-4 ${
+                          darkMode 
+                            ? 'bg-slate-900 border-slate-800 text-white focus:border-brand-primary focus:ring-blue-950/30' 
+                            : 'bg-slate-50 border-slate-200 focus:border-brand-primary focus:ring-blue-100/50'
                         }`}
                       />
                     </div>
                   </div>
-                  {/* Change calculation */}
+                  
                   {parseFloat(cashGiven) > 0 && (
-                    <div className="p-3.5 rounded-2xl border border-emerald-250 bg-emerald-50/40 dark:bg-emerald-950/10 flex items-center justify-between">
-                      <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Balance Change</span>
-                      <span className="text-lg font-black text-emerald-600">
+                    <div className="p-3.5 rounded-xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-success uppercase tracking-wider">Balance Change (ប្រាក់អាប់)</span>
+                      <span className="text-lg font-black text-brand-success">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
                     </div>
@@ -999,39 +1047,38 @@ export default function App() {
               )}
 
               {paymentMethod === 'khqr' && (
-                <div className="p-4 rounded-2xl border border-slate-150 dark:border-slate-700 bg-white text-center">
-                  <div className="inline-block p-3 rounded-2xl border border-slate-100 bg-white">
-                    {/* Generates standard QR server request for Bakong KHQR String */}
+                <div className="p-4 rounded-xl border border-slate-200/50 dark:border-white/5 bg-white text-center space-y-3">
+                  <div className="inline-block p-3 rounded-xl border border-slate-100 bg-white">
                     <img 
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`} 
                       alt="Bakong KHQR Code"
-                      className="h-44 w-44 mx-auto"
+                      className="h-40 w-40 mx-auto"
                     />
                   </div>
-                  <div className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.25em] text-rose-600 animate-pulse">
-                    Waiting for Cashier Scan Approval
+                  <div className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-brand-danger animate-pulse">
+                    Awaiting dynamic Bakong check approval...
                   </div>
                 </div>
               )}
 
               {paymentMethod === 'card' && (
-                <div className="p-6 rounded-2xl border border-slate-150 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 text-center">
+                <div className="p-6 rounded-xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/30 text-center">
                   {cardSimulating ? (
                     <div className="space-y-4">
-                      <div className="text-sm font-bold text-teal-600">Connecting to terminal...</div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                      <div className="text-xs font-bold text-brand-primary">Connecting to card reader...</div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                         <div 
-                          className="bg-emerald-600 h-full transition-all duration-300" 
+                          className="bg-brand-primary h-full transition-all duration-300" 
                           style={{ width: `${cardProgress}%` }}
                         />
                       </div>
-                      <div className="text-xs text-slate-400">{cardProgress}% Completed</div>
+                      <div className="text-[10px] text-slate-400 font-bold">{cardProgress}% Handshake</div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <CreditCard className="mx-auto h-10 w-10 text-emerald-600 animate-bounce" />
+                      <CreditCard className="mx-auto h-8 w-8 text-brand-primary animate-bounce" />
                       <p className="text-xs font-bold text-slate-500">Insert/Tap credit card on POS reader device.</p>
-                      <p className="text-[10px] text-slate-400">Submit transaction below to initialize wireless handshake.</p>
+                      <p className="text-[10px] text-slate-450">Submit transaction below to initialize wireless handshake.</p>
                     </div>
                   )}
                 </div>
@@ -1039,19 +1086,19 @@ export default function App() {
             </div>
 
             {/* Modal actions */}
-            <div className="mt-6 flex flex-col gap-2.5">
+            <div className="mt-6 flex flex-col gap-2">
               <button 
                 onClick={handleCheckoutSubmit}
                 disabled={cardSimulating}
-                className="w-full h-11 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm shadow-md transition disabled:opacity-55 flex items-center justify-center gap-1.5"
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-extrabold text-xs shadow-md hover:brightness-110 disabled:opacity-55 flex items-center justify-center gap-1.5 transition-all"
               >
-                <span>Confirm & Complete Payment</span>
+                <span>Confirm & Complete Transaction (ទូទាត់រួចរាល់)</span>
                 <Check className="h-4 w-4" />
               </button>
               <button 
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
-                className="w-full py-2.5 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition"
+                className="w-full py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
               >
                 Discard Checkout
               </button>
