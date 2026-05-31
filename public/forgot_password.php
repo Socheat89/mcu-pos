@@ -18,9 +18,9 @@ unset($_SESSION['password_reset_success'], $_SESSION['password_reset_debug_link'
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/landing.css">
-    <link rel="icon" href="images/logo.png" type="image/png">
-    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=2.3">
+    <link rel="icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
+    <link rel="shortcut icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="auth-page">
@@ -39,7 +39,7 @@ unset($_SESSION['password_reset_success'], $_SESSION['password_reset_debug_link'
     <main class="auth-shell">
         <div class="auth-card auth-card--compact">
             <div class="auth-header">
-                <a href="index.php" class="auth-logo">
+                <a href="<?php echo mc_url('index.php'); ?>" class="auth-logo">
                     <div class="logo-icon">
                         <i class="ph-bold ph-cube"></i>
                     </div>
@@ -88,10 +88,10 @@ unset($_SESSION['password_reset_success'], $_SESSION['password_reset_debug_link'
             </form>
 
             <div class="auth-footer">
-                Remembered it? <a href="login.php" class="link-strong">Back to sign in</a>
+                Remembered it? <a href="<?php echo mc_url('login.php'); ?>" class="link-strong">Back to sign in</a>
             </div>
         </div>
     </main>
-    <script src="js/loader.js"></script>
+    <script src="<?php echo mc_asset('js/loader.js'); ?>"></script>
 </body>
 </html>

@@ -63,7 +63,7 @@ class PasswordReset {
             [$user['id'], $tokenHash]
         );
 
-        $resetUrl = mc_url('public/reset_password.php?token=' . urlencode($token), true);
+        $resetUrl = mc_url('reset_password.php?token=' . urlencode($token), true);
         $emailSent = self::sendResetEmail($user['email'], $user['username'], $resetUrl);
         if (self::shouldExposeResetLink() || getenv('MC_LOG_RESET_LINKS') === '1') {
             self::logResetLink($user, $resetUrl, $emailSent);

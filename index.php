@@ -50,12 +50,43 @@ try {
 
     if (empty($path)) $path = '/';
 
+    // Helper to serve static assets with correct MIME type
+    $serveStatic = function(string $file) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $mimes = [
+            'css'   => 'text/css',
+            'js'    => 'application/javascript',
+            'png'   => 'image/png',
+            'jpg'   => 'image/jpeg',
+            'jpeg'  => 'image/jpeg',
+            'gif'   => 'image/gif',
+            'svg'   => 'image/svg+xml',
+            'ico'   => 'image/x-icon',
+            'woff'  => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf'   => 'font/ttf',
+            'otf'   => 'font/otf',
+            'json'  => 'application/json',
+            'xml'   => 'application/xml',
+            'pdf'   => 'application/pdf',
+        ];
+        $mime = $mimes[$ext] ?? 'application/octet-stream';
+        header("Content-Type: $mime");
+        header("Cache-Control: public, max-age=86400");
+        readfile($file);
+        exit;
+    };
+
     // 1. Static/Public Routing (Explicit /public or /admin)
     if (strpos($path, '/public/') === 0 || strpos($path, '/admin/') === 0) {
         $cleanPath = str_replace('/', DIRECTORY_SEPARATOR, $path);
         $file = $baseDir . $cleanPath;
         if (file_exists($file) && !is_dir($file)) {
-            include $file;
+            if (strtolower(pathinfo($file, PATHINFO_EXTENSION)) === 'php') {
+                include $file;
+            } else {
+                $serveStatic($file);
+            }
             exit;
         }
     }
@@ -65,7 +96,11 @@ try {
     $publicPath = $baseDir . '/public' . str_replace('/', DIRECTORY_SEPARATOR, $path);
     if ($path !== '/' && file_exists($publicPath) && !is_dir($publicPath)) {
         // Security check: Don't allow accessing PHP files that shouldn't be public if any (though public folder is meant to be public)
-        include $publicPath;
+        if (strtolower(pathinfo($publicPath, PATHINFO_EXTENSION)) === 'php') {
+            include $publicPath;
+        } else {
+            $serveStatic($publicPath);
+        }
         exit;
     }
 

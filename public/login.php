@@ -38,7 +38,7 @@
     <main class="auth-shell">
         <div class="auth-card auth-card--compact">
             <div class="auth-header">
-                <a href="/" class="auth-logo">
+                <a href="<?php echo mc_url('index.php'); ?>" class="auth-logo">
                     <div class="logo-icon">
                         <i class="ph-bold ph-cube"></i>
                     </div>
@@ -71,7 +71,7 @@
             <div class="form-group">
                 <div class="auth-label-row">
                     <label for="password" style="margin-bottom: 0;">Password</label>
-                    <a href="forgot_password.php" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
+                    <a href="<?php echo mc_url('forgot_password.php'); ?>" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
                 </div>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
@@ -80,7 +80,7 @@
         </form>
         
         <div class="auth-footer">
-            Don't have an account? <a href="register.php" class="link-strong">Sign up</a>
+            Don't have an account? <a href="<?php echo mc_url('register.php'); ?>" class="link-strong">Sign up</a>
         </div>
         </div>
     </main>
