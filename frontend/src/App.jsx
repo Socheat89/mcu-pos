@@ -4,6 +4,7 @@ import {
   ShoppingBag,
   Trash2,
   ArrowRight,
+  ArrowLeft,
   Clock,
   CreditCard,
   QrCode,
@@ -27,6 +28,7 @@ import {
   Zap,
   ChevronRight,
   Languages,
+  LogOut,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -43,6 +45,7 @@ import confetti from 'canvas-confetti';
 // ─── Translations Dictionary ──────────────────────────────────
 const translations = {
   en: {
+    exit: "Dashboard",
     sell: "Sell",
     reports: "Reports",
     pending: "Hold",
@@ -111,6 +114,7 @@ const translations = {
     out: "out",
   },
   km: {
+    exit: "ទៅកាន់ Dashboard",
     sell: "លក់ទំនិញ",
     reports: "របាយការណ៍",
     pending: "រង់ចាំ",
@@ -179,6 +183,7 @@ const translations = {
     out: "អស់",
   },
   zh: {
+    exit: "返回控制台",
     sell: "销售",
     reports: "报告",
     pending: "挂单",
@@ -697,6 +702,19 @@ export default function App() {
 
           {/* Right: Controls */}
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {/* Exit/Dashboard Button */}
+            <a
+              href={window.DASHBOARD_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/dashboard`}
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
+                darkMode
+                  ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-cyan border-brand-cyan/20 hover:border-brand-cyan/40 hover:shadow-glow-cyan/5'
+                  : 'bg-white hover:bg-gray-50 text-brand-cyan border-gray-200 hover:border-brand-cyan/30'
+              }`}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>{t('exit', 'Dashboard')}</span>
+            </a>
+
             {/* Analytics toggle */}
             <button
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}

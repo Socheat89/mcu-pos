@@ -12,10 +12,10 @@
     <style>
         .search-container { position: relative; margin-bottom: 24px; }
         .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
-        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: 16px; border: 1.5px solid var(--pos-border); background: white; font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
-        .search-container input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: 16px; border: 1.5px solid var(--pos-border); background: rgba(8, 10, 16, 0.4); color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: rgba(8, 10, 16, 0.6); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15); }
         
-        .avatar-circle { width: 44px; height: 44px; border-radius: 12px; background: #eef2ff; color: var(--pos-primary); display: grid; place-items: center; font-weight: 900; font-size: 16px; border: 1px solid rgba(99, 102, 241, 0.1); }
+        .avatar-circle { width: 44px; height: 44px; border-radius: 12px; background: rgba(6, 182, 212, 0.1); color: var(--pos-primary); display: grid; place-items: center; font-weight: 900; font-size: 16px; border: 1px solid rgba(6, 182, 212, 0.2); }
     </style>
 </head>
 <body class="pos-app">
@@ -65,8 +65,8 @@
                     <?php if (empty($customers)): ?>
                         <tr>
                             <td colspan="5" style="padding: 100px; text-align: center;">
-                                <div style="width: 80px; height: 80px; background: #f1f5f9; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
-                                    <i class="fas fa-users" style="font-size: 32px; color: #cbd5e1;"></i>
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+                                    <i class="fas fa-users" style="font-size: 32px; color: var(--pos-text-dim);"></i>
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_customers_yet'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('client_database_msg'); ?></p>

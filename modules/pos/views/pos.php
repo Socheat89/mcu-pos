@@ -3,6 +3,21 @@ require_once __DIR__ . '/../../../core/helpers/url.php';
 $urlPrefix = mc_base_path();
 $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 $tenantName = Tenant::getCurrent()['name'] ?? '';
+
+// Determine dashboard URL matching index.php routing
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
+$devPosPrefix = $urlPrefix . '/pos/';
+$isDevPos = (strpos($requestPath, $devPosPrefix) === 0);
+
+$posBase = $urlPrefix;
+if ($isDevPos) {
+    $posBase .= '/pos';
+} elseif ($subdomain) {
+    $posBase .= '/' . $subdomain . '/pos';
+} else {
+    $posBase .= '/pos';
+}
+$dashboardUrl = $posBase . '/dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +35,7 @@ $tenantName = Tenant::getCurrent()['name'] ?? '';
     <script>
         window.BASE_PATH = "<?php echo mc_base_path(); ?>";
         window.SUBDOMAIN = "<?php echo $subdomain; ?>";
+        window.DASHBOARD_URL = "<?php echo htmlspecialchars($dashboardUrl); ?>";
         window.PRODUCTS = <?php echo json_encode(array_map(function($p) {
             $image = !empty($p['image'])
                 ? mc_url('uploads/products/' . $p['image'])

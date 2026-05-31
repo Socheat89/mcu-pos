@@ -24,14 +24,14 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             font-size: 15px; 
             font-weight: 600;
             color: var(--pos-text);
-            background: #f8fafc;
+            background: rgba(8, 10, 16, 0.4);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
         }
         .pos-form-control:focus { 
             border-color: var(--pos-primary); 
-            background: white;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: rgba(8, 10, 16, 0.6);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
         }
         
         .pos-tabs {
@@ -39,9 +39,10 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             gap: 8px;
             margin-bottom: 32px;
             padding: 6px;
-            background: #f1f5f9;
+            background: rgba(8, 10, 16, 0.5);
             border-radius: 18px;
             width: fit-content;
+            border: 1px solid var(--pos-border);
         }
         
         .pos-tab-link {
@@ -59,8 +60,9 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         
         .pos-tab-link:hover { color: var(--pos-text); }
         .pos-tab-link.active { 
-            background: white; 
+            background: rgba(6, 182, 212, 0.15); 
             color: var(--pos-primary); 
+            border: 1px solid rgba(6, 182, 212, 0.25);
             box-shadow: var(--pos-shadow-sm);
         }
         
@@ -80,20 +82,23 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             padding: 16px;
             border: 1.5px solid var(--pos-border);
             border-radius: 18px;
-            background: white;
+            background: var(--pos-card);
             transition: all 0.2s;
+            color: var(--pos-text);
         }
-        .user-card:hover { transform: translateY(-2px); border-color: var(--pos-primary); box-shadow: var(--pos-shadow-md); }
+        .user-card:hover { transform: translateY(-2px); border-color: var(--pos-primary); box-shadow: var(--pos-shadow-md), var(--pos-shadow-glow); }
         
         .pos-small { font-size: 12px; color: var(--pos-text-muted); font-weight: 600; }
         .pos-card-sub { font-size: 14px; color: var(--pos-text-muted); font-weight: 500; margin-bottom: 24px; }
+        
+        .pos-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; }
 
         /* Toggle Switch Premium */
         .pos-toggle { position: relative; display: inline-block; width: 48px; height: 26px; }
         .pos-toggle input { opacity: 0; width: 0; height: 0; }
-        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e2e8f0; transition: .3s; border-radius: 34px; }
-        .pos-toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input:checked + .pos-toggle-slider { background-color: var(--pos-primary); }
+        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.08); transition: .3s; border-radius: 34px; border: 1px solid var(--pos-border); }
+        .pos-toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        input:checked + .pos-toggle-slider { background-color: var(--pos-primary); border-color: var(--pos-primary); }
         input:checked + .pos-toggle-slider:before { transform: translateX(22px); }
         
         .preview-pane { 
@@ -375,7 +380,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                         <div style="display: grid; gap: 15px;">
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; display: grid; place-items: center; color: #475569;"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--pos-border); display: grid; place-items: center; color: var(--pos-primary);"><i class="fas fa-money-bill-wave"></i></div>
                                     <div>
                                         <div style="font-weight: 700;">Cash Payment</div>
                                         <div class="pos-small">Accept physical currency</div>
@@ -389,7 +394,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #fef2f2; display: grid; place-items: center; color: #dc2626;"><i class="fas fa-qrcode"></i></div>
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); display: grid; place-items: center; color: var(--pos-danger);"><i class="fas fa-qrcode"></i></div>
                                     <div>
                                         <div style="font-weight: 700;">KHQR / Bakong</div>
                                         <div class="pos-small">Scan to pay with mobile app</div>
@@ -403,7 +408,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #eff6ff; display: grid; place-items: center; color: #2563eb;"><i class="fas fa-credit-card"></i></div>
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); display: grid; place-items: center; color: var(--pos-secondary);"><i class="fas fa-credit-card"></i></div>
                                     <div>
                                         <div style="font-weight: 700;">Credit / Debit Card</div>
                                         <div class="pos-small">Visa, Mastercard, etc.</div>
@@ -417,7 +422,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #f0fdf4; display: grid; place-items: center; color: #16a34a;"><i class="fas fa-university"></i></div>
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: grid; place-items: center; color: var(--pos-success);"><i class="fas fa-university"></i></div>
                                     <div>
                                         <div style="font-weight: 700;">Bank Transfer</div>
                                         <div class="pos-small">Direct bank-to-bank transfer</div>
@@ -431,20 +436,20 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                         </div>
                     </div>
 
-                    <div style="background: white; border: 1px solid var(--pos-border); border-radius: 16px; padding: 24px;">
+                    <div style="background: var(--pos-card); backdrop-filter: blur(12px); border: 1px solid var(--pos-border); border-radius: 16px; padding: 24px;">
                         <p class="pos-card-title">KHQR Configuration</p>
                         <p class="pos-card-sub" style="margin-bottom: 20px;">Upload your static KHQR image for customers to scan.</p>
                         
-                        <div style="text-align: center; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
-                            <img src="<?php echo htmlspecialchars($settings['pos_method_khqr_image']); ?>" style="width: 200px; height: 200px; object-fit: contain; background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; display: block; margin: 0 auto; box-shadow: var(--pos-shadow-sm);">
+                        <div style="text-align: center; background: rgba(8, 10, 16, 0.4); padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
+                            <img src="<?php echo htmlspecialchars($settings['pos_method_khqr_image']); ?>" style="width: 200px; height: 200px; object-fit: contain; background: white; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: block; margin: 0 auto; box-shadow: var(--pos-shadow-sm);">
                             <div style="margin-top: 15px;">
                                 <input type="file" name="khqr_upload" class="pos-form-control" accept="image/*" style="max-width: 250px; font-size: 12px; padding: 8px;">
                             </div>
                         </div>
                         
-                        <div style="display: flex; gap: 12px; background: #fff9db; padding: 15px; border-radius: 12px; border: 1px solid #fab005;">
-                            <i class="fas fa-lightbulb" style="color: #f08c00; font-size: 18px;"></i>
-                            <p class="pos-small" style="color: #856404; margin: 0; line-height: 1.4;">
+                        <div style="display: flex; gap: 12px; background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2); color: var(--pos-warning);">
+                            <i class="fas fa-lightbulb" style="font-size: 18px;"></i>
+                            <p class="pos-small" style="color: var(--pos-warning); margin: 0; line-height: 1.4;">
                                 This QR code will be displayed in the checkout modal when 'KHQR' is selected as the payment method.
                             </p>
                         </div>

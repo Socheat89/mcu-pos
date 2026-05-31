@@ -14,9 +14,9 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .report-card { background: white; border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
+        .report-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
         .ranking-item { display: flex; align-items: center; gap: 16px; padding: 14px; border-radius: 18px; transition: all 0.2s; border: 1px solid transparent; }
-        .ranking-item:hover { background: #f8fafc; border-color: var(--pos-border); transform: translateX(8px); }
+        .ranking-item:hover { background: rgba(255, 255, 255, 0.03); border-color: var(--pos-border); transform: translateX(8px); }
         .ranking-badge { width: 32px; height: 32px; border-radius: 10px; background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-size: 14px; font-weight: 900; flex-shrink: 0; }
     </style>
 </head>
@@ -99,7 +99,7 @@
         <div class="report-card" style="margin-bottom: 32px;">
              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
                 <h3 class="pos-card-title"><?php echo __('monthly_revenue_trends'); ?></h3>
-                <div class="badge" style="background: #f1f5f9; color: #64748b;"><?php echo __('past_6_months'); ?></div>
+                 <div class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); color: var(--pos-text-muted);"><?php echo __('past_6_months'); ?></div>
             </div>
             <div style="height: 320px;">
                 <canvas id="monthlySalesChart"></canvas>
@@ -148,7 +148,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 12, bodyFont: { size: 14, weight: 'bold' } } },
                 scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f1f5f9' }, ticks: { callback: v => '$' + v } },
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(255, 255, 255, 0.04)' }, ticks: { callback: v => '$' + v } },
                     x: { grid: { display: false } }
                 }
             }
@@ -177,7 +177,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f1f5f9' }, ticks: { callback: v => '$' + v } },
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(255, 255, 255, 0.04)' }, ticks: { callback: v => '$' + v } },
                     x: { grid: { display: false } }
                 }
             }

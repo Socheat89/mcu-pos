@@ -26,30 +26,33 @@ $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : '
             position: relative;
             overflow: hidden;
             box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+            border: 1px solid var(--pos-border);
         }
         .qr-card {
-            background: white;
+            background: var(--pos-card);
+            backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 32px;
-            border: 1.5px solid var(--pos-border);
+            border: 1px solid var(--pos-border);
             text-align: center;
         }
         .qr-placeholder {
-            background: #f8fafc;
+            background: white;
             border-radius: 20px;
             padding: 20px;
             display: inline-block;
-            border: 2px dashed var(--pos-border);
+            border: 1px solid var(--pos-border);
             margin-bottom: 24px;
         }
         .link-card {
-            background: white;
+            background: var(--pos-card);
+            backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 32px;
-            border: 1.5px solid var(--pos-border);
+            border: 1px solid var(--pos-border);
         }
         .copy-input {
-            background: #f8fafc;
+            background: rgba(8, 10, 16, 0.4);
             border: 1.5px solid var(--pos-border);
             border-radius: 12px;
             padding: 12px 16px;
@@ -58,6 +61,13 @@ $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : '
             font-weight: 600;
             color: var(--pos-text);
             margin-bottom: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .copy-input:focus {
+            border-color: var(--pos-primary);
+            background: rgba(8, 10, 16, 0.6);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
         }
     </style>
 </head>

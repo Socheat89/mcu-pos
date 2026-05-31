@@ -13,7 +13,7 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .form-card { background: white; border-radius: 24px; padding: 40px; border: 1.5px solid var(--pos-border); max-width: 800px; margin: 0 auto; }
+        .form-card { background: var(--pos-card); border-radius: 24px; padding: 40px; border: 1.5px solid var(--pos-border); max-width: 800px; margin: 0 auto; backdrop-filter: blur(12px); }
     </style>
 </head>
 <body class="pos-app">
