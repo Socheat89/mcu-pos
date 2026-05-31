@@ -140,10 +140,13 @@ class PasswordReset {
         $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
         $host = trim($host, '[]');
         $hostWithoutPort = preg_replace('/:\d+$/', '', $host);
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
 
         return in_array($hostWithoutPort, ['localhost', '127.0.0.1', '::1'], true)
             || strpos($hostWithoutPort, '192.168.') === 0
-            || strpos($hostWithoutPort, '10.') === 0;
+            || strpos($hostWithoutPort, '10.') === 0
+            || in_array($remoteAddr, ['127.0.0.1', '::1'], true)
+            || ($remoteAddr !== '' && filter_var($remoteAddr, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false);
     }
 
     private static function sendResetEmail(string $email, string $username, string $resetUrl): bool {

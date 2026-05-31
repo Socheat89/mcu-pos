@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../core/helpers/url.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=2.3">
     
     <!-- Favicon -->
-    <link rel="icon" href="images/logo.png" type="image/png">
-    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
+    <link rel="shortcut icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -68,7 +69,7 @@
             </div>
             
             <div class="form-group">
-                <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
+                <div class="auth-label-row">
                     <label for="password" style="margin-bottom: 0;">Password</label>
                     <a href="forgot_password.php" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
                 </div>
@@ -83,6 +84,6 @@
         </div>
         </div>
     </main>
-    <script src="js/loader.js"></script>
+    <script src="<?php echo mc_asset('js/loader.js'); ?>"></script>
 </body>
 </html>
