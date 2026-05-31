@@ -13,21 +13,22 @@ import {
   Check,
   Plus,
   Minus,
-  Info,
-  TrendingUp,
-  BarChart2,
-  Settings as SettingsIcon,
-  User,
-  Folder,
   Sparkles,
-  AlertTriangle,
   Moon,
   Sun,
   LayoutGrid,
-  CheckCircle2,
   Activity,
   Layers,
-  ArrowUpRight
+  TrendingUp,
+  BarChart2,
+  AlertTriangle,
+  Package,
+  Hash,
+  UserCircle,
+  Receipt,
+  Zap,
+  ChevronRight,
+  Store,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -41,7 +42,7 @@ import {
 } from 'recharts';
 import confetti from 'canvas-confetti';
 
-// --- Bakong KHQR Generator (NBC Standard) ---
+// ─── Bakong KHQR Generator (NBC Standard) ──────────────────────
 const crcTable = [
   0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50A5, 0x60C6, 0x70E7,
   0x8108, 0x9129, 0xA14A, 0xB16B, 0xC18C, 0xD1AD, 0xE1CE, 0xF1EF,
@@ -95,43 +96,36 @@ function formatTag(tag, value) {
 
 function generateKHQRString(data) {
   let str = '';
-  str += formatTag('00', '01'); // Payload Format Indicator
-  str += formatTag('01', '11'); // Initiation Method (Static)
-
-  // Merchant Account Info (Individual)
+  str += formatTag('00', '01');
+  str += formatTag('01', '11');
   let accountInfo = '';
   accountInfo += formatTag('00', data.bakongId);
   str += formatTag('29', accountInfo);
-
-  str += formatTag('52', '5999'); // Category Code
-  str += formatTag('53', data.currency === 'KHR' ? '116' : '840'); // Currency
-
+  str += formatTag('52', '5999');
+  str += formatTag('53', data.currency === 'KHR' ? '116' : '840');
   if (data.amount > 0) {
-    const amountStr = data.currency === 'KHR' 
-      ? Math.round(data.amount).toString() 
+    const amountStr = data.currency === 'KHR'
+      ? Math.round(data.amount).toString()
       : (data.amount % 1 === 0 ? data.amount.toString() : data.amount.toFixed(2));
     str += formatTag('54', amountStr);
   }
-
-  str += formatTag('58', 'KH'); // Country
+  str += formatTag('58', 'KH');
   str += formatTag('59', data.name || 'Merchant');
   str += formatTag('60', data.city || 'Phnom Penh');
-
   let addData = '';
   if (data.bill) addData += formatTag('01', data.bill);
   if (data.phone) addData += formatTag('02', data.phone);
   if (data.store) addData += formatTag('03', data.store);
   if (data.terminal) addData += formatTag('07', data.terminal);
   if (addData) str += formatTag('62', addData);
-
-  str += '6304'; // CRC Tag
+  str += '6304';
   str += calculateCRC(str);
   return str;
 }
 
-// --- Main App Component ---
+// ─── Main App Component ────────────────────────────────────────
 export default function App() {
-  // Load initial data from window (with robust mock Fallbacks if running standalone React)
+  // Load initial data from window
   const initialProducts = window.PRODUCTS || [
     { id: 1, name: 'Espresso Single', price: 1.5, stock: 25, category: 'Coffee', image: '' },
     { id: 2, name: 'Ice Latte Premium', price: 2.2, stock: 4, category: 'Coffee', image: '' },
@@ -156,7 +150,7 @@ export default function App() {
   const initialPendingOrders = window.PENDING_ORDERS || [];
   const initialResumeOrder = window.RESUME || null;
 
-  // React State
+  // State
   const [products] = useState(initialProducts);
   const [customers] = useState(initialCustomers);
   const [settings] = useState(initialSettings);
@@ -165,12 +159,11 @@ export default function App() {
 
   const [cart, setCart] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
-  const [orderStatus, setOrderStatus] = useState('completed'); // completed = Sale, pending = Hold
+  const [orderStatus, setOrderStatus] = useState('completed');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // Dark-first
 
-  // Modal / Sidebars state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [cashGiven, setCashGiven] = useState('');
@@ -180,13 +173,10 @@ export default function App() {
   const [analyticsViewOpen, setAnalyticsViewOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
-  // Clock state
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
-
-  // Form submit ref
   const formRef = useRef(null);
 
-  // Sync Tailwind class on html root element
+  // Sync dark mode class
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -195,7 +185,7 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Sync Clock
+  // Clock
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeStr(new Date().toLocaleTimeString());
@@ -217,26 +207,26 @@ export default function App() {
       if (resumeOrder.customer_id) {
         setSelectedCustomerId(resumeOrder.customer_id.toString());
       }
-      showToast('info', 'Held Order Resumed', `Continuing pending order #${resumeOrder.id}`);
+      showToast('info', 'បានស្ដារ Order', `កំពុងបន្ត order #${resumeOrder.id}`);
     }
   }, [resumeOrder, products]);
 
-  // Toast Helper
+  // Toast
   const showToast = (type, title, message) => {
     setToast({ type, title, message });
     setTimeout(() => setToast(null), 4000);
   };
 
-  // Cart operations
+  // ─── Cart Operations ──────────────────────────────────────
   const addToCart = (product) => {
     if (product.stock <= 0) {
-      showToast('warning', 'Out of Stock', `${product.name} is currently unavailable.`);
+      showToast('warning', 'អស់ស្តុក', `${product.name} មិនមានក្នុងស្តុកទេ។`);
       return;
     }
     const existing = cart.find(item => item.product.id === product.id);
     if (existing) {
       if (existing.quantity >= product.stock) {
-        showToast('warning', 'Stock Limit Reached', `Only ${product.stock} units of ${product.name} are in stock.`);
+        showToast('warning', 'ដល់កម្រិតស្តុក', `មានតែ ${product.stock} ​គ្រាប់នៅសល់។`);
         return;
       }
       setCart(cart.map(item =>
@@ -255,7 +245,7 @@ export default function App() {
       setCart(cart.filter(item => item.product.id !== productId));
     } else {
       if (nextQty > existing.product.stock) {
-        showToast('warning', 'Stock Limit Reached', `Only ${existing.product.stock} units available.`);
+        showToast('warning', 'ដល់កម្រិតស្តុក', `មានតែ ${existing.product.stock} ​គ្រាប់នៅសល់។`);
         return;
       }
       setCart(cart.map(item =>
@@ -266,13 +256,12 @@ export default function App() {
 
   const clearCart = () => {
     if (cart.length === 0) return;
-    if (window.confirm('Are you sure you want to clear your current cart?')) {
+    if (window.confirm('លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?')) {
       setCart([]);
-      showToast('info', 'Cart Cleared', 'All items have been removed.');
+      showToast('info', 'បានលុប', 'កន្ត្រកទទេហើយ។');
     }
   };
 
-  // Quick Add First Match
   const handleQuickAdd = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -282,16 +271,15 @@ export default function App() {
         if (match.stock > 0) {
           addToCart(match);
           setSearchQuery('');
-          showToast('success', 'Quick Added', `${match.name} added to cart.`);
+          showToast('success', 'បានបន្ថែម', `${match.name} បានបញ្ចូលក្នុងកន្ត្រក។`);
         }
       }
     }
   };
 
-  // Helpers
+  // ─── Helpers ──────────────────────────────────────────────
   const getSubtotal = () => cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-  const getGrandTotal = () => getSubtotal(); // Add tax/discounts if needed
-  const getLowStockCount = () => products.filter(p => p.stock > 0 && p.stock <= 5).length;
+  const getGrandTotal = () => getSubtotal();
   const getCategories = () => ['All', ...new Set(products.map(p => p.category))];
 
   const getFilteredProducts = () => {
@@ -330,18 +318,15 @@ export default function App() {
   // Submit Checkout
   const handleCheckoutSubmit = () => {
     if (cart.length === 0) return;
-
     if (orderStatus === 'pending') {
-      // If we are placing a hold order, submit directly
       submitCheckout();
       return;
     }
-
     if (paymentMethod === 'cash') {
       const total = getGrandTotal();
       const cashVal = parseFloat(cashGiven) || 0;
       if (cashVal < total) {
-        showToast('error', 'Insufficient Cash', 'Amount received is less than total payable.');
+        showToast('error', 'ប្រាក់មិនគ្រប់', 'ចំនួនទឹកប្រាក់តិចជាងសរុប។');
         return;
       }
       submitCheckout();
@@ -358,9 +343,7 @@ export default function App() {
       spread: 80,
       origin: { y: 0.6 }
     });
-
-    showToast('success', 'Transaction Successful', 'Processing transaction and loading receipt...');
-    
+    showToast('success', 'ជោគជ័យ!', 'កំពុងដំណើរការ...');
     setTimeout(() => {
       if (formRef.current) {
         formRef.current.submit();
@@ -368,7 +351,7 @@ export default function App() {
     }, 1200);
   };
 
-  // KHQR string generator
+  // KHQR
   const getKHQRString = () => {
     const total = getGrandTotal();
     return generateKHQRString({
@@ -383,7 +366,7 @@ export default function App() {
     });
   };
 
-  // Analytics mockup metrics
+  // Analytics data
   const getCategorySalesData = () => {
     const map = {};
     products.forEach(p => {
@@ -396,10 +379,13 @@ export default function App() {
     return products.slice(0, 8).map(p => ({ name: p.name.substring(0, 10), stock: p.stock }));
   };
 
+  // ═══════════════════════════════════════════════════════════
+  // RENDER
+  // ═══════════════════════════════════════════════════════════
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-350 ${darkMode ? 'bg-brand-bgDark text-slate-100' : 'bg-brand-bgLight text-slate-800'}`}>
-      
-      {/* Hidden legacy checkout form for PHP submission */}
+    <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-brand-bgDark text-brand-textDark' : 'bg-brand-bgLight text-brand-textLight'}`}>
+
+      {/* Hidden PHP checkout form */}
       <form ref={formRef} id="checkoutForm" method="POST" action={`${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/orders/create`} style={{ display: 'none' }}>
         <input type="hidden" name="order_status" value={orderStatus} />
         <input type="hidden" name="payment_method" value={paymentMethod} />
@@ -414,359 +400,360 @@ export default function App() {
         ))}
       </form>
 
-      {/* Toast Notification */}
+      {/* ─── Toast ─── */}
       {toast && (
-        <div className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-2xl border border-white/20 bg-gradient-to-r from-blue-600 to-brand-secondary p-4 text-white shadow-2xl backdrop-blur-xl animate-fade-in">
-          <Sparkles className="h-5 w-5 text-amber-300 animate-pulse" />
-          <div>
-            <div className="font-extrabold text-sm">{toast.title}</div>
-            <div className="text-xs opacity-90">{toast.message}</div>
+        <div className="fixed right-5 top-5 z-[100] animate-slide-up">
+          <div className={`flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-glass-lg backdrop-blur-xl border ${
+            toast.type === 'success' ? 'bg-brand-success/90 border-brand-success/50 text-white' :
+            toast.type === 'warning' ? 'bg-brand-warning/90 border-brand-warning/50 text-white' :
+            toast.type === 'error' ? 'bg-brand-danger/90 border-brand-danger/50 text-white' :
+            'bg-brand-cyan/90 border-brand-cyan/50 text-white'
+          }`}>
+            <Sparkles className="h-4 w-4 flex-shrink-0" />
+            <div>
+              <div className="font-bold text-sm leading-tight">{toast.title}</div>
+              <div className="text-xs opacity-90 mt-0.5">{toast.message}</div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Viewport content container */}
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-6 space-y-6">
-        
-        {/* Apple-level Minimalist Glass Header */}
-        <header className="relative overflow-hidden rounded-[24px] border border-slate-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-6 text-slate-850 dark:text-white shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl transition-all duration-300">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 dark:bg-blue-500/5 blur-3xl"></div>
-          <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-3xl"></div>
-          
-          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
-                <Layers className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">{settings.store_label}</div>
-                <h1 className="text-xl md:text-2xl font-black tracking-tight mt-0.5 bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">Mekong POS Terminal</h1>
-              </div>
+      {/* ─── Header ─── */}
+      <header className="flex-shrink-0">
+        <div className="accent-line" />
+        <div className={`glass px-5 py-3 flex items-center justify-between ${darkMode ? '' : ''}`}>
+          {/* Left: Branding */}
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan">
+              <Layers className="h-4.5 w-4.5 text-white" />
             </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              <button 
-                onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)} 
-                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold shadow-sm transition-all duration-300 active:scale-95 border border-slate-200/60 dark:border-white/10 ${
-                  analyticsViewOpen 
-                    ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-transparent' 
-                    : 'bg-white/80 dark:bg-slate-850/80 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
-              >
-                <BarChart2 className="h-4 w-4" />
-                <span>{analyticsViewOpen ? 'លក់ទំនិញ Cashier Mode' : 'របាយការណ៍ Analytics'}</span>
-              </button>
-
-              <button 
-                onClick={() => setPendingOrdersOpen(true)} 
-                className="relative flex items-center gap-2 rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-850/80 hover:bg-slate-50 dark:hover:bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all duration-300 active:scale-95"
-              >
-                <Clock className="h-4 w-4 text-brand-secondary" />
-                <span>បញ្ជាទិញរង់ចាំ Holds</span>
-                {pendingOrders.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[10px] font-bold px-2 py-0.5 animate-pulse">
-                    {pendingOrders.length}
-                  </span>
-                )}
-              </button>
-
-              <button 
-                onClick={() => setDarkMode(!darkMode)} 
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-850/80 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm active:scale-95"
-              >
-                {darkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-500" />}
-              </button>
-
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 dark:border-white/10 bg-slate-900/5 dark:bg-slate-900/40 px-4 py-2.5 text-xs font-bold tracking-wider font-mono">
-                <Clock className="h-4 w-4 text-brand-primary" />
-                <span>{timeStr}</span>
-              </div>
+            <div>
+              <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-muted">{settings.store_label}</div>
+              <h1 className="text-sm font-extrabold tracking-tight text-gradient leading-tight">Mekong POS</h1>
             </div>
           </div>
-        </header>
 
-        {/* Dashboard Metric summary widgets */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Catalog Size</div>
-            <div className="mt-2 text-2xl font-black tracking-tight">{products.length} Products</div>
-            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><LayoutGrid className="h-3.5 w-3.5" /> Total menu categories</div>
-          </div>
-          
-          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Subtotal Active</div>
-            <div className="mt-2 text-2xl font-black text-brand-primary tracking-tight">${getSubtotal().toFixed(2)}</div>
-            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><ShoppingBag className="h-3.5 w-3.5" /> {cart.length} item lines</div>
-          </div>
-          
-          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Inventory Status</div>
-            <div className={`mt-2 text-2xl font-black tracking-tight ${getLowStockCount() > 0 ? 'text-brand-danger' : 'text-brand-success'}`}>
-              {getLowStockCount()} Low Stock
-            </div>
-            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> Items requiring restock</div>
-          </div>
-          
-          <div className="p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Terminal Node</div>
-            <div className="mt-2 text-2xl font-black text-brand-success tracking-tight flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-brand-success inline-block animate-ping"></span>
-              <span>PP-01 Online</span>
-            </div>
-            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1"><Activity className="h-3.5 w-3.5" /> Active workspace</div>
-          </div>
-        </section>
+          {/* Right: Controls */}
+          <div className="flex items-center gap-2">
+            {/* Analytics toggle */}
+            <button
+              onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all duration-300 ${
+                analyticsViewOpen
+                  ? 'bg-gradient-to-r from-brand-cyan to-brand-violet text-white shadow-glow-cyan'
+                  : `${darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'}`
+              }`}
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{analyticsViewOpen ? 'លក់ទំនិញ' : 'របាយការណ៍'}</span>
+            </button>
 
-        {/* Dynamic content rendering */}
+            {/* Pending orders */}
+            <button
+              onClick={() => setPendingOrdersOpen(true)}
+              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all ${
+                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'
+              }`}
+            >
+              <Clock className="h-3.5 w-3.5 text-brand-violet" />
+              <span className="hidden sm:inline">រង់ចាំ</span>
+              {pendingOrders.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5 badge-pulse">
+                  {pendingOrders.length}
+                </span>
+              )}
+            </button>
+
+            {/* Dark mode */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${
+                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              {darkMode ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-slate-500" />}
+            </button>
+
+            {/* Clock */}
+            <div className={`hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-mono font-bold tracking-wider ${
+              darkMode ? 'bg-brand-surfDark border border-white/5 text-brand-cyan' : 'bg-white border border-gray-200 text-brand-cyan'
+            }`}>
+              <Activity className="h-3 w-3" />
+              <span>{timeStr}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── Main Content Area ─── */}
+      <div className="flex-1 flex overflow-hidden">
+
         {analyticsViewOpen ? (
-          /* --- Redesigned Premium Analytics Dashboard --- */
-          <div className="p-6 rounded-3xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl animate-fade-in space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-6 w-6 text-brand-primary" />
-                <h2 className="text-lg font-black tracking-tight">របាយការណ៍លក់ និងស្តុក (Analytics Overview)</h2>
+          /* ═══ Analytics View ═══ */
+          <div className="flex-1 overflow-y-auto p-5 animate-fade-in">
+            <div className={`rounded-2xl p-6 ${darkMode ? 'bg-brand-surfDark border border-white/5' : 'bg-white border border-gray-200'} shadow-glass`}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-brand-cyan" />
+                  <h2 className="text-base font-extrabold tracking-tight">របាយការណ៍លក់ និងស្តុក</h2>
+                </div>
+                <button
+                  onClick={() => setAnalyticsViewOpen(false)}
+                  className="text-[10px] font-bold uppercase tracking-wider text-brand-muted hover:text-brand-cyan transition"
+                >
+                  បិទ ✕
+                </button>
               </div>
-              <button 
-                onClick={() => setAnalyticsViewOpen(false)} 
-                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
-              >
-                Close Report
-              </button>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              
-              {/* Category Sales Chart (2 cols) */}
-              <div className="md:col-span-2 p-5 rounded-2xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30">
-                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-[0.1em]">Sales by Category (USD)</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={getCategorySalesData()}>
-                      <XAxis dataKey="name" stroke="#888888" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#888888" fontSize={11} tickLine={false} axisLine={false} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          background: 'rgba(15, 23, 42, 0.9)', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          borderRadius: '12px',
-                          color: '#fff' 
-                        }} 
-                      />
-                      <Bar dataKey="sales" fill="url(#bluePurpleGrad)" radius={[6, 6, 0, 0]}>
-                        {/* Define linear gradient inside Recharts svg */}
+              <div className="grid md:grid-cols-3 gap-5">
+                {/* Category Sales */}
+                <div className={`md:col-span-2 p-5 rounded-xl ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">ការលក់តាមប្រភេទ (USD)</h3>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={getCategorySalesData()}>
+                        <XAxis dataKey="name" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                        <Tooltip
+                          contentStyle={{
+                            background: darkMode ? 'rgba(19, 24, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+                            borderRadius: '12px',
+                            color: darkMode ? '#E2E8F0' : '#1E293B',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        />
+                        <Bar dataKey="sales" fill="url(#cyanVioletGrad)" radius={[6, 6, 0, 0]}>
+                          <defs>
+                            <linearGradient id="cyanVioletGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#06B6D4" />
+                              <stop offset="100%" stopColor="#8B5CF6" />
+                            </linearGradient>
+                          </defs>
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Stock Levels */}
+                <div className={`p-5 rounded-xl ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">ស្តុកបច្ចុប្បន្ន</h3>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={getStockLevelsData()}>
                         <defs>
-                          <linearGradient id="bluePurpleGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#2563EB" />
-                            <stop offset="100%" stopColor="#7C3AED" />
+                          <linearGradient id="cyanAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#06B6D4" stopOpacity={0.4} />
+                            <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.0} />
                           </linearGradient>
                         </defs>
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Stock Inventory levels (1 col) */}
-              <div className="p-5 rounded-2xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30">
-                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-[0.1em]">Current Stock Quantities</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={getStockLevelsData()}>
-                      <defs>
-                        <linearGradient id="yellowGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.4} />
-                          <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="name" stroke="#888888" fontSize={9} tickLine={false} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          background: 'rgba(15, 23, 42, 0.9)', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          borderRadius: '12px',
-                          color: '#fff' 
-                        }} 
-                      />
-                      <Area type="monotone" dataKey="stock" stroke="#F59E0B" fill="url(#yellowGrad)" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                        <XAxis dataKey="name" stroke="#64748B" fontSize={9} tickLine={false} />
+                        <Tooltip
+                          contentStyle={{
+                            background: darkMode ? 'rgba(19, 24, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+                            borderRadius: '12px',
+                            color: darkMode ? '#E2E8F0' : '#1E293B'
+                          }}
+                        />
+                        <Area type="monotone" dataKey="stock" stroke="#06B6D4" fill="url(#cyanAreaGrad)" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          /* --- Cashier POS Terminal Redesigned --- */
-          <div className="grid md:grid-cols-12 gap-6 items-start">
-            
-            {/* Products grid section */}
-            <main className="md:col-span-8 space-y-6">
-              
-              {/* Filter controls */}
-              <div className="flex flex-wrap items-center gap-3">
-                
-                {/* Search Menu Input */}
-                <div className="relative flex-1 min-w-[240px]">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-primary" />
-                  <input 
-                    type="text" 
-                    placeholder="ស្វែងរកទំនិញ Search barcode, SKU, or item name..." 
+          /* ═══ POS Terminal View ═══ */
+          <>
+            {/* ─── Left: Products ─── */}
+            <main className="flex-1 flex flex-col overflow-hidden">
+              {/* Search + Categories bar */}
+              <div className={`flex-shrink-0 px-5 py-3 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
+                {/* Search input */}
+                <div className="relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-cyan" />
+                  <input
+                    type="text"
+                    placeholder="ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleQuickAdd}
-                    className={`w-full py-3.5 pl-11 pr-4 text-sm font-semibold rounded-2xl border outline-none shadow-sm transition-all duration-300 focus:ring-4 ${
-                      darkMode 
-                        ? 'bg-slate-900 border-slate-800 text-white focus:border-brand-primary focus:ring-blue-950/30' 
-                        : 'bg-white border-slate-200 focus:border-brand-primary focus:ring-blue-100/50'
+                    className={`w-full py-2.5 pl-10 pr-4 text-sm font-medium rounded-xl border transition-all duration-300 ${
+                      darkMode
+                        ? 'bg-brand-surfDark border-white/5 text-brand-textDark placeholder-slate-500'
+                        : 'bg-white border-gray-200 text-brand-textLight placeholder-gray-400'
                     }`}
                   />
                 </div>
 
-                {/* Category Pills Scroller */}
-                <div className="flex items-center gap-2 overflow-x-auto py-1 pr-2 no-scrollbar">
+                {/* Category pills */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
                   {getCategories().map(cat => {
-                    const isSelected = selectedCategory === cat || (cat === 'All' && selectedCategory === '');
+                    const isActive = selectedCategory === cat || (cat === 'All' && selectedCategory === '');
                     return (
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
-                        className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border transition-all duration-300 ${
-                          isSelected
-                            ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-transparent shadow-md'
-                            : 'bg-white dark:bg-slate-900 border-slate-200/50 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        className={`px-3.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-300 ${
+                          isActive
+                            ? 'pill-active'
+                            : `${darkMode ? 'bg-brand-surfDark border border-white/5 text-slate-400 hover:text-brand-cyan hover:border-brand-cyan/20' : 'bg-white border border-gray-200 text-gray-500 hover:text-brand-cyan hover:border-brand-cyan/30'}`
                         }`}
                       >
-                        {cat}
+                        {cat === 'All' ? '🏷️ ទាំងអស់' : cat}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Products list grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* Product Grid */}
+              <div className="flex-1 overflow-y-auto p-5">
                 {getFilteredProducts().length === 0 ? (
-                  <div className="col-span-full py-20 text-center rounded-2xl border border-dashed border-slate-200/80 dark:border-slate-800">
-                    <LayoutGrid className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700 mb-3" />
-                    <p className="text-sm font-bold text-slate-400">រកមិនឃើញទំនិញទេ (No items matched filter)</p>
+                  <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
+                    <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
+                    <p className="text-sm font-bold text-brand-muted">រកមិនឃើញទំនិញទេ</p>
+                    <p className="text-xs text-brand-muted/60 mt-1">No products match your search</p>
                   </div>
                 ) : (
-                  getFilteredProducts().map(prod => {
-                    const isOutOfStock = prod.stock <= 0;
-                    const isLowStock = prod.stock > 0 && prod.stock <= 5;
-                    const stockText = isOutOfStock ? 'អស់ស្តុក (Out of Stock)' : `${prod.stock} items`;
-                    const hasInCart = cart.find(item => item.product.id === prod.id);
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                    {getFilteredProducts().map((prod, idx) => {
+                      const isOutOfStock = prod.stock <= 0;
+                      const isLowStock = prod.stock > 0 && prod.stock <= 5;
+                      const inCartItem = cart.find(item => item.product.id === prod.id);
 
-                    return (
-                      <div 
-                        key={prod.id}
-                        onClick={() => addToCart(prod)}
-                        className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 bg-white dark:bg-slate-900/60 border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark hover:translate-y-[-4px] hover:border-brand-primary/40 ${
-                          isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                        }`}
-                      >
-                        {/* Status Stock Badge */}
-                        <span className={`absolute right-3 top-3 z-10 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border ${
-                          isOutOfStock 
-                            ? 'bg-rose-500/10 text-brand-danger border-brand-danger/20' 
-                            : isLowStock 
-                              ? 'bg-brand-warning/10 text-brand-warning border-brand-warning/20'
-                              : 'bg-brand-success/10 text-brand-success border-brand-success/20'
-                        }`}>
-                          {stockText}
-                        </span>
+                      return (
+                        <div
+                          key={prod.id}
+                          onClick={() => addToCart(prod)}
+                          className={`glass-card rounded-xl overflow-hidden cursor-pointer animate-slide-up ${
+                            isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
+                          } ${inCartItem ? 'ring-2 ring-brand-cyan/40' : ''}`}
+                          style={{ animationDelay: `${idx * 30}ms`, animationFillMode: 'both' }}
+                        >
+                          {/* Image area */}
+                          <div className={`aspect-[4/3] relative overflow-hidden flex items-center justify-center ${
+                            darkMode ? 'bg-brand-bgDark/50' : 'bg-gray-50'
+                          }`}>
+                            {prod.image ? (
+                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <Package className={`h-8 w-8 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                            )}
 
-                        {/* Thumb Container */}
-                        <div className={`aspect-square w-full relative flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950/40 ring-1 ring-inset ${
-                          darkMode ? 'ring-white/5' : 'ring-slate-100'
-                        }`}>
-                          {prod.image ? (
-                            <img 
-                              src={prod.image} 
-                              alt={prod.name} 
-                              className="h-full w-full object-cover transition-transform duration-350 group-hover:scale-105" 
-                            />
-                          ) : (
-                            <LayoutGrid className="h-10 w-10 text-slate-200 dark:text-slate-800" />
-                          )}
-                          
-                          {/* Selection indicator overlay */}
-                          {hasInCart && (
-                            <div className="absolute inset-0 bg-brand-primary/10 backdrop-blur-xs flex items-center justify-center">
-                              <span className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full font-extrabold px-3 py-1 text-xs shadow-md">
-                                {hasInCart.quantity}
+                            {/* Stock badge */}
+                            <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide ${
+                              isOutOfStock ? 'stock-out' : isLowStock ? 'stock-low' : 'stock-ok'
+                            }`}>
+                              {isOutOfStock ? 'អស់' : isLowStock ? `${prod.stock} left` : `${prod.stock}`}
+                            </span>
+
+                            {/* In-cart quantity overlay */}
+                            {inCartItem && (
+                              <div className="product-overlay" style={{ opacity: 1 }}>
+                                <span className="bg-gradient-to-r from-brand-cyan to-brand-violet text-white rounded-full px-3 py-1 text-xs font-extrabold shadow-lg">
+                                  ×{inCartItem.quantity}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Hover overlay */}
+                            {!inCartItem && !isOutOfStock && (
+                              <div className="product-overlay">
+                                <div className="h-8 w-8 rounded-full bg-white/90 dark:bg-brand-surfDark/90 flex items-center justify-center shadow-lg">
+                                  <Plus className="h-4 w-4 text-brand-cyan" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="p-3 space-y-1">
+                            <h4 className="text-xs font-bold truncate leading-tight">{prod.name}</h4>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-extrabold text-brand-cyan">${prod.price.toFixed(2)}</span>
+                              <span className="text-[9px] font-medium text-brand-muted truncate max-w-[60px]">
+                                {prod.sku || prod.category}
                               </span>
                             </div>
-                          )}
-                        </div>
-
-                        {/* Card Info Details */}
-                        <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
-                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate leading-snug">{prod.name}</h4>
-                          <div className="flex items-center justify-between pt-1">
-                            <span className="text-base font-black text-brand-success">${prod.price.toFixed(2)}</span>
-                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 max-w-[80px] truncate">
-                              {prod.sku || prod.category}
-                            </span>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </main>
 
-            {/* Shopping Cart Drawer panel */}
-            <aside className="md:col-span-4 p-5 rounded-2xl border bg-white dark:bg-brand-surfDark border-slate-200/50 dark:border-white/5 shadow-premium-light dark:shadow-premium-dark backdrop-blur-xl sticky top-6 space-y-4">
-              
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
+            {/* ─── Right: Cart Sidebar ─── */}
+            <aside className={`w-[340px] flex-shrink-0 flex flex-col border-l ${
+              darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
+            }`}>
+              {/* Cart Header */}
+              <div className={`flex-shrink-0 px-5 py-3.5 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="h-5 w-5 text-brand-primary" />
-                  <h3 className="font-black text-sm">កន្ត្រកទំនិញ Active Cart</h3>
+                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center">
+                    <Receipt className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-extrabold tracking-tight">កន្ត្រក</h3>
                 </div>
-                <span className="text-[10px] font-black bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full text-slate-600 dark:text-slate-300">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)} Items
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                  darkMode ? 'bg-brand-bgDark text-brand-cyan' : 'bg-gray-100 text-brand-cyan'
+                }`}>
+                  {cart.reduce((sum, item) => sum + item.quantity, 0)} items
                 </span>
               </div>
 
-              {/* Items scroll list */}
-              <div className="space-y-3 min-h-[220px] max-h-[360px] overflow-y-auto pr-1">
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
                 {cart.length === 0 ? (
-                  <div className="h-[220px] flex flex-col items-center justify-center text-center space-y-1">
-                    <ShoppingBag className="h-8 w-8 text-slate-300 dark:text-slate-800" />
-                    <p className="text-xs font-bold text-slate-400">ទទេស្អាត (Cart is empty)</p>
-                    <p className="text-[10px] text-slate-400">Select items to begin checkout</p>
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <ShoppingBag className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                    <p className="text-xs font-bold text-brand-muted">កន្ត្រកទទេ</p>
+                    <p className="text-[10px] text-brand-muted/60 mt-0.5">ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម</p>
                   </div>
                 ) : (
                   cart.map(item => (
-                    <div 
+                    <div
                       key={item.product.id}
-                      className="flex items-center gap-3 p-3 rounded-xl border bg-slate-50/50 dark:bg-slate-950/20 border-slate-200/50 dark:border-white/5"
+                      className={`cart-item flex items-center gap-3 p-2.5 rounded-xl transition ${
+                        darkMode ? 'bg-brand-bgDark/40 border border-white/5' : 'bg-gray-50 border border-gray-100'
+                      }`}
                     >
-                      <div className="h-9 w-9 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-900 flex-shrink-0 flex items-center justify-center">
+                      {/* Thumb */}
+                      <div className={`h-9 w-9 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center ${
+                        darkMode ? 'bg-brand-bgDark' : 'bg-gray-100'
+                      }`}>
                         {item.product.image ? (
-                          <img src={item.product.image} className="h-full w-full object-cover" />
+                          <img src={item.product.image} className="h-full w-full object-cover" alt="" />
                         ) : (
-                          <LayoutGrid className="h-4 w-4 text-slate-400" />
+                          <Package className="h-4 w-4 text-brand-muted/40" />
                         )}
                       </div>
+
+                      {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{item.product.name}</div>
-                        <div className="text-xs font-black text-brand-success mt-0.5">${item.product.price.toFixed(2)}</div>
+                        <div className="text-[11px] font-bold truncate">{item.product.name}</div>
+                        <div className="text-[11px] font-extrabold text-brand-cyan mt-0.5">${(item.product.price * item.quantity).toFixed(2)}</div>
                       </div>
-                      
-                      {/* Plus/minus selectors */}
-                      <div className="flex items-center gap-1 rounded-full bg-white dark:bg-slate-900 p-0.5 border dark:border-white/5 shadow-sm">
-                        <button 
-                          onClick={() => updateCartQty(item.product.id, -1)}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-danger hover:text-white transition-all text-slate-500 text-xs"
+
+                      {/* Qty controls */}
+                      <div className={`flex items-center gap-0.5 rounded-full p-0.5 border ${
+                        darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
+                      }`}>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, -1); }}
+                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-danger/20 hover:text-brand-danger transition text-brand-muted text-xs"
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        <span className="w-4 text-center text-xs font-bold">{item.quantity}</span>
-                        <button 
-                          onClick={() => updateCartQty(item.product.id, 1)}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-success hover:text-white transition-all text-slate-500 text-xs"
+                        <span className="w-5 text-center text-[11px] font-bold">{item.quantity}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, 1); }}
+                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-success/20 hover:text-brand-success transition text-brand-muted text-xs"
                         >
                           <Plus className="h-3 w-3" />
                         </button>
@@ -776,149 +763,171 @@ export default function App() {
                 )}
               </div>
 
-              {/* CRM Loyalty selector */}
-              <div className="space-y-3 pt-2">
-                <div>
-                  <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">ជ្រើសរើសអតិថិជន Customer</label>
+              {/* Cart Footer */}
+              <div className={`flex-shrink-0 px-4 pb-4 pt-2 space-y-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+                {/* Customer + Mode selectors */}
+                <div className="space-y-2">
                   <div className="relative">
-                    <select 
-                      value={selectedCustomerId}
-                      onChange={(e) => setSelectedCustomerId(e.target.value)}
-                      className={`w-full appearance-none py-2.5 pl-3 pr-10 text-xs font-bold rounded-xl border outline-none shadow-sm transition ${
-                        darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200'
-                      }`}
-                    >
-                      <option value="">Walk-in Customer (អតិថិជនទូទៅ)</option>
-                      {customers.map(c => (
-                        <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-450 pointer-events-none" />
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">អតិថិជន</label>
+                    <div className="relative">
+                      <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
+                      <select
+                        value={selectedCustomerId}
+                        onChange={(e) => setSelectedCustomerId(e.target.value)}
+                        className={`w-full appearance-none py-2 pl-8 pr-8 text-[11px] font-medium rounded-lg border transition ${
+                          darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
+                        }`}
+                      >
+                        <option value="">Walk-in (អតិថិជនទូទៅ)</option>
+                        {customers.map(c => (
+                          <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-brand-muted pointer-events-none" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Action Mode</label>
-                    <select 
-                      value={orderStatus} 
-                      onChange={(e) => setOrderStatus(e.target.value)}
-                      className={`w-full py-2.5 px-3 text-xs font-bold rounded-xl border outline-none shadow-sm transition ${
-                        darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200'
-                      }`}
-                    >
-                      <option value="completed">Immediate Sale</option>
-                      <option value="pending">Hold Order</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Receipt Output</label>
-                    <div className="py-2.5 px-3 text-xs font-extrabold rounded-xl border border-brand-success/20 bg-brand-success/10 text-brand-success text-center">
-                      Auto-Print
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">Mode</label>
+                      <select
+                        value={orderStatus}
+                        onChange={(e) => setOrderStatus(e.target.value)}
+                        className={`w-full py-2 px-2.5 text-[11px] font-medium rounded-lg border transition ${
+                          darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200'
+                        }`}
+                      >
+                        <option value="completed">លក់ Sell</option>
+                        <option value="pending">រង់ចាំ Hold</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">Receipt</label>
+                      <div className={`py-2 px-2.5 text-[11px] font-bold rounded-lg text-center ${
+                        darkMode ? 'bg-brand-success/10 text-brand-success border border-brand-success/20' : 'bg-green-50 text-brand-success border border-green-200'
+                      }`}>
+                        Auto-Print
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Receipt Total values breakdown */}
-              <div className="p-4 rounded-xl border bg-slate-50/50 dark:bg-slate-950/20 border-slate-200/50 dark:border-white/5 space-y-2">
-                <div className="flex justify-between items-center text-xs font-bold text-slate-400">
-                  <span>Subtotal</span>
-                  <span>${getSubtotal().toFixed(2)}</span>
+                {/* Receipt Totals */}
+                <div className={`p-3 rounded-xl space-y-1.5 ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
+                    <span>Subtotal</span>
+                    <span>${getSubtotal().toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
+                    <span>Tax (0%)</span>
+                    <span>$0.00</span>
+                  </div>
+                  <div className="receipt-divider my-1.5" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-extrabold">សរុប Total</span>
+                    <span className="text-lg font-black text-gradient">${getGrandTotal().toFixed(2)}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-xs font-bold text-slate-400">
-                  <span>Sales Tax (0%)</span>
-                  <span>$0.00</span>
-                </div>
-                <div className="flex justify-between items-center border-t border-dashed border-slate-200 dark:border-white/5 pt-2.5 mt-2.5">
-                  <span className="text-xs font-extrabold">Grand Total</span>
-                  <span className="text-base font-black text-brand-success">${getGrandTotal().toFixed(2)}</span>
-                </div>
-              </div>
 
-              {/* Checkout actions */}
-              <div className="flex items-center gap-2 pt-2">
-                <button 
-                  onClick={clearCart}
-                  title="Clear Cart"
-                  className="h-11 w-11 rounded-xl flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all shadow-sm"
-                >
-                  <Trash2 className="h-4.5 w-4.5" />
-                </button>
-                <button 
-                  disabled={cart.length === 0}
-                  onClick={() => {
-                    if (orderStatus === 'pending') {
-                      handleCheckoutSubmit();
-                    } else {
-                      setPaymentModalOpen(true);
-                    }
-                  }}
-                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-extrabold text-xs shadow-md hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all duration-300"
-                >
-                  <span>{orderStatus === 'pending' ? 'Place Order on Hold' : 'ទូទាត់ប្រាក់ Process Checkout'}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+                {/* Actions */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={clearCart}
+                    title="Clear Cart"
+                    className="h-10 w-10 rounded-xl flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all flex-shrink-0"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    disabled={cart.length === 0}
+                    onClick={() => {
+                      if (orderStatus === 'pending') {
+                        handleCheckoutSubmit();
+                      } else {
+                        setPaymentModalOpen(true);
+                      }
+                    }}
+                    className="btn-primary flex-1 h-10 text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Zap className="h-3.5 w-3.5" />
+                    <span>{orderStatus === 'pending' ? 'ដាក់រង់ចាំ Hold' : 'ទូទាត់ Checkout'}</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             </aside>
-          </div>
+          </>
         )}
       </div>
 
-      {/* --- Hold Orders Drawer (Modal style on right side) --- */}
+      {/* ═══ Pending Orders Drawer ═══ */}
       {pendingOrdersOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end animate-fade-in">
-          <div className="w-full max-w-sm h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-white/5 shadow-2xl flex flex-col p-6 space-y-4">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
-              <h3 className="text-base font-extrabold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-brand-primary" />
-                <span>Pending Hold Orders</span>
-              </h3>
-              <button 
+        <div className="fixed inset-0 z-50 modal-backdrop flex justify-end animate-fade-in" onClick={() => setPendingOrdersOpen(false)}>
+          <div
+            className={`w-full max-w-sm h-full flex flex-col shadow-glass-lg animate-slide-right ${
+              darkMode ? 'bg-brand-surfDark' : 'bg-white'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drawer Header */}
+            <div className={`flex-shrink-0 px-5 py-4 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-brand-violet" />
+                <h3 className="text-sm font-extrabold">បញ្ជាទិញរង់ចាំ</h3>
+              </div>
+              <button
                 onClick={() => setPendingOrdersOpen(false)}
-                className="h-9 w-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-650"
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
+                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted' : 'hover:bg-gray-100 text-gray-400'
+                }`}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-2 space-y-4">
+            {/* Drawer Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {pendingOrders.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-2">
-                  <Clock className="h-8 w-8 text-slate-300 dark:text-slate-800" />
-                  <p className="text-xs font-bold text-slate-450">No pending orders found.</p>
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <Clock className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                  <p className="text-xs font-bold text-brand-muted">មិនមាន order រង់ចាំទេ</p>
                 </div>
               ) : (
-                pendingOrders.map(order => (
-                  <div 
+                pendingOrders.map((order, idx) => (
+                  <div
                     key={order.id}
-                    onClick={() => {
-                      window.location.href = `?resume=${order.id}`;
-                    }}
-                    className="p-4 rounded-xl border border-slate-200/50 dark:border-white/5 hover:border-brand-primary/40 cursor-pointer shadow-sm transition bg-slate-50/50 dark:bg-slate-900/30 group space-y-2"
+                    onClick={() => { window.location.href = `?resume=${order.id}`; }}
+                    className={`p-4 rounded-xl cursor-pointer transition-all animate-slide-up group ${
+                      darkMode
+                        ? 'bg-brand-bgDark/50 border border-white/5 hover:border-brand-cyan/30'
+                        : 'bg-gray-50 border border-gray-100 hover:border-brand-cyan/30'
+                    }`}
+                    style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-2">
                       <div>
-                        <span className="font-extrabold text-xs text-slate-850 dark:text-slate-200">Order #{order.id}</span>
-                        <div className="text-[9px] font-bold text-slate-400 mt-1 flex items-center gap-1">
+                        <span className="text-xs font-extrabold">Order #{order.id}</span>
+                        <div className="text-[9px] font-medium text-brand-muted mt-0.5 flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                      <span className="text-sm font-black text-brand-success">${parseFloat(order.total).toFixed(2)}</span>
+                      <span className="text-sm font-black text-brand-cyan">${parseFloat(order.total).toFixed(2)}</span>
                     </div>
 
                     {order.notes && (
-                      <div className="p-2.5 bg-brand-warning/10 dark:bg-amber-950/10 rounded-lg text-[10px] border border-brand-warning/20">
-                        <span className="font-extrabold block text-brand-warning uppercase tracking-wider">Note:</span>
-                        <span className="text-slate-600 dark:text-slate-350 font-bold">{order.notes}</span>
+                      <div className={`p-2 rounded-lg text-[10px] mb-2 ${
+                        darkMode ? 'bg-brand-warning/10 border border-brand-warning/20' : 'bg-amber-50 border border-amber-200'
+                      }`}>
+                        <span className="font-bold text-brand-warning block">Note:</span>
+                        <span className="text-brand-muted">{order.notes}</span>
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2.5">
-                      <span className="text-[10px] font-bold text-slate-450">{order.item_lines} items</span>
-                      <span className="text-[10px] font-black uppercase tracking-wider text-brand-primary group-hover:text-brand-secondary flex items-center gap-1">
-                        Resume <ArrowRight className="h-3 w-3" />
+                    <div className={`flex justify-between items-center pt-2 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+                      <span className="text-[10px] font-medium text-brand-muted">{order.item_lines} items</span>
+                      <span className="text-[10px] font-bold text-brand-cyan group-hover:text-brand-violet transition flex items-center gap-1">
+                        បន្ត <ChevronRight className="h-3 w-3" />
                       </span>
                     </div>
                   </div>
@@ -929,115 +938,121 @@ export default function App() {
         </div>
       )}
 
-      {/* --- Advanced Checkout Dialog Modal --- */}
+      {/* ═══ Payment Modal ═══ */}
       {paymentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className={`w-full max-w-lg rounded-3xl border shadow-2xl p-6 relative transition bg-white dark:bg-slate-900 border-slate-200/50 dark:border-white/5 ${
-            darkMode ? 'text-white' : 'text-slate-850'
-          }`}>
-            
+        <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
+          <div
+            className={`w-full max-w-md rounded-2xl shadow-glass-lg p-6 animate-scale-in ${
+              darkMode ? 'bg-brand-surfDark border border-white/5 text-brand-textDark' : 'bg-white border border-gray-200 text-brand-textLight'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
+            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary text-white flex items-center justify-center shadow">
-                  <CreditCard className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
+                  <CreditCard className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm">ទូទាត់ប្រាក់ Checkout Processing</h3>
-                  <p className="text-[10px] text-slate-400">Ensure security instruments are correctly routed</p>
+                  <h3 className="text-sm font-extrabold">ទូទាត់ប្រាក់</h3>
+                  <p className="text-[10px] text-brand-muted">Checkout Processing</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setPaymentModalOpen(false)}
-                className="h-8 w-8 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400"
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
+                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted' : 'hover:bg-gray-100 text-gray-400'
+                }`}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Total display */}
-            <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/30 border border-slate-200/50 dark:border-white/5 flex items-center justify-between">
+            {/* Total */}
+            <div className={`mt-4 p-4 rounded-xl flex items-center justify-between ${
+              darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'
+            }`}>
               <div>
-                <div className="text-[9px] font-extrabold uppercase tracking-widest text-slate-450">Total Payable</div>
-                <div className="text-xl font-black text-brand-success mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">ទឹកប្រាក់សរុប</div>
+                <div className="text-xl font-black text-gradient mt-0.5">${getGrandTotal().toFixed(2)}</div>
               </div>
-              <span className="text-[9px] font-black uppercase bg-brand-success/15 text-brand-success px-3 py-1 rounded-full tracking-wider border border-brand-success/20">
-                USD Active
+              <span className="text-[9px] font-bold uppercase bg-brand-cyan/15 text-brand-cyan px-2.5 py-1 rounded-full tracking-wider border border-brand-cyan/20">
+                USD
               </span>
             </div>
 
-            {/* Instrument Selection Tab Row */}
+            {/* Payment Method Tabs */}
             <div className="mt-5 space-y-2">
-              <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">Payment Instrument</label>
-              <div className="grid grid-cols-3 gap-3">
+              <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block">វិធីបង់ប្រាក់</label>
+              <div className="grid grid-cols-3 gap-2">
                 {settings.pos_method_cash_enabled === '1' && (
-                  <button 
+                  <button
                     onClick={() => setPaymentMethod('cash')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
-                      paymentMethod === 'cash' 
-                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
-                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
+                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                      paymentMethod === 'cash'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
                     <Wallet className="h-5 w-5" />
-                    <span className="text-xs">Cash/សាច់ប្រាក់</span>
+                    <span className="text-[10px]">សាច់ប្រាក់</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
-                  <button 
+                  <button
                     onClick={() => setPaymentMethod('khqr')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
-                      paymentMethod === 'khqr' 
-                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
-                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
+                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                      paymentMethod === 'khqr'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
                     <QrCode className="h-5 w-5" />
-                    <span className="text-xs">Dynamic KHQR</span>
+                    <span className="text-[10px]">KHQR</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
-                  <button 
+                  <button
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
-                      paymentMethod === 'card' 
-                        ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-extrabold shadow-sm' 
-                        : 'border-slate-200/50 dark:border-white/5 text-slate-450 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850'
+                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                      paymentMethod === 'card'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
                     <CreditCard className="h-5 w-5" />
-                    <span className="text-xs">Card Reader</span>
+                    <span className="text-[10px]">Card</span>
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Instrument-Specific Layout Area */}
-            <div className="mt-5">
+            {/* Payment Details */}
+            <div className="mt-4">
               {paymentMethod === 'cash' && (
-                <div className="space-y-4">
+                <div className="space-y-3 animate-fade-in">
                   <div>
-                    <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1.5">Cash Received</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">ប្រាក់ទទួលបាន</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">$</span>
-                      <input 
-                        type="number" 
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-brand-muted">$</span>
+                      <input
+                        type="number"
                         step="0.01"
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className={`w-full py-3.5 pl-8 pr-4 text-base font-black rounded-xl border outline-none transition focus:ring-4 ${
-                          darkMode 
-                            ? 'bg-slate-900 border-slate-800 text-white focus:border-brand-primary focus:ring-blue-950/30' 
-                            : 'bg-slate-50 border-slate-200 focus:border-brand-primary focus:ring-blue-100/50'
+                        className={`w-full py-3 pl-8 pr-4 text-base font-extrabold rounded-xl border transition ${
+                          darkMode
+                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark'
+                            : 'bg-gray-50 border-gray-200 text-brand-textLight'
                         }`}
                       />
                     </div>
                   </div>
-                  
+
                   {parseFloat(cashGiven) > 0 && (
-                    <div className="p-3.5 rounded-xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between">
-                      <span className="text-xs font-bold text-brand-success uppercase tracking-wider">Balance Change (ប្រាក់អាប់)</span>
+                    <div className="p-3 rounded-xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
+                      <span className="text-[11px] font-bold text-brand-success">ប្រាក់អាប់ Change</span>
                       <span className="text-lg font-black text-brand-success">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
@@ -1047,67 +1062,67 @@ export default function App() {
               )}
 
               {paymentMethod === 'khqr' && (
-                <div className="p-4 rounded-xl border border-slate-200/50 dark:border-white/5 bg-white text-center space-y-3">
-                  <div className="inline-block p-3 rounded-xl border border-slate-100 bg-white">
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`} 
+                <div className="text-center space-y-3 animate-fade-in">
+                  <div className="qr-container inline-block">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
                       alt="Bakong KHQR Code"
-                      className="h-40 w-40 mx-auto"
+                      className="h-40 w-40 mx-auto rounded-lg"
                     />
                   </div>
-                  <div className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-brand-danger animate-pulse">
-                    Awaiting dynamic Bakong check approval...
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-danger animate-pulse">
+                    កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...
                   </div>
                 </div>
               )}
 
               {paymentMethod === 'card' && (
-                <div className="p-6 rounded-xl border border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/30 text-center">
+                <div className={`p-5 rounded-xl text-center animate-fade-in ${
+                  darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'
+                }`}>
                   {cardSimulating ? (
-                    <div className="space-y-4">
-                      <div className="text-xs font-bold text-brand-primary">Connecting to card reader...</div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-brand-primary h-full transition-all duration-300" 
+                    <div className="space-y-3">
+                      <div className="text-xs font-bold text-brand-cyan">Connecting to card reader...</div>
+                      <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-gray-200'}`}>
+                        <div
+                          className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
                           style={{ width: `${cardProgress}%` }}
                         />
                       </div>
-                      <div className="text-[10px] text-slate-400 font-bold">{cardProgress}% Handshake</div>
+                      <div className="text-[10px] text-brand-muted font-bold">{cardProgress}%</div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <CreditCard className="mx-auto h-8 w-8 text-brand-primary animate-bounce" />
-                      <p className="text-xs font-bold text-slate-500">Insert/Tap credit card on POS reader device.</p>
-                      <p className="text-[10px] text-slate-450">Submit transaction below to initialize wireless handshake.</p>
+                      <CreditCard className="mx-auto h-8 w-8 text-brand-cyan animate-float" />
+                      <p className="text-xs font-bold text-brand-muted">បញ្ចូលកាត POS reader device</p>
+                      <p className="text-[10px] text-brand-muted/60">Submit to initialize handshake</p>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Modal actions */}
-            <div className="mt-6 flex flex-col gap-2">
-              <button 
+            {/* Modal Actions */}
+            <div className="mt-5 flex flex-col gap-2">
+              <button
                 onClick={handleCheckoutSubmit}
                 disabled={cardSimulating}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-extrabold text-xs shadow-md hover:brightness-110 disabled:opacity-55 flex items-center justify-center gap-1.5 transition-all"
+                className="btn-primary w-full h-11 text-xs font-extrabold flex items-center justify-center gap-1.5"
               >
-                <span>Confirm & Complete Transaction (ទូទាត់រួចរាល់)</span>
                 <Check className="h-4 w-4" />
+                <span>បញ្ជាក់ និង បញ្ចប់ Confirm</span>
               </button>
-              <button 
+              <button
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
-                className="w-full py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                className="w-full py-2.5 text-[11px] font-bold text-brand-muted hover:text-brand-cyan transition"
               >
-                Discard Checkout
+                បោះបង់ Cancel
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

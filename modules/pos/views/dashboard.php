@@ -48,56 +48,65 @@ foreach ($labels as $ym) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         .dashboard-hero {
             background: var(--pos-gradient-dark);
-            border-radius: 32px;
-            padding: 56px;
+            border-radius: var(--pos-radius-xl);
+            padding: 48px;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+            border: 1px solid var(--pos-border);
+            box-shadow: var(--pos-shadow-lg), var(--pos-shadow-glow);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .dashboard-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(129, 140, 248, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
         .dashboard-hero::after {
             content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;
+            background: radial-gradient(circle, rgba(129, 140, 248, 0.15) 0%, transparent 65%); border-radius: 50%; pointer-events: none;
         }
-        .dashboard-hero h1 { font-size: 44px; font-weight: 900; margin: 0; line-height: 1.1; letter-spacing: -1px; }
-        .dashboard-hero p { color: rgba(255,255,255,0.6); font-size: 18px; margin: 12px 0 32px; font-weight: 500; max-width: 500px; }
+        .dashboard-hero h1 { font-size: 40px; font-weight: 800; margin: 0; line-height: 1.1; letter-spacing: -1px; font-family: 'Space Grotesk', sans-serif; position: relative; z-index: 1; }
+        .dashboard-hero p { color: rgba(255,255,255,0.5); font-size: 16px; margin: 12px 0 28px; font-weight: 500; max-width: 500px; position: relative; z-index: 1; }
         
         .notification-card {
-            display: flex; gap: 20px; padding: 20px; background: white; border-radius: 20px;
-            border: 1.5px solid var(--pos-border); margin-bottom: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; gap: 16px; padding: 18px; background: var(--pos-card); backdrop-filter: blur(12px); border-radius: var(--pos-radius);
+            border: 1px solid var(--pos-border); margin-bottom: 12px; transition: all 0.3s ease;
         }
-        .notification-card:hover { transform: translateY(-4px) scale(1.01); border-color: var(--pos-primary); box-shadow: var(--pos-shadow-xl); }
-        .notification-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; font-size: 20px; }
+        .notification-card:hover { transform: translateY(-3px); border-color: rgba(129, 140, 248, 0.15); box-shadow: var(--pos-shadow-md); }
+        .notification-icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; font-size: 18px; }
 
-        .leaderboard-item { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 20px; background: #f8fafc; border: 1.5px solid var(--pos-border); transition: all 0.2s; }
-        .leaderboard-item:hover { background: white; border-color: var(--pos-primary); transform: translateX(8px); }
-        .rank-number { width: 40px; height: 40px; border-radius: 12px; background: white; border: 1px solid var(--pos-border); display: grid; place-items: center; font-weight: 900; color: var(--pos-primary); font-size: 15px; box-shadow: var(--pos-shadow-sm); }
-        .subscription-card .subscription-helper { color: var(--pos-text-muted); font-size: 13px; margin-top: 6px; font-weight: 600; }
+        .leaderboard-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: var(--pos-radius); background: var(--pos-card); border: 1px solid var(--pos-border); transition: all 0.25s ease; }
+        .leaderboard-item:hover { border-color: rgba(129, 140, 248, 0.15); transform: translateX(6px); box-shadow: var(--pos-shadow-sm); }
+        .rank-number { width: 38px; height: 38px; border-radius: 10px; background: var(--pos-primary-light); border: 1px solid rgba(129, 140, 248, 0.15); display: grid; place-items: center; font-weight: 800; color: var(--pos-primary); font-size: 14px; }
+        .subscription-card .subscription-helper { color: var(--pos-text-muted); font-size: 12px; margin-top: 6px; font-weight: 600; }
         .subscription-card .subscription-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
-        .subscription-list { display: flex; flex-direction: column; gap: 18px; margin-bottom: 16px; }
-        .subscription-plan { border: 1.5px solid var(--pos-border); border-radius: 22px; padding: 20px; background: #f8fafc; transition: all 0.2s ease; }
-        .subscription-plan:hover { border-color: var(--pos-primary); background: #fff; box-shadow: var(--pos-shadow-sm); }
-        .subscription-plan .plan-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .plan-name { font-weight: 850; font-size: 16px; margin: 0; color: var(--pos-text); }
-        .plan-meta { font-size: 12px; color: var(--pos-text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-        .plan-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .plan-stats .stat { background: #fff; border: 1px dashed var(--pos-border); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
-        .plan-stats .stat span { font-size: 11px; font-weight: 800; color: var(--pos-text-muted); text-transform: uppercase; }
-        .plan-stats .stat strong { font-size: 18px; font-weight: 900; color: var(--pos-text); }
-        .subscription-empty { border: 1.5px dashed var(--pos-border); border-radius: 20px; padding: 32px 20px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-        .subscription-empty i { font-size: 36px; color: var(--pos-border); }
+        .subscription-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+        .subscription-plan { border: 1px solid var(--pos-border); border-radius: var(--pos-radius); padding: 18px; background: var(--pos-card); transition: all 0.25s ease; }
+        .subscription-plan:hover { border-color: rgba(129, 140, 248, 0.15); box-shadow: var(--pos-shadow-sm); }
+        .subscription-plan .plan-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .plan-name { font-weight: 800; font-size: 15px; margin: 0; color: var(--pos-text); }
+        .plan-meta { font-size: 11px; color: var(--pos-text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .plan-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .plan-stats .stat { background: rgba(255,255,255,0.02); border: 1px dashed var(--pos-border); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+        .plan-stats .stat span { font-size: 10px; font-weight: 700; color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .plan-stats .stat strong { font-size: 17px; font-weight: 800; color: var(--pos-text); font-family: 'Space Grotesk', sans-serif; }
+        .subscription-empty { border: 1.5px dashed var(--pos-border); border-radius: var(--pos-radius); padding: 32px 20px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+        .subscription-empty i { font-size: 36px; color: var(--pos-text-dim); }
         .subscription-empty p { margin: 0; }
-        .subscription-empty-hint { font-size: 13px; color: var(--pos-text-muted); font-weight: 600; }
-        .subscription-cta { padding: 12px 28px; font-size: 13px; font-weight: 800; border-radius: 999px; }
-        .subscription-manage-btn { width: 100%; justify-content: center; border-radius: 18px; font-weight: 800; padding: 14px 24px; }
+        .subscription-empty-hint { font-size: 12px; color: var(--pos-text-muted); font-weight: 600; }
+        .subscription-cta { padding: 10px 24px; font-size: 13px; font-weight: 700; border-radius: 999px; }
+        .subscription-manage-btn { width: 100%; justify-content: center; border-radius: 14px; font-weight: 700; padding: 12px 24px; }
     </style>
 </head>
 <body class="pos-app">
@@ -109,17 +118,17 @@ foreach ($labels as $ym) {
             <div style="position: relative; z-index: 2;">
                 <h1><?php echo __('powering_growth'); ?></h1>
                 <p><?php echo __('welcome_back'); ?>, <?php echo htmlspecialchars($tenantName); ?>. <?php echo __('ecosystem_performing'); ?></p>
-                <div style="display: flex; gap: 16px;">
-                    <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 16px 36px; font-weight: 800; font-size: 16px;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 14px 32px; font-weight: 700; font-size: 14px; position: relative; z-index: 1;">
                         <i class="fas fa-plus"></i> <?php echo __('initiate_sale'); ?>
                     </a>
-                    <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: white; padding: 16px 36px; border-radius: 20px;">
+                    <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); color: white; padding: 14px 32px; border-radius: 12px; position: relative; z-index: 1;">
                         <i class="fas fa-chart-pie"></i> <?php echo __('analytical_overview'); ?>
                     </a>
                 </div>
             </div>
-            <div style="width: 200px; height: 200px; background: rgba(99, 102, 241, 0.1); border-radius: 40px; display: grid; place-items: center; transform: rotate(15deg); border: 2px solid rgba(255,255,255,0.1); position: relative; z-index: 1;">
-                 <i class="fas fa-rocket" style="font-size: 80px; color: var(--pos-primary); opacity: 0.8;"></i>
+            <div style="width: 160px; height: 160px; background: rgba(129, 140, 248, 0.08); border-radius: 32px; display: grid; place-items: center; transform: rotate(12deg); border: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 1;">
+                 <i class="fas fa-rocket" style="font-size: 64px; color: var(--pos-primary); opacity: 0.6;"></i>
             </div>
         </div>
 
@@ -128,12 +137,12 @@ foreach ($labels as $ym) {
             <div class="pos-stat">
                 <span class="k"><?php echo __('recent_orders'); ?></span>
                 <p class="v"><?php echo (int)($stats['total_orders'] ?? 0); ?></p>
-                <div class="chip" style="background: rgba(99, 102, 241, 0.1); color: var(--pos-primary);"><i class="fas fa-shopping-basket"></i></div>
+                <div class="chip" style="background: rgba(129, 140, 248, 0.1); color: var(--pos-primary);"><i class="fas fa-shopping-basket"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_revenue'); ?></span>
                 <p class="v"><?php echo htmlspecialchars($fmtMoney($stats['total_sales'] ?? 0)); ?></p>
-                <div class="chip" style="background: rgba(16, 185, 129, 0.1); color: var(--pos-success);"><i class="fas fa-money-bill-trend-up"></i></div>
+                <div class="chip" style="background: rgba(52, 211, 153, 0.1); color: var(--pos-success);"><i class="fas fa-money-bill-trend-up"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('products'); ?></span>
@@ -154,7 +163,7 @@ foreach ($labels as $ym) {
                     <h3 class="pos-card-title"><?php echo __('economic_momentum'); ?></h3>
                     <div class="badge badge-primary"><?php echo __('annual_revenue'); ?></div>
                 </div>
-                <div style="height: 380px; padding: 20px;">
+                <div style="height: 360px; padding: 20px;">
                     <canvas id="salesChart"></canvas>
                 </div>
                 
@@ -284,24 +293,24 @@ foreach ($labels as $ym) {
                     <h3 class="pos-card-title" style="margin-bottom: 24px;"><?php echo __('intelligence_alerts'); ?></h3>
                     <div>
                         <?php if (empty($lowStockItems)): ?>
-                            <div class="notification-card" style="background: #f0fdf4; border-color: #bbf7d0;">
-                                <div class="notification-icon" style="background: #22c55e; color: white;">
+                            <div class="notification-card" style="background: rgba(52, 211, 153, 0.06); border-color: rgba(52, 211, 153, 0.15);">
+                                <div class="notification-icon" style="background: rgba(52, 211, 153, 0.15); color: var(--pos-success);">
                                     <i class="fas fa-check-double"></i>
                                 </div>
                                 <div>
-                                    <p style="font-weight: 900; color: #166534; margin: 0; font-size: 15px;"><?php echo __('operational_health_optimal'); ?></p>
-                                    <p style="font-size: 13px; color: #14532d; margin: 4px 0 0; font-weight: 500;"><?php echo __('inventory_stabilized'); ?></p>
+                                    <p style="font-weight: 800; color: var(--pos-success); margin: 0; font-size: 14px;"><?php echo __('operational_health_optimal'); ?></p>
+                                    <p style="font-size: 12px; color: var(--pos-text-muted); margin: 4px 0 0; font-weight: 500;"><?php echo __('inventory_stabilized'); ?></p>
                                 </div>
                             </div>
                         <?php else: ?>
                             <?php foreach (array_slice($lowStockItems, 0, 4) as $p): ?>
                                 <div class="notification-card">
-                                    <div class="notification-icon" style="background: #fef2f2; color: #ef4444;">
+                                    <div class="notification-icon" style="background: rgba(248, 113, 113, 0.1); color: var(--pos-danger);">
                                         <i class="fas fa-arrow-trend-down"></i>
                                     </div>
                                     <div style="flex: 1;">
-                                        <p style="font-weight: 850; color: var(--pos-text); margin: 0; font-size: 15px;"><?php echo htmlspecialchars($p['name']); ?></p>
-                                        <p style="font-size: 13px; color: #b91c1c; margin: 4px 0 0; font-weight: 700;"><?php echo __('inventory_deficit'); ?>: <?php echo (int)$p['stock_quantity']; ?> <?php echo __('units_remaining'); ?></p>
+                                        <p style="font-weight: 700; color: var(--pos-text); margin: 0; font-size: 14px;"><?php echo htmlspecialchars($p['name']); ?></p>
+                                        <p style="font-size: 12px; color: var(--pos-danger); margin: 4px 0 0; font-weight: 600;"><?php echo __('inventory_deficit'); ?>: <?php echo (int)$p['stock_quantity']; ?> <?php echo __('units_remaining'); ?></p>
                                     </div>
                                     <a href="<?php echo htmlspecialchars($posUrl('products/' . $p['id'] . '/edit')); ?>" class="pos-icon-btn"><i class="fas fa-arrow-right"></i></a>
                                 </div>
@@ -318,8 +327,8 @@ foreach ($labels as $ym) {
                     </div>
                     <div style="display: grid; gap: 16px;">
                         <?php if (empty($topProducts)): ?>
-                            <div style="text-align: center; padding: 48px; border: 2px dashed var(--pos-border); border-radius: 24px;">
-                                <i class="fas fa-chart-bar" style="font-size: 40px; color: var(--pos-border); margin-bottom: 16px;"></i>
+                            <div style="text-align: center; padding: 48px; border: 1.5px dashed var(--pos-border); border-radius: var(--pos-radius);">
+                                <i class="fas fa-chart-bar" style="font-size: 36px; color: var(--pos-text-dim); margin-bottom: 16px;"></i>
                                 <p style="font-weight: 700; color: var(--pos-text-muted);"><?php echo __('data_aggregation'); ?></p>
                             </div>
                         <?php else: ?>
@@ -327,10 +336,10 @@ foreach ($labels as $ym) {
                                 <div class="leaderboard-item">
                                     <div class="rank-number"><?php echo $idx + 1; ?></div>
                                     <div style="flex: 1;">
-                                        <p style="font-weight: 800; color: var(--pos-text); font-size: 15px; margin: 0;"><?php echo htmlspecialchars($tp['name']); ?></p>
-                                        <p style="font-size: 12px; color: var(--pos-text-muted); font-weight: 700; text-transform: uppercase; margin-top: 2px;"><?php echo (int)$tp['qty']; ?> <?php echo __('acquisitions_recorded'); ?></p>
+                                        <p style="font-weight: 700; color: var(--pos-text); font-size: 14px; margin: 0;"><?php echo htmlspecialchars($tp['name']); ?></p>
+                                        <p style="font-size: 11px; color: var(--pos-text-muted); font-weight: 700; text-transform: uppercase; margin-top: 2px;"><?php echo (int)$tp['qty']; ?> <?php echo __('acquisitions_recorded'); ?></p>
                                     </div>
-                                    <div style="font-weight: 900; color: var(--pos-primary); font-size: 16px;">$<?php echo number_format($tp['qty'] * 24.5, 2); ?></div>
+                                    <div style="font-weight: 800; color: var(--pos-primary); font-size: 15px; font-family: 'Space Grotesk', sans-serif;">$<?php echo number_format($tp['qty'] * 24.5, 2); ?></div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -376,20 +385,20 @@ foreach ($labels as $ym) {
                     labels: labels,
                     datasets: [{
                         data: data,
-                        borderColor: '#6366f1',
-                        borderWidth: 6,
+                        borderColor: '#818cf8',
+                        borderWidth: 3,
                         fill: true,
                         tension: 0.45,
                         pointRadius: 0,
-                        pointHoverRadius: 10,
-                        pointHoverBackgroundColor: '#6366f1',
-                        pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 4,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#818cf8',
+                        pointHoverBorderColor: '#141830',
+                        pointHoverBorderWidth: 3,
                         backgroundColor: (context) => {
                             const ctx = context.chart.ctx;
-                            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
-                            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 360);
+                            gradient.addColorStop(0, 'rgba(129, 140, 248, 0.15)');
+                            gradient.addColorStop(1, 'rgba(129, 140, 248, 0)');
                             return gradient;
                         }
                     }]
@@ -397,17 +406,34 @@ foreach ($labels as $ym) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { padding: 16, cornerRadius: 16, bodyFont: { size: 14, weight: 'bold' } } },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            padding: 14, 
+                            cornerRadius: 12, 
+                            backgroundColor: '#141830',
+                            borderColor: 'rgba(255,255,255,0.06)',
+                            borderWidth: 1,
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            bodyFont: { size: 13, weight: 'bold' } 
+                        } 
+                    },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { weight: '800' }, color: '#94a3b8' } },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { weight: '700', size: 11 }, color: '#64748b' },
+                            border: { display: false }
+                        },
                         y: { 
                             beginAtZero: true, 
-                            grid: { color: '#f1f5f9', borderDash: [6, 6] }, 
+                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, 
                             ticks: { 
-                                font: { weight: '800' }, 
-                                color: '#94a3b8',
+                                font: { weight: '700', size: 11 }, 
+                                color: '#64748b',
                                 callback: function(value) { return '$' + value; }
-                            } 
+                            },
+                            border: { display: false }
                         }
                     }
                 }
