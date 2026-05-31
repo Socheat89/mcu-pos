@@ -187,5 +187,35 @@ class PasswordReset {
 
         @file_put_contents($logDir . '/password_reset_links.log', $line, FILE_APPEND | LOCK_EX);
     }
+
+    public static function resetPasswordDirectly(string $identity, string $password): bool {
+        $identity = trim($identity);
+        if ($identity === '') {
+            return false;
+        }
+
+        $db = Database::getInstance();
+        $user = $db->fetchOne(
+            "SELECT u.id
+             FROM users u
+             JOIN tenants t ON u.tenant_id = t.id
+             WHERE (u.username = ? OR u.email = ?)
+               AND u.status = 'active'
+               AND t.status = 'active'
+             LIMIT 1",
+            [$identity, $identity]
+        );
+
+        if (!$user) {
+            return false;
+        }
+
+        $db->query(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            [password_hash($password, PASSWORD_DEFAULT), $user['id']]
+        );
+
+        return true;
+    }
 }
 ?>
