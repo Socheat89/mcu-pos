@@ -144,7 +144,7 @@ $structuredData = [
                     <div class="auth-form-group">
                         <div style="display: flex; justify-content: space-between;">
                             <label for="modal-password">Password</label>
-                            <a href="#" style="font-size: 0.8rem; color: var(--primary);">Forgot?</a>
+                            <a href="forgot_password.php" class="link-strong" style="font-size: 0.8rem;">Forgot?</a>
                         </div>
                         <input type="password" id="modal-password" name="password" placeholder="Enter your password" required>
                     </div>

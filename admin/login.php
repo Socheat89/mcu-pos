@@ -142,6 +142,25 @@ $success = $_GET['success'] ?? '';
             font-size: 0.75rem;
             color: var(--text-muted);
         }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-row label { margin-bottom: 0; }
+
+        .text-link {
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .text-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -178,7 +197,10 @@ $success = $_GET['success'] ?? '';
             </div>
 
             <div class="form-group">
-                <label>Password</label>
+                <div class="form-row">
+                    <label>Password</label>
+                    <a href="../public/forgot_password.php" class="text-link">Forgot password?</a>
+                </div>
                 <div class="input-wrapper">
                     <i class="ph-bold ph-key"></i>
                     <input type="password" name="password" required placeholder="••••••••">

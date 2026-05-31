@@ -70,7 +70,7 @@
             <div class="form-group">
                 <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
                     <label for="password" style="margin-bottom: 0;">Password</label>
-                    <a href="#" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
+                    <a href="forgot_password.php" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
                 </div>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
