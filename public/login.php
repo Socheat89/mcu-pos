@@ -8,7 +8,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -20,104 +20,9 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: #f8fafc;
-        }
-        
-        .auth-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: var(--shadow-xl);
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid var(--border-color);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .auth-logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 800;
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            text-decoration: none;
-            color: var(--text-main);
-        }
-        
-        .form-group { margin-bottom: 1.25rem; }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            font-weight: 500; 
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-        
-        .form-group input { 
-            width: 100%; 
-            padding: 0.75rem 1rem; 
-            border: 1px solid var(--border-color); /* Fixed border variable name */
-            border-radius: 0.5rem; 
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .btn-full { width: 100%; }
-        
-        .alert {
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        .alert-error {
-            background: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-        
-        .alert-success {
-            background: #f0fdf4;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-        
-        .auth-footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        
-        .auth-footer a {
-            color: var(--primary);
-            font-weight: 600;
-        }
-    </style>
+    
 </head>
-<body>
+<body class="auth-page">
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -129,17 +34,18 @@
             <div class="loader-progress"><span></span></div>
         </div>
     </div>
-    <div class="auth-card">
-        <div class="auth-header">
-            <a href="/" class="auth-logo">
-                <div class="logo-icon">
-                    <i class="ph-bold ph-cube"></i>
-                </div>
-                <span>Mekong CyberUnit</span>
-            </a>
-            <h2>Welcome back</h2>
-            <p>Sign in to your account</p>
-        </div>
+    <main class="auth-shell">
+        <div class="auth-card auth-card--compact">
+            <div class="auth-header">
+                <a href="/" class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="ph-bold ph-cube"></i>
+                    </div>
+                    <span>Mekong CyberUnit</span>
+                </a>
+                <h2>Welcome back</h2>
+                <p>Sign in to your account</p>
+            </div>
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-error">
@@ -164,18 +70,19 @@
             <div class="form-group">
                 <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
                     <label for="password" style="margin-bottom: 0;">Password</label>
-                    <a href="#" style="font-size: 0.85rem; color: var(--primary);">Forgot password?</a>
+                    <a href="#" class="link-strong" style="font-size: 0.85rem;">Forgot password?</a>
                 </div>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
             
-            <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+            <button type="submit" class="btn btn-primary full-width">Sign In</button>
         </form>
         
         <div class="auth-footer">
-            Don't have an account? <a href="register.php">Sign up</a>
+            Don't have an account? <a href="register.php" class="link-strong">Sign up</a>
         </div>
-    </div>
+        </div>
+    </main>
     <script src="js/loader.js"></script>
 </body>
 </html>

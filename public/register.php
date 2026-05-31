@@ -9,7 +9,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -21,481 +21,9 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-            background: #f8fafc;
-        }
-
-        .auth-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: var(--shadow-xl);
-            width: 100%;
-            max-width: 800px;
-            border: 1px solid var(--border-color);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .auth-logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 800;
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            text-decoration: none;
-            color: var(--text-main);
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
-        }
-        
-        .form-group { margin-bottom: 1.25rem; }
-        
-        .form-group.full-width { grid-column: span 2; }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            font-weight: 500; 
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-        
-        .form-group input { 
-            width: 100%; 
-            padding: 0.75rem 1rem; 
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem; 
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-helper {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-            display: block;
-        }
-
-        .system-selection {
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1.5rem;
-        }
-        
-        .system-selection h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .checkbox-group {
-            display: grid;
-            gap: 0.75rem;
-        }
-        
-        .checkbox-card {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .checkbox-card:hover {
-            background: #f8fafc;
-            border-color: var(--primary);
-        }
-
-        .checkbox-card input {
-            margin-right: 1rem;
-            width: 1.2rem;
-            height: 1.2rem;
-            accent-color: var(--primary);
-        }
-        
-        .checkbox-card span { font-weight: 600; font-size: 0.95rem; color: #0f172a; }
-        .checkbox-price { margin-left: auto; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 0.25rem 0.6rem; background: #f1f5f9; border-radius: 0.4rem; }
-        
-        /* Fix for method card in narrower spaces */
-        .method-card {
-            min-width: 0;
-        }
-        .method-card div[style*="flex:1"] {
-            min-width: 0;
-            overflow: hidden;
-        }
-        
-        .btn-full { width: 100%; }
-        
-        .alert {
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        .alert-error {
-            background: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-        
-        .auth-footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        
-        .auth-footer a {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* Stepper */
-        .stepper {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stepper-item {
-            display: flex;
-            gap: 0.75rem;
-            padding: 1rem;
-            border: 1.5px dashed #e2e8f0;
-            border-radius: 0.85rem;
-            background: #f8fafc;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .stepper-item .step-number {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #475569;
-        }
-
-        .stepper-item.active {
-            border-style: solid;
-            border-color: #2563eb;
-            background: #eff6ff;
-        }
-
-        .stepper-item.active .step-number {
-            border-color: #2563eb;
-            color: #2563eb;
-        }
-
-        .stepper-item.completed {
-            border-color: #10b981;
-            background: #ecfdf5;
-        }
-
-        .stepper-item.completed .step-number {
-            border-color: #10b981;
-            background: #10b981;
-            color: white;
-        }
-
-        .stepper-item small {
-            display: block;
-            color: #64748b;
-            font-size: 0.8rem;
-            margin-top: 0.2rem;
-        }
-        
-        @media (max-width: 640px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .form-group.full-width { grid-column: span 1; }
-        }
-
-        /* Premium Forms */
-        .form-group label {
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.6rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .form-group input, .form-group select {
-            border: 1.5px solid #e2e8f0;
-            background: #f8fafc;
-            border-radius: 0.75rem;
-            padding: 0.875rem 1rem;
-            font-weight: 500;
-            color: #0f172a;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            background: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-            outline: none;
-        }
-
-        .form-group input::placeholder {
-            color: #94a3b8;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -2px rgba(37, 99, 235, 0.1);
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 0;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 90%;
-            max-width: 450px;
-            animation: modalFadeIn 0.3s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            line-height: 1;
-        }
-
-        .modal-body {
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .qr-code-container {
-            margin-bottom: 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            display: inline-block;
-            background: white;
-        }
-
-        .qr-code-container img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .payment-amount {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .payment-instruction {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 1rem;
-            background: #f8fafc;
-        }
-
-        .total-display {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px dashed var(--border-color);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        /* Countdown Style */
-        .countdown-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .countdown-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .countdown-circle-bg {
-            fill: none;
-            stroke: #f1f5f9;
-            stroke-width: 8;
-        }
-
-        .countdown-circle-progress {
-            fill: none;
-            stroke: #E31E26;
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 351.85; /* 2 * PI * r (r=56) */
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 1s linear;
-            filter: drop-shadow(0 0 5px rgba(227, 30, 38, 0.4));
-        }
-
-        .countdown-text {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #1e293b;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .waiting-status {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 1rem;
-        }
-
-        .waiting-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .waiting-desc {
-            font-size: 0.95rem;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .telegram-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.25rem;
-            background: rgba(0, 136, 204, 0.1);
-            color: #0088cc;
-            border-radius: 2rem;
-            font-weight: 700;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-            border: 1px solid rgba(0, 136, 204, 0.2);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 136, 204, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0); }
-        }
-
-        .waiting-status .countdown-text {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-    </style>
+    
 </head>
-<body>
+<body class="auth-page">
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -507,17 +35,18 @@
             <div class="loader-progress"><span></span></div>
         </div>
     </div>
-    <div class="auth-card">
-        <div class="auth-header">
-            <a href="index.php" class="auth-logo">
-                <div class="logo-icon">
-                    <i class="ph-bold ph-cube"></i>
-                </div>
-                <span>Mekong CyberUnit</span>
-            </a>
-            <h3>Create Account</h3>
-            <p>Complete payment via Bakong to setup your workspace</p>
-        </div>
+    <main class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="index.php" class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="ph-bold ph-cube"></i>
+                    </div>
+                    <span>Mekong CyberUnit</span>
+                </a>
+                <h3>Create Account</h3>
+                <p>Complete payment via Bakong to setup your workspace</p>
+            </div>
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-error">
@@ -563,21 +92,21 @@
                         $features = $db->fetchAll("SELECT feature_key FROM system_modules WHERE system_id = ?", [$plan['id']]);
                         $featureList = array_column($features, 'feature_key');
                     ?>
-                    <label class="checkbox-card" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $plan['price']; ?>, '<?php echo $planCode; ?>')" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                        <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                    <label class="checkbox-card checkbox-card--stack" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $plan['price']; ?>, '<?php echo $planCode; ?>')">
+                        <div class="checkbox-card__row">
+                            <div class="checkbox-card__row-left">
                                 <input type="radio" name="plan_select" value="<?php echo $plan['id']; ?>" class="plan-radio" data-plan-code="<?php echo $planCode; ?>" data-plan-price="<?php echo number_format($plan['price'], 2, '.', ''); ?>">
                                 <span><?php echo htmlspecialchars($plan['name']); ?></span>
                             </div>
-                            <div class="checkbox-price" style="margin: 0;">$<?php echo number_format($plan['price'], 2); ?>/mo</div>
+                            <div class="checkbox-price">$<?php echo number_format($plan['price'], 2); ?>/mo</div>
                         </div>
                         
-                        <div style="font-size:0.8rem; color:#64748b;"><?php echo htmlspecialchars($plan['description']); ?></div>
+                        <div class="checkbox-desc"><?php echo htmlspecialchars($plan['description']); ?></div>
                         
                         <?php if (!empty($featureList)): ?>
-                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px;">
+                        <div class="plan-chip-row">
                             <?php foreach ($featureList as $feat): ?>
-                                <span style="font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #475569; border: 1px solid #e2e8f0; text-transform: capitalize;">
+                                <span class="plan-chip">
                                     <?php echo str_replace('_', ' ', $feat); ?>
                                 </span>
                             <?php endforeach; ?>
@@ -589,34 +118,34 @@
             </div>
 
             <!-- Subscription Duration Selection -->
-            <div class="system-selection" id="duration_section" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem; display: none;">
+            <div class="system-selection" id="duration_section" style="display: none;">
                 <h3>2. Select Duration</h3>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <select id="duration_select" class="form-control" onchange="updateTotalPrice()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-family: inherit; font-size: 0.95rem;">
+                    <select id="duration_select" class="form-control" onchange="updateTotalPrice()">
                         <?php for($i=1; $i<=12; $i++): ?>
                             <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
-                <div id="bonus_notice" style="display: none; padding: 0.75rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; color: #1e40af; font-size: 0.85rem; margin-bottom: 1rem;">
-                    <i class="ph-bold ph-gift" style="margin-right: 4px;"></i> 
+                <div id="bonus_notice" class="notice-card" style="display: none;">
+                    <i class="ph-bold ph-gift"></i>
                     <strong>Special Offer!</strong> Get <span id="bonus_months">0</span> months free for 1-year subscription.
                 </div>
-                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="price-summary">
                     <span style="font-weight: 500;">Total Amount:</span>
-                    <span id="total_price_display" style="font-size: 1.25rem; font-weight: 800; color: #E31E26;">$0.00</span>
+                    <span id="total_price_display" class="price-highlight">$0.00</span>
                 </div>
             </div>
 
             <!-- Payment Method Selection -->
-            <div class="system-selection" id="payment_method_section" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem;">
+            <div class="system-selection" id="payment_method_section" style="display: none;">
                 <h3>3. Select Payment Method</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-card method-card" onclick="selectPaymentMethod('bakong')">
                         <input type="radio" name="payment_method" value="bakong" class="method-radio" checked>
-                        <div style="flex:1;">
+                        <div class="method-card__content">
                             <span>Bakong QR</span>
-                            <div style="font-size:0.8rem; color:#64748b;">Scan with Bakong or any Banking App</div>
+                            <div class="checkbox-desc">Scan with Bakong or any Banking App</div>
                         </div>
                         <div class="checkbox-price">Dynamic</div>
                     </label>
@@ -624,40 +153,41 @@
             </div>
 
             <!-- Pay CTA moved here -->
-            <div class="total-display" id="payment_cta" style="display:none; flex-direction:column; gap:10px; border:none; margin-top: 2rem; padding: 1.5rem; background: #fff; border: 1px solid var(--border-color); border-radius: 1rem; box-shadow: var(--shadow-sm);">
-                <button type="button" class="btn btn-primary btn-full" onclick="showModal()" style="background: #E31E26; border-color: #E31E26; height: 3.5rem; font-size: 1.1rem; font-weight: 700;">
+            <div class="payment-cta" id="payment_cta" style="display:none;">
+                <button type="button" class="btn btn-primary full-width" onclick="showModal()">
                     <i class="ph-bold ph-qr-code"></i> <span id="pay_btn_text">Proceed to Payment</span>
                 </button>
-                <p style="text-align:center; font-size:0.85rem; color:#64748b; margin: 0;">
-                    <i class="ph-bold ph-shield-check" style="color: #10b981;"></i> Secure payment powered by Bakong KHQR
+                <p class="payment-cta__note">
+                    <i class="ph-bold ph-shield-check"></i> Secure payment powered by Bakong KHQR
                 </p>
             </div>
         </form>
         
         <div class="auth-footer">
-            Already have an account? <a href="login.php">Sign in</a>
+            Already have an account? <a href="login.php" class="link-strong">Sign in</a>
         </div>
-    </div>
+        </div>
+    </main>
 
     <!-- Payment Modal (Bakong Branded) -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header" style="background: #E31E26; color: white;">
-                <h3 style="font-weight: 600;">
-                    <div style="background: white; border-radius: 4px; padding: 2px;">
-                        <i class="ph-bold ph-qr-code" style="color: #E31E26;"></i>
+            <div class="modal-header modal-header--brand">
+                <h3>
+                    <div class="modal-badge">
+                        <i class="ph-bold ph-qr-code"></i>
                     </div>
                     Scan to Pay (Bakong)
                 </h3>
-                <button type="button" class="modal-close" onclick="closeModal()" style="color: rgba(255,255,255,0.8);">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="payment-amount" id="modalAmount">$0.00</div>
                 <div class="payment-instruction">Scan with Bakong or any Banking App</div>
                 
-                <div class="qr-code-container" style="border-color: #E31E26; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                <div class="qr-code-container qr-code-container--center">
                     <div id="qrPlaceholder" style="display: none;">
-                         <i class="ph-bold ph-spinner ph-spin" style="font-size: 2rem; color: #E31E26;"></i>
+                         <i class="ph-bold ph-spinner ph-spin"></i>
                     </div>
                     <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
                 </div>
@@ -677,8 +207,8 @@
                     <div id="apiStatus" style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">Status: INITIALIZING...</div>
                 </div>
             </div>
-            <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 1rem; background: #f8fafc;">
-                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none; background: #16a34a; border-color: #16a34a;" onclick="notifyAdmin()">
+            <div class="modal-footer">
+                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="notifyAdmin()">
                     <i class="ph-bold ph-check-circle"></i> I Have Paid (Notify Admin)
                 </button>
                 <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>
@@ -688,13 +218,13 @@
 
     <!-- Payment Success Modal -->
     <div id="successModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; padding: 3rem 2rem; text-align: center;">
-            <div style="width: 80px; height: 80px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div class="modal-content modal-content--sm modal-content--center">
+            <div class="modal-icon modal-icon--success">
                 <i class="ph-bold ph-check"></i>
             </div>
-            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #0f172a;">Payment Successful!</h3>
-            <p style="color: #64748b; margin-bottom: 2rem;">Thank you for your payment. Your workspace setup is being initialized.</p>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--primary); font-weight: 600;">
+            <h3>Payment Successful!</h3>
+            <p>Thank you for your payment. Your workspace setup is being initialized.</p>
+            <div class="status-inline">
                 <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
             </div>
         </div>
@@ -702,14 +232,14 @@
 
     <!-- Waiting for Approval Modal -->
     <div id="waitingModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header" style="background: #0088cc; color: white; border-bottom: none;">
-                <h3 style="font-weight: 600;">
+        <div class="modal-content">
+            <div class="modal-header modal-header--telegram">
+                <h3>
                     <i class="ph-bold ph-telegram-logo"></i> Awaiting Approval
                 </h3>
-                <button type="button" class="modal-close" onclick="closeWaitingModal()" style="color: white;">&times;</button>
+                <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 3rem 2rem;">
+            <div class="modal-body">
                 <div class="waiting-status">
                     <div class="countdown-container">
                         <svg class="countdown-svg">
@@ -746,13 +276,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        @keyframes scaleIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-    </style>
 
     <script>
         // State
@@ -865,12 +388,6 @@
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
             
-            // Branding
-            const modalHeader = document.querySelector('.modal-header');
-            const modalTitle = modalHeader.querySelector('h3');
-            modalHeader.style.background = '#E31E26'; 
-            modalTitle.innerHTML = '<div style="background: white; border-radius: 4px; padding: 2px;"><i class="ph-bold ph-qr-code" style="color: #E31E26;"></i></div> Scan to Pay (Bakong)';
-
             // Reset UI
             const qrImage = document.getElementById('qrImage');
             const qrPlaceholder = document.getElementById('qrPlaceholder');

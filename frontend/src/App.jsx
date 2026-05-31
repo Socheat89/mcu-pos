@@ -16,19 +16,17 @@ import {
   Sparkles,
   Moon,
   Sun,
-  LayoutGrid,
   Activity,
   Layers,
   TrendingUp,
   BarChart2,
   AlertTriangle,
   Package,
-  Hash,
   UserCircle,
   Receipt,
   Zap,
   ChevronRight,
-  Store,
+  Languages,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -41,6 +39,220 @@ import {
   Area
 } from 'recharts';
 import confetti from 'canvas-confetti';
+
+// ─── Translations Dictionary ──────────────────────────────────
+const translations = {
+  en: {
+    sell: "Sell",
+    reports: "Reports",
+    pending: "Hold",
+    all: "All",
+    cart: "Cart",
+    items: "items",
+    customer: "Customer",
+    walk_in: "Walk-in (General Customer)",
+    mode: "Mode",
+    mode_sell: "Sell",
+    mode_hold: "Hold",
+    receipt: "Receipt",
+    auto_print: "Auto-Print",
+    subtotal: "Subtotal",
+    tax: "Tax (0%)",
+    total: "Total",
+    clear_cart_confirm: "Clear all items in cart?",
+    clear_cart: "Clear Cart",
+    checkout: "Checkout",
+    hold_order: "Hold",
+    pending_orders_title: "Pending Orders",
+    no_pending_orders: "No pending orders",
+    order: "Order",
+    note: "Note",
+    resume: "Resume",
+    payment_title: "Payment",
+    payment_subtitle: "Checkout Processing",
+    total_payable: "Total Payable",
+    payment_method: "Payment Method",
+    cash: "Cash",
+    khqr: "KHQR",
+    card: "Card",
+    cash_received: "Cash Received",
+    change: "Change",
+    waiting_khqr: "Waiting for Bakong payment...",
+    connecting_card: "Connecting to card reader...",
+    insert_card: "Insert card into POS reader device",
+    submit_handshake: "Submit to initialize handshake",
+    confirm_finish: "Confirm & Finish",
+    cancel: "Cancel",
+    search_placeholder: "Search products — barcode, SKU, name...",
+    out_of_stock: "Out of stock",
+    low_stock: "left",
+    toast_added: "Added",
+    toast_added_msg: "has been added to cart.",
+    toast_no_stock: "Out of Stock",
+    toast_no_stock_msg: "is out of stock.",
+    toast_limit_stock: "Stock Limit Reached",
+    toast_limit_stock_msg: "Only :qty units left in stock.",
+    toast_clear: "Cleared",
+    toast_clear_msg: "Cart has been cleared.",
+    toast_recovered: "Order Restored",
+    toast_recovered_msg: "Continuing order #:id",
+    toast_insufficient_cash: "Insufficient Cash",
+    toast_insufficient_cash_msg: "Received amount is less than total.",
+    toast_checkout_success: "Success!",
+    toast_checkout_success_msg: "Processing...",
+    sales_by_category: "Sales by Category (USD)",
+    current_stock_levels: "Current Stock",
+    report_title: "Sales & Stock Report",
+    close_report: "Close Reports",
+    no_products: "No products found",
+    no_products_subtitle: "No products match your search",
+    products_label: "Products",
+    stock_alerts: "Stock alerts",
+    out: "out",
+  },
+  km: {
+    sell: "លក់ទំនិញ",
+    reports: "របាយការណ៍",
+    pending: "រង់ចាំ",
+    all: "ទាំងអស់",
+    cart: "កន្ត្រក",
+    items: "មុខទំនិញ",
+    customer: "អតិថិជន",
+    walk_in: "Walk-in (អតិថិជនទូទៅ)",
+    mode: "របៀបលក់",
+    mode_sell: "លក់ Sell",
+    mode_hold: "រង់ចាំ Hold",
+    receipt: "វិក្កយបត្រ",
+    auto_print: "បោះពុម្ពស្វ័យប្រវត្តិ",
+    subtotal: "សរុបរង",
+    tax: "ពន្ធ (0%)",
+    total: "សរុប Total",
+    clear_cart_confirm: "លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?",
+    clear_cart: "សម្អាតកន្ត្រក",
+    checkout: "ទូទាត់ Checkout",
+    hold_order: "ដាក់រង់ចាំ Hold",
+    pending_orders_title: "បញ្ជាទិញរង់ចាំ",
+    no_pending_orders: "មិនមាន order រង់ចាំទេ",
+    order: "ការបញ្ជាទិញ",
+    note: "កំណត់ចំណាំ",
+    resume: "បន្ត",
+    payment_title: "ទូទាត់ប្រាក់",
+    payment_subtitle: "Checkout Processing",
+    total_payable: "ទឹកប្រាក់សរុប",
+    payment_method: "វិធីបង់ប្រាក់",
+    cash: "សាច់ប្រាក់",
+    khqr: "KHQR",
+    card: "កាត Card",
+    cash_received: "ប្រាក់ទទួលបាន",
+    change: "ប្រាក់អាប់ Change",
+    waiting_khqr: "កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...",
+    connecting_card: "កំពុងភ្ជាប់ទៅឧបករណ៍កាត...",
+    insert_card: "បញ្ចូលកាត POS reader device",
+    submit_handshake: "Submit to initialize handshake",
+    confirm_finish: "បញ្ជាក់ និង បញ្ចប់ Confirm",
+    cancel: "បោះបង់ Cancel",
+    search_placeholder: "ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ...",
+    out_of_stock: "អស់ស្តុក",
+    low_stock: "នៅសល់",
+    toast_added: "បានបន្ថែម",
+    toast_added_msg: "បានបញ្ចូលក្នុងកន្ត្រក។",
+    toast_no_stock: "អស់ស្តុក",
+    toast_no_stock_msg: "មិនមានក្នុងស្តុកទេ។",
+    toast_limit_stock: "ដល់កម្រិតស្តុក",
+    toast_limit_stock_msg: "មានតែ :qty គ្រាប់នៅសល់។",
+    toast_clear: "បានលុប",
+    toast_clear_msg: "កន្ត្រកទទេហើយ។",
+    toast_recovered: "បានស្ដារ Order",
+    toast_recovered_msg: "កំពុងបន្ត order #:id",
+    toast_insufficient_cash: "ប្រាក់មិនគ្រប់",
+    toast_insufficient_cash_msg: "ចំនួនទឹកប្រាក់តិចជាងសរុប।",
+    toast_checkout_success: "ជោគជ័យ!",
+    toast_checkout_success_msg: "កំពុងដំណើរការ...",
+    sales_by_category: "ការលក់តាមប្រភេទ (USD)",
+    current_stock_levels: "ស្តុកបច្ចុប្បន្ន",
+    report_title: "របាយការណ៍លក់ និងស្តុក",
+    close_report: "បិទរបាយការណ៍",
+    no_products: "រកមិនឃើញទំនិញទេ",
+    no_products_subtitle: "No products match your search",
+    products_label: "ទំនិញ",
+    stock_alerts: "ស្តុកតិច/អស់",
+    out: "អស់",
+  },
+  zh: {
+    sell: "销售",
+    reports: "报告",
+    pending: "挂单",
+    all: "全部",
+    cart: "购物车",
+    items: "件商品",
+    customer: "顾客",
+    walk_in: "散客 (普通顾客)",
+    mode: "模式",
+    mode_sell: "销售",
+    mode_hold: "挂单",
+    receipt: "小票",
+    auto_print: "自动打印",
+    subtotal: "小计",
+    tax: "税 (0%)",
+    total: "总计",
+    clear_cart_confirm: "确认清空购物车吗？",
+    clear_cart: "清空",
+    checkout: "结账",
+    hold_order: "挂单",
+    pending_orders_title: "挂单列表",
+    no_pending_orders: "暂无挂单",
+    order: "订单",
+    note: "备注",
+    resume: "继续",
+    payment_title: "付款",
+    payment_subtitle: "结账处理",
+    total_payable: "应付总额",
+    payment_method: "付款方式",
+    cash: "现金",
+    khqr: "KHQR",
+    card: "刷卡",
+    cash_received: "实收金额",
+    change: "找零",
+    waiting_khqr: "等待巴孔扫码支付...",
+    connecting_card: "正在连接刷卡机...",
+    insert_card: "请将卡插入POS机",
+    submit_handshake: "确认以初始化握手",
+    confirm_finish: "确认并结束",
+    cancel: "取消",
+    search_placeholder: "搜索商品 — 条码、SKU、名称...",
+    out_of_stock: "无库存",
+    low_stock: "剩余",
+    toast_added: "已添加",
+    toast_added_msg: "已加入购物车。",
+    toast_no_stock: "无库存",
+    toast_no_stock_msg: "该商品无库存。",
+    toast_limit_stock: "达到库存上限",
+    toast_limit_stock_msg: "库存仅剩 :qty 件。",
+    toast_clear: "已清空",
+    toast_clear_msg: "购物车已清空。",
+    toast_recovered: "订单已恢复",
+    toast_recovered_msg: "正在继续订单 #:id",
+    toast_insufficient_cash: "金额不足",
+    toast_insufficient_cash_msg: "实收金额小于应付总额。",
+    toast_checkout_success: "成功！",
+    toast_checkout_success_msg: "正在处理...",
+    sales_by_category: "按类别销售额 (USD)",
+    current_stock_levels: "当前库存水平",
+    report_title: "销售与库存报告",
+    close_report: "关闭报告",
+    no_products: "未找到商品",
+    no_products_subtitle: "没有找到符合搜索条件的商品",
+    products_label: "商品",
+    stock_alerts: "库存提醒",
+    out: "售罄",
+  }
+};
+
+const languages = [
+  { code: 'km', label: 'ភាសាខ្មែរ', flag: '🇰🇭' },
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' }
+];
 
 // ─── Bakong KHQR Generator (NBC Standard) ──────────────────────
 const crcTable = [
@@ -176,6 +388,35 @@ export default function App() {
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
 
+  // Translation State & Dropdown Handlers
+  const [currentLang, setCurrentLang] = useState(window.CURRENT_LANG || 'km');
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef(null);
+
+  // Translation helper
+  const t = (key, fallback) => {
+    return translations[currentLang]?.[key] || fallback;
+  };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
+        setLangMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const changeLang = (code) => {
+    setCurrentLang(code);
+    setLangMenuOpen(false);
+    // Persist language setting in PHP backend session/cookie
+    fetch(`${window.BASE_PATH || ''}/public/set_lang.php?lang=${code}`)
+      .catch(err => console.error("Error setting language session:", err));
+  };
+
   // Sync dark mode class
   useEffect(() => {
     if (darkMode) {
@@ -207,7 +448,7 @@ export default function App() {
       if (resumeOrder.customer_id) {
         setSelectedCustomerId(resumeOrder.customer_id.toString());
       }
-      showToast('info', 'បានស្ដារ Order', `កំពុងបន្ត order #${resumeOrder.id}`);
+      showToast('info', t('toast_recovered', 'បានស្ដារ Order'), t('toast_recovered_msg', 'កំពុងបន្ត order #:id').replace(':id', resumeOrder.id));
     }
   }, [resumeOrder, products]);
 
@@ -220,13 +461,13 @@ export default function App() {
   // ─── Cart Operations ──────────────────────────────────────
   const addToCart = (product) => {
     if (product.stock <= 0) {
-      showToast('warning', 'អស់ស្តុក', `${product.name} មិនមានក្នុងស្តុកទេ។`);
+      showToast('warning', t('toast_no_stock', 'អស់ស្តុក'), `${product.name} ${t('toast_no_stock_msg', 'មិនមានក្នុងស្តុកទេ។')}`);
       return;
     }
     const existing = cart.find(item => item.product.id === product.id);
     if (existing) {
       if (existing.quantity >= product.stock) {
-        showToast('warning', 'ដល់កម្រិតស្តុក', `មានតែ ${product.stock} ​គ្រាប់នៅសល់។`);
+        showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', product.stock));
         return;
       }
       setCart(cart.map(item =>
@@ -245,7 +486,7 @@ export default function App() {
       setCart(cart.filter(item => item.product.id !== productId));
     } else {
       if (nextQty > existing.product.stock) {
-        showToast('warning', 'ដល់កម្រិតស្តុក', `មានតែ ${existing.product.stock} ​គ្រាប់នៅសល់។`);
+        showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', existing.product.stock));
         return;
       }
       setCart(cart.map(item =>
@@ -256,9 +497,9 @@ export default function App() {
 
   const clearCart = () => {
     if (cart.length === 0) return;
-    if (window.confirm('លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?')) {
+    if (window.confirm(t('clear_cart_confirm', 'លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?'))) {
       setCart([]);
-      showToast('info', 'បានលុប', 'កន្ត្រកទទេហើយ។');
+      showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
     }
   };
 
@@ -271,7 +512,7 @@ export default function App() {
         if (match.stock > 0) {
           addToCart(match);
           setSearchQuery('');
-          showToast('success', 'បានបន្ថែម', `${match.name} បានបញ្ចូលក្នុងកន្ត្រក។`);
+          showToast('success', t('toast_added', 'បានបន្ថែម'), `${match.name} ${t('toast_added_msg', 'បានបញ្ចូលក្នុងកន្ត្រក។')}`);
         }
       }
     }
@@ -326,7 +567,7 @@ export default function App() {
       const total = getGrandTotal();
       const cashVal = parseFloat(cashGiven) || 0;
       if (cashVal < total) {
-        showToast('error', 'ប្រាក់មិនគ្រប់', 'ចំនួនទឹកប្រាក់តិចជាងសរុប។');
+        showToast('error', t('toast_insufficient_cash', 'ប្រាក់មិនគ្រប់'), t('toast_insufficient_cash_msg', 'ចំនួនទឹកប្រាក់តិចជាងសរុប។'));
         return;
       }
       submitCheckout();
@@ -343,7 +584,7 @@ export default function App() {
       spread: 80,
       origin: { y: 0.6 }
     });
-    showToast('success', 'ជោគជ័យ!', 'កំពុងដំណើរការ...');
+    showToast('success', t('toast_checkout_success', 'ជោគជ័យ!'), t('toast_checkout_success_msg', 'កំពុងដំណើរការ...'));
     setTimeout(() => {
       if (formRef.current) {
         formRef.current.submit();
@@ -378,6 +619,21 @@ export default function App() {
   const getStockLevelsData = () => {
     return products.slice(0, 8).map(p => ({ name: p.name.substring(0, 10), stock: p.stock }));
   };
+
+  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const visibleProductCount = getFilteredProducts().length;
+  const lowStockCount = products.filter(p => p.stock > 0 && p.stock <= 5).length;
+  const outOfStockCount = products.filter(p => p.stock <= 0).length;
+  const selectedCustomer = customers.find(c => String(c.id) === String(selectedCustomerId));
+  const quickTenderOptions = Array.from(new Set([
+    getGrandTotal(),
+    Math.ceil(getGrandTotal()),
+    Math.ceil(getGrandTotal() / 5) * 5,
+    Math.ceil(getGrandTotal() / 10) * 10
+  ]
+    .filter(amount => amount > 0 && amount >= getGrandTotal())
+    .map(amount => Number(amount.toFixed(2)))
+  )).slice(0, 4);
 
   // ═══════════════════════════════════════════════════════════
   // RENDER
@@ -421,20 +677,20 @@ export default function App() {
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
         <div className="accent-line" />
-        <div className={`glass px-5 py-3 flex items-center justify-between ${darkMode ? '' : ''}`}>
+        <div className="glass px-3 py-3 sm:px-5 flex flex-wrap items-center justify-between gap-3">
           {/* Left: Branding */}
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan">
-              <Layers className="h-4.5 w-4.5 text-white" />
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="h-9 w-9 flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan">
+              <Layers className="h-4 w-4 text-white" />
             </div>
-            <div>
-              <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-muted">{settings.store_label}</div>
+            <div className="min-w-0">
+              <div className="max-w-[180px] truncate text-[9px] font-bold uppercase tracking-[0.3em] text-brand-muted sm:max-w-none">{settings.store_label}</div>
               <h1 className="text-sm font-extrabold tracking-tight text-gradient leading-tight">Mekong POS</h1>
             </div>
           </div>
 
           {/* Right: Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {/* Analytics toggle */}
             <button
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
@@ -445,7 +701,7 @@ export default function App() {
               }`}
             >
               <BarChart2 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{analyticsViewOpen ? 'លក់ទំនិញ' : 'របាយការណ៍'}</span>
+              <span className="hidden sm:inline">{analyticsViewOpen ? t('sell', 'លក់ទំនិញ') : t('reports', 'របាយការណ៍')}</span>
             </button>
 
             {/* Pending orders */}
@@ -456,13 +712,51 @@ export default function App() {
               }`}
             >
               <Clock className="h-3.5 w-3.5 text-brand-violet" />
-              <span className="hidden sm:inline">រង់ចាំ</span>
+              <span className="hidden sm:inline">{t('pending', 'រង់ចាំ')}</span>
               {pendingOrders.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5 badge-pulse">
                   {pendingOrders.length}
                 </span>
               )}
             </button>
+
+            {/* Language Switcher Dropdown */}
+            <div className="relative" ref={langMenuRef}>
+              <button
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                className={`h-8 px-2.5 rounded-lg flex items-center gap-1.5 transition-all text-[11px] font-bold ${
+                  darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
+                }`}
+              >
+                <Languages className="h-3.5 w-3.5 text-brand-cyan" />
+                <span className="uppercase">{currentLang === 'en' ? 'EN' : currentLang === 'km' ? 'KH' : 'ZH'}</span>
+                <ChevronDown className="h-3 w-3 text-brand-muted" />
+              </button>
+
+              {langMenuOpen && (
+                <div className={`absolute right-0 mt-1.5 w-36 rounded-xl shadow-glass-lg border backdrop-blur-xl p-1 z-50 animate-scale-in ${
+                  darkMode ? 'bg-brand-surfDark/95 border-white/5 text-brand-textDark' : 'bg-white/95 border-gray-100 text-brand-textLight'
+                }`}>
+                  {languages.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => changeLang(lang.code)}
+                      className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all ${
+                        currentLang === lang.code
+                          ? 'bg-gradient-to-r from-brand-cyan/20 to-brand-violet/20 text-brand-cyan border border-brand-cyan/10'
+                          : `hover:bg-brand-cyan/10 text-brand-muted hover:text-brand-cyan border border-transparent`
+                      }`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <span>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </span>
+                      {currentLang === lang.code && <Check className="h-3 w-3 text-brand-cyan" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Dark mode */}
             <button
@@ -486,29 +780,52 @@ export default function App() {
       </header>
 
       {/* ─── Main Content Area ─── */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden lg:flex-row">
 
         {analyticsViewOpen ? (
           /* ═══ Analytics View ═══ */
-          <div className="flex-1 overflow-y-auto p-5 animate-fade-in">
-            <div className={`rounded-2xl p-6 ${darkMode ? 'bg-brand-surfDark border border-white/5' : 'bg-white border border-gray-200'} shadow-glass`}>
-              <div className="flex items-center justify-between mb-6">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-5 animate-fade-in">
+            <div className="mx-auto max-w-7xl space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-brand-cyan" />
-                  <h2 className="text-base font-extrabold tracking-tight">របាយការណ៍លក់ និងស្តុក</h2>
+                  <h2 className="text-base font-extrabold tracking-tight">{t('report_title', 'របាយការណ៍លក់ និងស្តុក')}</h2>
                 </div>
                 <button
                   onClick={() => setAnalyticsViewOpen(false)}
                   className="text-[10px] font-bold uppercase tracking-wider text-brand-muted hover:text-brand-cyan transition"
                 >
-                  បិទ ✕
+                  {t('close_report', 'បិទ')} ✕
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {[
+                  { label: t('cart', 'Cart'), value: `$${getGrandTotal().toFixed(2)}`, icon: Receipt },
+                  { label: t('items', 'items'), value: cartItemCount, icon: ShoppingBag },
+                  { label: t('stock_alerts', 'Stock alerts'), value: `${lowStockCount}/${outOfStockCount}`, icon: AlertTriangle },
+                  { label: t('pending', 'Hold'), value: pendingOrders.length, icon: Clock }
+                ].map((stat) => {
+                  const StatIcon = stat.icon;
+                  return (
+                    <div
+                      key={stat.label}
+                      className={`rounded-lg border p-3 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'} shadow-card`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-muted">{stat.label}</span>
+                        <StatIcon className="h-4 w-4 text-brand-cyan" />
+                      </div>
+                      <div className="mt-2 text-lg font-black tracking-tight">{stat.value}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
                 {/* Category Sales */}
-                <div className={`md:col-span-2 p-5 rounded-xl ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
-                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">ការលក់តាមប្រភេទ (USD)</h3>
+                <div className={`md:col-span-2 p-4 sm:p-5 rounded-lg ${darkMode ? 'bg-brand-surfDark border border-white/5' : 'bg-white border border-gray-200'} shadow-card`}>
+                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">{t('sales_by_category', 'ការលក់តាមប្រភេទ (USD)')}</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={getCategorySalesData()}>
@@ -516,18 +833,18 @@ export default function App() {
                         <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
                         <Tooltip
                           contentStyle={{
-                            background: darkMode ? 'rgba(19, 24, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            background: darkMode ? 'rgba(36, 50, 45, 0.96)' : 'rgba(255, 250, 242, 0.96)',
                             border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
                             borderRadius: '12px',
-                            color: darkMode ? '#E2E8F0' : '#1E293B',
+                            color: darkMode ? '#E9E3D8' : '#1B1A17',
                             backdropFilter: 'blur(8px)'
                           }}
                         />
                         <Bar dataKey="sales" fill="url(#cyanVioletGrad)" radius={[6, 6, 0, 0]}>
                           <defs>
                             <linearGradient id="cyanVioletGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#06B6D4" />
-                              <stop offset="100%" stopColor="#8B5CF6" />
+                              <stop offset="0%" stopColor="#0F766E" />
+                              <stop offset="100%" stopColor="#E76F51" />
                             </linearGradient>
                           </defs>
                         </Bar>
@@ -537,27 +854,27 @@ export default function App() {
                 </div>
 
                 {/* Stock Levels */}
-                <div className={`p-5 rounded-xl ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
-                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">ស្តុកបច្ចុប្បន្ន</h3>
+                <div className={`p-4 sm:p-5 rounded-lg ${darkMode ? 'bg-brand-surfDark border border-white/5' : 'bg-white border border-gray-200'} shadow-card`}>
+                  <h3 className="text-[10px] font-bold text-brand-muted mb-4 uppercase tracking-wider">{t('current_stock_levels', 'ស្តុកបច្ចុប្បន្ន')}</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={getStockLevelsData()}>
                         <defs>
                           <linearGradient id="cyanAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#06B6D4" stopOpacity={0.4} />
-                            <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.0} />
+                            <stop offset="0%" stopColor="#0F766E" stopOpacity={0.4} />
+                            <stop offset="100%" stopColor="#0F766E" stopOpacity={0.0} />
                           </linearGradient>
                         </defs>
                         <XAxis dataKey="name" stroke="#64748B" fontSize={9} tickLine={false} />
                         <Tooltip
                           contentStyle={{
-                            background: darkMode ? 'rgba(19, 24, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            background: darkMode ? 'rgba(36, 50, 45, 0.96)' : 'rgba(255, 250, 242, 0.96)',
                             border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
                             borderRadius: '12px',
-                            color: darkMode ? '#E2E8F0' : '#1E293B'
+                            color: darkMode ? '#E9E3D8' : '#1B1A17'
                           }}
                         />
-                        <Area type="monotone" dataKey="stock" stroke="#06B6D4" fill="url(#cyanAreaGrad)" strokeWidth={2} />
+                        <Area type="monotone" dataKey="stock" stroke="#0F766E" fill="url(#cyanAreaGrad)" strokeWidth={2} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -569,19 +886,19 @@ export default function App() {
           /* ═══ POS Terminal View ═══ */
           <>
             {/* ─── Left: Products ─── */}
-            <main className="flex-1 flex flex-col overflow-hidden">
+            <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
               {/* Search + Categories bar */}
-              <div className={`flex-shrink-0 px-5 py-3 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
+              <div className={`flex-shrink-0 px-3 py-3 sm:px-5 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
                 {/* Search input */}
                 <div className="relative">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-cyan" />
                   <input
                     type="text"
-                    placeholder="ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ..."
+                    placeholder={t('search_placeholder', 'ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleQuickAdd}
-                    className={`w-full py-2.5 pl-10 pr-4 text-sm font-medium rounded-xl border transition-all duration-300 ${
+                    className={`w-full py-2.5 pl-10 pr-4 text-sm font-medium rounded-lg border transition-all duration-300 ${
                       darkMode
                         ? 'bg-brand-surfDark border-white/5 text-brand-textDark placeholder-slate-500'
                         : 'bg-white border-gray-200 text-brand-textLight placeholder-gray-400'
@@ -603,23 +920,50 @@ export default function App() {
                             : `${darkMode ? 'bg-brand-surfDark border border-white/5 text-slate-400 hover:text-brand-cyan hover:border-brand-cyan/20' : 'bg-white border border-gray-200 text-gray-500 hover:text-brand-cyan hover:border-brand-cyan/30'}`
                         }`}
                       >
-                        {cat === 'All' ? '🏷️ ទាំងអស់' : cat}
+                        {cat === 'All' ? t('all', 'ទាំងអស់') : cat}
                       </button>
                     );
                   })}
                 </div>
+
+                <div className="hidden grid-cols-3 gap-2 sm:grid">
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Package className="h-3.5 w-3.5 text-brand-cyan" />
+                      <span>{t('products_label', 'Products')}</span>
+                    </div>
+                    <div className="mt-1 text-sm font-black">{visibleProductCount}</div>
+                  </div>
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <AlertTriangle className="h-3.5 w-3.5 text-brand-warning" />
+                      <span>{t('stock_alerts', 'Stock alerts')}</span>
+                    </div>
+                    <div className="mt-1 text-sm font-black">
+                      {lowStockCount}
+                      <span className="ml-1 text-[10px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
+                    </div>
+                  </div>
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
+                      <span>{t('pending', 'Pending')}</span>
+                    </div>
+                    <div className="mt-1 text-sm font-black">{pendingOrders.length}</div>
+                  </div>
+                </div>
               </div>
 
               {/* Product Grid */}
-              <div className="flex-1 overflow-y-auto p-5">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-5">
                 {getFilteredProducts().length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
                     <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
-                    <p className="text-sm font-bold text-brand-muted">រកមិនឃើញទំនិញទេ</p>
-                    <p className="text-xs text-brand-muted/60 mt-1">No products match your search</p>
+                    <p className="text-sm font-bold text-brand-muted">{t('no_products', 'រកមិនឃើញទំនិញទេ')}</p>
+                    <p className="text-xs text-brand-muted/60 mt-1">{t('no_products_subtitle', 'No products match your search')}</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                     {getFilteredProducts().map((prod, idx) => {
                       const isOutOfStock = prod.stock <= 0;
                       const isLowStock = prod.stock > 0 && prod.stock <= 5;
@@ -629,7 +973,7 @@ export default function App() {
                         <div
                           key={prod.id}
                           onClick={() => addToCart(prod)}
-                          className={`glass-card rounded-xl overflow-hidden cursor-pointer animate-slide-up ${
+                          className={`glass-card rounded-lg overflow-hidden cursor-pointer animate-slide-up ${
                             isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
                           } ${inCartItem ? 'ring-2 ring-brand-cyan/40' : ''}`}
                           style={{ animationDelay: `${idx * 30}ms`, animationFillMode: 'both' }}
@@ -648,7 +992,7 @@ export default function App() {
                             <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide ${
                               isOutOfStock ? 'stock-out' : isLowStock ? 'stock-low' : 'stock-ok'
                             }`}>
-                              {isOutOfStock ? 'អស់' : isLowStock ? `${prod.stock} left` : `${prod.stock}`}
+                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock} ${t('low_stock', 'left')}` : `${prod.stock}`}
                             </span>
 
                             {/* In-cart quantity overlay */}
@@ -689,7 +1033,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`w-[340px] flex-shrink-0 flex flex-col border-l ${
+            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Cart Header */}
@@ -698,28 +1042,28 @@ export default function App() {
                   <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center">
                     <Receipt className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <h3 className="text-sm font-extrabold tracking-tight">កន្ត្រក</h3>
+                  <h3 className="text-sm font-extrabold tracking-tight">{t('cart', 'កន្ត្រក')}</h3>
                 </div>
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
                   darkMode ? 'bg-brand-bgDark text-brand-cyan' : 'bg-gray-100 text-brand-cyan'
                 }`}>
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)} items
+                  {cartItemCount} {t('items', 'items')}
                 </span>
               </div>
 
               {/* Cart Items */}
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-2">
                 {cart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center">
                     <ShoppingBag className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
-                    <p className="text-xs font-bold text-brand-muted">កន្ត្រកទទេ</p>
-                    <p className="text-[10px] text-brand-muted/60 mt-0.5">ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម</p>
+                    <p className="text-xs font-bold text-brand-muted">{t('cart_empty', 'កន្ត្រកទទេ')}</p>
+                    <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('select_products', 'ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម')}</p>
                   </div>
                 ) : (
                   cart.map(item => (
                     <div
                       key={item.product.id}
-                      className={`cart-item flex items-center gap-3 p-2.5 rounded-xl transition ${
+                      className={`cart-item flex items-center gap-3 p-2.5 rounded-lg transition ${
                         darkMode ? 'bg-brand-bgDark/40 border border-white/5' : 'bg-gray-50 border border-gray-100'
                       }`}
                     >
@@ -764,11 +1108,11 @@ export default function App() {
               </div>
 
               {/* Cart Footer */}
-              <div className={`flex-shrink-0 px-4 pb-4 pt-2 space-y-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+              <div className={`flex-shrink-0 px-3 pb-3 pt-2 sm:px-4 sm:pb-4 space-y-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
                 {/* Customer + Mode selectors */}
                 <div className="space-y-2">
                   <div className="relative">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">អតិថិជន</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('customer', 'អតិថិជន')}</label>
                     <div className="relative">
                       <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
                       <select
@@ -778,7 +1122,7 @@ export default function App() {
                           darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
                         }`}
                       >
-                        <option value="">Walk-in (អតិថិជនទូទៅ)</option>
+                        <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
                         {customers.map(c => (
                           <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
                         ))}
@@ -789,7 +1133,7 @@ export default function App() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">Mode</label>
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('mode', 'Mode')}</label>
                       <select
                         value={orderStatus}
                         onChange={(e) => setOrderStatus(e.target.value)}
@@ -797,34 +1141,38 @@ export default function App() {
                           darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200'
                         }`}
                       >
-                        <option value="completed">លក់ Sell</option>
-                        <option value="pending">រង់ចាំ Hold</option>
+                        <option value="completed">{t('mode_sell', 'លក់ Sell')}</option>
+                        <option value="pending">{t('mode_hold', 'រង់ចាំ Hold')}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">Receipt</label>
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('receipt', 'Receipt')}</label>
                       <div className={`py-2 px-2.5 text-[11px] font-bold rounded-lg text-center ${
                         darkMode ? 'bg-brand-success/10 text-brand-success border border-brand-success/20' : 'bg-green-50 text-brand-success border border-green-200'
                       }`}>
-                        Auto-Print
+                        {t('auto_print', 'Auto-Print')}
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Receipt Totals */}
-                <div className={`p-3 rounded-xl space-y-1.5 ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                <div className={`p-3 rounded-lg space-y-1.5 ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                  <div className="flex justify-between gap-3 text-[11px] font-medium text-brand-muted">
+                    <span>{t('customer', 'Customer')}</span>
+                    <span className="truncate text-right">{selectedCustomer?.name || t('walk_in', 'Walk-in')}</span>
+                  </div>
                   <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
-                    <span>Subtotal</span>
+                    <span>{t('subtotal', 'Subtotal')}</span>
                     <span>${getSubtotal().toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
-                    <span>Tax (0%)</span>
+                    <span>{t('tax', 'Tax (0%)')}</span>
                     <span>$0.00</span>
                   </div>
                   <div className="receipt-divider my-1.5" />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-extrabold">សរុប Total</span>
+                    <span className="text-xs font-extrabold">{t('total', 'សរុប Total')}</span>
                     <span className="text-lg font-black text-gradient">${getGrandTotal().toFixed(2)}</span>
                   </div>
                 </div>
@@ -833,8 +1181,8 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={clearCart}
-                    title="Clear Cart"
-                    className="h-10 w-10 rounded-xl flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all flex-shrink-0"
+                    title={t('clear_cart', 'Clear Cart')}
+                    className="h-10 w-10 rounded-lg flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -850,7 +1198,7 @@ export default function App() {
                     className="btn-primary flex-1 h-10 text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Zap className="h-3.5 w-3.5" />
-                    <span>{orderStatus === 'pending' ? 'ដាក់រង់ចាំ Hold' : 'ទូទាត់ Checkout'}</span>
+                    <span>{orderStatus === 'pending' ? t('hold_order', 'ដាក់រង់ចាំ Hold') : t('checkout', 'ទូទាត់ Checkout')}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -873,7 +1221,7 @@ export default function App() {
             <div className={`flex-shrink-0 px-5 py-4 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-brand-violet" />
-                <h3 className="text-sm font-extrabold">បញ្ជាទិញរង់ចាំ</h3>
+                <h3 className="text-sm font-extrabold">{t('pending_orders_title', 'បញ្ជាទិញរង់ចាំ')}</h3>
               </div>
               <button
                 onClick={() => setPendingOrdersOpen(false)}
@@ -890,7 +1238,7 @@ export default function App() {
               {pendingOrders.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <Clock className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
-                  <p className="text-xs font-bold text-brand-muted">មិនមាន order រង់ចាំទេ</p>
+                  <p className="text-xs font-bold text-brand-muted">{t('no_pending_orders', 'មិនមាន order រង់ចាំទេ')}</p>
                 </div>
               ) : (
                 pendingOrders.map((order, idx) => (
@@ -906,7 +1254,7 @@ export default function App() {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <span className="text-xs font-extrabold">Order #{order.id}</span>
+                        <span className="text-xs font-extrabold">{t('order', 'Order')} #{order.id}</span>
                         <div className="text-[9px] font-medium text-brand-muted mt-0.5 flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -919,15 +1267,15 @@ export default function App() {
                       <div className={`p-2 rounded-lg text-[10px] mb-2 ${
                         darkMode ? 'bg-brand-warning/10 border border-brand-warning/20' : 'bg-amber-50 border border-amber-200'
                       }`}>
-                        <span className="font-bold text-brand-warning block">Note:</span>
+                        <span className="font-bold text-brand-warning block">{t('note', 'Note')}:</span>
                         <span className="text-brand-muted">{order.notes}</span>
                       </div>
                     )}
 
                     <div className={`flex justify-between items-center pt-2 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
-                      <span className="text-[10px] font-medium text-brand-muted">{order.item_lines} items</span>
+                      <span className="text-[10px] font-medium text-brand-muted">{order.item_lines} {t('items', 'items')}</span>
                       <span className="text-[10px] font-bold text-brand-cyan group-hover:text-brand-violet transition flex items-center gap-1">
-                        បន្ត <ChevronRight className="h-3 w-3" />
+                        {t('resume', 'បន្ត')} <ChevronRight className="h-3 w-3" />
                       </span>
                     </div>
                   </div>
@@ -954,8 +1302,8 @@ export default function App() {
                   <CreditCard className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold">ទូទាត់ប្រាក់</h3>
-                  <p className="text-[10px] text-brand-muted">Checkout Processing</p>
+                  <h3 className="text-sm font-extrabold">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
+                  <p className="text-[10px] text-brand-muted">{t('payment_subtitle', 'Checkout Processing')}</p>
                 </div>
               </div>
               <button
@@ -973,7 +1321,7 @@ export default function App() {
               darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'
             }`}>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">ទឹកប្រាក់សរុប</div>
+                <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
                 <div className="text-xl font-black text-gradient mt-0.5">${getGrandTotal().toFixed(2)}</div>
               </div>
               <span className="text-[9px] font-bold uppercase bg-brand-cyan/15 text-brand-cyan px-2.5 py-1 rounded-full tracking-wider border border-brand-cyan/20">
@@ -983,19 +1331,19 @@ export default function App() {
 
             {/* Payment Method Tabs */}
             <div className="mt-5 space-y-2">
-              <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block">វិធីបង់ប្រាក់</label>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block">{t('payment_method', 'វិធីបង់ប្រាក់')}</label>
               <div className="grid grid-cols-3 gap-2">
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
                     className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
                       paymentMethod === 'cash'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
                         : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
                     <Wallet className="h-5 w-5" />
-                    <span className="text-[10px]">សាច់ប្រាក់</span>
+                    <span className="text-[10px]">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
@@ -1003,7 +1351,7 @@ export default function App() {
                     onClick={() => setPaymentMethod('khqr')}
                     className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
                       paymentMethod === 'khqr'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
                         : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
@@ -1016,12 +1364,12 @@ export default function App() {
                     onClick={() => setPaymentMethod('card')}
                     className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
                       paymentMethod === 'card'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan/20'
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
                         : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
                     }`}
                   >
                     <CreditCard className="h-5 w-5" />
-                    <span className="text-[10px]">Card</span>
+                    <span className="text-[10px]">{t('card', 'Card')}</span>
                   </button>
                 )}
               </div>
@@ -1032,7 +1380,7 @@ export default function App() {
               {paymentMethod === 'cash' && (
                 <div className="space-y-3 animate-fade-in">
                   <div>
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">ប្រាក់ទទួលបាន</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-brand-muted">$</span>
                       <input
@@ -1048,11 +1396,27 @@ export default function App() {
                         }`}
                       />
                     </div>
+                    <div className="mt-2 grid grid-cols-4 gap-1.5">
+                      {quickTenderOptions.map(amount => (
+                        <button
+                          key={amount}
+                          type="button"
+                          onClick={() => setCashGiven(amount.toFixed(2))}
+                          className={`rounded-lg border px-2 py-1.5 text-[10px] font-extrabold transition ${
+                            darkMode
+                              ? 'border-white/5 bg-brand-bgDark text-brand-textDark hover:border-brand-cyan/30 hover:text-brand-cyan'
+                              : 'border-gray-200 bg-white text-brand-textLight hover:border-brand-cyan/30 hover:text-brand-cyan'
+                          }`}
+                        >
+                          ${amount.toFixed(2)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {parseFloat(cashGiven) > 0 && (
                     <div className="p-3 rounded-xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
-                      <span className="text-[11px] font-bold text-brand-success">ប្រាក់អាប់ Change</span>
+                      <span className="text-[11px] font-bold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
                       <span className="text-lg font-black text-brand-success">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
@@ -1071,7 +1435,7 @@ export default function App() {
                     />
                   </div>
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-danger animate-pulse">
-                    កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...
+                    {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
                   </div>
                 </div>
               )}
@@ -1082,7 +1446,7 @@ export default function App() {
                 }`}>
                   {cardSimulating ? (
                     <div className="space-y-3">
-                      <div className="text-xs font-bold text-brand-cyan">Connecting to card reader...</div>
+                      <div className="text-xs font-bold text-brand-cyan">{t('connecting_card', 'Connecting to card reader...')}</div>
                       <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-gray-200'}`}>
                         <div
                           className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
@@ -1094,8 +1458,8 @@ export default function App() {
                   ) : (
                     <div className="space-y-2">
                       <CreditCard className="mx-auto h-8 w-8 text-brand-cyan animate-float" />
-                      <p className="text-xs font-bold text-brand-muted">បញ្ចូលកាត POS reader device</p>
-                      <p className="text-[10px] text-brand-muted/60">Submit to initialize handshake</p>
+                      <p className="text-xs font-bold text-brand-muted">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
+                      <p className="text-[10px] text-brand-muted/60">{t('submit_handshake', 'Submit to initialize handshake')}</p>
                     </div>
                   )}
                 </div>
@@ -1110,14 +1474,14 @@ export default function App() {
                 className="btn-primary w-full h-11 text-xs font-extrabold flex items-center justify-center gap-1.5"
               >
                 <Check className="h-4 w-4" />
-                <span>បញ្ជាក់ និង បញ្ចប់ Confirm</span>
+                <span>{t('confirm_finish', 'បញ្ជាក់ និង បញ្ចប់ Confirm')}</span>
               </button>
               <button
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
                 className="w-full py-2.5 text-[11px] font-bold text-brand-muted hover:text-brand-cyan transition"
               >
-                បោះបង់ Cancel
+                {t('cancel', 'បោះបង់ Cancel')}
               </button>
             </div>
           </div>

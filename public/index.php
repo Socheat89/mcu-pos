@@ -60,8 +60,7 @@ $structuredData = [
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css?v=2.2">
@@ -74,423 +73,17 @@ $structuredData = [
 <?php echo json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
     </script>
     
-    <style>
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 0;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 90%;
-            max-width: 450px;
-            animation: modalFadeIn 0.3s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #64748b;
-            line-height: 1;
-        }
-
-        .modal-body {
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .qr-code-container {
-            margin-bottom: 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            display: inline-block;
-            background: white;
-        }
-
-        .qr-code-container img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .payment-amount {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        /* Countdown Style */
-        .countdown-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .countdown-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .countdown-circle-bg {
-            fill: none;
-            stroke: #f1f5f9;
-            stroke-width: 8;
-        }
-
-        .countdown-circle-progress {
-            fill: none;
-            stroke: #E31E26;
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 351.85; /* 2 * PI * r (r=56) */
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 1s linear;
-        }
-
-        .countdown-text {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #1e293b;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .waiting-status {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 1rem;
-        }
-
-        .waiting-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .waiting-desc {
-            font-size: 0.95rem;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .telegram-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: #f0f9ff;
-            color: #0369a1;
-            border-radius: 2rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-        }
-
-        /* Auth Modal Specific */
-        .auth-form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .auth-form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #1e293b;
-        }
-
-        .auth-form-group input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .auth-form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .auth-divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 1.5rem 0;
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        .auth-divider::before,
-        .auth-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .auth-divider:not(:empty)::before {
-            margin-right: .5em;
-        }
-
-        .auth-divider:not(:empty)::after {
-            margin-left: .5em;
-        }
-
-        .auth-error {
-            background: #fef2f2;
-            color: #b91c1c;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
-            display: none;
-            border: 1px solid #fecaca;
-        }
-
-        /* About Section */
-        .about-section {
-            background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.35), transparent 55%),
-                        radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.25), transparent 45%),
-                        #020617;
-            color: #e2e8f0;
-            padding: 5rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .about-section::after {
-            content: '';
-            position: absolute;
-            inset: 20% auto auto -60px;
-            width: 220px;
-            height: 220px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
-            filter: blur(0);
-            transform: rotate(25deg);
-            border-radius: 30px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            opacity: 0.6;
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2.5rem;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .about-intro h2 {
-            font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: clamp(2rem, 4vw, 3rem);
-            margin: 1rem 0 1.5rem;
-            color: #f8fafc;
-        }
-
-        .about-intro p {
-            color: #cbd5f5;
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-        }
-
-        .about-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.4rem 0.9rem;
-            border-radius: 999px;
-            background: rgba(148, 163, 184, 0.15);
-            color: #93c5fd;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .about-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 0.9rem;
-        }
-
-        .about-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.7rem;
-            color: #cbd5f5;
-        }
-
-        .about-profile {
-            background: rgba(15, 23, 42, 0.85);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            box-shadow: 0 40px 60px -35px rgba(15, 23, 42, 0.9);
-        }
-
-        .profile-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 1.25rem;
-        }
-
-        .profile-meta span:last-child {
-            color: #67e8f9;
-        }
-
-        .profile-name {
-            font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: 1.8rem;
-            margin: 0 0 0.5rem;
-            color: #e2e8f0;
-        }
-
-        .profile-role {
-            color: #60a5fa;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .profile-bio {
-            color: #cbd5f5;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(120px, 1fr));
-            gap: 1.2rem;
-        }
-
-        .stat-card {
-            background: rgba(59, 130, 246, 0.08);
-            border-radius: 1rem;
-            padding: 1rem;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .stat-value {
-            display: block;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #f4faff;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: #94a3b8;
-        }
-
-        .signature {
-            margin-top: 2rem;
-            font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: 1rem;
-            color: #cbd5f5;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-        
-        /* Premium Mockup and UI additions */
-        .mockup-container {
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(0);
-        }
-        .mockup-container:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 35px 80px -15px rgba(15, 23, 42, 0.3) !important;
-        }
-        @keyframes glowPulse {
-            0%, 100% { filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.1)); }
-            50% { filter: drop-shadow(0 0 30px rgba(20, 184, 166, 0.25)); }
-        }
-        .animate-glow {
-            animation: glowPulse 4s infinite ease-in-out;
-        }
-        @keyframes badgeRipple {
-            0% { box-shadow: 0 0 0 0px rgba(124, 58, 237, 0.4); }
-            100% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
-        }
-        .badge-pulse {
-            animation: badgeRipple 2s infinite ease-out;
-        }
-    </style>
+    
     
     <!-- Payment Success Modal -->
     <div id="successModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; padding: 3rem 2rem; text-align: center;">
-            <div style="width: 80px; height: 80px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div class="modal-content modal-content--sm modal-content--center">
+            <div class="modal-icon modal-icon--success">
                 <i class="ph-bold ph-check"></i>
             </div>
-            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #0f172a;">Payment Successful!</h3>
-            <p style="color: #64748b; margin-bottom: 2rem;">Thank you for your payment. Your workspace setup is being initialized.</p>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--primary); font-weight: 600;">
+            <h3>Payment Successful!</h3>
+            <p>Thank you for your payment. Your workspace setup is being initialized.</p>
+            <div class="status-inline">
                 <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
             </div>
         </div>
@@ -498,14 +91,14 @@ $structuredData = [
 
     <!-- Waiting for Approval Modal -->
     <div id="waitingModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header" style="background: #0088cc; color: white; border-bottom: none;">
-                <h3 style="font-weight: 600;">
+        <div class="modal-content">
+            <div class="modal-header modal-header--telegram">
+                <h3>
                     <i class="ph-bold ph-telegram-logo"></i> Awaiting Approval
                 </h3>
-                <button type="button" class="modal-close" onclick="closeWaitingModal()" style="color: white;">&times;</button>
+                <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 3rem 2rem;">
+            <div class="modal-body">
                 <div class="waiting-status">
                     <div class="countdown-container">
                         <svg class="countdown-svg">
@@ -531,23 +124,16 @@ $structuredData = [
         </div>
     </div>
 
-    <style>
-        @keyframes scaleIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-    </style>
-
     <!-- Sign In Modal -->
     <div id="authModal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content modal-content--sm">
             <div class="modal-header">
-                <h3 style="font-weight: 600;">
+                <h3>
                     <i class="ph-bold ph-user-circle"></i> Welcome Back
                 </h3>
                 <button type="button" class="modal-close" onclick="closeAuthModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 2.5rem 2rem;">
+            <div class="modal-body">
                 <div id="authError" class="auth-error"></div>
                 <form id="authForm" onsubmit="handleAuthSubmit(event)">
                     <div class="auth-form-group">
@@ -563,14 +149,14 @@ $structuredData = [
                         <input type="password" id="modal-password" name="password" placeholder="Enter your password" required>
                     </div>
                     
-                    <button type="submit" id="signInBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-                        Sign In <i class="ph-bold ph-sign-in" style="margin-left: 8px;"></i>
+                    <button type="submit" id="signInBtn" class="btn btn-primary full-width">
+                        Sign In <i class="ph-bold ph-sign-in"></i>
                     </button>
                     
                     <div class="auth-divider">or</div>
                     
-                    <p style="font-size: 0.9rem; margin: 0;">
-                        New here? <a href="register.php" style="color: var(--primary); font-weight: 600;">Create an account</a>
+                    <p>
+                        New here? <a href="register.php" class="link-strong">Create an account</a>
                     </p>
                 </form>
             </div>
@@ -638,186 +224,80 @@ $structuredData = [
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-pill badge-pulse">
-                <i class="ph-fill ph-sparkle" style="margin-right: 6px;"></i> v2.0 is now live
-            </div>
-            <h1>
-                Run your entire business on <br>
-                <span class="gradient-text">Cambodia’s Unified POS Platform</span>
-            </h1>
-            <p>
-                Stop juggling multiple disjointed subscriptions. Mekong CyberUnit is a Khmer POS system built for Cambodia so anyone searching “POS Khmer” or “POS system” discovers a bilingual suite that merges POS, Inventory, HR, and Accounting in one secure cloud workspace.
-            </p>
-            <div class="btn-group">
-                <a href="register.php" class="btn btn-primary">
-                    Start Free Trial <i class="ph-bold ph-arrow-right" style="margin-left: 8px;"></i>
-                </a>
-            </div>
-               <!-- Premium Dashboard Preview / Mockup -->
-            <div class="mockup-container">
-                <div class="mock-dashboard">
-                    
-                    <!-- Mockup Header -->
-                    <div class="mock-header">
-                        <div class="mock-header-left">
-                            <span class="mock-dot red"></span>
-                            <span class="mock-dot yellow"></span>
-                            <span class="mock-dot green"></span>
-                            <span style="margin-left: 8px; font-family: monospace; color: #64748b;">Mekong POS Terminal v2.0</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <span class="mock-badge-active">
-                                <span class="mock-badge-dot"></span> Active Terminal 01
-                            </span>
-                            <span style="color: #94a3b8; font-family: monospace;">16:15:30</span>
-                        </div>
+    <section class="hero" id="top">
+        <div class="container hero-grid">
+            <div class="hero-copy">
+                <div class="hero-pill">
+                    <i class="ph-fill ph-sparkle"></i>
+                    Khmer-first cloud POS
+                </div>
+                <h1>Run sales, inventory, and subscriptions in one Mekong workspace.</h1>
+                <p>
+                    Mekong CyberUnit keeps Khmer and English teams in sync with POS, inventory, HR, and billing
+                    across every branch. One dashboard, one subscription, zero chaos.
+                </p>
+                <div class="btn-group hero-actions">
+                    <a href="register.php" class="btn btn-primary">
+                        Start Free Trial <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                    <a href="#pricing" class="btn btn-outline">See Pricing</a>
+                </div>
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <strong>120+</strong>
+                        <span>SMEs onboarded</span>
                     </div>
-
-                    <!-- Mockup Main Body -->
-                    <div class="mock-body">
-                        
-                        <!-- Mockup Sidebar -->
-                        <div class="mock-sidebar">
-                            <div class="mock-sidebar-top">
-                                <div class="mock-logo">MCU</div>
-                                <div class="mock-sidebar-item"><i class="ph-bold ph-house"></i></div>
-                                <div class="mock-sidebar-item active"><i class="ph-bold ph-shopping-cart"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph-bold ph-package"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph-bold ph-users"></i></div>
-                                <div class="mock-sidebar-item"><i class="ph-bold ph-chart-bar"></i></div>
-                            </div>
-                            <div class="mock-sidebar-item"><i class="ph-bold ph-gear"></i></div>
-                        </div>
-
-                        <!-- Mockup Content Area -->
-                        <div class="mock-main-content">
-                            
-                            <!-- Products Grid -->
-                            <div class="mock-products-grid">
-                                <!-- Search -->
-                                <div class="mock-search-bar">
-                                    <div class="mock-search-wrapper">
-                                        <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                                        <input type="text" class="mock-search-input" placeholder="Search coffee, drinks, snacks..." readonly>
-                                    </div>
-                                    <div class="mock-filter-btn">
-                                        All Categories <i class="ph-bold ph-caret-down"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Cards -->
-                                <div class="mock-grid">
-                                    <div class="mock-card mock-product-card">
-                                        <div class="mock-card-img">
-                                            <span class="mock-card-badge">15 In Stock</span>
-                                            ☕
-                                        </div>
-                                        <div class="mock-card-title">Espresso Single</div>
-                                        <div class="mock-card-footer">
-                                            <span class="mock-card-price">$1.50</span>
-                                            <span class="mock-card-category">Coffee</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="mock-card selected mock-product-card">
-                                        <div class="mock-card-img">
-                                            <span class="mock-card-badge low">4 Low Stock</span>
-                                            🥤
-                                        </div>
-                                        <div class="mock-card-title">Ice Latte Premium</div>
-                                        <div class="mock-card-footer">
-                                            <span class="mock-card-price">$2.20</span>
-                                            <span class="mock-card-category">Coffee</span>
-                                        </div>
-                                        <span class="mock-selected-count">1</span>
-                                    </div>
-
-                                    <div class="mock-card mock-product-card">
-                                        <div class="mock-card-img">
-                                            <span class="mock-card-badge">12 In Stock</span>
-                                            🥐
-                                        </div>
-                                        <div class="mock-card-title">Croissant Butter</div>
-                                        <div class="mock-card-footer">
-                                            <span class="mock-card-price">$1.80</span>
-                                            <span class="mock-card-category">Bakery</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Cart Info -->
-                            <div class="mock-cart">
-                                <div class="mock-cart-header">
-                                    <span class="mock-cart-title"><i class="ph-bold ph-shopping-bag" style="color: #10b981;"></i> Active Cart</span>
-                                    <span class="mock-cart-count">1 Items</span>
-                                </div>
-                                
-                                <div class="mock-cart-item">
-                                    <div class="mock-cart-item-thumb">🥤</div>
-                                    <div class="mock-cart-item-info">
-                                        <h6 class="mock-cart-item-name">Ice Latte Premium</h6>
-                                        <span class="mock-cart-item-price">$2.20</span>
-                                    </div>
-                                    <div class="mock-qty-selector">
-                                        <span style="color: #64748b; cursor: pointer;">-</span>
-                                        <span>1</span>
-                                        <span style="color: #64748b; cursor: pointer;">+</span>
-                                    </div>
-                                </div>
-
-                                <div class="mock-cart-summary">
-                                    <div class="mock-summary-line">
-                                        <span>Subtotal</span>
-                                        <span>$2.20</span>
-                                    </div>
-                                    <div class="mock-summary-line">
-                                        <span>Tax (0%)</span>
-                                        <span>$0.00</span>
-                                    </div>
-                                    <div class="mock-summary-line total">
-                                        <span>Total</span>
-                                        <span style="color: #34d399;">$2.20</span>
-                                    </div>
-
-                                    <div class="mock-checkout-btn-group">
-                                        <button class="mock-btn-trash" type="button"><i class="ph-bold ph-trash"></i></button>
-                                        <button class="mock-btn-checkout" type="button">Checkout <i class="ph-bold ph-arrow-right"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="metric-card">
+                        <strong>3</strong>
+                        <span>Languages shipped</span>
                     </div>
-
-                    <!-- Simulated KHQR Overlay Preview -->
-                    <div class="mock-khqr-overlay">
-                        <div class="mock-khqr-card animate-pulse">
-                            <div class="mock-khqr-header">
-                                <span class="mock-khqr-badge"><i class="ph-bold ph-qr-code"></i></span>
-                                <span class="mock-khqr-title">Scan to Pay (Bakong)</span>
-                            </div>
-                            <div class="mock-khqr-amount">$2.20</div>
-                            <div class="mock-khqr-qr">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=simulate_khqr_pay" alt="Mock QR" style="height: 100px; width: 100px; display: block;" />
-                            </div>
-                            <div class="mock-khqr-status">
-                                <span style="height: 6px; width: 6px; border-radius: 50%; background: #f43f5e; display: inline-block;"></span> Awaiting Approval...
-                            </div>
-                        </div>
+                    <div class="metric-card">
+                        <strong>24 hr</strong>
+                        <span>Average rollout</span>
                     </div>
                 </div>
             </div>
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="hero-card__title">Live sales pulse</div>
+                    <div class="hero-card__item">
+                        <span>Morning rush</span>
+                        <strong>$1,240</strong>
+                    </div>
+                    <div class="hero-card__item">
+                        <span>Low stock alerts</span>
+                        <strong>8 items</strong>
+                    </div>
+                    <div class="hero-card__item">
+                        <span>Open tabs</span>
+                        <strong>12 orders</strong>
+                    </div>
+                </div>
+                <div class="hero-card hero-card--accent">
+                    <div class="hero-card__title">Why teams switch</div>
+                    <div class="hero-card__item">
+                        <span>KHQR + cash</span>
+                        <strong>2 taps</strong>
+                    </div>
+                    <div class="hero-card__item">
+                        <span>Multi-outlet view</span>
+                        <strong>Unified</strong>
+                    </div>
+                    <div class="hero-card__item">
+                        <span>Offline friendly</span>
+                        <strong>Always on</strong>
+                    </div>
+                </div>
             </div>
+        </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="features-section" style="padding: 100px 0; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+    <section id="features" class="features-section">
         <div class="container">
             <div class="section-header">
-                <div class="hero-pill" style="margin-bottom: 1rem;">
-                    <i class="ph-bold ph-sparkle" style="margin-right: 6px;"></i> Platform Highlights
+                <div class="section-kicker">
+                    <i class="ph-bold ph-sparkle"></i> Platform Highlights
                 </div>
                 <h2>Packed with Enterprise-grade Features</h2>
                 <p>Everything you need to scale your retail, cafe, or restaurant business in Cambodia.</p>
@@ -949,7 +429,7 @@ $structuredData = [
     <section class="pricing-section" id="pricing">
         <div class="container">
             <div class="section-header">
-                <div class="hero-pill" style="margin-bottom: 1rem;">Cloud POS Plans</div>
+                <div class="section-kicker">Cloud POS Plans</div>
                 <h2>Simple, Transparent Pricing</h2>
                 <p>Choose the right plan for your business needs.</p>
             </div>
@@ -972,41 +452,41 @@ $structuredData = [
                     // Fetch linked modules for this plan
                     $modules = $db->fetchAll("SELECT module_name FROM system_modules WHERE system_id = ?", [$plan['id']]);
                 ?>
-                <div class="system-card <?php echo $isPopular ? 'popular-card border-pulse' : ''; ?>" <?php echo $isPopular ? 'style="transform: scale(1.03); z-index: 1;"' : ''; ?>>
+                <div class="system-card <?php echo $isPopular ? 'popular-card' : ''; ?>">
                     <?php if ($isPopular): ?>
-                    <div style="position: absolute; top: 0; right: 0; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 0.35rem 1rem; font-size: 0.75rem; font-weight: 700; border-bottom-left-radius: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">POPULAR</div>
+                    <div class="plan-badge">Popular</div>
                     <?php endif; ?>
                     
-                    <h3 class="system-title" style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 800;"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                    <p class="system-desc" style="margin-bottom: 1.5rem; min-height: 50px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;"><?php echo htmlspecialchars($plan['description']); ?></p>
+                    <h3 class="system-title"><?php echo htmlspecialchars($plan['name']); ?></h3>
+                    <p class="system-desc"><?php echo htmlspecialchars($plan['description']); ?></p>
                     
-                    <div class="price-tag" style="margin-bottom: 2rem; display: flex; align-items: baseline; gap: 4px;">
-                        <span class="price-amount" style="font-size: 2.25rem; font-weight: 800; color: #f8fafc;">$<?php echo number_format($plan['price'], 2); ?></span>
-                        <span class="price-period" style="color: var(--text-muted); font-size: 0.9rem;">/month</span>
+                    <div class="price-tag">
+                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
+                        <span class="price-period">/month</span>
                     </div>
                     
-                    <ul style="list-style: none; padding: 0; margin: 0 0 2rem 0; color: var(--text-muted); text-align: left; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <ul class="plan-list">
                         <?php if (empty($modules)): ?>
-                            <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
-                                <i class="ph-bold ph-info" style="color: var(--secondary); font-size: 1.1rem;"></i> Basic Platform Access
+                            <li>
+                                <i class="ph-bold ph-info"></i> Basic Platform Access
                             </li>
                         <?php else: ?>
                             <?php foreach ($modules as $mod): ?>
-                            <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
-                                <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> 
-                                <span style="text-transform: uppercase; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.03em;"><?php echo htmlspecialchars($mod['module_name']); ?></span> Module
+                            <li>
+                                <i class="ph-bold ph-check-circle"></i>
+                                <span><?php echo htmlspecialchars($mod['module_name']); ?> Module</span>
                             </li>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                        <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
-                            <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> Cloud Storage
+                        <li>
+                            <i class="ph-bold ph-check-circle"></i> Cloud Storage
                         </li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #e2e8f0;">
-                            <i class="ph-bold ph-check-circle" style="color: var(--primary); font-size: 1.1rem;"></i> 24/7 Priority Support
+                        <li>
+                            <i class="ph-bold ph-check-circle"></i> 24/7 Priority Support
                         </li>
                     </ul>
                     
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?>" style="width: 100%; text-align: center; text-decoration: none; display: block; padding: 0.75rem 1.5rem; font-weight: 700;">
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?> full-width">
                         Choose <?php echo htmlspecialchars($plan['name']); ?>
                     </a>
                 </div>
@@ -1026,8 +506,8 @@ $structuredData = [
     <section id="testimonials" class="testimonials-section">
         <div class="container">
             <div class="section-header">
-                <div class="hero-pill" style="margin-bottom: 1rem;">
-                    <i class="ph-bold ph-chats" style="margin-right: 6px;"></i> Customer Reviews
+                <div class="section-kicker">
+                    <i class="ph-bold ph-chats"></i> Customer Reviews
                 </div>
                 <h2>Loved by Operators Across Cambodia</h2>
                 <p>See how local cafes, retail stores, and pharmacies scale their businesses with Mekong CyberUnit.</p>
@@ -1083,8 +563,8 @@ $structuredData = [
     <section id="faq" class="faq-section">
         <div class="container">
             <div class="section-header">
-                <div class="hero-pill" style="margin-bottom: 1rem;">
-                    <i class="ph-bold ph-question" style="margin-right: 6px;"></i> Frequently Asked Questions
+                <div class="section-kicker">
+                    <i class="ph-bold ph-question"></i> Frequently Asked Questions
                 </div>
                 <h2>Got Questions? We Have Answers</h2>
                 <p>Everything you need to know about setting up and using Mekong CyberUnit POS.</p>
@@ -1150,8 +630,8 @@ $structuredData = [
     <section id="contact" class="contact-section">
         <div class="container">
             <div class="section-header">
-                <div class="hero-pill" style="margin-bottom: 1rem;">
-                    <i class="ph-bold ph-envelope" style="margin-right: 6px;"></i> Contact Us
+                <div class="section-kicker">
+                    <i class="ph-bold ph-envelope"></i> Contact Us
                 </div>
                 <h2>Get in Touch with Our Team</h2>
                 <p>Have questions about pricing, features, or custom integrations? We're here to help.</p>
@@ -1182,7 +662,7 @@ $structuredData = [
                             </div>
                             <div class="contact-method-text">
                                 <h4>Telegram Channels</h4>
-                                <p><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" style="color: #22d3ee; text-decoration: underline;">@SOCHEAT_DOEM</a></p>
+                                <p><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="contact-link">@SOCHEAT_DOEM</a></p>
                             </div>
                         </li>
                         
@@ -1222,8 +702,8 @@ $structuredData = [
                             <textarea id="contact-message" name="message" rows="5" placeholder="How can we help your business?" required></textarea>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary full-width" style="grid-column: 1 / -1; margin-top: 1rem; width: 100%;">
-                            Send Message <i class="ph-bold ph-paper-plane-right" style="margin-left: 8px;"></i>
+                        <button type="submit" class="btn btn-primary full-width">
+                            Send Message <i class="ph-bold ph-paper-plane-right"></i>
                         </button>
                     </form>
                 </div>
@@ -1238,10 +718,10 @@ $structuredData = [
                 <h2>Ready to transform your business?</h2>
                 <p>Join hundreds of businesses using Mekong CyberUnit to streamline operations.</p>
                 <div class="btn-group">
-                     <a href="register.php" class="btn" style="background: white; color: var(--text-main);">
+                     <a href="register.php" class="btn btn-primary">
                         Create Free Account
                     </a>
-                    <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn btn-ghost">
                         Contact Sales
                     </a>
                 </div>
@@ -1255,7 +735,7 @@ $structuredData = [
             <div class="footer-grid">
                 <div class="footer-brand">
                     <div class="logo">
-                        <div class="logo-icon" style="width: 28px; height: 28px;">
+                        <div class="logo-icon">
                             <i class="ph-bold ph-cube"></i>
                         </div>
                         <span>Mekong CyberUnit</span>
@@ -1301,22 +781,22 @@ $structuredData = [
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header" style="background: #E31E26; color: white;">
-                <h3 style="font-weight: 600;">
-                    <div style="background: white; border-radius: 4px; padding: 2px;">
-                        <i class="ph-bold ph-qr-code" style="color: #E31E26;"></i>
+            <div class="modal-header modal-header--brand">
+                <h3>
+                    <div class="modal-badge">
+                        <i class="ph-bold ph-qr-code"></i>
                     </div>
                     Scan to Pay (Bakong)
                 </h3>
-                <button type="button" class="modal-close" onclick="closeModal()" style="color: rgba(255,255,255,0.8);">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="payment-amount" id="modalAmount">$0.00</div>
-                <div class="payment-instruction" style="color: #64748b; margin-bottom: 1.5rem;">Scan with Bakong or any Banking App</div>
+                <div class="payment-instruction">Scan with Bakong or any Banking App</div>
                 
-                <div class="qr-code-container" style="border-color: #E31E26; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                <div class="qr-code-container qr-code-container--center">
                     <div id="qrPlaceholder" style="display: none;">
-                         <i class="ph-bold ph-spinner ph-spin" style="font-size: 2rem; color: #E31E26;"></i>
+                         <i class="ph-bold ph-spinner ph-spin"></i>
                     </div>
                     <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
                 </div>
@@ -1339,12 +819,12 @@ $structuredData = [
                     </button>
                 </div>
                 
-                <p style="font-size: 0.9rem; color: #64748b; margin-top: 1rem;">
-                    Payment for <span id="planName" style="font-weight: 700; color: #0f172a;">Plan</span>
+                <p class="payment-meta">
+                    Payment for <span id="planName">Plan</span>
                 </p>
             </div>
-            <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 1rem; background: #f8fafc;">
-                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none; background: #16a34a; border-color: #16a34a;" onclick="confirmStaticPayment()">
+            <div class="modal-footer">
+                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="confirmStaticPayment()">
                     <i class="ph-bold ph-check-circle"></i> I Have Paid
                 </button>
                 <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>

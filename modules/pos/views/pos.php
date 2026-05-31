@@ -14,7 +14,7 @@ $tenantName = Tenant::getCurrent()['name'] ?? '';
     <link href="<?php echo mc_base_path(); ?>/public/dist/assets/index.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <!-- Inline values to pass down to React -->
     <script>
@@ -64,6 +64,8 @@ $tenantName = Tenant::getCurrent()['name'] ?? '';
             'pos_method_khqr_enabled' => $settings['pos_method_khqr_enabled'] ?? '1',
             'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1'
         ]); ?>;
+
+        window.CURRENT_LANG = "<?php echo Language::getCurrentLang(); ?>";
 
         window.RESUME = <?php
             $resumePayload = null;
