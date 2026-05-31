@@ -79,20 +79,11 @@ unset($_SESSION['password_reset_success'], $_SESSION['password_reset_debug_link'
                 <div class="form-group">
                     <label for="identity">Username or email</label>
                     <input type="text" id="identity" name="identity" required placeholder="username or email@example.com" autocomplete="username">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">New password</label>
-                    <input type="password" id="password" name="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password">
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password">Confirm password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required minlength="8" placeholder="Repeat new password" autocomplete="new-password">
+                    <p class="form-helper">If the account exists, the reset link expires in 1 hour.</p>
                 </div>
 
                 <button type="submit" class="btn btn-primary full-width">
-                    Reset Password
+                    Send Reset Link
                 </button>
             </form>
 

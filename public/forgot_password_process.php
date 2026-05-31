@@ -12,35 +12,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $identity = trim($_POST['identity'] ?? '');
-$password = $_POST['password'] ?? '';
-$confirmPassword = $_POST['confirm_password'] ?? '';
-
 if ($identity === '') {
     header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Please enter your username or email.'));
     exit;
 }
 
-if (strlen($password) < 8) {
-    header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Password must be at least 8 characters.'));
-    exit;
-}
-
-if ($password !== $confirmPassword) {
-    header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Passwords do not match.'));
-    exit;
-}
-
 try {
-    if (PasswordReset::resetPasswordDirectly($identity, $password)) {
-        header("Location: $urlPrefix/login.php?success=" . urlencode('Password reset successfully. Please sign in with your new password.'));
-        exit;
+    $result = PasswordReset::requestReset($identity);
+
+    $_SESSION['password_reset_success'] = 'If an active account matches, a password reset link has been prepared.';
+    if ($result && PasswordReset::shouldExposeResetLink()) {
+        $_SESSION['password_reset_debug_link'] = $result['reset_url'];
     }
 
-    header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Account not found or inactive.'));
+    header("Location: $urlPrefix/forgot_password.php?sent=1");
     exit;
 } catch (Exception $e) {
-    error_log('Direct password reset error: ' . $e->getMessage());
-    header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Unable to reset password. Please try again.'));
+    error_log('Forgot password error: ' . $e->getMessage());
+    header("Location: $urlPrefix/forgot_password.php?error=" . urlencode('Unable to prepare a reset link. Please try again.'));
     exit;
 }
 ?>
