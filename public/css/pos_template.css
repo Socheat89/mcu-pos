@@ -8,39 +8,39 @@
 /* ── POS Design Tokens ───────────────────────────────────────────────────── */
 :root {
     /* Brand */
-    --pos-primary: #0f766e;
-    --pos-primary-rgb: 15, 118, 110;
-    --pos-primary-light: rgba(15, 118, 110, 0.12);
-    --pos-secondary: #e76f51;
-    --pos-accent: #f4a261;
-    --pos-success: #2a9d8f;
-    --pos-warning: #f4a261;
-    --pos-danger: #d94841;
+    --pos-primary: #06b6d4;
+    --pos-primary-rgb: 6, 182, 212;
+    --pos-primary-light: rgba(6, 182, 212, 0.1);
+    --pos-secondary: #6366f1;
+    --pos-accent: #8b5cf6;
+    --pos-success: #10b981;
+    --pos-warning: #f59e0b;
+    --pos-danger: #f43f5e;
 
     /* Surfaces */
-    --pos-bg: #f6f0e6;
-    --pos-card: rgba(255, 255, 255, 0.82);
-    --pos-card-solid: #fffaf3;
-    --pos-elevated: #ffffff;
-    --pos-text: #1b1a17;
-    --pos-text-muted: #6b645c;
-    --pos-text-dim: #857c73;
-    --pos-border: rgba(27, 26, 23, 0.12);
-    --pos-border-light: rgba(27, 26, 23, 0.06);
+    --pos-bg: #080a10;
+    --pos-card: rgba(14, 19, 34, 0.65);
+    --pos-card-solid: #0e1322;
+    --pos-elevated: #161b2e;
+    --pos-text: #f8fafc;
+    --pos-text-muted: #94a3b8;
+    --pos-text-dim: #64748b;
+    --pos-border: rgba(255, 255, 255, 0.08);
+    --pos-border-light: rgba(255, 255, 255, 0.04);
 
     /* Shadows */
-    --pos-shadow-sm: 0 6px 16px rgba(31, 29, 25, 0.08);
-    --pos-shadow-md: 0 14px 28px rgba(31, 29, 25, 0.12);
-    --pos-shadow-lg: 0 24px 48px rgba(31, 29, 25, 0.16);
-    --pos-shadow-xl: 0 32px 64px rgba(31, 29, 25, 0.18);
-    --pos-shadow-glow: 0 0 24px rgba(15, 118, 110, 0.18);
+    --pos-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --pos-shadow-md: 0 12px 24px rgba(0, 0, 0, 0.4);
+    --pos-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.5);
+    --pos-shadow-xl: 0 32px 64px rgba(0, 0, 0, 0.6);
+    --pos-shadow-glow: 0 0 24px rgba(6, 182, 212, 0.2);
 
     /* Gradients */
-    --pos-gradient-primary: linear-gradient(135deg, #0f766e 0%, #2a9d8f 50%, #f4a261 100%);
-    --pos-gradient-dark: linear-gradient(135deg, #0b5f58 0%, #11443d 50%, #1f3c3a 100%);
-    --pos-gradient-surface: linear-gradient(180deg, rgba(255, 250, 243, 0.96) 0%, rgba(246, 240, 230, 0.98) 100%);
-    --pos-gradient-sidebar: linear-gradient(180deg, #0f766e 0%, #0b5f58 100%);
-    --pos-sidebar-glow: radial-gradient(circle at 50% 0%, rgba(244, 162, 97, 0.22) 0%, transparent 60%);
+    --pos-gradient-primary: linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #6366f1 100%);
+    --pos-gradient-dark: linear-gradient(135deg, #090d16 0%, #0d1222 50%, #151a2e 100%);
+    --pos-gradient-surface: linear-gradient(180deg, rgba(14, 19, 34, 0.96) 0%, rgba(8, 10, 16, 0.98) 100%);
+    --pos-gradient-sidebar: linear-gradient(180deg, #080b11 0%, #0e1322 100%);
+    --pos-sidebar-glow: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.18) 0%, transparent 60%);
 
     /* Layout */
     --pos-sidebar-w: 272px;
@@ -437,7 +437,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(14, 19, 34, 0.85);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--pos-border);
@@ -454,7 +454,7 @@ body {
     height: 42px;
     border-radius: 12px;
     border: 1px solid var(--pos-border);
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(14, 19, 34, 0.6);
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -464,9 +464,9 @@ body {
 }
 
 .pos-sidebar-toggle:hover {
-    background: rgba(129, 140, 248, 0.08);
+    background: rgba(6, 182, 212, 0.08);
     color: var(--pos-primary);
-    border-color: rgba(129, 140, 248, 0.2);
+    border-color: rgba(6, 182, 212, 0.2);
     transform: translateY(-1px);
 }
 
@@ -476,7 +476,7 @@ body {
     gap: 10px;
     padding: 8px 16px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(14, 19, 34, 0.6);
     border: 1px solid var(--pos-border);
 }
 
@@ -485,13 +485,13 @@ body {
     height: 8px;
     background: var(--pos-success);
     border-radius: 50%;
-    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     animation: statusPulse 2s infinite;
 }
 
 @keyframes statusPulse {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2); }
-    50% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.05); }
+    0%, 100% { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.05); }
 }
 
 .pos-status-text {
@@ -514,7 +514,7 @@ body {
     align-items: flex-end;
     padding: 6px 14px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(14, 19, 34, 0.6);
     border: 1px solid var(--pos-border);
 }
 
@@ -547,15 +547,15 @@ body {
     gap: 10px;
     cursor: pointer;
     padding: 6px 8px 6px 14px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(14, 19, 34, 0.6);
     border: 1px solid var(--pos-border);
     border-radius: var(--pos-radius);
     transition: all 0.25s ease;
 }
 
 .pos-user-profile:hover {
-    background: rgba(129, 140, 248, 0.06);
-    border-color: rgba(129, 140, 248, 0.15);
+    background: rgba(6, 182, 212, 0.06);
+    border-color: rgba(6, 182, 212, 0.15);
     transform: translateY(-1px);
 }
 
@@ -588,7 +588,7 @@ body {
     display: grid;
     place-items: center;
     font-size: 14px;
-    box-shadow: 0 6px 16px rgba(129, 140, 248, 0.25);
+    box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25);
 }
 
 /* ── Page Content ────────────────────────────────────────────────────────── */
@@ -875,7 +875,7 @@ body {
     height: 40px;
     border-radius: 10px;
     border: 1px solid var(--pos-border);
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(14, 19, 34, 0.6);
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -887,6 +887,7 @@ body {
     border-color: var(--pos-primary);
     color: var(--pos-primary);
     background: var(--pos-primary-light);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
     transform: translateY(-2px);
 }
 
@@ -945,7 +946,7 @@ body {
 .pos-form-control {
     width: 100%;
     padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(8, 10, 16, 0.4);
     border: 1.5px solid var(--pos-border);
     border-radius: 12px;
     font-size: 14px;
@@ -957,9 +958,9 @@ body {
 }
 
 .pos-form-control:focus {
-    background: rgba(129, 140, 248, 0.04);
+    background: rgba(6, 182, 212, 0.04);
     border-color: var(--pos-primary);
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }
 
 .pos-form-control::placeholder {

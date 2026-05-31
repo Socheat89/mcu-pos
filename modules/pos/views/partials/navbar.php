@@ -207,25 +207,25 @@ $activeClass = function (string $key) use ($activeNav): string {
                         align-items: center;
                     }
                     .pos-lang-btn {
-                        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-                        border: 1px solid rgba(226, 232, 240, 0.95);
+                        background: rgba(14, 19, 34, 0.6);
+                        border: 1px solid var(--pos-border);
                         padding: 10px 14px;
                         border-radius: 16px;
                         font-weight: 800;
                         font-family: 'Space Grotesk', 'Battambang', sans-serif;
                         font-size: 13px;
-                        color: #334155;
+                        color: var(--pos-text);
                         cursor: pointer;
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+                        box-shadow: var(--pos-shadow-sm);
                         transition: all 0.2s;
                     }
                     .pos-lang-btn:hover {
-                        border-color: rgba(99, 102, 241, 0.25);
-                        background: #ffffff;
-                        color: #4f46e5;
+                        border-color: var(--pos-primary);
+                        background: rgba(14, 19, 34, 0.8);
+                        color: var(--pos-primary);
                         transform: translateY(-1px);
                     }
                     .pos-lang-dropdown { 
@@ -238,10 +238,10 @@ $activeClass = function (string $key) use ($activeNav): string {
                         z-index: 1000;
                     }
                     .pos-lang-dropdown-inner {
-                        background: white;
+                        background: var(--pos-elevated);
                         border-radius: 18px;
-                        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
-                        border: 1px solid rgba(226, 232, 240, 0.95);
+                        box-shadow: var(--pos-shadow-xl);
+                        border: 1px solid var(--pos-border);
                         min-width: 160px;
                         padding: 6px;
                         overflow: hidden;
@@ -256,19 +256,19 @@ $activeClass = function (string $key) use ($activeNav): string {
                         gap: 12px;
                         padding: 10px 14px;
                         text-decoration: none;
-                        color: #475569;
+                        color: var(--pos-text-muted);
                         font-size: 13px;
                         font-weight: 700;
                         border-radius: 12px;
                         transition: all 0.2s;
                     }
                     .pos-lang-item:hover {
-                        background: #f8fafc;
-                        color: #4f46e5;
+                        background: rgba(255, 255, 255, 0.05);
+                        color: var(--pos-primary);
                     }
                     .pos-lang-item.active {
-                        background: #eef2ff;
-                        color: #4f46e5;
+                        background: var(--pos-primary-light);
+                        color: var(--pos-primary);
                     }
                 </style>
                 <div class="pos-lang-switcher" id="posLangSwitcher">

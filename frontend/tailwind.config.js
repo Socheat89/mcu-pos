@@ -9,19 +9,19 @@ export default {
     extend: {
       colors: {
         brand: {
-          cyan: '#0F766E',
-          violet: '#E76F51',
-          success: '#2A9D8F',
-          warning: '#F4A261',
-          danger: '#D94841',
-          bgLight: '#F7F1E8',
-          bgDark: '#1F2F2A',
-          surfLight: '#FFFAF2',
-          surfDark: '#24322D',
-          surfDarkAlt: '#2B3B35',
-          textLight: '#1B1A17',
-          textDark: '#E9E3D8',
-          muted: '#6B645C',
+          cyan: '#06B6D4',
+          violet: '#6366F1',
+          success: '#10B981',
+          warning: '#F59E0B',
+          danger: '#F43F5E',
+          bgLight: '#F8FAFC',
+          bgDark: '#080A10',
+          surfLight: '#FFFFFF',
+          surfDark: '#0E1322',
+          surfDarkAlt: '#182035',
+          textLight: '#0F172A',
+          textDark: '#F1F5F9',
+          muted: '#64748B',
         }
       },
       fontFamily: {
@@ -29,12 +29,12 @@ export default {
         mono: ['JetBrains Mono', 'monospace']
       },
       boxShadow: {
-        'glass': '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'glow-cyan': '0 0 20px rgba(15, 118, 110, 0.28)',
-        'glow-violet': '0 0 20px rgba(231, 111, 81, 0.28)',
-        'card': '0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 12px 24px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.08)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.35)',
+        'glow-violet': '0 0 20px rgba(99, 102, 241, 0.35)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0 16px 32px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.12)',
       },
       animation: {
         'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -43,6 +43,7 @@ export default {
         'fade-in': 'fadeIn 0.25s ease-out',
         'shimmer': 'shimmer 2s infinite',
         'float': 'float 6s ease-in-out infinite',
+        'scanner-laser': 'laserMove 2s infinite ease-in-out',
       },
       keyframes: {
         slideUp: {
@@ -68,6 +69,10 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-8px)' },
+        },
+        laserMove: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(155px)' }
         }
       },
       backdropBlur: {

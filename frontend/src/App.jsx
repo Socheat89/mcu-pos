@@ -677,15 +677,21 @@ export default function App() {
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
         <div className="accent-line" />
-        <div className="glass px-3 py-3 sm:px-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="glass px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3 shadow-md">
           {/* Left: Branding */}
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-9 w-9 flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan">
-              <Layers className="h-4 w-4 text-white" />
+            <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan transition-transform hover:rotate-12 duration-300">
+              <Layers className="h-5 w-5 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="max-w-[180px] truncate text-[9px] font-bold uppercase tracking-[0.3em] text-brand-muted sm:max-w-none">{settings.store_label}</div>
-              <h1 className="text-sm font-extrabold tracking-tight text-gradient leading-tight">Mekong POS</h1>
+              <div className="max-w-[180px] truncate text-[9px] font-black uppercase tracking-[0.25em] text-brand-muted sm:max-w-none">{settings.store_label}</div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm font-black tracking-tight text-gradient leading-tight">Mekong POS</h1>
+                <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-brand-success/15 text-brand-success border border-brand-success/20">
+                  <span className="h-1 w-1 rounded-full bg-brand-success animate-ping"></span>
+                  Terminal Live
+                </span>
+              </div>
             </div>
           </div>
 
@@ -973,32 +979,39 @@ export default function App() {
                         <div
                           key={prod.id}
                           onClick={() => addToCart(prod)}
-                          className={`glass-card rounded-lg overflow-hidden cursor-pointer animate-slide-up ${
+                          className={`glass-card rounded-2xl overflow-hidden cursor-pointer animate-slide-up group transition-all duration-300 ${
                             isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
-                          } ${inCartItem ? 'ring-2 ring-brand-cyan/40' : ''}`}
-                          style={{ animationDelay: `${idx * 30}ms`, animationFillMode: 'both' }}
+                          } ${inCartItem ? 'ring-2 ring-brand-cyan shadow-glow-cyan' : ''}`}
+                          style={{ animationDelay: `${idx * 20}ms`, animationFillMode: 'both' }}
                         >
                           {/* Image area */}
                           <div className={`aspect-[4/3] relative overflow-hidden flex items-center justify-center ${
-                            darkMode ? 'bg-brand-bgDark/50' : 'bg-gray-50'
+                            darkMode ? 'bg-brand-bgDark/40' : 'bg-slate-50'
                           }`}>
                             {prod.image ? (
-                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover" />
+                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             ) : (
-                              <Package className={`h-8 w-8 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                              <Package className={`h-9 w-9 transition-transform duration-500 group-hover:scale-110 ${darkMode ? 'text-slate-700' : 'text-slate-300'}`} />
                             )}
 
-                            {/* Stock badge */}
-                            <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide ${
-                              isOutOfStock ? 'stock-out' : isLowStock ? 'stock-low' : 'stock-ok'
+                            {/* Stock badge with pulsing dot */}
+                            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
+                              isOutOfStock ? 'stock-out bg-brand-danger/10 text-brand-danger' : 
+                              isLowStock ? 'stock-low bg-brand-warning/10 text-brand-warning' : 
+                              'stock-ok bg-brand-success/10 text-brand-success'
                             }`}>
-                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock} ${t('low_stock', 'left')}` : `${prod.stock}`}
+                              <span className={`h-1.5 w-1.5 rounded-full ${
+                                isOutOfStock ? 'bg-brand-danger' : 
+                                isLowStock ? 'bg-brand-warning animate-pulse' : 
+                                'bg-brand-success'
+                              }`}></span>
+                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock}` : `${prod.stock}`}
                             </span>
 
                             {/* In-cart quantity overlay */}
                             {inCartItem && (
                               <div className="product-overlay" style={{ opacity: 1 }}>
-                                <span className="bg-gradient-to-r from-brand-cyan to-brand-violet text-white rounded-full px-3 py-1 text-xs font-extrabold shadow-lg">
+                                <span className="bg-gradient-to-r from-brand-cyan to-brand-violet text-white rounded-full px-3 py-1 text-xs font-black shadow-lg shadow-glow-cyan">
                                   ×{inCartItem.quantity}
                                 </span>
                               </div>
@@ -1006,20 +1019,20 @@ export default function App() {
 
                             {/* Hover overlay */}
                             {!inCartItem && !isOutOfStock && (
-                              <div className="product-overlay">
-                                <div className="h-8 w-8 rounded-full bg-white/90 dark:bg-brand-surfDark/90 flex items-center justify-center shadow-lg">
-                                  <Plus className="h-4 w-4 text-brand-cyan" />
+                              <div className="product-overlay bg-black/10 dark:bg-black/30 backdrop-blur-[2px]">
+                                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                                  <Plus className="h-5 w-5 text-white" />
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* Info */}
-                          <div className="p-3 space-y-1">
-                            <h4 className="text-xs font-bold truncate leading-tight">{prod.name}</h4>
+                          <div className="p-3.5 space-y-1.5">
+                            <h4 className="text-xs font-bold truncate leading-tight text-slate-800 dark:text-slate-200 group-hover:text-brand-cyan transition-colors">{prod.name}</h4>
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-extrabold text-brand-cyan">${prod.price.toFixed(2)}</span>
-                              <span className="text-[9px] font-medium text-brand-muted truncate max-w-[60px]">
+                              <span className="text-sm font-black text-brand-cyan">${prod.price.toFixed(2)}</span>
+                              <span className="text-[9px] font-bold text-brand-muted truncate max-w-[70px] uppercase bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                 {prod.sku || prod.category}
                               </span>
                             </div>
@@ -1113,22 +1126,51 @@ export default function App() {
                 <div className="space-y-2">
                   <div className="relative">
                     <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('customer', 'អតិថិជន')}</label>
-                    <div className="relative">
-                      <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
-                      <select
-                        value={selectedCustomerId}
-                        onChange={(e) => setSelectedCustomerId(e.target.value)}
-                        className={`w-full appearance-none py-2 pl-8 pr-8 text-[11px] font-medium rounded-lg border transition ${
-                          darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
-                        }`}
-                      >
-                        <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
-                        {customers.map(c => (
-                          <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-brand-muted pointer-events-none" />
-                    </div>
+                    
+                    {selectedCustomerId ? (
+                      // Beautiful active customer card
+                      <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                        darkMode ? 'bg-brand-bgDark/60 border-brand-cyan/25' : 'bg-slate-50 border-brand-cyan/20'
+                      }`}>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center font-bold text-xs shadow-md">
+                            {(() => {
+                              const match = customers.find(c => String(c.id) === String(selectedCustomerId));
+                              if (!match) return 'CU';
+                              return match.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                            })()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-black truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.name}</p>
+                            <p className="text-[9px] text-brand-muted font-bold truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.phone || 'No phone'}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSelectedCustomerId('')}
+                          className="h-6 w-6 rounded-lg bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger flex items-center justify-center transition-all"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      // Select input
+                      <div className="relative">
+                        <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
+                        <select
+                          value={selectedCustomerId}
+                          onChange={(e) => setSelectedCustomerId(e.target.value)}
+                          className={`w-full appearance-none py-2 pl-8 pr-8 text-[11px] font-medium rounded-lg border transition ${
+                            darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
+                          }`}
+                        >
+                          <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
+                          {customers.map(c => (
+                            <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-brand-muted pointer-events-none" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -1290,26 +1332,26 @@ export default function App() {
       {paymentModalOpen && (
         <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
           <div
-            className={`w-full max-w-md rounded-2xl shadow-glass-lg p-6 animate-scale-in ${
-              darkMode ? 'bg-brand-surfDark border border-white/5 text-brand-textDark' : 'bg-white border border-gray-200 text-brand-textLight'
+            className={`w-full max-w-md rounded-3xl shadow-glass-lg p-6 border transition-all duration-300 ${
+              darkMode ? 'bg-brand-surfDark/95 border-white/10 text-brand-textDark shadow-glow-violet' : 'bg-white/95 border-slate-200 text-brand-textLight'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
-                  <CreditCard className="h-4 w-4" />
+                <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
+                  <CreditCard className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
-                  <p className="text-[10px] text-brand-muted">{t('payment_subtitle', 'Checkout Processing')}</p>
+                  <h3 className="text-sm font-black tracking-tight">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
+                  <p className="text-[10px] text-brand-muted font-bold uppercase tracking-wider">{t('payment_subtitle', 'Checkout Processing')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setPaymentModalOpen(false)}
-                className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
-                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted' : 'hover:bg-gray-100 text-gray-400'
+                className={`h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
+                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted hover:text-white' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'
                 }`}
               >
                 <X className="h-4 w-4" />
@@ -1317,14 +1359,14 @@ export default function App() {
             </div>
 
             {/* Total */}
-            <div className={`mt-4 p-4 rounded-xl flex items-center justify-between ${
-              darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'
+            <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border ${
+              darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
             }`}>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
-                <div className="text-xl font-black text-gradient mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                <div className="text-2xl font-black text-gradient mt-0.5">ef{getGrandTotal().toFixed(2)}</div>
               </div>
-              <span className="text-[9px] font-bold uppercase bg-brand-cyan/15 text-brand-cyan px-2.5 py-1 rounded-full tracking-wider border border-brand-cyan/20">
+              <span className="text-[9px] font-black uppercase bg-brand-cyan/15 text-brand-cyan px-3 py-1.5 rounded-full tracking-wider border border-brand-cyan/25 shadow-glow-cyan">
                 USD
               </span>
             </div>
@@ -1336,40 +1378,40 @@ export default function App() {
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
-                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'cash'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
                     }`}
                   >
                     <Wallet className="h-5 w-5" />
-                    <span className="text-[10px]">{t('cash', 'សាច់ប្រាក់')}</span>
+                    <span className="text-[10px] font-bold">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('khqr')}
-                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'khqr'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
                     }`}
                   >
                     <QrCode className="h-5 w-5" />
-                    <span className="text-[10px]">KHQR</span>
+                    <span className="text-[10px] font-bold">KHQR</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
+                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
                       paymentMethod === 'card'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-bold shadow-glow-cyan'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20' : 'border-gray-200 text-gray-500 hover:border-brand-cyan/30'}`
+                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
+                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
                     }`}
                   >
                     <CreditCard className="h-5 w-5" />
-                    <span className="text-[10px]">{t('card', 'Card')}</span>
+                    <span className="text-[10px] font-bold">{t('card', 'Card')}</span>
                   </button>
                 )}
               </div>
@@ -1378,46 +1420,70 @@ export default function App() {
             {/* Payment Details */}
             <div className="mt-4">
               {paymentMethod === 'cash' && (
-                <div className="space-y-3 animate-fade-in">
+                <div className="space-y-3.5 animate-fade-in">
                   <div>
                     <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-brand-muted">$</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-brand-muted">$</span>
                       <input
                         type="number"
                         step="0.01"
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className={`w-full py-3 pl-8 pr-4 text-base font-extrabold rounded-xl border transition ${
+                        className={`w-full py-3.5 pl-9 pr-4 text-lg font-black rounded-2xl border transition-all duration-300 ${
                           darkMode
-                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark'
-                            : 'bg-gray-50 border-gray-200 text-brand-textLight'
+                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50 focus:shadow-glow-cyan'
+                            : 'bg-slate-50 border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:shadow-glow-cyan'
                         }`}
                       />
                     </div>
-                    <div className="mt-2 grid grid-cols-4 gap-1.5">
-                      {quickTenderOptions.map(amount => (
+                    {/* Visual Bill Selector Pad */}
+                    <div className="mt-3 space-y-2">
+                      <div className="text-[8px] font-extrabold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {[
+                          { val: 1.00, label: '$1' },
+                          { val: 5.00, label: '$5' },
+                          { val: 10.00, label: '$10' },
+                          { val: 20.00, label: '$20' },
+                          { val: 50.00, label: '$50' },
+                          { val: 100.00, label: '$100' },
+                          { val: 2.50, label: '10K ៛' },
+                          { val: 5.00, label: '20K ៛' },
+                          { val: 12.50, label: '50K ៛' }
+                        ].map(bill => (
+                          <button
+                            key={bill.label}
+                            type="button"
+                            onClick={() => {
+                              const current = parseFloat(cashGiven) || 0;
+                              setCashGiven((current + bill.val).toFixed(2));
+                            }}
+                            className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
+                              darkMode
+                                ? 'border-white/5 bg-brand-bgDark text-brand-textDark hover:border-brand-cyan/50 hover:bg-brand-cyan/10 hover:text-brand-cyan'
+                                : 'border-slate-200 bg-white text-brand-textLight hover:border-brand-cyan/50 hover:bg-brand-cyan/5 hover:text-brand-cyan'
+                            }`}
+                          >
+                            {bill.label}
+                          </button>
+                        ))}
                         <button
-                          key={amount}
                           type="button"
-                          onClick={() => setCashGiven(amount.toFixed(2))}
-                          className={`rounded-lg border px-2 py-1.5 text-[10px] font-extrabold transition ${
-                            darkMode
-                              ? 'border-white/5 bg-brand-bgDark text-brand-textDark hover:border-brand-cyan/30 hover:text-brand-cyan'
-                              : 'border-gray-200 bg-white text-brand-textLight hover:border-brand-cyan/30 hover:text-brand-cyan'
-                          }`}
+                          onClick={() => setCashGiven('')}
+                          className="rounded-xl border py-2 text-[10px] font-black border-brand-danger/20 bg-brand-danger/5 text-brand-danger hover:bg-brand-danger/10"
                         >
-                          ${amount.toFixed(2)}
+                          C
                         </button>
-                      ))}
+                      </div>
                     </div>
                   </div>
 
                   {parseFloat(cashGiven) > 0 && (
-                    <div className="p-3 rounded-xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
-                      <span className="text-[11px] font-bold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
-                      <span className="text-lg font-black text-brand-success">
+                    <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
+                      <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
+                      <span className="text-xl font-black text-brand-success">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
                     </div>
@@ -1426,40 +1492,66 @@ export default function App() {
               )}
 
               {paymentMethod === 'khqr' && (
-                <div className="text-center space-y-3 animate-fade-in">
-                  <div className="qr-container inline-block">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
-                      alt="Bakong KHQR Code"
-                      className="h-40 w-40 mx-auto rounded-lg"
-                    />
+                <div className="text-center space-y-4 animate-fade-in">
+                  <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
+                    <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
+                        alt="Bakong KHQR Code"
+                        className="h-44 w-44 mx-auto rounded-xl relative z-10"
+                      />
+                      <div className="absolute inset-x-0 h-0.5 bg-red-500 shadow-[0_0_10px_#f43f5e] animate-scanner-laser top-3.5 z-20"></div>
+                    </div>
                   </div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-danger animate-pulse">
-                    {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
+                  <div className="flex flex-col items-center justify-center gap-1.5">
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-cyan animate-pulse flex items-center gap-2 justify-center">
+                      <span className="h-2 w-2 rounded-full bg-brand-cyan animate-ping"></span>
+                      {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
+                    </div>
+                    <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Syncing with Bakong Network</span>
                   </div>
                 </div>
               )}
 
               {paymentMethod === 'card' && (
-                <div className={`p-5 rounded-xl text-center animate-fade-in ${
-                  darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'
+                <div className={`p-6 rounded-2xl text-center border animate-fade-in ${
+                  darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
                 }`}>
                   {cardSimulating ? (
-                    <div className="space-y-3">
-                      <div className="text-xs font-bold text-brand-cyan">{t('connecting_card', 'Connecting to card reader...')}</div>
-                      <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-gray-200'}`}>
-                        <div
-                          className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
-                          style={{ width: `${cardProgress}%` }}
-                        />
+                    <div className="space-y-4">
+                      <div className="relative w-44 h-24 mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-3 text-left text-white shadow-xl overflow-hidden border border-white/10">
+                        <div className="h-6 w-8 bg-amber-400/80 rounded-md relative shadow-inner flex items-center justify-center overflow-hidden">
+                          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:4px_100%]"></div>
+                        </div>
+                        <div className="mt-4 text-[9px] font-mono tracking-widest opacity-80">•••• •••• •••• 8842</div>
+                        <div className="mt-2 text-[7px] font-bold tracking-widest uppercase opacity-50">ASSOCIATE CARD</div>
+                        <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-brand-cyan to-brand-violet animate-pulse"></div>
                       </div>
-                      <div className="text-[10px] text-brand-muted font-bold">{cardProgress}%</div>
+                      <div className="space-y-2">
+                        <div className="text-xs font-black text-brand-cyan flex items-center justify-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan animate-ping"></span>
+                          {cardProgress < 40 ? t('connecting_card', 'Connecting to card reader...') :
+                           cardProgress < 85 ? 'Reading card chip & authenticating...' :
+                           'Authorizing payment transaction...'}
+                        </div>
+                        <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-slate-200'}`}>
+                          <div
+                            className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${cardProgress}%` }}
+                          />
+                        </div>
+                        <div className="text-[10px] text-brand-muted font-black tracking-wider uppercase">${cardProgress}% Completed</div>
+                      </div>
                     </div>
                   ) : (
-                    <div className="space-y-2">
-                      <CreditCard className="mx-auto h-8 w-8 text-brand-cyan animate-float" />
-                      <p className="text-xs font-bold text-brand-muted">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
-                      <p className="text-[10px] text-brand-muted/60">{t('submit_handshake', 'Submit to initialize handshake')}</p>
+                    <div className="space-y-3.5 py-4">
+                      <div className="relative h-12 w-12 mx-auto rounded-full bg-brand-cyan/15 flex items-center justify-center border border-brand-cyan/25 animate-float">
+                        <CreditCard className="h-6 w-6 text-brand-cyan" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-brand-cyan uppercase tracking-wider">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
+                        <p className="text-[10px] text-brand-muted font-bold mt-1 max-w-[240px] mx-auto">{t('submit_handshake', 'Submit payment below to trigger card hardware handshake')}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1471,7 +1563,7 @@ export default function App() {
               <button
                 onClick={handleCheckoutSubmit}
                 disabled={cardSimulating}
-                className="btn-primary w-full h-11 text-xs font-extrabold flex items-center justify-center gap-1.5"
+                className="btn-primary w-full h-11 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Check className="h-4 w-4" />
                 <span>{t('confirm_finish', 'បញ្ជាក់ និង បញ្ចប់ Confirm')}</span>
@@ -1479,7 +1571,7 @@ export default function App() {
               <button
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
-                className="w-full py-2.5 text-[11px] font-bold text-brand-muted hover:text-brand-cyan transition"
+                className="w-full py-2.5 text-[10px] font-black text-brand-muted hover:text-brand-cyan transition-all duration-300 uppercase tracking-wider"
               >
                 {t('cancel', 'បោះបង់ Cancel')}
               </button>
