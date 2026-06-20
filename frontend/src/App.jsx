@@ -374,9 +374,17 @@ export default function App() {
   const [pendingOrders] = useState(initialPendingOrders);
   const [resumeOrder] = useState(initialResumeOrder);
 
-  const [cart, setCart] = useState([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState('');
-  const [orderStatus, setOrderStatus] = useState('completed');
+  // Multi-Order states mimicking Odoo POS tabs
+  const [orders, setOrders] = useState([
+    { id: Date.now(), name: 'Order 1', cart: [], selectedCustomerId: '', orderStatus: 'completed' }
+  ]);
+  const [activeOrderId, setActiveOrderId] = useState(orders[0].id);
+
+  // Keypad / Numpad state for Odoo POS controls
+  const [keypadMode, setKeypadMode] = useState('quantity'); // 'quantity' | 'discount' | 'price'
+  const [activeProductId, setActiveProductId] = useState(null);
+  const [keypadValue, setKeypadValue] = useState('');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [darkMode, setDarkMode] = useState(false); // Light-first
@@ -392,6 +400,48 @@ export default function App() {
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
+
+  // Dynamic references to active order details
+  const activeOrder = orders.find(o => o.id === activeOrderId) || orders[0];
+  const cart = activeOrder.cart;
+  const selectedCustomerId = activeOrder.selectedCustomerId;
+  const orderStatus = activeOrder.orderStatus;
+
+  const updateActiveOrder = (updater) => {
+    setOrders(prev => prev.map(o => o.id === activeOrderId ? { ...o, ...updater(o) } : o));
+  };
+
+  const setSelectedCustomerId = (val) => updateActiveOrder(() => ({ selectedCustomerId: val }));
+  const setOrderStatus = (val) => updateActiveOrder(() => ({ orderStatus: val }));
+
+  const addNewOrder = () => {
+    const nextNum = orders.length + 1;
+    const newOrd = {
+      id: Date.now(),
+      name: `Order ${nextNum}`,
+      cart: [],
+      selectedCustomerId: '',
+      orderStatus: 'completed'
+    };
+    setOrders([...orders, newOrd]);
+    setActiveOrderId(newOrd.id);
+  };
+
+  const removeOrder = (id, e) => {
+    e.stopPropagation();
+    if (orders.length === 1) {
+      updateActiveOrder(() => ({ cart: [], selectedCustomerId: '', orderStatus: 'completed' }));
+      setActiveProductId(null);
+      return;
+    }
+    const index = orders.findIndex(o => o.id === id);
+    const nextOrders = orders.filter(o => o.id !== id);
+    setOrders(nextOrders);
+    if (activeOrderId === id) {
+      const nextActive = nextOrders[Math.max(0, index - 1)];
+      setActiveOrderId(nextActive.id);
+    }
+  };
 
   // Translation State & Dropdown Handlers
   const [currentLang, setCurrentLang] = useState(window.CURRENT_LANG || 'km');
@@ -446,12 +496,22 @@ export default function App() {
       resumeOrder.items.forEach(item => {
         const prod = products.find(p => p.id === item.product_id);
         if (prod) {
-          restoredCart.push({ product: prod, quantity: item.quantity });
+          restoredCart.push({ product: prod, quantity: item.quantity, discount: 0, customPrice: undefined });
         }
       });
-      setCart(restoredCart);
-      if (resumeOrder.customer_id) {
-        setSelectedCustomerId(resumeOrder.customer_id.toString());
+      setOrders([
+        {
+          id: resumeOrder.id,
+          name: `Resumed #${resumeOrder.id}`,
+          cart: restoredCart,
+          selectedCustomerId: resumeOrder.customer_id ? resumeOrder.customer_id.toString() : '',
+          orderStatus: 'completed'
+        }
+      ]);
+      setActiveOrderId(resumeOrder.id);
+      if (restoredCart.length > 0) {
+        setActiveProductId(restoredCart[0].product.id);
+        setKeypadValue(String(restoredCart[0].quantity));
       }
       showToast('info', t('toast_recovered', 'បានស្ដារ Order'), t('toast_recovered_msg', 'កំពុងបន្ត order #:id').replace(':id', resumeOrder.id));
     }
@@ -470,16 +530,30 @@ export default function App() {
       return;
     }
     const existing = cart.find(item => item.product.id === product.id);
+    let newCart;
     if (existing) {
       if (existing.quantity >= product.stock) {
         showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', product.stock));
         return;
       }
-      setCart(cart.map(item =>
+      newCart = cart.map(item =>
         item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      ));
+      );
     } else {
-      setCart([...cart, { product, quantity: 1 }]);
+      newCart = [...cart, { product, quantity: 1, discount: 0, customPrice: undefined }];
+    }
+    
+    updateActiveOrder(() => ({ cart: newCart }));
+    
+    // Auto-select/focus added product
+    setActiveProductId(product.id);
+    const addedItem = newCart.find(item => item.product.id === product.id);
+    if (keypadMode === 'quantity') {
+      setKeypadValue(String(addedItem.quantity));
+    } else if (keypadMode === 'discount') {
+      setKeypadValue(String(addedItem.discount || 0));
+    } else if (keypadMode === 'price') {
+      setKeypadValue(String(addedItem.customPrice !== undefined ? addedItem.customPrice : addedItem.product.price));
     }
   };
 
@@ -487,23 +561,32 @@ export default function App() {
     const existing = cart.find(item => item.product.id === productId);
     if (!existing) return;
     const nextQty = existing.quantity + delta;
+    let newCart;
     if (nextQty <= 0) {
-      setCart(cart.filter(item => item.product.id !== productId));
+      newCart = cart.filter(item => item.product.id !== productId);
+      if (activeProductId === productId) {
+        setActiveProductId(null);
+      }
     } else {
       if (nextQty > existing.product.stock) {
         showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', existing.product.stock));
         return;
       }
-      setCart(cart.map(item =>
+      newCart = cart.map(item =>
         item.product.id === productId ? { ...item, quantity: nextQty } : item
-      ));
+      );
+      if (activeProductId === productId && keypadMode === 'quantity') {
+        setKeypadValue(String(nextQty));
+      }
     }
+    updateActiveOrder(() => ({ cart: newCart }));
   };
 
   const clearCart = () => {
     if (cart.length === 0) return;
     if (window.confirm(t('clear_cart_confirm', 'លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?'))) {
-      setCart([]);
+      updateActiveOrder(() => ({ cart: [] }));
+      setActiveProductId(null);
       showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
     }
   };
@@ -523,8 +606,104 @@ export default function App() {
     }
   };
 
+  // ─── Keypad Actions ───────────────────────────────────────
+  const changeKeypadMode = (mode) => {
+    setKeypadMode(mode);
+    if (activeProductId) {
+      const activeItem = cart.find(item => item.product.id === activeProductId);
+      if (activeItem) {
+        if (mode === 'quantity') {
+          setKeypadValue(String(activeItem.quantity));
+        } else if (mode === 'discount') {
+          setKeypadValue(String(activeItem.discount || 0));
+        } else if (mode === 'price') {
+          setKeypadValue(String(activeItem.customPrice !== undefined ? activeItem.customPrice : activeItem.product.price));
+        }
+      }
+    }
+  };
+
+  const handleSelectCartItem = (productId) => {
+    setActiveProductId(productId);
+    const activeItem = cart.find(item => item.product.id === productId);
+    if (activeItem) {
+      if (keypadMode === 'quantity') {
+        setKeypadValue(String(activeItem.quantity));
+      } else if (keypadMode === 'discount') {
+        setKeypadValue(String(activeItem.discount || 0));
+      } else if (keypadMode === 'price') {
+        setKeypadValue(String(activeItem.customPrice !== undefined ? activeItem.customPrice : activeItem.product.price));
+      }
+    }
+  };
+
+  const handleKeypadPress = (val) => {
+    if (!activeProductId) return;
+    
+    let currentValStr = keypadValue;
+    if (val === 'backspace') {
+      currentValStr = currentValStr.slice(0, -1);
+      if (currentValStr === '') currentValStr = '0';
+    } else if (val === '+/-') {
+      if (currentValStr.startsWith('-')) {
+        currentValStr = currentValStr.substring(1);
+      } else if (currentValStr !== '0' && currentValStr !== '') {
+        currentValStr = '-' + currentValStr;
+      }
+    } else if (val === '.') {
+      if (!currentValStr.includes('.')) {
+        currentValStr = (currentValStr || '0') + '.';
+      }
+    } else {
+      if (currentValStr === '0' || currentValStr === '') {
+        currentValStr = val;
+      } else {
+        currentValStr += val;
+      }
+    }
+    
+    setKeypadValue(currentValStr);
+    const numVal = parseFloat(currentValStr) || 0;
+    
+    updateActiveOrder(order => {
+      const updatedCart = order.cart.map(item => {
+        if (item.product.id === activeProductId) {
+          if (keypadMode === 'quantity') {
+            if (numVal > item.product.stock) {
+              showToast('warning', t('toast_limit_stock'), t('toast_limit_stock_msg').replace(':qty', item.product.stock));
+              return item;
+            }
+            return { ...item, quantity: numVal };
+          } else if (keypadMode === 'discount') {
+            return { ...item, discount: Math.min(100, Math.max(0, numVal)) };
+          } else if (keypadMode === 'price') {
+            return { ...item, customPrice: Math.max(0, numVal) };
+          }
+        }
+        return item;
+      }).filter(item => item.quantity > 0 || (item.product.id === activeProductId && keypadMode !== 'quantity'));
+      
+      const hasActiveItem = updatedCart.some(item => item.product.id === activeProductId);
+      if (!hasActiveItem && keypadMode === 'quantity') {
+        setActiveProductId(null);
+      }
+      
+      return { cart: updatedCart };
+    });
+  };
+
   // ─── Helpers ──────────────────────────────────────────────
-  const getSubtotal = () => cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const getItemUnitPrice = (item) => {
+    const base = item.customPrice !== undefined ? item.customPrice : item.product.price;
+    const disc = item.discount || 0;
+    return base * (1 - disc / 100);
+  };
+
+  const getItemTotal = (item) => {
+    return getItemUnitPrice(item) * item.quantity;
+  };
+
+  const getSubtotal = () => cart.reduce((sum, item) => sum + getItemTotal(item), 0);
   const getGrandTotal = () => getSubtotal();
   const getCategories = () => ['All', ...new Set(products.map(p => p.category))];
 
@@ -657,6 +836,7 @@ export default function App() {
           <React.Fragment key={item.product.id}>
             <input type="hidden" name={`items[${index}][product_id]`} value={item.product.id} />
             <input type="hidden" name={`items[${index}][quantity]`} value={item.quantity} />
+            <input type="hidden" name={`items[${index}][unit_price]`} value={getItemUnitPrice(item)} />
           </React.Fragment>
         ))}
       </form>
@@ -681,18 +861,18 @@ export default function App() {
 
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
-        <div className="bg-[#714B67] px-4 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-white border-b border-[#5b3c53] shadow-sm">
+        <div className="glass px-4 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200">
           {/* Left: Branding */}
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-9 w-9 flex-shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
-              <Layers className="h-4.5 w-4.5 text-white" />
+            <div className="h-9 w-9 flex-shrink-0 rounded-md bg-brand-cyan flex items-center justify-center">
+              <Layers className="h-4 w-4 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="max-w-[180px] truncate text-[9px] font-bold uppercase tracking-[0.15em] text-[#d8c2d4] sm:max-w-none">{settings.store_label}</div>
+              <div className="max-w-[180px] truncate text-[8px] font-bold uppercase tracking-wider text-brand-muted sm:max-w-none">{settings.store_label}</div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black tracking-tight text-white leading-tight">Mekong POS</h1>
-                <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-white/10 text-[#a3ecd1] border border-white/10">
-                  <span className="h-1 w-1 rounded-full bg-emerald-400 animate-ping"></span>
+                <h1 className="text-xs font-black tracking-tight text-brand-cyan">Mekong POS</h1>
+                <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-brand-success/15 text-brand-success border border-brand-success/20">
+                  <span className="h-1 w-1 rounded-full bg-brand-success animate-ping"></span>
                   Terminal Live
                 </span>
               </div>
@@ -704,7 +884,11 @@ export default function App() {
             {/* Exit/Dashboard Button */}
             <a
               href={window.DASHBOARD_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/dashboard`}
-              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white transition-all"
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
+                darkMode
+                  ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-cyan border-brand-cyan/20 hover:border-brand-cyan/40 hover:shadow-glow-cyan/5'
+                  : 'bg-white hover:bg-gray-50 text-brand-cyan border-gray-200 hover:border-brand-cyan/30'
+              }`}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>{t('exit', 'Dashboard')}</span>
@@ -713,10 +897,10 @@ export default function App() {
             {/* Analytics toggle */}
             <button
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold transition-all duration-300 ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all duration-300 ${
                 analyticsViewOpen
-                  ? 'bg-[#00A09D] text-white border border-[#008d8a]'
-                  : 'border border-white/20 hover:bg-white/10 text-white'
+                  ? 'bg-brand-cyan text-white shadow-sm'
+                  : `${darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'}`
               }`}
             >
               <BarChart2 className="h-3.5 w-3.5" />
@@ -726,12 +910,14 @@ export default function App() {
             {/* Pending orders */}
             <button
               onClick={() => setPendingOrdersOpen(true)}
-              className="relative flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white transition-all"
+              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all ${
+                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'
+              }`}
             >
-              <Clock className="h-3.5 w-3.5 text-[#a3e5ec]" />
+              <Clock className="h-3.5 w-3.5 text-brand-violet" />
               <span className="hidden sm:inline">{t('pending', 'រង់ចាំ')}</span>
               {pendingOrders.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#e05038] text-white rounded-full text-[9px] font-bold px-1.5 py-0.5">
+                <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5 badge-pulse">
                   {pendingOrders.length}
                 </span>
               )}
@@ -741,47 +927,55 @@ export default function App() {
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className="h-8 px-2.5 rounded-md flex items-center gap-1.5 transition-all text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white bg-transparent"
+                className={`h-8 px-2.5 rounded-lg flex items-center gap-1.5 transition-all text-[11px] font-bold ${
+                  darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
+                }`}
               >
-                <Languages className="h-3.5 w-3.5 text-[#a3e5ec]" />
+                <Languages className="h-3.5 w-3.5 text-brand-cyan" />
                 <span className="uppercase">{currentLang === 'en' ? 'EN' : currentLang === 'km' ? 'KH' : 'ZH'}</span>
-                <ChevronDown className="h-3 w-3 text-[#d8c2d4]" />
+                <ChevronDown className="h-3 w-3 text-brand-muted" />
               </button>
 
               {langMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-36 rounded-lg shadow-md border p-1 z-50 bg-white border-gray-200 text-brand-textLight">
+                <div className={`absolute right-0 mt-1.5 w-36 rounded-xl shadow-glass-lg border backdrop-blur-xl p-1 z-50 animate-scale-in ${
+                  darkMode ? 'bg-brand-surfDark/95 border-white/5 text-brand-textDark' : 'bg-white/95 border-gray-100 text-brand-textLight'
+                }`}>
                   {languages.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => changeLang(lang.code)}
-                      className={`w-full flex items-center justify-between rounded-md px-2.5 py-1.5 text-[11px] font-bold transition-all ${
+                      className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all ${
                         currentLang === lang.code
-                          ? 'bg-[#714B67]/10 text-[#714B67] border border-[#714B67]/20'
-                          : 'hover:bg-gray-100 text-gray-600 border border-transparent'
+                          ? 'bg-gradient-to-r from-brand-cyan/20 to-brand-violet/20 text-brand-cyan border border-brand-cyan/10'
+                          : `hover:bg-brand-cyan/10 text-brand-muted hover:text-brand-cyan border border-transparent`
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
                         <span>{lang.flag}</span>
                         <span>{lang.label}</span>
                       </span>
-                      {currentLang === lang.code && <Check className="h-3 w-3 text-[#714B67]" />}
+                      {currentLang === lang.code && <Check className="h-3 w-3 text-brand-cyan" />}
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Dark mode hidden or styled neutrally */}
+            {/* Dark mode */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="h-8 w-8 rounded-md flex items-center justify-center transition-all border border-white/20 hover:bg-white/10 text-white"
+              className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${
+                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
+              }`}
             >
-              {darkMode ? <Sun className="h-3.5 w-3.5 text-amber-300" /> : <Moon className="h-3.5 w-3.5 text-slate-300" />}
+              {darkMode ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-slate-500" />}
             </button>
 
             {/* Clock */}
-            <div className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-mono font-bold tracking-wider border border-white/20 bg-white/5 text-white">
-              <Activity className="h-3 w-3 text-[#a3e5ec]" />
+            <div className={`hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-mono font-bold tracking-wider ${
+              darkMode ? 'bg-brand-surfDark border border-white/5 text-brand-cyan' : 'bg-white border border-gray-200 text-brand-cyan'
+            }`}>
+              <Activity className="h-3 w-3" />
               <span>{timeStr}</span>
             </div>
           </div>
@@ -894,206 +1088,24 @@ export default function App() {
         ) : (
           /* ═══ POS Terminal View ═══ */
           <>
-            {/* ─── Left: Cart Sidebar ─── */}
-            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-b lg:h-auto lg:w-[360px] lg:border-r lg:border-b-0 ${
-              darkMode ? 'bg-white border-gray-200' : 'bg-white border-gray-200'
-            }`}>
-              {/* Cart Header */}
-              <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
-                <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-md bg-[#714B67] flex items-center justify-center">
-                    <Receipt className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <h3 className="text-sm font-extrabold tracking-tight">{t('cart', 'កន្ត្រក')}</h3>
-                </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-[#714B67]">
-                  {cartItemCount} {t('items', 'items')}
-                </span>
-              </div>
-
-              {/* Cart Items */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 space-y-2">
-                {cart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center">
-                    <ShoppingBag className="h-8 w-8 mb-2 text-gray-300" />
-                    <p className="text-xs font-bold text-brand-muted">{t('cart_empty', 'កន្ត្រកទទេ')}</p>
-                    <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('select_products', 'ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម')}</p>
-                  </div>
-                ) : (
-                  cart.map(item => (
-                    <div
-                      key={item.product.id}
-                      className="cart-item flex items-center gap-3 p-2 rounded border bg-gray-50/50 border-gray-100"
-                    >
-                      {/* Thumb */}
-                      <div className="h-8 w-8 rounded overflow-hidden flex-shrink-0 flex items-center justify-center bg-white border border-gray-100">
-                        {item.product.image ? (
-                          <img src={item.product.image} className="h-full w-full object-cover" alt="" />
-                        ) : (
-                          <Package className="h-4 w-4 text-brand-muted/40" />
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold truncate text-gray-800">{item.product.name}</div>
-                        <div className="text-[11px] font-extrabold text-[#714B67] mt-0.5">${(item.product.price * item.quantity).toFixed(2)}</div>
-                      </div>
-
-                      {/* Qty controls */}
-                      <div className="flex items-center gap-0.5 rounded p-0.5 border bg-white border-gray-200">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, -1); }}
-                          className="h-5 w-5 rounded flex items-center justify-center hover:bg-red-50 text-gray-500 hover:text-[#e05038] transition text-xs"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-5 text-center text-[11px] font-bold text-gray-850">{item.quantity}</span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, 1); }}
-                          className="h-5 w-5 rounded flex items-center justify-center hover:bg-green-50 text-gray-500 hover:text-[#2c8a3c] transition text-xs"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Cart Footer */}
-              <div className="flex-shrink-0 px-3 pb-3 pt-2 space-y-3 border-t border-gray-200 bg-gray-50/30">
-                {/* Customer + Mode selectors */}
-                <div className="space-y-2">
-                  <div className="relative">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('customer', 'អតិថិជន')}</label>
-                    
-                    {selectedCustomerId ? (
-                      // Beautiful active customer card
-                      <div className="p-2.5 rounded border flex items-center justify-between gap-2.5 bg-gray-50 border-[#714B67]/20">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="h-7 w-7 rounded bg-[#714B67] text-white flex items-center justify-center font-bold text-xs">
-                            {(() => {
-                              const match = customers.find(c => String(c.id) === String(selectedCustomerId));
-                              if (!match) return 'CU';
-                              return match.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                            })()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-bold truncate text-gray-800">{customers.find(c => String(c.id) === String(selectedCustomerId))?.name}</p>
-                            <p className="text-[9px] text-brand-muted font-bold truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.phone || 'No phone'}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setSelectedCustomerId('')}
-                          className="h-5 w-5 rounded bg-red-50 hover:bg-red-100 text-[#e05038] flex items-center justify-center transition-all"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      // Select input
-                      <div className="relative">
-                        <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
-                        <select
-                          value={selectedCustomerId}
-                          onChange={(e) => setSelectedCustomerId(e.target.value)}
-                          className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-semibold rounded border bg-gray-50 border-gray-200 text-gray-700"
-                        >
-                          <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
-                          {customers.map(c => (
-                            <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-brand-muted pointer-events-none" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('mode', 'Mode')}</label>
-                      <select
-                        value={orderStatus}
-                        onChange={(e) => setOrderStatus(e.target.value)}
-                        className="w-full py-1.5 px-2 text-[11px] font-semibold rounded border bg-gray-50 border-gray-200 text-gray-700"
-                      >
-                        <option value="completed">{t('mode_sell', 'លក់ Sell')}</option>
-                        <option value="pending">{t('mode_hold', 'រង់ចាំ Hold')}</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('receipt', 'Receipt')}</label>
-                      <div className="py-1.5 px-2 text-[11px] font-bold rounded text-center bg-green-50 text-[#2c8a3c] border border-green-200">
-                        {t('auto_print', 'Auto-Print')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Receipt Totals */}
-                <div className="p-2.5 rounded border border-gray-200 bg-gray-50/50 space-y-1.5">
-                  <div className="flex justify-between gap-3 text-[11px] font-medium text-brand-muted">
-                    <span>{t('customer', 'Customer')}</span>
-                    <span className="truncate text-right">{selectedCustomer?.name || t('walk_in', 'Walk-in')}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
-                    <span>{t('subtotal', 'Subtotal')}</span>
-                    <span>${getSubtotal().toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
-                    <span>{t('tax', 'Tax (0%)')}</span>
-                    <span>$0.00</span>
-                  </div>
-                  <div className="receipt-divider my-1 border-t border-dashed border-gray-300" />
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-extrabold text-gray-800">{t('total', 'សរុប Total')}</span>
-                    <span className="text-base font-black text-[#714B67]">${getGrandTotal().toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={clearCart}
-                    title={t('clear_cart', 'Clear Cart')}
-                    className="h-10 w-10 rounded border border-red-200 bg-red-50 text-[#e05038] hover:bg-red-100 flex items-center justify-center transition-all flex-shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    disabled={cart.length === 0}
-                    onClick={() => {
-                      if (orderStatus === 'pending') {
-                        handleCheckoutSubmit();
-                      } else {
-                        setPaymentModalOpen(true);
-                      }
-                    }}
-                    className="bg-[#2c8a3c] hover:bg-[#257633] text-white flex-1 h-10 rounded text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-                  >
-                    <Zap className="h-3.5 w-3.5" />
-                    <span>{orderStatus === 'pending' ? t('hold_order', 'ដាក់រង់ចាំ Hold') : t('checkout', 'ទូទាត់ Checkout')}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            </aside>
-
-            {/* ─── Right: Products ─── */}
+            {/* ─── Left: Products ─── */}
             <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
               {/* Search + Categories bar */}
-              <div className="flex-shrink-0 px-4 py-3 space-y-3 border-b border-gray-200 bg-white">
+              <div className={`flex-shrink-0 px-3 py-3 sm:px-5 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
                 {/* Search input */}
                 <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#714B67]" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-cyan" />
                   <input
                     type="text"
                     placeholder={t('search_placeholder', 'ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleQuickAdd}
-                    className="w-full py-2 pl-10 pr-4 text-sm font-medium rounded border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none"
+                    className={`w-full py-2.5 pl-10 pr-4 text-sm font-medium rounded-lg border transition-all duration-300 ${
+                      darkMode
+                        ? 'bg-brand-surfDark border-white/5 text-brand-textDark placeholder-slate-500'
+                        : 'bg-white border-gray-200 text-brand-textLight placeholder-gray-400'
+                    }`}
                   />
                 </div>
 
@@ -1105,10 +1117,10 @@ export default function App() {
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
-                        className={`px-3 py-1 rounded text-[11px] font-bold whitespace-nowrap transition-all ${
+                        className={`px-3.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-300 ${
                           isActive
-                            ? 'bg-[#714B67] text-white border border-[#714B67]'
-                            : 'bg-gray-100 hover:bg-gray-200 border border-transparent text-gray-600'
+                            ? 'pill-active'
+                            : `${darkMode ? 'bg-brand-surfDark border border-white/5 text-slate-400 hover:text-brand-cyan hover:border-brand-cyan/20' : 'bg-white border border-gray-200 text-gray-500 hover:text-brand-cyan hover:border-brand-cyan/30'}`
                         }`}
                       >
                         {cat === 'All' ? t('all', 'ទាំងអស់') : cat}
@@ -1118,44 +1130,44 @@ export default function App() {
                 </div>
 
                 <div className="hidden grid-cols-3 gap-2 sm:grid">
-                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
-                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Package className="h-3.5 w-3.5 text-[#714B67]" />
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Package className="h-3.5 w-3.5 text-brand-cyan" />
                       <span>{t('products_label', 'Products')}</span>
                     </div>
-                    <div className="mt-0.5 text-xs font-black text-gray-800">{visibleProductCount}</div>
+                    <div className="mt-1 text-sm font-black">{visibleProductCount}</div>
                   </div>
-                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
-                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
-                      <AlertTriangle className="h-3.5 w-3.5 text-[#ec9a29]" />
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <AlertTriangle className="h-3.5 w-3.5 text-brand-warning" />
                       <span>{t('stock_alerts', 'Stock alerts')}</span>
                     </div>
-                    <div className="mt-0.5 text-xs font-black text-gray-800">
+                    <div className="mt-1 text-sm font-black">
                       {lowStockCount}
-                      <span className="ml-1 text-[9px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
+                      <span className="ml-1 text-[10px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
                     </div>
                   </div>
-                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
-                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Clock className="h-3.5 w-3.5 text-[#00A09D]" />
+                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
                       <span>{t('pending', 'Pending')}</span>
                     </div>
-                    <div className="mt-0.5 text-xs font-black text-gray-800">{pendingOrders.length}</div>
+                    <div className="mt-1 text-sm font-black">{pendingOrders.length}</div>
                   </div>
                 </div>
               </div>
 
               {/* Product Grid */}
-              <div className="flex-1 overflow-y-auto p-4 bg-gray-150">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-5">
                 {getFilteredProducts().length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
-                    <Package className="h-12 w-12 text-gray-300 mb-2" />
-                    <p className="text-xs font-bold text-brand-muted">{t('no_products', 'រកមិនឃើញទំនិញទេ')}</p>
-                    <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('no_products_subtitle', 'No products match your search')}</p>
+                    <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
+                    <p className="text-sm font-bold text-brand-muted">{t('no_products', 'រកមិនឃើញទំនិញទេ')}</p>
+                    <p className="text-xs text-brand-muted/60 mt-1">{t('no_products_subtitle', 'No products match your search')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                    {getFilteredProducts().map((prod) => {
+                    {getFilteredProducts().map((prod, idx) => {
                       const isOutOfStock = prod.stock <= 0;
                       const isLowStock = prod.stock > 0 && prod.stock <= 5;
                       const inCartItem = cart.find(item => item.product.id === prod.id);
@@ -1164,36 +1176,39 @@ export default function App() {
                         <div
                           key={prod.id}
                           onClick={() => addToCart(prod)}
-                          className={`bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer animate-slide-up group ${
-                            isOutOfStock ? 'opacity-45 cursor-not-allowed' : ''
-                          } ${inCartItem ? 'ring-2 ring-[#714B67]' : ''}`}
+                          className={`glass-card rounded-2xl overflow-hidden cursor-pointer animate-slide-up group transition-all duration-300 ${
+                            isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
+                          } ${inCartItem ? 'ring-2 ring-brand-cyan shadow-glow-cyan' : ''}`}
+                          style={{ animationDelay: `${idx * 20}ms`, animationFillMode: 'both' }}
                         >
                           {/* Image area */}
-                          <div className="aspect-[4/3] relative overflow-hidden flex items-center justify-center bg-gray-50 border-b border-gray-100">
+                          <div className={`aspect-[4/3] relative overflow-hidden flex items-center justify-center ${
+                            darkMode ? 'bg-brand-bgDark/40' : 'bg-slate-50'
+                          }`}>
                             {prod.image ? (
-                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover" />
+                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             ) : (
-                              <Package className="h-8 w-8 text-gray-300" />
+                              <Package className={`h-9 w-9 transition-transform duration-500 group-hover:scale-110 ${darkMode ? 'text-slate-700' : 'text-slate-300'}`} />
                             )}
 
-                            {/* Stock badge with dot */}
-                            <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider flex items-center gap-1 ${
-                              isOutOfStock ? 'bg-red-50 text-[#e05038] border border-red-100' : 
-                              isLowStock ? 'bg-amber-50 text-[#d97706] border border-amber-100' : 
-                              'bg-green-50 text-[#2c8a3c] border border-green-100'
+                            {/* Stock badge with pulsing dot */}
+                            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
+                              isOutOfStock ? 'stock-out bg-brand-danger/10 text-brand-danger' : 
+                              isLowStock ? 'stock-low bg-brand-warning/10 text-brand-warning' : 
+                              'stock-ok bg-brand-success/10 text-brand-success'
                             }`}>
-                              <span className={`h-1 w-1 rounded-full ${
-                                isOutOfStock ? 'bg-[#e05038]' : 
-                                isLowStock ? 'bg-[#d97706]' : 
-                                'bg-[#2c8a3c]'
+                              <span className={`h-1.5 w-1.5 rounded-full ${
+                                isOutOfStock ? 'bg-brand-danger' : 
+                                isLowStock ? 'bg-brand-warning animate-pulse' : 
+                                'bg-brand-success'
                               }`}></span>
-                              {isOutOfStock ? t('out_of_stock', 'អស់') : `${prod.stock}`}
+                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock}` : `${prod.stock}`}
                             </span>
 
                             {/* In-cart quantity overlay */}
                             {inCartItem && (
-                              <div className="absolute inset-0 bg-black/5 backdrop-blur-[0.5px] flex items-center justify-center">
-                                <span className="bg-[#714B67] text-white rounded px-2.5 py-1 text-[11px] font-extrabold">
+                              <div className="product-overlay" style={{ opacity: 1 }}>
+                                <span className="bg-brand-cyan text-white rounded-full px-3 py-1 text-xs font-black shadow-sm">
                                   ×{inCartItem.quantity}
                                 </span>
                               </div>
@@ -1201,20 +1216,20 @@ export default function App() {
 
                             {/* Hover overlay */}
                             {!inCartItem && !isOutOfStock && (
-                              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <div className="h-7 w-7 rounded bg-[#714B67] flex items-center justify-center shadow">
-                                  <Plus className="h-4 w-4 text-white" />
+                              <div className="product-overlay bg-black/5 dark:bg-black/20">
+                                <div className="h-8 w-8 rounded-full bg-brand-cyan flex items-center justify-center shadow-sm transform scale-90 group-hover:scale-100 transition-transform duration-200">
+                                  <Plus className="h-4.5 w-4.5 text-white" />
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* Info */}
-                          <div className="p-2.5 space-y-1">
-                            <h4 className="text-[11px] font-bold truncate leading-tight text-gray-800 group-hover:text-[#714B67] transition-colors">{prod.name}</h4>
+                          <div className="p-3.5 space-y-1.5">
+                            <h4 className="text-xs font-bold truncate leading-tight text-slate-800 dark:text-slate-200 group-hover:text-brand-cyan transition-colors">{prod.name}</h4>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-extrabold text-[#714B67]">${prod.price.toFixed(2)}</span>
-                              <span className="text-[8px] font-bold text-gray-400 truncate max-w-[60px] uppercase bg-gray-100 px-1 py-0.5 rounded">
+                              <span className="text-sm font-black text-brand-cyan">${prod.price.toFixed(2)}</span>
+                              <span className="text-[9px] font-bold text-brand-muted truncate max-w-[70px] uppercase bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                 {prod.sku || prod.category}
                               </span>
                             </div>
@@ -1226,6 +1241,241 @@ export default function App() {
                 )}
               </div>
             </main>
+
+            {/* ─── Right: Cart Sidebar ─── */}
+            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
+              darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
+            }`}>
+              {/* Odoo POS Order Tabs */}
+              <div className="flex-shrink-0 px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                {orders.map(order => {
+                  const isActive = order.id === activeOrderId;
+                  return (
+                    <div
+                      key={order.id}
+                      onClick={() => {
+                        setActiveOrderId(order.id);
+                        if (order.cart.length > 0) {
+                          setActiveProductId(order.cart[0].product.id);
+                          setKeypadValue(String(order.cart[0].quantity));
+                        } else {
+                          setActiveProductId(null);
+                          setKeypadValue('');
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold cursor-pointer transition-all border ${
+                        isActive
+                          ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
+                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{order.name}</span>
+                      <button
+                        onClick={(e) => removeOrder(order.id, e)}
+                        className={`h-3.5 w-3.5 rounded flex items-center justify-center text-[9px] hover:bg-black/10 hover:text-black font-black ${
+                          isActive ? 'text-white/80 hover:text-white' : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+                <button
+                  onClick={addNewOrder}
+                  className="px-2.5 py-1.5 rounded bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 flex items-center justify-center transition-all cursor-pointer shadow-sm text-[11px] font-bold"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Cart Header */}
+              <div className={`flex-shrink-0 px-5 py-3 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded bg-brand-cyan flex items-center justify-center">
+                    <Receipt className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <h3 className="text-xs font-bold tracking-tight text-slate-800">{t('cart', 'កន្ត្រក')}</h3>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-brand-cyan">
+                  {cartItemCount} {t('items', 'items')}
+                </span>
+              </div>
+
+              {/* Cart Items */}
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-1 bg-white">
+                {cart.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center py-10">
+                    <ShoppingBag className="h-8 w-8 mb-2 text-gray-300" />
+                    <p className="text-xs font-bold text-brand-muted">{t('cart_empty', 'កន្ត្រកទទេ')}</p>
+                    <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('select_products', 'ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម')}</p>
+                  </div>
+                ) : (
+                  cart.map(item => (
+                    <div
+                      key={item.product.id}
+                      onClick={() => handleSelectCartItem(item.product.id)}
+                      className={`cart-item flex flex-col gap-1 p-2 rounded cursor-pointer transition-all border ${
+                        item.product.id === activeProductId
+                          ? 'bg-brand-cyan/5 border-brand-cyan ring-1 ring-brand-cyan shadow-sm'
+                          : 'border-transparent hover:bg-gray-50/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-bold text-[11px] truncate text-slate-800">{item.product.name}</div>
+                        <div className="font-black text-[11px] text-brand-cyan">${getItemTotal(item).toFixed(2)}</div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-0.5 text-[9px] text-brand-muted font-semibold pl-2 border-l border-brand-cyan/30">
+                        <div>
+                          {item.quantity} {item.quantity === 1 ? 'Unit' : 'Units'} at{' '}
+                          {item.customPrice !== undefined ? (
+                            <span>
+                              <span className="line-through text-gray-400 mr-1">${item.product.price.toFixed(2)}</span>
+                              <span className="text-brand-cyan font-bold">${item.customPrice.toFixed(2)}</span>
+                            </span>
+                          ) : (
+                            `$${item.product.price.toFixed(2)}`
+                          )}{' '}
+                          / Unit
+                        </div>
+                        {item.discount > 0 && (
+                          <div className="text-brand-danger font-bold">
+                            With a {item.discount}% discount
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Cart Footer */}
+              <div className="flex-shrink-0 px-3 pb-3 pt-2 bg-gray-50 border-t border-gray-200 flex flex-col gap-2">
+                {/* Odoo style Customer Select Button */}
+                <div className="relative">
+                  {selectedCustomerId ? (
+                    <button
+                      onClick={() => setSelectedCustomerId('')}
+                      className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-white hover:bg-gray-100 border border-brand-cyan rounded text-[11px] font-bold text-brand-cyan transition-all shadow-sm"
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <UserCircle className="h-4 w-4 text-brand-cyan flex-shrink-0" />
+                        <span className="truncate">{selectedCustomer?.name || 'Walk-in'}</span>
+                      </span>
+                      <X className="h-3.5 w-3.5 hover:text-brand-danger" />
+                    </button>
+                  ) : (
+                    <div className="relative">
+                      <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <select
+                        value={selectedCustomerId}
+                        onChange={(e) => setSelectedCustomerId(e.target.value)}
+                        className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-bold rounded border border-gray-200 bg-white text-gray-600 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
+                      >
+                        <option value="">{t('customer', 'អតិថិជន')} : {t('walk_in', 'Walk-in')}</option>
+                        {customers.map(c => (
+                          <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Keypad Grid & Checkout Action */}
+                <div className="flex gap-2 items-stretch">
+                  {/* Numpad Keypad (left/center) */}
+                  <div className="flex-1 grid grid-cols-4 gap-1 select-none">
+                    {[
+                      { val: '1', label: '1' },
+                      { val: '2', label: '2' },
+                      { val: '3', label: '3' },
+                      { val: 'qty', label: 'Qty', isMode: true, modeName: 'quantity' },
+                      { val: '4', label: '4' },
+                      { val: '5', label: '5' },
+                      { val: '6', label: '6' },
+                      { val: 'disc', label: 'Disc', isMode: true, modeName: 'discount' },
+                      { val: '7', label: '7' },
+                      { val: '8', label: '8' },
+                      { val: '9', label: '9' },
+                      { val: 'price', label: 'Price', isMode: true, modeName: 'price' },
+                      { val: '+/-', label: '+/-' },
+                      { val: '0', label: '0' },
+                      { val: '.', label: '.' },
+                      { val: 'backspace', label: '⌫' }
+                    ].map(btn => {
+                      const isSelectedMode = btn.isMode && keypadMode === btn.modeName;
+                      return (
+                        <button
+                          key={btn.val}
+                          type="button"
+                          onClick={() => {
+                            if (btn.isMode) {
+                              changeKeypadMode(btn.modeName);
+                            } else {
+                              handleKeypadPress(btn.val);
+                            }
+                          }}
+                          className={`h-9 rounded text-center text-xs font-black transition-all border ${
+                            isSelectedMode
+                              ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
+                              : btn.isMode
+                              ? 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
+                              : btn.val === 'backspace'
+                              ? 'bg-gray-100 border-gray-200 text-brand-danger hover:bg-red-50'
+                              : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-100'
+                          }`}
+                        >
+                          {btn.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Payment checkout Action Button (right) */}
+                  <div className="w-[96px] flex flex-col gap-1">
+                    <button
+                      onClick={clearCart}
+                      title={t('clear_cart', 'Clear Cart')}
+                      className="h-8 border border-brand-danger/20 bg-brand-danger/5 text-brand-danger hover:bg-brand-danger/10 rounded flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    
+                    <button
+                      disabled={cart.length === 0}
+                      onClick={() => {
+                        if (orderStatus === 'pending') {
+                          handleCheckoutSubmit();
+                        } else {
+                          setPaymentModalOpen(true);
+                        }
+                      }}
+                      className="flex-1 bg-brand-success text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed rounded flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
+                    >
+                      <Zap className="h-4 w-4" />
+                      <span className="text-[10px] font-black tracking-wider uppercase">
+                        {orderStatus === 'pending' ? 'Hold' : 'Payment'}
+                      </span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Receipt Totals summary */}
+                <div className="p-2.5 rounded bg-white border border-gray-200 space-y-1 text-[11px] font-medium text-brand-muted">
+                  <div className="flex justify-between items-center">
+                    <span>{t('subtotal', 'Subtotal')}</span>
+                    <span>${getSubtotal().toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-black text-slate-800 border-t border-gray-100 pt-1.5 mt-1">
+                    <span>{t('total', 'Total')}</span>
+                    <span className="text-sm font-black text-brand-cyan">${getGrandTotal().toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </>
         )}
       </div>
@@ -1240,14 +1490,16 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
-            <div className="flex-shrink-0 px-5 py-4 flex items-center justify-between border-b border-gray-100">
+            <div className={`flex-shrink-0 px-5 py-4 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-[#714B67]" />
+                <Clock className="h-5 w-5 text-brand-violet" />
                 <h3 className="text-sm font-extrabold">{t('pending_orders_title', 'បញ្ជាទិញរង់ចាំ')}</h3>
               </div>
               <button
                 onClick={() => setPendingOrdersOpen(false)}
-                className="h-8 w-8 rounded-lg flex items-center justify-center transition hover:bg-gray-100 text-gray-400"
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
+                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted' : 'hover:bg-gray-100 text-gray-400'
+                }`}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1257,7 +1509,7 @@ export default function App() {
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {pendingOrders.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
-                  <Clock className="h-10 w-10 mb-3 text-gray-200" />
+                  <Clock className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
                   <p className="text-xs font-bold text-brand-muted">{t('no_pending_orders', 'មិនមាន order រង់ចាំទេ')}</p>
                 </div>
               ) : (
@@ -1265,7 +1517,11 @@ export default function App() {
                   <div
                     key={order.id}
                     onClick={() => { window.location.href = `?resume=${order.id}`; }}
-                    className="p-4 rounded cursor-pointer transition-all animate-slide-up bg-gray-50 border border-gray-100 hover:border-[#714B67]/30"
+                    className={`p-4 rounded-xl cursor-pointer transition-all animate-slide-up group ${
+                      darkMode
+                        ? 'bg-brand-bgDark/50 border border-white/5 hover:border-brand-cyan/30'
+                        : 'bg-gray-50 border border-gray-100 hover:border-brand-cyan/30'
+                    }`}
                     style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -1276,19 +1532,21 @@ export default function App() {
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                      <span className="text-sm font-black text-[#714B67]">${parseFloat(order.total).toFixed(2)}</span>
+                      <span className="text-sm font-black text-brand-cyan">${parseFloat(order.total).toFixed(2)}</span>
                     </div>
 
                     {order.notes && (
-                      <div className="p-2 rounded text-[10px] mb-2 bg-amber-50 border border-amber-200">
-                        <span className="font-bold text-amber-600 block">{t('note', 'Note')}:</span>
+                      <div className={`p-2 rounded-lg text-[10px] mb-2 ${
+                        darkMode ? 'bg-brand-warning/10 border border-brand-warning/20' : 'bg-amber-50 border border-amber-200'
+                      }`}>
+                        <span className="font-bold text-brand-warning block">{t('note', 'Note')}:</span>
                         <span className="text-brand-muted">{order.notes}</span>
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                    <div className={`flex justify-between items-center pt-2 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
                       <span className="text-[10px] font-medium text-brand-muted">{order.item_lines} {t('items', 'items')}</span>
-                      <span className="text-[10px] font-bold text-[#714B67] hover:text-[#00A09D] transition flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-brand-cyan group-hover:text-brand-violet transition flex items-center gap-1">
                         {t('resume', 'បន្ត')} <ChevronRight className="h-3 w-3" />
                       </span>
                     </div>
@@ -1304,35 +1562,41 @@ export default function App() {
       {paymentModalOpen && (
         <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
           <div
-            className="w-full max-w-md rounded-lg p-6 border transition-all duration-300 bg-white border-gray-200 text-brand-textLight"
+            className={`w-full max-w-md rounded-3xl shadow-glass-lg p-6 border transition-all duration-300 ${
+              darkMode ? 'bg-brand-surfDark/95 border-white/10 text-brand-textDark shadow-glow-violet' : 'bg-white/95 border-slate-200 text-brand-textLight'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center text-[#714B67]">
+                <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
                   <CreditCard className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black tracking-tight text-gray-800">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
+                  <h3 className="text-sm font-black tracking-tight">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
                   <p className="text-[10px] text-brand-muted font-bold uppercase tracking-wider">{t('payment_subtitle', 'Checkout Processing')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setPaymentModalOpen(false)}
-                className="h-8 w-8 rounded-lg flex items-center justify-center transition-all hover:bg-gray-100 text-gray-400 hover:text-gray-700"
+                className={`h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
+                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted hover:text-white' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'
+                }`}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Total */}
-            <div className="mt-4 p-4 rounded-lg flex items-center justify-between border bg-gray-50 border-gray-100">
+            <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border ${
+              darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
+            }`}>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
-                <div className="text-xl font-black text-[#714B67] mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                <div className="text-2xl font-black text-gradient mt-0.5">ef{getGrandTotal().toFixed(2)}</div>
               </div>
-              <span className="text-[10px] font-black uppercase bg-[#714B67]/10 text-[#714B67] px-3 py-1.5 rounded tracking-wider border border-[#714B67]/20">
+              <span className="text-[9px] font-black uppercase bg-brand-cyan/15 text-brand-cyan px-3 py-1.5 rounded-full tracking-wider border border-brand-cyan/25 shadow-glow-cyan">
                 USD
               </span>
             </div>
@@ -1346,11 +1610,11 @@ export default function App() {
                     onClick={() => setPaymentMethod('cash')}
                     className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'cash'
-                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
-                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <Wallet className="h-4.5 w-4.5" />
+                    <Wallet className="h-4 w-4" />
                     <span className="text-[10px] font-bold">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
@@ -1359,11 +1623,11 @@ export default function App() {
                     onClick={() => setPaymentMethod('khqr')}
                     className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'khqr'
-                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
-                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <QrCode className="h-4.5 w-4.5" />
+                    <QrCode className="h-4 w-4" />
                     <span className="text-[10px] font-bold">KHQR</span>
                   </button>
                 )}
@@ -1372,11 +1636,11 @@ export default function App() {
                     onClick={() => setPaymentMethod('card')}
                     className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'card'
-                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
-                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <CreditCard className="h-4.5 w-4.5" />
+                    <CreditCard className="h-4 w-4" />
                     <span className="text-[10px] font-bold">{t('card', 'Card')}</span>
                   </button>
                 )}
@@ -1386,9 +1650,9 @@ export default function App() {
             {/* Payment Details */}
             <div className="mt-4">
               {paymentMethod === 'cash' && (
-                <div className="space-y-3 animate-fade-in">
+                <div className="space-y-3.5 animate-fade-in">
                   <div>
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-brand-muted">$</span>
                       <input
@@ -1397,12 +1661,16 @@ export default function App() {
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className="w-full py-2.5 pl-9 pr-4 text-lg font-black rounded border border-gray-200 text-gray-800 focus:outline-none focus:border-[#714B67]"
+                        className={`w-full py-2.5 pl-9 pr-4 text-lg font-black rounded-lg border transition-all duration-200 ${
+                          darkMode
+                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50'
+                            : 'bg-white border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan'
+                        }`}
                       />
                     </div>
                     {/* Visual Bill Selector Pad */}
-                    <div className="mt-3 space-y-1.5">
-                      <div className="text-[8px] font-bold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
+                    <div className="mt-3 space-y-2">
+                      <div className="text-[8px] font-extrabold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[
                           { val: 1.00, label: '$1' },
@@ -1422,7 +1690,11 @@ export default function App() {
                               const current = parseFloat(cashGiven) || 0;
                               setCashGiven((current + bill.val).toFixed(2));
                             }}
-                            className="rounded border border-gray-200 bg-white py-1.5 text-[10px] font-black text-gray-700 hover:border-[#714B67]/50 hover:bg-[#714B67]/5 hover:text-[#714B67]"
+                            className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
+                              darkMode
+                                ? 'border-white/5 bg-brand-bgDark text-brand-textDark hover:border-brand-cyan/50 hover:bg-brand-cyan/10 hover:text-brand-cyan'
+                                : 'border-slate-200 bg-white text-brand-textLight hover:border-brand-cyan/50 hover:bg-brand-cyan/5 hover:text-brand-cyan'
+                            }`}
                           >
                             {bill.label}
                           </button>
@@ -1430,7 +1702,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setCashGiven('')}
-                          className="rounded border py-1.5 text-[10px] font-black border-red-200 bg-red-50 text-[#e05038] hover:bg-red-100"
+                          className="rounded-xl border py-2 text-[10px] font-black border-brand-danger/20 bg-brand-danger/5 text-brand-danger hover:bg-brand-danger/10"
                         >
                           C
                         </button>
@@ -1439,9 +1711,9 @@ export default function App() {
                   </div>
 
                   {parseFloat(cashGiven) > 0 && (
-                    <div className="p-3 rounded border border-green-200 bg-green-50/50 flex items-center justify-between animate-scale-in">
-                      <span className="text-[11px] font-bold text-[#2c8a3c]">{t('change', 'ប្រាក់អាប់ Change')}</span>
-                      <span className="text-lg font-black text-[#2c8a3c]">
+                    <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
+                      <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
+                      <span className="text-xl font-black text-brand-success">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
                     </div>
@@ -1450,19 +1722,20 @@ export default function App() {
               )}
 
               {paymentMethod === 'khqr' && (
-                <div className="text-center space-y-3 animate-fade-in">
-                  <div className="relative inline-block p-1 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden">
-                    <div className="relative qr-container inline-block border border-gray-100 rounded bg-white overflow-hidden p-2">
+                <div className="text-center space-y-4 animate-fade-in">
+                  <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
+                    <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
                         alt="Bakong KHQR Code"
-                        className="h-40 w-40 mx-auto rounded"
+                        className="h-44 w-44 mx-auto rounded-xl relative z-10"
                       />
+                      <div className="absolute inset-x-0 h-0.5 bg-red-500 shadow-[0_0_10px_#f43f5e] animate-scanner-laser top-3.5 z-20"></div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center gap-1">
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#714B67] animate-pulse flex items-center gap-2 justify-center">
-                      <span className="h-2 w-2 rounded-full bg-[#714B67] animate-ping"></span>
+                  <div className="flex flex-col items-center justify-center gap-1.5">
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-cyan animate-pulse flex items-center gap-2 justify-center">
+                      <span className="h-2 w-2 rounded-full bg-brand-cyan animate-ping"></span>
                       {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
                     </div>
                     <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Syncing with Bakong Network</span>
@@ -1471,37 +1744,43 @@ export default function App() {
               )}
 
               {paymentMethod === 'card' && (
-                <div className="p-4 rounded border border-gray-100 bg-gray-50/50 text-center animate-fade-in">
+                <div className={`p-6 rounded-2xl text-center border animate-fade-in ${
+                  darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
+                }`}>
                   {cardSimulating ? (
-                    <div className="space-y-3">
-                      <div className="relative w-40 h-22 mx-auto bg-slate-800 rounded p-3 text-left text-white shadow-md border border-white/10">
-                        <div className="h-5 w-7 bg-amber-400/80 rounded-sm relative shadow-inner"></div>
-                        <div className="mt-3 text-[9px] font-mono tracking-widest opacity-80">•••• •••• •••• 8842</div>
-                        <div className="mt-1 text-[7px] font-bold tracking-widest uppercase opacity-50">ASSOCIATE CARD</div>
+                    <div className="space-y-4">
+                      <div className="relative w-44 h-24 mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-3 text-left text-white shadow-xl overflow-hidden border border-white/10">
+                        <div className="h-6 w-8 bg-amber-400/80 rounded-md relative shadow-inner flex items-center justify-center overflow-hidden">
+                          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:4px_100%]"></div>
+                        </div>
+                        <div className="mt-4 text-[9px] font-mono tracking-widest opacity-80">•••• •••• •••• 8842</div>
+                        <div className="mt-2 text-[7px] font-bold tracking-widest uppercase opacity-50">ASSOCIATE CARD</div>
+                        <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-brand-cyan to-brand-violet animate-pulse"></div>
                       </div>
                       <div className="space-y-2">
-                        <div className="text-[11px] font-black text-[#714B67] flex items-center justify-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#714B67] animate-ping"></span>
+                        <div className="text-xs font-black text-brand-cyan flex items-center justify-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan animate-ping"></span>
                           {cardProgress < 40 ? t('connecting_card', 'Connecting to card reader...') :
                            cardProgress < 85 ? 'Reading card chip & authenticating...' :
                            'Authorizing payment transaction...'}
                         </div>
-                        <div className="w-full h-1.5 rounded bg-gray-200 overflow-hidden">
+                        <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-slate-200'}`}>
                           <div
-                            className="bg-[#714B67] h-full transition-all duration-300 rounded"
+                            className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
                             style={{ width: `${cardProgress}%` }}
                           />
                         </div>
+                        <div className="text-[10px] text-brand-muted font-black tracking-wider uppercase">${cardProgress}% Completed</div>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3 py-2">
-                      <div className="relative h-10 w-10 mx-auto rounded bg-[#714B67]/10 flex items-center justify-center border border-[#714B67]/20">
-                        <CreditCard className="h-5 w-5 text-[#714B67]" />
+                    <div className="space-y-3.5 py-4">
+                      <div className="relative h-12 w-12 mx-auto rounded-full bg-brand-cyan/15 flex items-center justify-center border border-brand-cyan/25 animate-float">
+                        <CreditCard className="h-6 w-6 text-brand-cyan" />
                       </div>
                       <div>
-                        <p className="text-xs font-black text-[#714B67] uppercase tracking-wider">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
-                        <p className="text-[10px] text-brand-muted font-bold mt-0.5 max-w-[240px] mx-auto">{t('submit_handshake', 'Submit payment below to trigger card hardware handshake')}</p>
+                        <p className="text-xs font-black text-brand-cyan uppercase tracking-wider">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
+                        <p className="text-[10px] text-brand-muted font-bold mt-1 max-w-[240px] mx-auto">{t('submit_handshake', 'Submit payment below to trigger card hardware handshake')}</p>
                       </div>
                     </div>
                   )}
@@ -1514,7 +1793,7 @@ export default function App() {
               <button
                 onClick={handleCheckoutSubmit}
                 disabled={cardSimulating}
-                className="bg-[#2c8a3c] hover:bg-[#257633] text-white w-full h-10 rounded text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="btn-primary w-full h-11 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Check className="h-4 w-4" />
                 <span>{t('confirm_finish', 'បញ្ជាក់ និង បញ្ចប់ Confirm')}</span>
@@ -1522,7 +1801,7 @@ export default function App() {
               <button
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
-                className="w-full py-2 text-[10px] font-black text-brand-muted hover:text-[#714B67] transition-all duration-200 uppercase tracking-wider"
+                className="w-full py-2.5 text-[10px] font-black text-brand-muted hover:text-brand-cyan transition-all duration-300 uppercase tracking-wider"
               >
                 {t('cancel', 'បោះបង់ Cancel')}
               </button>

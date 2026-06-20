@@ -18,9 +18,9 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         body {
             margin: 0;
             padding: 0;
-            background: var(--pos-bg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--pos-text);
+            color: #333;
             overflow-x: hidden;
         }
         .container {
@@ -29,13 +29,14 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             padding: 20px;
         }
         .header {
-            background: #ffffff;
-            color: var(--pos-text);
-            padding: 32px 40px;
-            border-radius: var(--pos-radius-lg);
-            margin-bottom: 24px;
-            border: 1px solid var(--pos-border);
-            box-shadow: var(--pos-shadow-sm);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            color: #333;
+            padding: 40px 50px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -47,17 +48,20 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--pos-primary);
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
         .header h1 {
             margin: 0;
-            font-size: 2.4em;
+            font-size: 2.8em;
             font-weight: 700;
-            color: var(--pos-primary);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .header p {
-            margin: 8px 0 0;
-            color: var(--pos-text-muted);
+            margin: 10px 0 0;
+            color: #666;
             font-size: 1.1em;
             font-weight: 400;
         }
@@ -292,11 +296,12 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             margin-top: 20px;
         }
         .products-section {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: var(--pos-radius-lg);
-            border: 1px solid var(--pos-border);
-            box-shadow: var(--pos-shadow-sm);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
         }
@@ -307,7 +312,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--pos-primary);
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
         .products-grid {
             display: grid;
@@ -333,16 +338,18 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             background: rgba(102, 126, 234, 0.5);
         }
         .product-card {
-            background: #ffffff;
-            padding: 16px;
-            border-radius: var(--pos-radius);
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid var(--pos-border);
-            box-shadow: var(--pos-shadow-sm);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
             position: relative;
             overflow: hidden;
+            transform: translateY(0);
         }
         .product-card::before {
             content: '';
@@ -351,25 +358,27 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             left: 0;
             right: 0;
             height: 3px;
-            background: var(--pos-primary);
+            background: linear-gradient(90deg, #667eea, #764ba2);
             transform: scaleX(0);
-            transition: transform 0.2s ease;
+            transition: transform 0.3s ease;
         }
         .product-card:hover {
-            border-color: var(--pos-primary);
-            box-shadow: var(--pos-shadow-md);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: rgba(102, 126, 234, 0.3);
         }
         .product-card:hover::before {
             transform: scaleX(1);
         }
         .product-card.selected {
-            border-color: var(--pos-secondary);
-            background: var(--pos-primary-light);
-            box-shadow: var(--pos-shadow-md);
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
         }
         .product-card.selected::before {
             transform: scaleX(1);
-            background: var(--pos-secondary);
+            background: linear-gradient(90deg, #28a745, #20c997);
         }
         .product-image {
             width: 100%;
@@ -453,11 +462,12 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             z-index: 1;
         }
         .cart-section {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: var(--pos-radius-lg);
-            border: 1px solid var(--pos-border);
-            box-shadow: var(--pos-shadow-sm);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             position: sticky;
             top: 20px;
             height: fit-content;
@@ -469,7 +479,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--pos-success);
+            background: linear-gradient(90deg, #28a745, #20c997);
         }
         .cart-section h2 {
             margin: 0 0 20px 0;
@@ -702,27 +712,30 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             accent-color: #667eea;
         }
         .checkout-btn {
-            background: var(--pos-success);
+            background: linear-gradient(135deg, #48bb78, #38a169);
             color: #fff;
             border: none;
-            padding: 14px 20px;
+            padding: 18px 20px;
             width: 100%;
-            border-radius: var(--pos-radius);
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .checkout-btn:hover:not(:disabled) {
-            background: #257633;
+            background: linear-gradient(135deg, #38a169, #2f855a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
         }
         .checkout-btn:disabled {
             background: #a0aec0;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
         .checkout-btn:disabled {
             background: #6c757d;

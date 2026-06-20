@@ -99,7 +99,7 @@
         <div class="report-card" style="margin-bottom: 32px;">
              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
                 <h3 class="pos-card-title"><?php echo __('monthly_revenue_trends'); ?></h3>
-                 <div class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); color: var(--pos-text-muted);"><?php echo __('past_6_months'); ?></div>
+                  <div class="badge" style="background: rgba(0, 0, 0, 0.03); border: 1px solid var(--pos-border); color: var(--pos-text-muted);"><?php echo __('past_6_months'); ?></div>
             </div>
             <div style="height: 320px;">
                 <canvas id="monthlySalesChart"></canvas>

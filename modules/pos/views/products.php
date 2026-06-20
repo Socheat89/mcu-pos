@@ -18,9 +18,9 @@ $urlPrefix = mc_base_path();
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
         .search-container { position: relative; margin-bottom: 24px; }
-        .search-container i { position: absolute; left: 20px; top: 14px; color: var(--pos-primary); font-size: 16px; }
-        .search-container input { width: 100%; padding: 12px 20px 12px 50px; border-radius: var(--pos-radius); border: 1px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s; }
-        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12); }
+        .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
         .product-img { width: 44px; height: 44px; border-radius: var(--pos-radius); background: #ffffff; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
     </style>
@@ -43,12 +43,12 @@ $urlPrefix = mc_base_path();
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_skus'); ?></span>
                 <p class="v"><?php echo count($products); ?></p>
-                <div class="chip" style="background: #f7f4f7; color: #714B67;"><i class="fas fa-box"></i></div>
+                <div class="chip" style="background: rgba(99, 102, 241, 0.1); color: var(--pos-primary);"><i class="fas fa-box"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_categories'); ?></span>
                 <p class="v">12</p>
-                <div class="chip" style="background: #f0faf9; color: #00A09D;"><i class="fas fa-tags"></i></div>
+                <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-tags"></i></div>
             </div>
         </div>
 
