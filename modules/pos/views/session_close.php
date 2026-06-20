@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-card pos-shadow-xl">
-            <form method="POST" onsubmit="return confirm('<?php echo __('close_session_confirm'); ?>')">
+            <form method="POST" id="closeSessionForm">
                 <section style="margin-bottom: 32px;">
                     <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
@@ -80,11 +80,32 @@
                     <a href="<?php echo htmlspecialchars($posUrl('sessions')); ?>" class="btn btn-outline" style="min-width: 140px; text-decoration: none;">
                         <?php echo __('cancel'); ?>
                     </a>
-                    <button type="submit" class="btn" style="min-width: 200px; background: var(--pos-danger); color: white; border: none; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.3);">
+                    <button type="button" id="closeSessionBtn" class="btn" style="min-width: 200px; background: var(--pos-danger); color: white; border: none; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.3);">
                         <i class="fas fa-power-off" style="margin-right: 8px;"></i> <?php echo __('close_session'); ?>
                     </button>
                 </div>
             </form>
+
+            <script>
+                document.getElementById('closeSessionBtn').addEventListener('click', function () {
+                    if (window.POSUI && window.POSUI.confirm) {
+                        POSUI.confirm({
+                            type: 'danger',
+                            title: '<?php echo __('close_session'); ?>',
+                            subtitle: '<?php echo __('close_session_confirm'); ?>',
+                            message: '<?php echo __('cash_control'); ?>: <strong>$<?php echo number_format($expectedCash, 2); ?></strong>',
+                            okText: '<?php echo __('close_session'); ?>',
+                            cancelText: '<?php echo __('cancel'); ?>',
+                            onOk: function () {
+                                document.getElementById('closeSessionForm').submit();
+                            }
+                        });
+                    } else {
+                        // Fallback if POSUI not loaded yet
+                        document.getElementById('closeSessionForm').submit();
+                    }
+                });
+            </script>
         </div>
     </div>
 
