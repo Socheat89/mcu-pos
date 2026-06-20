@@ -311,3 +311,122 @@ select:focus {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
+
+/* ==========================================================================
+   POS Terminal Refresh
+   Keeps the React checkout aligned with the PHP POS shell.
+   ========================================================================== */
+
+:root {
+  --terminal-bg: #05070d;
+  --terminal-surface: rgba(12, 17, 31, 0.86);
+  --terminal-surface-strong: rgba(15, 23, 42, 0.94);
+  --terminal-border: rgba(148, 163, 184, 0.16);
+  --terminal-text: #f8fafc;
+  --terminal-muted: #a7b0c2;
+  --terminal-primary: #22d3ee;
+  --terminal-secondary: #818cf8;
+  --terminal-success: #34d399;
+  --terminal-danger: #fb7185;
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(34, 211, 238, 0.045) 0, transparent 220px),
+    radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.14) 0, transparent 360px),
+    var(--terminal-bg);
+}
+
+#root {
+  background: transparent;
+}
+
+.dark {
+  background:
+    linear-gradient(180deg, rgba(8, 13, 24, 0.78) 0%, rgba(5, 7, 13, 0.98) 44%),
+    var(--terminal-bg) !important;
+}
+
+.glass,
+.dark .glass,
+.glass-card,
+.dark .glass-card {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(10, 15, 28, 0.84)) !important;
+  border: 1px solid var(--terminal-border) !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.glass-card {
+  border-radius: 18px;
+}
+
+.glass-card:hover,
+.dark .glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 211, 238, 0.34) !important;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32), 0 0 32px rgba(34, 211, 238, 0.16);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #14b8a6 0%, #22d3ee 52%, #6366f1 100%);
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(34, 211, 238, 0.18);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 16px 34px rgba(34, 211, 238, 0.28);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #22d3ee 0%, #818cf8 55%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.pill-active {
+  background: linear-gradient(135deg, #14b8a6 0%, #22d3ee 52%, #6366f1 100%);
+  color: white;
+  box-shadow: 0 10px 24px rgba(34, 211, 238, 0.18);
+}
+
+input,
+select {
+  border-radius: 14px;
+}
+
+input:focus,
+select:focus,
+.dark input:focus,
+.dark select:focus {
+  border-color: rgba(34, 211, 238, 0.72);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
+}
+
+.modal-backdrop {
+  background: rgba(5, 7, 13, 0.74);
+}
+
+.stock-ok {
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--terminal-success);
+  border-color: rgba(52, 211, 153, 0.24);
+}
+
+.stock-low {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.24);
+}
+
+.stock-out {
+  background: rgba(251, 113, 133, 0.12);
+  color: var(--terminal-danger);
+  border-color: rgba(251, 113, 133, 0.24);
+}
+
+@media (max-width: 768px) {
+  .glass-card:hover,
+  .dark .glass-card:hover {
+    transform: none;
+  }
+}
