@@ -24,7 +24,7 @@
     <div class="fade-in">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div class="pos-title">
-                <h1><?php echo __('customer_relations'); ?></h1>
+                <h1><?php echo __('customers'); ?></h1>
                 <p><?php echo __('customer_management_msg'); ?></p>
             </div>
             <a href="<?php echo htmlspecialchars($posUrl('customers/create')); ?>" class="btn btn-primary">

@@ -116,7 +116,7 @@ foreach ($labels as $ym) {
         <!-- Dashboard Hero -->
         <div class="dashboard-hero">
             <div style="position: relative; z-index: 2;">
-                <h1><?php echo __('powering_growth'); ?></h1>
+                <h1><?php echo __('dashboard'); ?></h1>
                 <p><?php echo __('welcome_back'); ?>, <?php echo htmlspecialchars($tenantName); ?>. <?php echo __('ecosystem_performing'); ?></p>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 14px 32px; font-weight: 700; font-size: 14px; position: relative; z-index: 1;">

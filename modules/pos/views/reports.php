@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('reports'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+    <title><?php echo __('analytics'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,7 +26,7 @@
     <div class="fade-in">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div class="pos-title">
-                <h1><?php echo __('business_analytics'); ?></h1>
+                <h1><?php echo __('analytics'); ?></h1>
                 <p><?php echo __('performance_monitor_msg'); ?></p>
             </div>
             <button class="btn btn-outline" onclick="window.print()">

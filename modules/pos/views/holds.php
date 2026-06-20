@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('held_orders'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+    <title><?php echo __('on_hold'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,7 @@
                 <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: rgba(245, 158, 11, 0.12); padding: 8px 16px; border-radius: 12px; color: var(--pos-warning); border: 1px solid rgba(245, 158, 11, 0.2); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
                     <i class="fas fa-pause-circle"></i> <?php echo __('transaction_queue'); ?>
                 </div>
-                <h1><?php echo __('held_orders_history'); ?></h1>
+                <h1><?php echo __('on_hold'); ?></h1>
                 <p><?php echo __('held_orders_msg'); ?></p>
             </div>
             <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 14px 28px;">
