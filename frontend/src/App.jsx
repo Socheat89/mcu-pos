@@ -894,6 +894,20 @@ export default function App() {
               <span>{t('exit', 'Dashboard')}</span>
             </a>
 
+            {/* Close Session Button */}
+            <a
+              href={window.CLOSE_SESSION_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/sessions/close`}
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
+                darkMode
+                  ? 'bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger border-brand-danger/20 hover:border-brand-danger/40'
+                  : 'bg-red-50 hover:bg-red-100 text-brand-danger border-red-200 hover:border-brand-danger/40'
+              }`}
+              title={currentLang === 'km' ? 'បិទវគ្គលក់' : currentLang === 'zh' ? '关闭班次' : 'Close Session'}
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{currentLang === 'km' ? 'បិទវគ្គ' : currentLang === 'zh' ? '关闭班次' : 'Close Session'}</span>
+            </a>
+
             {/* Analytics toggle */}
             <button
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
@@ -1594,7 +1608,7 @@ export default function App() {
             }`}>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
-                <div className="text-2xl font-black text-gradient mt-0.5">ef{getGrandTotal().toFixed(2)}</div>
+                <div className="text-2xl font-black text-gradient mt-0.5">${getGrandTotal().toFixed(2)}</div>
               </div>
               <span className="text-[9px] font-black uppercase bg-brand-cyan/15 text-brand-cyan px-3 py-1.5 rounded-full tracking-wider border border-brand-cyan/25 shadow-glow-cyan">
                 USD
