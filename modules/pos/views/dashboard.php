@@ -118,11 +118,28 @@ foreach ($labels as $ym) {
             <div style="position: relative; z-index: 2;">
                 <h1 style="font-size: 28px; font-weight: 800; font-family: 'Inter', sans-serif;"><?php echo __('dashboard'); ?></h1>
                 <p style="margin: 8px 0 20px; font-size: 14px; opacity: 0.9; font-family: 'Inter', sans-serif;"><?php echo __('welcome_back'); ?>, <?php echo htmlspecialchars($tenantName); ?>. <?php echo __('ecosystem_performing'); ?></p>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: var(--pos-secondary); color: white; border: none;">
-                        <i class="fas fa-desktop"></i> <?php echo __('initiate_sale'); ?>
-                    </a>
-                    <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: white;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <?php if ($activeSession): ?>
+                        <span style="font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: var(--pos-radius); background: rgba(16, 185, 129, 0.15); color: #86efac; border: 1px solid rgba(16, 185, 129, 0.25); display: inline-flex; align-items: center; gap: 8px;">
+                            <span style="height: 8px; width: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: statusPulse 2s infinite;"></span>
+                            <?php echo __('active_session'); ?> (#<?php echo (int)$activeSession['id']; ?>)
+                        </span>
+                        <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: var(--pos-secondary); color: white; border: none; text-decoration: none;">
+                            <i class="fas fa-desktop"></i> <?php echo __('resume_sale'); ?>
+                        </a>
+                        <a href="<?php echo htmlspecialchars($posUrl('sessions/close')); ?>" class="btn" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.3); color: #fda4af; text-decoration: none;">
+                            <i class="fas fa-power-off"></i> <?php echo __('close_session'); ?>
+                        </a>
+                    <?php else: ?>
+                        <span style="font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: var(--pos-radius); background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.25); display: inline-flex; align-items: center; gap: 8px;">
+                            <span style="height: 8px; width: 8px; border-radius: 50%; background: #f43f5e; display: inline-block;"></span>
+                            <?php echo __('no_active_session'); ?>
+                        </span>
+                        <a href="<?php echo htmlspecialchars($posUrl('sessions/open')); ?>" class="btn" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: var(--pos-primary); color: white; border: none; text-decoration: none;">
+                            <i class="fas fa-key"></i> <?php echo __('open_session'); ?>
+                        </a>
+                    <?php endif; ?>
+                    <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: white; text-decoration: none;">
                         <i class="fas fa-chart-pie"></i> <?php echo __('analytical_overview'); ?>
                     </a>
                 </div>
