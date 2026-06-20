@@ -11,6 +11,7 @@ return [
     'customers' => '客户',
     'reports' => '报告',
     'menu' => '数字化菜单',
+    'cashiers' => '收银员',
     'language' => '语言',
     'english' => '英语',
     'khmer' => '高棉语',

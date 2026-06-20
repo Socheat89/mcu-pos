@@ -11,6 +11,7 @@ return [
     'customers' => 'អតិថិជន',
     'reports' => 'របាយការណ៍',
     'menu' => 'មីនុយឌីជីថល',
+    'cashiers' => 'អ្នកលក់ (Cashier)',
     'language' => 'ភាសា',
     'english' => 'អង់គ្លេស',
     'khmer' => 'ខ្មែរ',

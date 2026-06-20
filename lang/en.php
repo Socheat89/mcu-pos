@@ -11,6 +11,7 @@ return [
     'customers' => 'Customers',
     'reports' => 'Reports',
     'menu' => 'Digital Menu',
+    'cashiers' => 'Cashiers',
     'language' => 'Language',
     'english' => 'English',
     'khmer' => 'Khmer',

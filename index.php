@@ -170,6 +170,11 @@ try {
                 } elseif ($sub === 'sessions') {
                     require_once $baseDir . '/modules/pos/controllers/SessionController.php';
                     $controller = new SessionController();
+                } elseif ($sub === 'cashiers') {
+                    require_once $baseDir . '/modules/pos/controllers/CashierController.php';
+                    require_once $baseDir . '/core/classes/User.php';
+                    require_once $baseDir . '/core/classes/Settings.php';
+                    $controller = new CashierController();
                 } elseif ($sub === 'holds') {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();

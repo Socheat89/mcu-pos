@@ -72,6 +72,7 @@ $navLabel = function (string $key): string {
         'customers' => __('customers'),
         'reports' => __('analytics'),
         'settings' => __('settings'),
+        'cashiers' => __('cashiers'),
     ];
 
     return $labels[$key] ?? __($key);
@@ -169,6 +170,12 @@ $navLabel = function (string $key): string {
                 <?php if ($hasFeature('pos', 'settings')): ?>
                 <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
                     <i class="fas fa-gear"></i><span><?php echo $navLabel('settings'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if (class_exists('Auth') && Auth::isTenantAdmin()): ?>
+                <a class="pos-side-link <?php echo $activeClass('cashiers'); ?>" href="<?php echo htmlspecialchars($posUrl('cashiers')); ?>">
+                    <i class="fas fa-user-tie"></i><span><?php echo $navLabel('cashiers'); ?></span>
                 </a>
                 <?php endif; ?>
             <?php endif; ?>
