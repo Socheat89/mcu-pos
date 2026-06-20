@@ -26,7 +26,7 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Battambang', 'Courier New', monospace; margin: 0; padding: 0; background: var(--pos-bg, #080A10); color: var(--pos-text, #f8fafc); }
+        body { font-family: 'Battambang', 'Courier New', monospace; margin: 0; padding: 0; background: var(--pos-bg, #f3f4f6); color: var(--pos-text, #1f2937); }
         .receipt-wrap { padding: 20px; }
         .receipt { 
             max-width: <?php echo $paperWidth; ?>px; 
@@ -34,11 +34,11 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             background: white; 
             color: #000;
             padding: 20px; 
-            border: 1px solid rgba(0,0,0,0.1); 
+            border: 1px solid var(--pos-border); 
             font-size: <?php echo $fontSize; ?>px; 
             line-height: 1.4; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
+            box-shadow: var(--pos-shadow-md);
+            border-radius: var(--pos-radius-lg);
         }
         .header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
         .header img { display: block; margin: 0 auto 10px; }
@@ -64,9 +64,9 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             flex-wrap: wrap;
         }
         .btn { 
-            padding: 12px 24px; 
+            padding: 10px 20px; 
             text-decoration: none; 
-            border-radius: 12px; 
+            border-radius: var(--pos-radius); 
             display: inline-flex; 
             align-items: center;
             gap: 8px;
@@ -76,26 +76,25 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             cursor: pointer;
         }
         .btn-primary {
-            background: var(--pos-primary, #06b6d4);
-            background: var(--pos-gradient-primary, linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%));
+            background: var(--pos-primary);
             color: white;
             border: none;
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+            box-shadow: none;
         }
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+            background: #5b3c53;
+            transform: none;
         }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--pos-text, #f8fafc) !important;
-            border: 1.5px solid var(--pos-border, rgba(255,255,255,0.08));
+            background: #ffffff;
+            color: var(--pos-text) !important;
+            border: 1px solid var(--pos-border);
         }
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--pos-primary, #06b6d4) !important;
-            border-color: var(--pos-primary, #06b6d4);
-            transform: translateY(-1px);
+            background: var(--pos-primary-light);
+            color: var(--pos-primary) !important;
+            border-color: var(--pos-primary);
+            transform: none;
         }
         
         @media print {

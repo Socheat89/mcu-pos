@@ -14,10 +14,10 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .report-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
-        .ranking-item { display: flex; align-items: center; gap: 16px; padding: 14px; border-radius: 18px; transition: all 0.2s; border: 1px solid transparent; }
-        .ranking-item:hover { background: rgba(255, 255, 255, 0.03); border-color: var(--pos-border); transform: translateX(8px); }
-        .ranking-badge { width: 32px; height: 32px; border-radius: 10px; background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-size: 14px; font-weight: 900; flex-shrink: 0; }
+        .report-card { background: var(--pos-card); border-radius: var(--pos-radius-lg); padding: 24px; border: 1px solid var(--pos-border); }
+        .ranking-item { display: flex; align-items: center; gap: 16px; padding: 10px; border-radius: var(--pos-radius); transition: all 0.2s; border: 1px solid transparent; }
+        .ranking-item:hover { background: #f3f4f6; border-color: var(--pos-border); }
+        .ranking-badge { width: 32px; height: 32px; border-radius: var(--pos-radius); background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-size: 14px; font-weight: 900; flex-shrink: 0; }
     </style>
 </head>
 <body class="pos-app">
@@ -39,22 +39,22 @@
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_revenue'); ?></span>
                 <p class="v">$<?php echo number_format($salesSummary['total_sales'] ?? 0, 2); ?></p>
-                <div class="chip" style="background: rgba(99, 102, 241, 0.1); color: var(--pos-primary);"><i class="fas fa-dollar-sign"></i></div>
+                <div class="chip" style="background: #ecfdf5; color: #2c8a3c;"><i class="fas fa-dollar-sign"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('orders_volume'); ?></span>
                 <p class="v"><?php echo number_format($salesSummary['total_orders'] ?? 0); ?></p>
-                <div class="chip" style="background: rgba(16, 185, 129, 0.1); color: var(--pos-success);"><i class="fas fa-shopping-bag"></i></div>
+                <div class="chip" style="background: #f7f4f7; color: #714B67;"><i class="fas fa-shopping-bag"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('avg_ticket_size'); ?></span>
                 <p class="v">$<?php echo number_format($salesSummary['avg_order_value'] ?? 0, 2); ?></p>
-                <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-chart-line"></i></div>
+                <div class="chip" style="background: #f0faf9; color: #00A09D;"><i class="fas fa-chart-line"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_customers'); ?></span>
                 <p class="v"><?php echo number_format($salesSummary['unique_customers'] ?? 0); ?></p>
-                <div class="chip" style="background: rgba(245, 158, 11, 0.1); color: var(--pos-warning);"><i class="fas fa-users"></i></div>
+                <div class="chip" style="background: #fffbeb; color: #ec9a29;"><i class="fas fa-users"></i></div>
             </div>
         </div>
 
@@ -110,7 +110,7 @@
     <script>
         // Common chart styling
         Chart.defaults.font.family = "'Battambang', 'Inter', sans-serif";
-        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.color = '#4b5563';
 
         // 1. Daily Evolution
         const dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
@@ -125,20 +125,20 @@
                 }),
                 datasets: [{
                     data: dailyData.map(d => parseFloat(d.daily_total)),
-                    borderColor: '#6366f1',
-                    borderWidth: 5,
+                    borderColor: '#714B67',
+                    borderWidth: 4,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 0,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#6366f1',
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#714B67',
                     pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 4,
+                    pointHoverBorderWidth: 3,
                     backgroundColor: (context) => {
                         const ctx = context.chart.ctx;
                         const g = ctx.createLinearGradient(0, 0, 0, 400);
-                        g.addColorStop(0, 'rgba(99, 102, 241, 0.15)');
-                        g.addColorStop(1, 'rgba(99, 102, 241, 0)');
+                        g.addColorStop(0, 'rgba(113, 75, 103, 0.12)');
+                        g.addColorStop(1, 'rgba(113, 75, 103, 0)');
                         return g;
                     }
                 }]
@@ -146,9 +146,9 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 12, bodyFont: { size: 14, weight: 'bold' } } },
+                plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 6, bodyFont: { size: 14, weight: 'bold' } } },
                 scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(255, 255, 255, 0.04)' }, ticks: { callback: v => '$' + v } },
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#e5e7eb' }, ticks: { callback: v => '$' + v } },
                     x: { grid: { display: false } }
                 }
             }
@@ -167,8 +167,8 @@
                 }),
                 datasets: [{
                     data: monthData.map(d => parseFloat(d.monthly_total)),
-                    backgroundColor: '#8b5cf6',
-                    borderRadius: 12,
+                    backgroundColor: '#00A09D',
+                    borderRadius: 6,
                     maxBarThickness: 50
                 }]
             },
@@ -177,7 +177,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(255, 255, 255, 0.04)' }, ticks: { callback: v => '$' + v } },
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#e5e7eb' }, ticks: { callback: v => '$' + v } },
                     x: { grid: { display: false } }
                 }
             }

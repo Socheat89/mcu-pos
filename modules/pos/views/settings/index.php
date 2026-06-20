@@ -14,24 +14,25 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* Modernized Styles for Premium POS Settings */
+        /* Modernized Styles for Premium POS Settings */
         .pos-form-group { margin-bottom: 24px; }
         .pos-form-label { display: block; margin-bottom: 10px; font-weight: 800; color: var(--pos-text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         .pos-form-control { 
             width: 100%; 
-            padding: 14px 18px; 
-            border: 1.5px solid var(--pos-border); 
-            border-radius: 16px; 
-            font-size: 15px; 
+            padding: 12px 16px; 
+            border: 1px solid var(--pos-border); 
+            border-radius: var(--pos-radius); 
+            font-size: 14px; 
             font-weight: 600;
             color: var(--pos-text);
-            background: rgba(8, 10, 16, 0.4);
+            background: #ffffff;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
         }
         .pos-form-control:focus { 
             border-color: var(--pos-primary); 
-            background: rgba(8, 10, 16, 0.6);
-            box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12);
         }
         
         .pos-tabs {
@@ -39,15 +40,15 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             gap: 8px;
             margin-bottom: 32px;
             padding: 6px;
-            background: rgba(8, 10, 16, 0.5);
-            border-radius: 18px;
+            background: #ffffff;
+            border-radius: var(--pos-radius);
             width: fit-content;
             border: 1px solid var(--pos-border);
         }
         
         .pos-tab-link {
-            padding: 12px 24px;
-            border-radius: 14px;
+            padding: 10px 20px;
+            border-radius: var(--pos-radius);
             font-weight: 800;
             cursor: pointer;
             color: var(--pos-text-muted);
@@ -60,10 +61,10 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         
         .pos-tab-link:hover { color: var(--pos-text); }
         .pos-tab-link.active { 
-            background: rgba(var(--pos-primary-rgb), 0.15); 
+            background: #f7f4f7; 
             color: var(--pos-primary); 
-            border: 1px solid rgba(var(--pos-primary-rgb), 0.25);
-            box-shadow: var(--pos-shadow-sm);
+            border: 1px solid #ebdbe8;
+            box-shadow: none;
         }
         
         .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
@@ -80,36 +81,36 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             display: flex;
             align-items: center;
             padding: 16px;
-            border: 1.5px solid var(--pos-border);
-            border-radius: 18px;
+            border: 1px solid var(--pos-border);
+            border-radius: var(--pos-radius-lg);
             background: var(--pos-card);
             transition: all 0.2s;
             color: var(--pos-text);
         }
-        .user-card:hover { transform: translateY(-2px); border-color: var(--pos-primary); box-shadow: var(--pos-shadow-md), var(--pos-shadow-glow); }
+        .user-card:hover { border-color: var(--pos-primary); box-shadow: var(--pos-shadow-md); }
         
         .pos-small { font-size: 12px; color: var(--pos-text-muted); font-weight: 600; }
         .pos-card-sub { font-size: 14px; color: var(--pos-text-muted); font-weight: 500; margin-bottom: 24px; }
         
-        .pos-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+        .pos-badge { display: inline-block; padding: 4px 8px; border-radius: var(--pos-radius); font-size: 11px; font-weight: 700; }
 
         /* Toggle Switch Premium */
         .pos-toggle { position: relative; display: inline-block; width: 48px; height: 26px; }
         .pos-toggle input { opacity: 0; width: 0; height: 0; }
-        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.08); transition: .3s; border-radius: 34px; border: 1px solid var(--pos-border); }
-        .pos-toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .3s; border-radius: 34px; border: 1px solid var(--pos-border); }
+        .pos-toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         input:checked + .pos-toggle-slider { background-color: var(--pos-primary); border-color: var(--pos-primary); }
         input:checked + .pos-toggle-slider:before { transform: translateX(22px); }
         
         .preview-pane { 
-            background: #1e293b; 
+            background: #f8fafc; 
             padding: 40px; 
-            border-radius: 24px; 
+            border-radius: var(--pos-radius-lg); 
             display: flex; 
             justify-content: center; 
             align-items: flex-start; 
             min-height: 600px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            border: 1px solid var(--pos-border);
         }
     </style>
 </head>
@@ -133,7 +134,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
     <form action="<?php echo mc_url($subdomain . '/pos/settings/update'); ?>" method="POST" enctype="multipart/form-data">
         
-        <div class="pos-card pad" style="margin-bottom: 40px; border-radius: 28px;">
+        <div class="pos-card pad" style="margin-bottom: 40px; border-radius: var(--pos-radius-lg);">
             <div class="pos-tabs">
                 <div class="pos-tab-link active" onclick="switchTab('users', this)">
                     <i class="fas fa-shield-halved"></i> User Access

@@ -2046,28 +2046,36 @@ textarea:focus {
     border-color: #fecaca;
 }
 
-.dashboard-hero {
-    min-height: 230px;
-    background: linear-gradient(135deg, #714B67 0%, #5a3c52 100%) !important;
+.dashboard-hero,
+.menu-hero {
+    min-height: auto;
+    background: #714B67 !important;
     border: 0 !important;
-    box-shadow: var(--pos-shadow-md) !important;
+    box-shadow: var(--pos-shadow-sm) !important;
+    border-radius: var(--pos-radius-lg) !important;
 }
 
 .dashboard-hero::before,
-.dashboard-hero::after {
+.dashboard-hero::after,
+.menu-hero::before,
+.menu-hero::after {
     display: none;
 }
 
 .dashboard-hero h1,
-.dashboard-hero p {
+.dashboard-hero p,
+.menu-hero h1,
+.menu-hero p {
     color: #ffffff !important;
 }
 
-.dashboard-hero p {
+.dashboard-hero p,
+.menu-hero p {
     opacity: 0.88;
 }
 
-.dashboard-hero .btn-outline {
+.dashboard-hero .btn-outline,
+.menu-hero .btn-outline {
     background: rgba(255, 255, 255, 0.14) !important;
     color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.32) !important;

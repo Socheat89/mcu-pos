@@ -13,12 +13,12 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .detail-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
+        .detail-card { background: var(--pos-card); border-radius: var(--pos-radius-lg); padding: 24px; border: 1px solid var(--pos-border); }
         .detail-group { margin-bottom: 24px; }
         .detail-label { font-size: 11px; font-weight: 800; color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         .detail-value { font-size: 15px; font-weight: 700; color: var(--pos-text); }
         
-        .summary-box { background: var(--pos-gradient-primary); color: white; border-radius: 24px; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .summary-box { background: var(--pos-primary); color: white; border-radius: var(--pos-radius-lg); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .summary-box::after { content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: -20px; bottom: -20px; font-size: 120px; opacity: 0.1; }
     </style>
 </head>
@@ -52,7 +52,7 @@
             <div class="detail-card">
                 <span class="detail-label"><?php echo __('billing_to'); ?></span>
                 <div style="display: flex; align-items: center; gap: 16px; margin-top: 12px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-size: 18px; font-weight: 900;">
+                    <div style="width: 48px; height: 48px; border-radius: var(--pos-radius); background: #f7f4f7; color: var(--pos-primary); display: grid; place-items: center; font-size: 18px; font-weight: 900;">
                         <?php echo strtoupper(substr($order['customer_name'] ?? 'W', 0, 1)); ?>
                     </div>
                     <div>
@@ -107,7 +107,7 @@
                         <tr>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); display: grid; place-items: center;">
+                                    <div style="width: 40px; height: 40px; border-radius: var(--pos-radius); background: #f3f4f6; border: 1px solid var(--pos-border); display: grid; place-items: center;">
                                         <i class="fas fa-barcode" style="color: var(--pos-text-muted); font-size: 14px;"></i>
                                     </div>
                                     <div>

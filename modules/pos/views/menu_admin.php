@@ -18,56 +18,53 @@ $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : '
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
         .menu-hero {
-            background: var(--pos-gradient-dark);
-            border-radius: 32px;
-            padding: 40px;
+            background: #714B67;
+            border-radius: var(--pos-radius-lg);
+            padding: 32px;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
             border: 1px solid var(--pos-border);
         }
         .qr-card {
             background: var(--pos-card);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            padding: 32px;
+            border-radius: var(--pos-radius-lg);
+            padding: 24px;
             border: 1px solid var(--pos-border);
             text-align: center;
         }
         .qr-placeholder {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: var(--pos-radius);
+            padding: 16px;
             display: inline-block;
             border: 1px solid var(--pos-border);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .link-card {
             background: var(--pos-card);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            padding: 32px;
+            border-radius: var(--pos-radius-lg);
+            padding: 24px;
             border: 1px solid var(--pos-border);
         }
         .copy-input {
             background: #ffffff;
-            border: 1.5px solid var(--pos-border);
+            border: 1px solid var(--pos-border);
             border-radius: var(--pos-radius);
-            padding: 12px 16px;
+            padding: 10px 14px;
             width: 100%;
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
             color: var(--pos-text);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             outline: none;
             transition: all 0.2s;
         }
         .copy-input:focus {
             border-color: var(--pos-primary);
             background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(var(--pos-primary-rgb), 0.2);
+            box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12);
         }
     </style>
 </head>

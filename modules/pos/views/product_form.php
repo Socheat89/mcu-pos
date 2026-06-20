@@ -14,11 +14,11 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .form-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: var(--pos-radius-xl); padding: 40px; border: 1.5px solid var(--pos-border); max-width: 900px; margin: 0 auto; }
-        .upload-zone { border: 2.5px dashed var(--pos-border); border-radius: var(--pos-radius-lg); padding: 48px; text-align: center; background: #ffffff; transition: all 0.3s; cursor: pointer; position: relative; }
+        .form-card { background: var(--pos-card); border-radius: var(--pos-radius-lg); padding: 40px; border: 1px solid var(--pos-border); max-width: 900px; margin: 0 auto; }
+        .upload-zone { border: 1px dashed var(--pos-border); border-radius: var(--pos-radius-lg); padding: 48px; text-align: center; background: #ffffff; transition: all 0.2s; cursor: pointer; position: relative; }
         .upload-zone:hover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
         .upload-zone.dragover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
-        .preview-img { max-width: 100%; max-height: 280px; border-radius: var(--pos-radius-lg); margin-top: 20px; box-shadow: var(--pos-shadow-lg); border: 4px solid var(--pos-border); }
+        .preview-img { max-width: 100%; max-height: 280px; border-radius: var(--pos-radius-lg); margin-top: 20px; box-shadow: var(--pos-shadow-sm); border: 1px solid var(--pos-border); }
     </style>
 </head>
 <body class="pos-app">
@@ -104,7 +104,7 @@
                         <div class="upload-zone" onclick="document.getElementById('image-input').click()">
                             <input type="file" id="image-input" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
                             <div id="upload-placeholder" style="<?php echo (isset($product) && $product['image']) ? 'display:none;' : ''; ?>">
-                                <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; box-shadow: var(--pos-shadow-sm);">
+                                <div style="width: 64px; height: 64px; background: #f3f4f6; border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px;">
                                     <i class="fas fa-file-export" style="font-size: 24px; color: var(--pos-primary);"></i>
                                 </div>
                                 <div style="font-weight: 800; color: var(--pos-text); font-size: 15px;"><?php echo __('click_select_drag_msg'); ?></div>
@@ -128,7 +128,7 @@
                     <a href="<?php echo htmlspecialchars($posUrl('products')); ?>" class="btn btn-outline" style="min-width: 140px;">
                         <?php echo __('cancel'); ?>
                     </a>
-                    <button type="submit" class="btn btn-primary" style="min-width: 200px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);">
+                    <button type="submit" class="btn btn-primary" style="min-width: 200px;">
                         <i class="fas fa-save" style="margin-right: 8px;"></i> <?php echo isset($product) ? __('update_records') : __('save_product'); ?>
                     </button>
                 </div>

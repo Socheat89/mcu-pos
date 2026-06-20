@@ -13,7 +13,7 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .form-card { background: var(--pos-card); border-radius: 24px; padding: 40px; border: 1.5px solid var(--pos-border); max-width: 800px; margin: 0 auto; backdrop-filter: blur(12px); }
+        .form-card { background: var(--pos-card); border-radius: var(--pos-radius-lg); padding: 40px; border: 1px solid var(--pos-border); max-width: 800px; margin: 0 auto; }
     </style>
 </head>
 <body class="pos-app">
@@ -21,7 +21,7 @@
 
     <div class="fade-in">
         <div style="text-align: center; margin-bottom: 40px;">
-            <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: rgba(16, 185, 129, 0.1); color: var(--pos-success); padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: #ecfdf5; color: var(--pos-success); padding: 6px 12px; border-radius: var(--pos-radius); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #bbf7d0;">
                 <i class="fas fa-users-cog"></i> <?php echo __('client_relations'); ?>
             </div>
             <h1 style="font-size: 36px; font-weight: 900; color: var(--pos-text); margin: 0;"><?php echo isset($customer) ? __('profile_update') : __('new_client_registration'); ?></h1>
@@ -74,7 +74,7 @@
                     <a href="<?php echo htmlspecialchars($posUrl('customers')); ?>" class="btn btn-outline" style="min-width: 140px;">
                         <?php echo __('discard'); ?>
                     </a>
-                    <button type="submit" class="btn btn-primary" style="min-width: 200px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);">
+                    <button type="submit" class="btn btn-primary" style="min-width: 200px;">
                         <i class="fas fa-check-circle" style="margin-right: 8px;"></i> <?php echo isset($customer) ? __('update_profile') : __('register_client'); ?>
                     </button>
                 </div>

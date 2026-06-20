@@ -681,19 +681,18 @@ export default function App() {
 
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
-        <div className="accent-line" />
-        <div className="glass px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3 shadow-md">
+        <div className="bg-[#714B67] px-4 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-white border-b border-[#5b3c53] shadow-sm">
           {/* Left: Branding */}
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan transition-transform hover:rotate-12 duration-300">
-              <Layers className="h-5 w-5 text-white" />
+            <div className="h-9 w-9 flex-shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
+              <Layers className="h-4.5 w-4.5 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="max-w-[180px] truncate text-[9px] font-black uppercase tracking-[0.25em] text-brand-muted sm:max-w-none">{settings.store_label}</div>
+              <div className="max-w-[180px] truncate text-[9px] font-bold uppercase tracking-[0.15em] text-[#d8c2d4] sm:max-w-none">{settings.store_label}</div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black tracking-tight text-gradient leading-tight">Mekong POS</h1>
-                <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-brand-success/15 text-brand-success border border-brand-success/20">
-                  <span className="h-1 w-1 rounded-full bg-brand-success animate-ping"></span>
+                <h1 className="text-sm font-black tracking-tight text-white leading-tight">Mekong POS</h1>
+                <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-white/10 text-[#a3ecd1] border border-white/10">
+                  <span className="h-1 w-1 rounded-full bg-emerald-400 animate-ping"></span>
                   Terminal Live
                 </span>
               </div>
@@ -705,11 +704,7 @@ export default function App() {
             {/* Exit/Dashboard Button */}
             <a
               href={window.DASHBOARD_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/dashboard`}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
-                darkMode
-                  ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-cyan border-brand-cyan/20 hover:border-brand-cyan/40 hover:shadow-glow-cyan/5'
-                  : 'bg-white hover:bg-gray-50 text-brand-cyan border-gray-200 hover:border-brand-cyan/30'
-              }`}
+              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white transition-all"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>{t('exit', 'Dashboard')}</span>
@@ -718,10 +713,10 @@ export default function App() {
             {/* Analytics toggle */}
             <button
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all duration-300 ${
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold transition-all duration-300 ${
                 analyticsViewOpen
-                  ? 'bg-gradient-to-r from-brand-cyan to-brand-violet text-white shadow-glow-cyan'
-                  : `${darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'}`
+                  ? 'bg-[#00A09D] text-white border border-[#008d8a]'
+                  : 'border border-white/20 hover:bg-white/10 text-white'
               }`}
             >
               <BarChart2 className="h-3.5 w-3.5" />
@@ -731,14 +726,12 @@ export default function App() {
             {/* Pending orders */}
             <button
               onClick={() => setPendingOrdersOpen(true)}
-              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all ${
-                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'
-              }`}
+              className="relative flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white transition-all"
             >
-              <Clock className="h-3.5 w-3.5 text-brand-violet" />
+              <Clock className="h-3.5 w-3.5 text-[#a3e5ec]" />
               <span className="hidden sm:inline">{t('pending', 'រង់ចាំ')}</span>
               {pendingOrders.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5 badge-pulse">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#e05038] text-white rounded-full text-[9px] font-bold px-1.5 py-0.5">
                   {pendingOrders.length}
                 </span>
               )}
@@ -748,55 +741,47 @@ export default function App() {
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className={`h-8 px-2.5 rounded-lg flex items-center gap-1.5 transition-all text-[11px] font-bold ${
-                  darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
-                }`}
+                className="h-8 px-2.5 rounded-md flex items-center gap-1.5 transition-all text-[11px] font-bold border border-white/20 hover:bg-white/10 text-white bg-transparent"
               >
-                <Languages className="h-3.5 w-3.5 text-brand-cyan" />
+                <Languages className="h-3.5 w-3.5 text-[#a3e5ec]" />
                 <span className="uppercase">{currentLang === 'en' ? 'EN' : currentLang === 'km' ? 'KH' : 'ZH'}</span>
-                <ChevronDown className="h-3 w-3 text-brand-muted" />
+                <ChevronDown className="h-3 w-3 text-[#d8c2d4]" />
               </button>
 
               {langMenuOpen && (
-                <div className={`absolute right-0 mt-1.5 w-36 rounded-xl shadow-glass-lg border backdrop-blur-xl p-1 z-50 animate-scale-in ${
-                  darkMode ? 'bg-brand-surfDark/95 border-white/5 text-brand-textDark' : 'bg-white/95 border-gray-100 text-brand-textLight'
-                }`}>
+                <div className="absolute right-0 mt-1.5 w-36 rounded-lg shadow-md border p-1 z-50 bg-white border-gray-200 text-brand-textLight">
                   {languages.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => changeLang(lang.code)}
-                      className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all ${
+                      className={`w-full flex items-center justify-between rounded-md px-2.5 py-1.5 text-[11px] font-bold transition-all ${
                         currentLang === lang.code
-                          ? 'bg-gradient-to-r from-brand-cyan/20 to-brand-violet/20 text-brand-cyan border border-brand-cyan/10'
-                          : `hover:bg-brand-cyan/10 text-brand-muted hover:text-brand-cyan border border-transparent`
+                          ? 'bg-[#714B67]/10 text-[#714B67] border border-[#714B67]/20'
+                          : 'hover:bg-gray-100 text-gray-600 border border-transparent'
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
                         <span>{lang.flag}</span>
                         <span>{lang.label}</span>
                       </span>
-                      {currentLang === lang.code && <Check className="h-3 w-3 text-brand-cyan" />}
+                      {currentLang === lang.code && <Check className="h-3 w-3 text-[#714B67]" />}
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Dark mode */}
+            {/* Dark mode hidden or styled neutrally */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${
-                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border border-white/5' : 'bg-white hover:bg-gray-50 border border-gray-200'
-              }`}
+              className="h-8 w-8 rounded-md flex items-center justify-center transition-all border border-white/20 hover:bg-white/10 text-white"
             >
-              {darkMode ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-slate-500" />}
+              {darkMode ? <Sun className="h-3.5 w-3.5 text-amber-300" /> : <Moon className="h-3.5 w-3.5 text-slate-300" />}
             </button>
 
             {/* Clock */}
-            <div className={`hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-mono font-bold tracking-wider ${
-              darkMode ? 'bg-brand-surfDark border border-white/5 text-brand-cyan' : 'bg-white border border-gray-200 text-brand-cyan'
-            }`}>
-              <Activity className="h-3 w-3" />
+            <div className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-mono font-bold tracking-wider border border-white/20 bg-white/5 text-white">
+              <Activity className="h-3 w-3 text-[#a3e5ec]" />
               <span>{timeStr}</span>
             </div>
           </div>
@@ -909,184 +894,28 @@ export default function App() {
         ) : (
           /* ═══ POS Terminal View ═══ */
           <>
-            {/* ─── Left: Products ─── */}
-            <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
-              {/* Search + Categories bar */}
-              <div className={`flex-shrink-0 px-3 py-3 sm:px-5 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
-                {/* Search input */}
-                <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-cyan" />
-                  <input
-                    type="text"
-                    placeholder={t('search_placeholder', 'ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ...')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={handleQuickAdd}
-                    className={`w-full py-2.5 pl-10 pr-4 text-sm font-medium rounded-lg border transition-all duration-300 ${
-                      darkMode
-                        ? 'bg-brand-surfDark border-white/5 text-brand-textDark placeholder-slate-500'
-                        : 'bg-white border-gray-200 text-brand-textLight placeholder-gray-400'
-                    }`}
-                  />
-                </div>
-
-                {/* Category pills */}
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-                  {getCategories().map(cat => {
-                    const isActive = selectedCategory === cat || (cat === 'All' && selectedCategory === '');
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
-                        className={`px-3.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-300 ${
-                          isActive
-                            ? 'pill-active'
-                            : `${darkMode ? 'bg-brand-surfDark border border-white/5 text-slate-400 hover:text-brand-cyan hover:border-brand-cyan/20' : 'bg-white border border-gray-200 text-gray-500 hover:text-brand-cyan hover:border-brand-cyan/30'}`
-                        }`}
-                      >
-                        {cat === 'All' ? t('all', 'ទាំងអស់') : cat}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="hidden grid-cols-3 gap-2 sm:grid">
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Package className="h-3.5 w-3.5 text-brand-cyan" />
-                      <span>{t('products_label', 'Products')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{visibleProductCount}</div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <AlertTriangle className="h-3.5 w-3.5 text-brand-warning" />
-                      <span>{t('stock_alerts', 'Stock alerts')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">
-                      {lowStockCount}
-                      <span className="ml-1 text-[10px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
-                    </div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
-                      <span>{t('pending', 'Pending')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{pendingOrders.length}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Product Grid */}
-              <div className="flex-1 overflow-y-auto p-3 sm:p-5">
-                {getFilteredProducts().length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
-                    <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
-                    <p className="text-sm font-bold text-brand-muted">{t('no_products', 'រកមិនឃើញទំនិញទេ')}</p>
-                    <p className="text-xs text-brand-muted/60 mt-1">{t('no_products_subtitle', 'No products match your search')}</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                    {getFilteredProducts().map((prod, idx) => {
-                      const isOutOfStock = prod.stock <= 0;
-                      const isLowStock = prod.stock > 0 && prod.stock <= 5;
-                      const inCartItem = cart.find(item => item.product.id === prod.id);
-
-                      return (
-                        <div
-                          key={prod.id}
-                          onClick={() => addToCart(prod)}
-                          className={`glass-card rounded-2xl overflow-hidden cursor-pointer animate-slide-up group transition-all duration-300 ${
-                            isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
-                          } ${inCartItem ? 'ring-2 ring-brand-cyan shadow-glow-cyan' : ''}`}
-                          style={{ animationDelay: `${idx * 20}ms`, animationFillMode: 'both' }}
-                        >
-                          {/* Image area */}
-                          <div className={`aspect-[4/3] relative overflow-hidden flex items-center justify-center ${
-                            darkMode ? 'bg-brand-bgDark/40' : 'bg-slate-50'
-                          }`}>
-                            {prod.image ? (
-                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            ) : (
-                              <Package className={`h-9 w-9 transition-transform duration-500 group-hover:scale-110 ${darkMode ? 'text-slate-700' : 'text-slate-300'}`} />
-                            )}
-
-                            {/* Stock badge with pulsing dot */}
-                            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
-                              isOutOfStock ? 'stock-out bg-brand-danger/10 text-brand-danger' : 
-                              isLowStock ? 'stock-low bg-brand-warning/10 text-brand-warning' : 
-                              'stock-ok bg-brand-success/10 text-brand-success'
-                            }`}>
-                              <span className={`h-1.5 w-1.5 rounded-full ${
-                                isOutOfStock ? 'bg-brand-danger' : 
-                                isLowStock ? 'bg-brand-warning animate-pulse' : 
-                                'bg-brand-success'
-                              }`}></span>
-                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock}` : `${prod.stock}`}
-                            </span>
-
-                            {/* In-cart quantity overlay */}
-                            {inCartItem && (
-                              <div className="product-overlay" style={{ opacity: 1 }}>
-                                <span className="bg-gradient-to-r from-brand-cyan to-brand-violet text-white rounded-full px-3 py-1 text-xs font-black shadow-lg shadow-glow-cyan">
-                                  ×{inCartItem.quantity}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Hover overlay */}
-                            {!inCartItem && !isOutOfStock && (
-                              <div className="product-overlay bg-black/10 dark:bg-black/30 backdrop-blur-[2px]">
-                                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                  <Plus className="h-5 w-5 text-white" />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="p-3.5 space-y-1.5">
-                            <h4 className="text-xs font-bold truncate leading-tight text-slate-800 dark:text-slate-200 group-hover:text-brand-cyan transition-colors">{prod.name}</h4>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-black text-brand-cyan">${prod.price.toFixed(2)}</span>
-                              <span className="text-[9px] font-bold text-brand-muted truncate max-w-[70px] uppercase bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
-                                {prod.sku || prod.category}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </main>
-
-            {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
-              darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
+            {/* ─── Left: Cart Sidebar ─── */}
+            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-b lg:h-auto lg:w-[360px] lg:border-r lg:border-b-0 ${
+              darkMode ? 'bg-white border-gray-200' : 'bg-white border-gray-200'
             }`}>
               {/* Cart Header */}
-              <div className={`flex-shrink-0 px-5 py-3.5 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+              <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
                 <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center">
+                  <div className="h-7 w-7 rounded-md bg-[#714B67] flex items-center justify-center">
                     <Receipt className="h-3.5 w-3.5 text-white" />
                   </div>
                   <h3 className="text-sm font-extrabold tracking-tight">{t('cart', 'កន្ត្រក')}</h3>
                 </div>
-                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                  darkMode ? 'bg-brand-bgDark text-brand-cyan' : 'bg-gray-100 text-brand-cyan'
-                }`}>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-[#714B67]">
                   {cartItemCount} {t('items', 'items')}
                 </span>
               </div>
 
               {/* Cart Items */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-2">
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 space-y-2">
                 {cart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center">
-                    <ShoppingBag className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                    <ShoppingBag className="h-8 w-8 mb-2 text-gray-300" />
                     <p className="text-xs font-bold text-brand-muted">{t('cart_empty', 'កន្ត្រកទទេ')}</p>
                     <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('select_products', 'ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម')}</p>
                   </div>
@@ -1094,14 +923,10 @@ export default function App() {
                   cart.map(item => (
                     <div
                       key={item.product.id}
-                      className={`cart-item flex items-center gap-3 p-2.5 rounded-lg transition ${
-                        darkMode ? 'bg-brand-bgDark/40 border border-white/5' : 'bg-gray-50 border border-gray-100'
-                      }`}
+                      className="cart-item flex items-center gap-3 p-2 rounded border bg-gray-50/50 border-gray-100"
                     >
                       {/* Thumb */}
-                      <div className={`h-9 w-9 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center ${
-                        darkMode ? 'bg-brand-bgDark' : 'bg-gray-100'
-                      }`}>
+                      <div className="h-8 w-8 rounded overflow-hidden flex-shrink-0 flex items-center justify-center bg-white border border-gray-100">
                         {item.product.image ? (
                           <img src={item.product.image} className="h-full w-full object-cover" alt="" />
                         ) : (
@@ -1111,24 +936,22 @@ export default function App() {
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold truncate">{item.product.name}</div>
-                        <div className="text-[11px] font-extrabold text-brand-cyan mt-0.5">${(item.product.price * item.quantity).toFixed(2)}</div>
+                        <div className="text-[11px] font-bold truncate text-gray-800">{item.product.name}</div>
+                        <div className="text-[11px] font-extrabold text-[#714B67] mt-0.5">${(item.product.price * item.quantity).toFixed(2)}</div>
                       </div>
 
                       {/* Qty controls */}
-                      <div className={`flex items-center gap-0.5 rounded-full p-0.5 border ${
-                        darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
-                      }`}>
+                      <div className="flex items-center gap-0.5 rounded p-0.5 border bg-white border-gray-200">
                         <button
                           onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, -1); }}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-danger/20 hover:text-brand-danger transition text-brand-muted text-xs"
+                          className="h-5 w-5 rounded flex items-center justify-center hover:bg-red-50 text-gray-500 hover:text-[#e05038] transition text-xs"
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        <span className="w-5 text-center text-[11px] font-bold">{item.quantity}</span>
+                        <span className="w-5 text-center text-[11px] font-bold text-gray-850">{item.quantity}</span>
                         <button
                           onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, 1); }}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-success/20 hover:text-brand-success transition text-brand-muted text-xs"
+                          className="h-5 w-5 rounded flex items-center justify-center hover:bg-green-50 text-gray-500 hover:text-[#2c8a3c] transition text-xs"
                         >
                           <Plus className="h-3 w-3" />
                         </button>
@@ -1139,7 +962,7 @@ export default function App() {
               </div>
 
               {/* Cart Footer */}
-              <div className={`flex-shrink-0 px-3 pb-3 pt-2 sm:px-4 sm:pb-4 space-y-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+              <div className="flex-shrink-0 px-3 pb-3 pt-2 space-y-3 border-t border-gray-200 bg-gray-50/30">
                 {/* Customer + Mode selectors */}
                 <div className="space-y-2">
                   <div className="relative">
@@ -1147,11 +970,9 @@ export default function App() {
                     
                     {selectedCustomerId ? (
                       // Beautiful active customer card
-                      <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
-                        darkMode ? 'bg-brand-bgDark/60 border-brand-cyan/25' : 'bg-slate-50 border-brand-cyan/20'
-                      }`}>
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center font-bold text-xs shadow-md">
+                      <div className="p-2.5 rounded border flex items-center justify-between gap-2.5 bg-gray-50 border-[#714B67]/20">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="h-7 w-7 rounded bg-[#714B67] text-white flex items-center justify-center font-bold text-xs">
                             {(() => {
                               const match = customers.find(c => String(c.id) === String(selectedCustomerId));
                               if (!match) return 'CU';
@@ -1159,15 +980,15 @@ export default function App() {
                             })()}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[11px] font-black truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.name}</p>
+                            <p className="text-[11px] font-bold truncate text-gray-800">{customers.find(c => String(c.id) === String(selectedCustomerId))?.name}</p>
                             <p className="text-[9px] text-brand-muted font-bold truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.phone || 'No phone'}</p>
                           </div>
                         </div>
                         <button
                           onClick={() => setSelectedCustomerId('')}
-                          className="h-6 w-6 rounded-lg bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger flex items-center justify-center transition-all"
+                          className="h-5 w-5 rounded bg-red-50 hover:bg-red-100 text-[#e05038] flex items-center justify-center transition-all"
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-3 w-3" />
                         </button>
                       </div>
                     ) : (
@@ -1177,9 +998,7 @@ export default function App() {
                         <select
                           value={selectedCustomerId}
                           onChange={(e) => setSelectedCustomerId(e.target.value)}
-                          className={`w-full appearance-none py-2 pl-8 pr-8 text-[11px] font-medium rounded-lg border transition ${
-                            darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
-                          }`}
+                          className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-semibold rounded border bg-gray-50 border-gray-200 text-gray-700"
                         >
                           <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
                           {customers.map(c => (
@@ -1197,9 +1016,7 @@ export default function App() {
                       <select
                         value={orderStatus}
                         onChange={(e) => setOrderStatus(e.target.value)}
-                        className={`w-full py-2 px-2.5 text-[11px] font-medium rounded-lg border transition ${
-                          darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200'
-                        }`}
+                        className="w-full py-1.5 px-2 text-[11px] font-semibold rounded border bg-gray-50 border-gray-200 text-gray-700"
                       >
                         <option value="completed">{t('mode_sell', 'លក់ Sell')}</option>
                         <option value="pending">{t('mode_hold', 'រង់ចាំ Hold')}</option>
@@ -1207,9 +1024,7 @@ export default function App() {
                     </div>
                     <div>
                       <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('receipt', 'Receipt')}</label>
-                      <div className={`py-2 px-2.5 text-[11px] font-bold rounded-lg text-center ${
-                        darkMode ? 'bg-brand-success/10 text-brand-success border border-brand-success/20' : 'bg-green-50 text-brand-success border border-green-200'
-                      }`}>
+                      <div className="py-1.5 px-2 text-[11px] font-bold rounded text-center bg-green-50 text-[#2c8a3c] border border-green-200">
                         {t('auto_print', 'Auto-Print')}
                       </div>
                     </div>
@@ -1217,7 +1032,7 @@ export default function App() {
                 </div>
 
                 {/* Receipt Totals */}
-                <div className={`p-3 rounded-lg space-y-1.5 ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
+                <div className="p-2.5 rounded border border-gray-200 bg-gray-50/50 space-y-1.5">
                   <div className="flex justify-between gap-3 text-[11px] font-medium text-brand-muted">
                     <span>{t('customer', 'Customer')}</span>
                     <span className="truncate text-right">{selectedCustomer?.name || t('walk_in', 'Walk-in')}</span>
@@ -1230,10 +1045,10 @@ export default function App() {
                     <span>{t('tax', 'Tax (0%)')}</span>
                     <span>$0.00</span>
                   </div>
-                  <div className="receipt-divider my-1.5" />
+                  <div className="receipt-divider my-1 border-t border-dashed border-gray-300" />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-extrabold">{t('total', 'សរុប Total')}</span>
-                    <span className="text-lg font-black text-gradient">${getGrandTotal().toFixed(2)}</span>
+                    <span className="text-xs font-extrabold text-gray-800">{t('total', 'សរុប Total')}</span>
+                    <span className="text-base font-black text-[#714B67]">${getGrandTotal().toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -1242,7 +1057,7 @@ export default function App() {
                   <button
                     onClick={clearCart}
                     title={t('clear_cart', 'Clear Cart')}
-                    className="h-10 w-10 rounded-lg flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all flex-shrink-0"
+                    className="h-10 w-10 rounded border border-red-200 bg-red-50 text-[#e05038] hover:bg-red-100 flex items-center justify-center transition-all flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -1255,7 +1070,7 @@ export default function App() {
                         setPaymentModalOpen(true);
                       }
                     }}
-                    className="btn-primary flex-1 h-10 text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="bg-[#2c8a3c] hover:bg-[#257633] text-white flex-1 h-10 rounded text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
                     <Zap className="h-3.5 w-3.5" />
                     <span>{orderStatus === 'pending' ? t('hold_order', 'ដាក់រង់ចាំ Hold') : t('checkout', 'ទូទាត់ Checkout')}</span>
@@ -1264,6 +1079,153 @@ export default function App() {
                 </div>
               </div>
             </aside>
+
+            {/* ─── Right: Products ─── */}
+            <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+              {/* Search + Categories bar */}
+              <div className="flex-shrink-0 px-4 py-3 space-y-3 border-b border-gray-200 bg-white">
+                {/* Search input */}
+                <div className="relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#714B67]" />
+                  <input
+                    type="text"
+                    placeholder={t('search_placeholder', 'ស្វែងរកទំនិញ — barcode, SKU, ឈ្មោះ...')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleQuickAdd}
+                    className="w-full py-2 pl-10 pr-4 text-sm font-medium rounded border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none"
+                  />
+                </div>
+
+                {/* Category pills */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                  {getCategories().map(cat => {
+                    const isActive = selectedCategory === cat || (cat === 'All' && selectedCategory === '');
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
+                        className={`px-3 py-1 rounded text-[11px] font-bold whitespace-nowrap transition-all ${
+                          isActive
+                            ? 'bg-[#714B67] text-white border border-[#714B67]'
+                            : 'bg-gray-100 hover:bg-gray-200 border border-transparent text-gray-600'
+                        }`}
+                      >
+                        {cat === 'All' ? t('all', 'ទាំងអស់') : cat}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="hidden grid-cols-3 gap-2 sm:grid">
+                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Package className="h-3.5 w-3.5 text-[#714B67]" />
+                      <span>{t('products_label', 'Products')}</span>
+                    </div>
+                    <div className="mt-0.5 text-xs font-black text-gray-800">{visibleProductCount}</div>
+                  </div>
+                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
+                      <AlertTriangle className="h-3.5 w-3.5 text-[#ec9a29]" />
+                      <span>{t('stock_alerts', 'Stock alerts')}</span>
+                    </div>
+                    <div className="mt-0.5 text-xs font-black text-gray-800">
+                      {lowStockCount}
+                      <span className="ml-1 text-[9px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
+                    </div>
+                  </div>
+                  <div className="rounded border border-gray-200 bg-white px-3 py-1.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-brand-muted">
+                      <Clock className="h-3.5 w-3.5 text-[#00A09D]" />
+                      <span>{t('pending', 'Pending')}</span>
+                    </div>
+                    <div className="mt-0.5 text-xs font-black text-gray-800">{pendingOrders.length}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Grid */}
+              <div className="flex-1 overflow-y-auto p-4 bg-gray-150">
+                {getFilteredProducts().length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
+                    <Package className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-xs font-bold text-brand-muted">{t('no_products', 'រកមិនឃើញទំនិញទេ')}</p>
+                    <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('no_products_subtitle', 'No products match your search')}</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                    {getFilteredProducts().map((prod) => {
+                      const isOutOfStock = prod.stock <= 0;
+                      const isLowStock = prod.stock > 0 && prod.stock <= 5;
+                      const inCartItem = cart.find(item => item.product.id === prod.id);
+
+                      return (
+                        <div
+                          key={prod.id}
+                          onClick={() => addToCart(prod)}
+                          className={`bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer animate-slide-up group ${
+                            isOutOfStock ? 'opacity-45 cursor-not-allowed' : ''
+                          } ${inCartItem ? 'ring-2 ring-[#714B67]' : ''}`}
+                        >
+                          {/* Image area */}
+                          <div className="aspect-[4/3] relative overflow-hidden flex items-center justify-center bg-gray-50 border-b border-gray-100">
+                            {prod.image ? (
+                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <Package className="h-8 w-8 text-gray-300" />
+                            )}
+
+                            {/* Stock badge with dot */}
+                            <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider flex items-center gap-1 ${
+                              isOutOfStock ? 'bg-red-50 text-[#e05038] border border-red-100' : 
+                              isLowStock ? 'bg-amber-50 text-[#d97706] border border-amber-100' : 
+                              'bg-green-50 text-[#2c8a3c] border border-green-100'
+                            }`}>
+                              <span className={`h-1 w-1 rounded-full ${
+                                isOutOfStock ? 'bg-[#e05038]' : 
+                                isLowStock ? 'bg-[#d97706]' : 
+                                'bg-[#2c8a3c]'
+                              }`}></span>
+                              {isOutOfStock ? t('out_of_stock', 'អស់') : `${prod.stock}`}
+                            </span>
+
+                            {/* In-cart quantity overlay */}
+                            {inCartItem && (
+                              <div className="absolute inset-0 bg-black/5 backdrop-blur-[0.5px] flex items-center justify-center">
+                                <span className="bg-[#714B67] text-white rounded px-2.5 py-1 text-[11px] font-extrabold">
+                                  ×{inCartItem.quantity}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Hover overlay */}
+                            {!inCartItem && !isOutOfStock && (
+                              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="h-7 w-7 rounded bg-[#714B67] flex items-center justify-center shadow">
+                                  <Plus className="h-4 w-4 text-white" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="p-2.5 space-y-1">
+                            <h4 className="text-[11px] font-bold truncate leading-tight text-gray-800 group-hover:text-[#714B67] transition-colors">{prod.name}</h4>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-extrabold text-[#714B67]">${prod.price.toFixed(2)}</span>
+                              <span className="text-[8px] font-bold text-gray-400 truncate max-w-[60px] uppercase bg-gray-100 px-1 py-0.5 rounded">
+                                {prod.sku || prod.category}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </main>
           </>
         )}
       </div>
@@ -1278,16 +1240,14 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
-            <div className={`flex-shrink-0 px-5 py-4 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+            <div className="flex-shrink-0 px-5 py-4 flex items-center justify-between border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-brand-violet" />
+                <Clock className="h-5 w-5 text-[#714B67]" />
                 <h3 className="text-sm font-extrabold">{t('pending_orders_title', 'បញ្ជាទិញរង់ចាំ')}</h3>
               </div>
               <button
                 onClick={() => setPendingOrdersOpen(false)}
-                className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
-                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted' : 'hover:bg-gray-100 text-gray-400'
-                }`}
+                className="h-8 w-8 rounded-lg flex items-center justify-center transition hover:bg-gray-100 text-gray-400"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1297,7 +1257,7 @@ export default function App() {
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {pendingOrders.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
-                  <Clock className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                  <Clock className="h-10 w-10 mb-3 text-gray-200" />
                   <p className="text-xs font-bold text-brand-muted">{t('no_pending_orders', 'មិនមាន order រង់ចាំទេ')}</p>
                 </div>
               ) : (
@@ -1305,11 +1265,7 @@ export default function App() {
                   <div
                     key={order.id}
                     onClick={() => { window.location.href = `?resume=${order.id}`; }}
-                    className={`p-4 rounded-xl cursor-pointer transition-all animate-slide-up group ${
-                      darkMode
-                        ? 'bg-brand-bgDark/50 border border-white/5 hover:border-brand-cyan/30'
-                        : 'bg-gray-50 border border-gray-100 hover:border-brand-cyan/30'
-                    }`}
+                    className="p-4 rounded cursor-pointer transition-all animate-slide-up bg-gray-50 border border-gray-100 hover:border-[#714B67]/30"
                     style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -1320,21 +1276,19 @@ export default function App() {
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                      <span className="text-sm font-black text-brand-cyan">${parseFloat(order.total).toFixed(2)}</span>
+                      <span className="text-sm font-black text-[#714B67]">${parseFloat(order.total).toFixed(2)}</span>
                     </div>
 
                     {order.notes && (
-                      <div className={`p-2 rounded-lg text-[10px] mb-2 ${
-                        darkMode ? 'bg-brand-warning/10 border border-brand-warning/20' : 'bg-amber-50 border border-amber-200'
-                      }`}>
-                        <span className="font-bold text-brand-warning block">{t('note', 'Note')}:</span>
+                      <div className="p-2 rounded text-[10px] mb-2 bg-amber-50 border border-amber-200">
+                        <span className="font-bold text-amber-600 block">{t('note', 'Note')}:</span>
                         <span className="text-brand-muted">{order.notes}</span>
                       </div>
                     )}
 
-                    <div className={`flex justify-between items-center pt-2 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                       <span className="text-[10px] font-medium text-brand-muted">{order.item_lines} {t('items', 'items')}</span>
-                      <span className="text-[10px] font-bold text-brand-cyan group-hover:text-brand-violet transition flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-[#714B67] hover:text-[#00A09D] transition flex items-center gap-1">
                         {t('resume', 'បន្ត')} <ChevronRight className="h-3 w-3" />
                       </span>
                     </div>
@@ -1350,41 +1304,35 @@ export default function App() {
       {paymentModalOpen && (
         <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
           <div
-            className={`w-full max-w-md rounded-3xl shadow-glass-lg p-6 border transition-all duration-300 ${
-              darkMode ? 'bg-brand-surfDark/95 border-white/10 text-brand-textDark shadow-glow-violet' : 'bg-white/95 border-slate-200 text-brand-textLight'
-            }`}
+            className="w-full max-w-md rounded-lg p-6 border transition-all duration-300 bg-white border-gray-200 text-brand-textLight"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-slate-100'}`}>
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
+                <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center text-[#714B67]">
                   <CreditCard className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black tracking-tight">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
+                  <h3 className="text-sm font-black tracking-tight text-gray-800">{t('payment_title', 'ទូទាត់ប្រាក់')}</h3>
                   <p className="text-[10px] text-brand-muted font-bold uppercase tracking-wider">{t('payment_subtitle', 'Checkout Processing')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setPaymentModalOpen(false)}
-                className={`h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
-                  darkMode ? 'hover:bg-brand-bgDark text-brand-muted hover:text-white' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'
-                }`}
+                className="h-8 w-8 rounded-lg flex items-center justify-center transition-all hover:bg-gray-100 text-gray-400 hover:text-gray-700"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Total */}
-            <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border ${
-              darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
-            }`}>
+            <div className="mt-4 p-4 rounded-lg flex items-center justify-between border bg-gray-50 border-gray-100">
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
-                <div className="text-2xl font-black text-gradient mt-0.5">ef{getGrandTotal().toFixed(2)}</div>
+                <div className="text-xl font-black text-[#714B67] mt-0.5">${getGrandTotal().toFixed(2)}</div>
               </div>
-              <span className="text-[9px] font-black uppercase bg-brand-cyan/15 text-brand-cyan px-3 py-1.5 rounded-full tracking-wider border border-brand-cyan/25 shadow-glow-cyan">
+              <span className="text-[10px] font-black uppercase bg-[#714B67]/10 text-[#714B67] px-3 py-1.5 rounded tracking-wider border border-[#714B67]/20">
                 USD
               </span>
             </div>
@@ -1396,39 +1344,39 @@ export default function App() {
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'cash'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
+                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
                     }`}
                   >
-                    <Wallet className="h-5 w-5" />
+                    <Wallet className="h-4.5 w-4.5" />
                     <span className="text-[10px] font-bold">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('khqr')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'khqr'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
+                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
                     }`}
                   >
-                    <QrCode className="h-5 w-5" />
+                    <QrCode className="h-4.5 w-4.5" />
                     <span className="text-[10px] font-bold">KHQR</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'card'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-[#714B67] bg-[#714B67]/5 text-[#714B67] font-extrabold'
+                        : 'border-gray-250 text-gray-500 hover:border-[#714B67]/30 hover:text-[#714B67]'
                     }`}
                   >
-                    <CreditCard className="h-5 w-5" />
+                    <CreditCard className="h-4.5 w-4.5" />
                     <span className="text-[10px] font-bold">{t('card', 'Card')}</span>
                   </button>
                 )}
@@ -1438,9 +1386,9 @@ export default function App() {
             {/* Payment Details */}
             <div className="mt-4">
               {paymentMethod === 'cash' && (
-                <div className="space-y-3.5 animate-fade-in">
+                <div className="space-y-3 animate-fade-in">
                   <div>
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-brand-muted">$</span>
                       <input
@@ -1449,16 +1397,12 @@ export default function App() {
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className={`w-full py-3.5 pl-9 pr-4 text-lg font-black rounded-2xl border transition-all duration-300 ${
-                          darkMode
-                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50 focus:shadow-glow-cyan'
-                            : 'bg-slate-50 border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:shadow-glow-cyan'
-                        }`}
+                        className="w-full py-2.5 pl-9 pr-4 text-lg font-black rounded border border-gray-200 text-gray-800 focus:outline-none focus:border-[#714B67]"
                       />
                     </div>
                     {/* Visual Bill Selector Pad */}
-                    <div className="mt-3 space-y-2">
-                      <div className="text-[8px] font-extrabold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="text-[8px] font-bold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[
                           { val: 1.00, label: '$1' },
@@ -1478,11 +1422,7 @@ export default function App() {
                               const current = parseFloat(cashGiven) || 0;
                               setCashGiven((current + bill.val).toFixed(2));
                             }}
-                            className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
-                              darkMode
-                                ? 'border-white/5 bg-brand-bgDark text-brand-textDark hover:border-brand-cyan/50 hover:bg-brand-cyan/10 hover:text-brand-cyan'
-                                : 'border-slate-200 bg-white text-brand-textLight hover:border-brand-cyan/50 hover:bg-brand-cyan/5 hover:text-brand-cyan'
-                            }`}
+                            className="rounded border border-gray-200 bg-white py-1.5 text-[10px] font-black text-gray-700 hover:border-[#714B67]/50 hover:bg-[#714B67]/5 hover:text-[#714B67]"
                           >
                             {bill.label}
                           </button>
@@ -1490,7 +1430,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setCashGiven('')}
-                          className="rounded-xl border py-2 text-[10px] font-black border-brand-danger/20 bg-brand-danger/5 text-brand-danger hover:bg-brand-danger/10"
+                          className="rounded border py-1.5 text-[10px] font-black border-red-200 bg-red-50 text-[#e05038] hover:bg-red-100"
                         >
                           C
                         </button>
@@ -1499,9 +1439,9 @@ export default function App() {
                   </div>
 
                   {parseFloat(cashGiven) > 0 && (
-                    <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
-                      <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
-                      <span className="text-xl font-black text-brand-success">
+                    <div className="p-3 rounded border border-green-200 bg-green-50/50 flex items-center justify-between animate-scale-in">
+                      <span className="text-[11px] font-bold text-[#2c8a3c]">{t('change', 'ប្រាក់អាប់ Change')}</span>
+                      <span className="text-lg font-black text-[#2c8a3c]">
                         ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
                       </span>
                     </div>
@@ -1510,20 +1450,19 @@ export default function App() {
               )}
 
               {paymentMethod === 'khqr' && (
-                <div className="text-center space-y-4 animate-fade-in">
-                  <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
-                    <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
+                <div className="text-center space-y-3 animate-fade-in">
+                  <div className="relative inline-block p-1 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden">
+                    <div className="relative qr-container inline-block border border-gray-100 rounded bg-white overflow-hidden p-2">
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
                         alt="Bakong KHQR Code"
-                        className="h-44 w-44 mx-auto rounded-xl relative z-10"
+                        className="h-40 w-40 mx-auto rounded"
                       />
-                      <div className="absolute inset-x-0 h-0.5 bg-red-500 shadow-[0_0_10px_#f43f5e] animate-scanner-laser top-3.5 z-20"></div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center gap-1.5">
-                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-cyan animate-pulse flex items-center gap-2 justify-center">
-                      <span className="h-2 w-2 rounded-full bg-brand-cyan animate-ping"></span>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#714B67] animate-pulse flex items-center gap-2 justify-center">
+                      <span className="h-2 w-2 rounded-full bg-[#714B67] animate-ping"></span>
                       {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
                     </div>
                     <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Syncing with Bakong Network</span>
@@ -1532,43 +1471,37 @@ export default function App() {
               )}
 
               {paymentMethod === 'card' && (
-                <div className={`p-6 rounded-2xl text-center border animate-fade-in ${
-                  darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
-                }`}>
+                <div className="p-4 rounded border border-gray-100 bg-gray-50/50 text-center animate-fade-in">
                   {cardSimulating ? (
-                    <div className="space-y-4">
-                      <div className="relative w-44 h-24 mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-3 text-left text-white shadow-xl overflow-hidden border border-white/10">
-                        <div className="h-6 w-8 bg-amber-400/80 rounded-md relative shadow-inner flex items-center justify-center overflow-hidden">
-                          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:4px_100%]"></div>
-                        </div>
-                        <div className="mt-4 text-[9px] font-mono tracking-widest opacity-80">•••• •••• •••• 8842</div>
-                        <div className="mt-2 text-[7px] font-bold tracking-widest uppercase opacity-50">ASSOCIATE CARD</div>
-                        <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-brand-cyan to-brand-violet animate-pulse"></div>
+                    <div className="space-y-3">
+                      <div className="relative w-40 h-22 mx-auto bg-slate-800 rounded p-3 text-left text-white shadow-md border border-white/10">
+                        <div className="h-5 w-7 bg-amber-400/80 rounded-sm relative shadow-inner"></div>
+                        <div className="mt-3 text-[9px] font-mono tracking-widest opacity-80">•••• •••• •••• 8842</div>
+                        <div className="mt-1 text-[7px] font-bold tracking-widest uppercase opacity-50">ASSOCIATE CARD</div>
                       </div>
                       <div className="space-y-2">
-                        <div className="text-xs font-black text-brand-cyan flex items-center justify-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan animate-ping"></span>
+                        <div className="text-[11px] font-black text-[#714B67] flex items-center justify-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#714B67] animate-ping"></span>
                           {cardProgress < 40 ? t('connecting_card', 'Connecting to card reader...') :
                            cardProgress < 85 ? 'Reading card chip & authenticating...' :
                            'Authorizing payment transaction...'}
                         </div>
-                        <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-brand-bgDark' : 'bg-slate-200'}`}>
+                        <div className="w-full h-1.5 rounded bg-gray-200 overflow-hidden">
                           <div
-                            className="bg-gradient-to-r from-brand-cyan to-brand-violet h-full transition-all duration-300 rounded-full"
+                            className="bg-[#714B67] h-full transition-all duration-300 rounded"
                             style={{ width: `${cardProgress}%` }}
                           />
                         </div>
-                        <div className="text-[10px] text-brand-muted font-black tracking-wider uppercase">${cardProgress}% Completed</div>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3.5 py-4">
-                      <div className="relative h-12 w-12 mx-auto rounded-full bg-brand-cyan/15 flex items-center justify-center border border-brand-cyan/25 animate-float">
-                        <CreditCard className="h-6 w-6 text-brand-cyan" />
+                    <div className="space-y-3 py-2">
+                      <div className="relative h-10 w-10 mx-auto rounded bg-[#714B67]/10 flex items-center justify-center border border-[#714B67]/20">
+                        <CreditCard className="h-5 w-5 text-[#714B67]" />
                       </div>
                       <div>
-                        <p className="text-xs font-black text-brand-cyan uppercase tracking-wider">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
-                        <p className="text-[10px] text-brand-muted font-bold mt-1 max-w-[240px] mx-auto">{t('submit_handshake', 'Submit payment below to trigger card hardware handshake')}</p>
+                        <p className="text-xs font-black text-[#714B67] uppercase tracking-wider">{t('insert_card', 'បញ្ចូលកាត POS reader device')}</p>
+                        <p className="text-[10px] text-brand-muted font-bold mt-0.5 max-w-[240px] mx-auto">{t('submit_handshake', 'Submit payment below to trigger card hardware handshake')}</p>
                       </div>
                     </div>
                   )}
@@ -1581,7 +1514,7 @@ export default function App() {
               <button
                 onClick={handleCheckoutSubmit}
                 disabled={cardSimulating}
-                className="btn-primary w-full h-11 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-[#2c8a3c] hover:bg-[#257633] text-white w-full h-10 rounded text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 <Check className="h-4 w-4" />
                 <span>{t('confirm_finish', 'បញ្ជាក់ និង បញ្ចប់ Confirm')}</span>
@@ -1589,7 +1522,7 @@ export default function App() {
               <button
                 onClick={() => setPaymentModalOpen(false)}
                 disabled={cardSimulating}
-                className="w-full py-2.5 text-[10px] font-black text-brand-muted hover:text-brand-cyan transition-all duration-300 uppercase tracking-wider"
+                className="w-full py-2 text-[10px] font-black text-brand-muted hover:text-[#714B67] transition-all duration-200 uppercase tracking-wider"
               >
                 {t('cancel', 'បោះបង់ Cancel')}
               </button>

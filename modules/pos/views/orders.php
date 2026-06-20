@@ -11,11 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
         .search-container { position: relative; margin-bottom: 24px; }
-        .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
-        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
-        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
+        .search-container i { position: absolute; left: 20px; top: 14px; color: var(--pos-primary); font-size: 16px; }
+        .search-container input { width: 100%; padding: 12px 20px 12px 50px; border-radius: var(--pos-radius); border: 1px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12); }
         
-        .avatar-box { width: 36px; height: 36px; border-radius: var(--pos-radius); background: var(--pos-primary-light); display: grid; place-items: center; font-size: 14px; font-weight: 900; color: var(--pos-primary); border: 1px solid rgba(var(--pos-primary-rgb), 0.2); }
+        .avatar-box { width: 36px; height: 36px; border-radius: var(--pos-radius); background: #f7f4f7; display: grid; place-items: center; font-size: 14px; font-weight: 900; color: var(--pos-primary); border: 1px solid #ebdbe8; }
     </style>
 </head>
 <body class="pos-app">
@@ -36,7 +36,7 @@
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_orders'); ?></span>
                 <p class="v"><?php echo count($orders); ?></p>
-                <div class="chip" style="background: rgba(99, 102, 241, 0.1); color: var(--pos-primary);"><i class="fas fa-receipt"></i></div>
+                <div class="chip" style="background: #f7f4f7; color: #714B67;"><i class="fas fa-receipt"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('success_rate'); ?></span>
@@ -46,7 +46,7 @@
                 $rate = round(($completed / $total) * 100);
                 ?>
                 <p class="v"><?php echo $rate; ?>%</p>
-                <div class="chip" style="background: rgba(16, 185, 129, 0.1); color: var(--pos-success);"><i class="fas fa-check-double"></i></div>
+                <div class="chip" style="background: #ecfdf5; color: #2c8a3c;"><i class="fas fa-check-double"></i></div>
             </div>
         </div>
 
