@@ -1710,41 +1710,41 @@ textarea:focus {
 }
 
 /* ============================================================================
-   POS Clean UI
-   Simple, calm, easy-to-scan interface for day-to-day POS work.
+   POS Clean UI - Odoo POS Style
+   Simple, calm, easy-to-scan light interface for business operations.
    ============================================================================ */
 
 :root {
-    --pos-primary: #2563eb;
-    --pos-primary-rgb: 37, 99, 235;
-    --pos-primary-light: rgba(37, 99, 235, 0.08);
-    --pos-secondary: #0f766e;
-    --pos-accent: #7c3aed;
-    --pos-success: #059669;
-    --pos-warning: #d97706;
-    --pos-danger: #dc2626;
-    --pos-bg: #f5f7fb;
+    --pos-primary: #714B67;
+    --pos-primary-rgb: 113, 75, 103;
+    --pos-primary-light: rgba(113, 75, 103, 0.08);
+    --pos-secondary: #00A09D;
+    --pos-accent: #00A09D;
+    --pos-success: #2c8a3c;
+    --pos-warning: #ec9a29;
+    --pos-danger: #e05038;
+    --pos-bg: #f3f4f6;
     --pos-card: #ffffff;
     --pos-card-solid: #ffffff;
     --pos-elevated: #ffffff;
-    --pos-text: #111827;
-    --pos-text-muted: #64748b;
-    --pos-text-dim: #94a3b8;
-    --pos-border: #e5e7eb;
-    --pos-border-light: #f1f5f9;
-    --pos-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-    --pos-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
-    --pos-shadow-lg: 0 18px 45px rgba(15, 23, 42, 0.10);
-    --pos-shadow-xl: 0 26px 60px rgba(15, 23, 42, 0.12);
+    --pos-text: #1f2937;
+    --pos-text-muted: #4b5563;
+    --pos-text-dim: #9ca3af;
+    --pos-border: #dee2e6;
+    --pos-border-light: #e5e7eb;
+    --pos-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --pos-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --pos-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --pos-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
     --pos-shadow-glow: none;
-    --pos-gradient-primary: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
-    --pos-gradient-dark: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    --pos-gradient-surface: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    --pos-gradient-primary: linear-gradient(135deg, #714B67 0%, #00A09D 100%);
+    --pos-gradient-dark: linear-gradient(135deg, #714B67 0%, #5a3c52 100%);
+    --pos-gradient-surface: #ffffff;
     --pos-gradient-sidebar: #ffffff;
     --pos-sidebar-glow: none;
-    --pos-radius: 10px;
-    --pos-radius-lg: 12px;
-    --pos-radius-xl: 16px;
+    --pos-radius: 6px;
+    --pos-radius-lg: 8px;
+    --pos-radius-xl: 12px;
 }
 
 body.pos-app {
@@ -1812,7 +1812,7 @@ body.pos-app {
 
 .pos-side-link {
     color: #475569;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 .pos-side-link:hover {
@@ -1974,7 +1974,7 @@ body.pos-app {
 }
 
 .btn {
-    border-radius: 10px;
+    border-radius: 6px;
     box-shadow: none !important;
 }
 
@@ -1984,7 +1984,7 @@ body.pos-app {
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
+    background: #5b3c53;
     transform: none;
 }
 
@@ -1998,18 +1998,20 @@ body.pos-app {
 .pos-icon-btn:hover {
     background: var(--pos-primary-light) !important;
     color: var(--pos-primary);
-    border-color: #bfdbfe !important;
+    border-color: #d8c2d4 !important;
     transform: none;
 }
 
 .pos-form-control,
 .search-container input,
+.user-card input,
 select,
 textarea {
     background-color: #ffffff !important;
     border-color: var(--pos-border) !important;
     color: var(--pos-text) !important;
     box-shadow: none !important;
+    border-radius: 6px !important;
 }
 
 .pos-form-control:focus,
@@ -2017,13 +2019,13 @@ textarea {
 select:focus,
 textarea:focus {
     border-color: var(--pos-primary) !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12) !important;
 }
 
 .badge-primary {
-    background: #eff6ff;
+    background: #f7f4f7;
     color: var(--pos-primary);
-    border-color: #bfdbfe;
+    border-color: #ebdbe8;
 }
 
 .badge-success {
@@ -2046,7 +2048,7 @@ textarea:focus {
 
 .dashboard-hero {
     min-height: 230px;
-    background: linear-gradient(135deg, #2563eb 0%, #0f766e 100%) !important;
+    background: linear-gradient(135deg, #714B67 0%, #5a3c52 100%) !important;
     border: 0 !important;
     box-shadow: var(--pos-shadow-md) !important;
 }

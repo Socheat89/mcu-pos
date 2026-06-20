@@ -9,32 +9,32 @@ export default {
     extend: {
       colors: {
         brand: {
-          cyan: '#06B6D4',
-          violet: '#6366F1',
-          success: '#10B981',
-          warning: '#F59E0B',
-          danger: '#F43F5E',
-          bgLight: '#F8FAFC',
-          bgDark: '#080A10',
+          cyan: '#714B67', // Odoo brand Purple
+          violet: '#00A09D', // Odoo brand Teal
+          success: '#2c8a3c',
+          warning: '#ec9a29',
+          danger: '#e05038',
+          bgLight: '#f3f4f6',
+          bgDark: '#ffffff',
           surfLight: '#FFFFFF',
-          surfDark: '#0E1322',
-          surfDarkAlt: '#182035',
-          textLight: '#0F172A',
-          textDark: '#F1F5F9',
-          muted: '#64748B',
+          surfDark: '#ffffff',
+          surfDarkAlt: '#f3f4f6',
+          textLight: '#1f2937',
+          textDark: '#1f2937',
+          muted: '#4b5563',
         }
       },
       fontFamily: {
-        sans: ['Sora', 'Battambang', 'sans-serif'],
+        sans: ['Inter', 'Sora', 'Battambang', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace']
       },
       boxShadow: {
-        'glass': '0 8px 32px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.35)',
-        'glow-violet': '0 0 20px rgba(99, 102, 241, 0.35)',
-        'card': '0 4px 12px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1)',
-        'card-hover': '0 16px 32px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.12)',
+        'glass': '0 1px 3px rgba(0, 0, 0, 0.05)',
+        'glass-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+        'glow-cyan': '0 0 15px rgba(113, 75, 103, 0.2)',
+        'glow-violet': '0 0 15px rgba(0, 160, 157, 0.2)',
+        'card': '0 1px 3px rgba(0, 0, 0, 0.05)',
+        'card-hover': '0 8px 24px rgba(0, 0, 0, 0.08)',
       },
       animation: {
         'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',

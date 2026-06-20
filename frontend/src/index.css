@@ -432,21 +432,21 @@ select:focus,
 }
 
 /* ==========================================================================
-   Clean POS Terminal
+   Clean POS Terminal - Odoo POS Style
    Plain, readable surfaces for cashier workflow.
    ========================================================================== */
 
 :root {
-  --terminal-bg: #f5f7fb;
+  --terminal-bg: #f3f4f6;
   --terminal-surface: #ffffff;
   --terminal-surface-strong: #ffffff;
-  --terminal-border: #e5e7eb;
-  --terminal-text: #111827;
-  --terminal-muted: #64748b;
-  --terminal-primary: #2563eb;
-  --terminal-secondary: #0f766e;
-  --terminal-success: #059669;
-  --terminal-danger: #dc2626;
+  --terminal-border: #dee2e6;
+  --terminal-text: #1f2937;
+  --terminal-muted: #4b5563;
+  --terminal-primary: #714B67;
+  --terminal-secondary: #00A09D;
+  --terminal-success: #2c8a3c;
+  --terminal-danger: #e05038;
 }
 
 body,
@@ -471,7 +471,7 @@ body,
 }
 
 .glass-card {
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
 .glass-card:hover,
@@ -482,24 +482,24 @@ body,
 }
 
 .btn-primary {
-  background: #2563eb;
-  border-radius: 10px;
+  background: #714B67;
+  border-radius: 6px;
   box-shadow: none;
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  background: #5b3c53;
   box-shadow: none;
 }
 
 .text-gradient {
   background: none;
   -webkit-text-fill-color: currentColor;
-  color: #2563eb;
+  color: #714B67;
 }
 
 .pill-active {
-  background: #2563eb;
+  background: #714B67;
   color: #ffffff;
   box-shadow: none;
 }
@@ -508,7 +508,7 @@ input,
 select {
   background: #ffffff !important;
   border-color: var(--terminal-border) !important;
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--terminal-text) !important;
 }
 
@@ -517,7 +517,7 @@ select:focus,
 .dark input:focus,
 .dark select:focus {
   border-color: var(--terminal-primary) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12) !important;
 }
 
 .modal-backdrop {

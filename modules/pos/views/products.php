@@ -19,10 +19,10 @@ $urlPrefix = mc_base_path();
         }
         .search-container { position: relative; margin-bottom: 24px; }
         .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
-        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: 16px; border: 1.5px solid var(--pos-border); background: rgba(8, 10, 16, 0.4); color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
-        .search-container input:focus { border-color: var(--pos-primary); background: rgba(8, 10, 16, 0.6); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15); }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
-        .product-img { width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
+        .product-img { width: 44px; height: 44px; border-radius: var(--pos-radius); background: #ffffff; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
     </style>
 </head>
 <body class="pos-app">
