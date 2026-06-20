@@ -66,6 +66,7 @@ $navLabel = function (string $key): string {
     $labels = [
         'dashboard' => __('dashboard'),
         'pos' => __('pos'),
+        'sessions' => __('sessions'),
         'holds' => __('on_hold'),
         'products' => __('inventory'),
         'customers' => __('customers'),
@@ -129,6 +130,9 @@ $navLabel = function (string $key): string {
             </a>
             <a class="pos-side-link <?php echo $activeClass('pos'); ?>" href="<?php echo htmlspecialchars($posUrl('pos')); ?>">
                 <i class="fas fa-desktop"></i><span><?php echo $navLabel('pos'); ?></span>
+            </a>
+            <a class="pos-side-link <?php echo $activeClass('sessions'); ?>" href="<?php echo htmlspecialchars($posUrl('sessions')); ?>">
+                <i class="fas fa-history"></i><span><?php echo $navLabel('sessions'); ?></span>
             </a>
             <?php endif; ?>
 

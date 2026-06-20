@@ -82,6 +82,7 @@ $dashboardUrl = $posBase . '/dashboard';
         ]); ?>;
 
         window.CURRENT_LANG = "<?php echo Language::getCurrentLang(); ?>";
+        window.ACTIVE_SESSION_ID = <?php echo (int)($activeSession['id'] ?? 0); ?>;
 
         window.RESUME = <?php
             $resumePayload = null;

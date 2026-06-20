@@ -24,10 +24,10 @@ if ($isProduction) {
     // Local Development Credentials - with fallback for cPanel environments
     // Try cPanel hosted credentials first
     return [
-        'host' => 'localhost',
+        'host' => '127.0.0.1;port=3307',
         'database' => 'mekocclj_mekong_saas',
-        'username' => 'mekocclj_mekong_saas',
-        'password' => 'Socheat@2026',
+        'username' => 'root',
+        'password' => '',
         'charset' => 'utf8mb4'
     ];
 }

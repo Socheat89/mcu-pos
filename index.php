@@ -167,6 +167,9 @@ try {
                 } elseif ($sub === 'menu') {
                     require_once $baseDir . '/modules/pos/controllers/MenuController.php';
                     $controller = new MenuController();
+                } elseif ($sub === 'sessions') {
+                    require_once $baseDir . '/modules/pos/controllers/SessionController.php';
+                    $controller = new SessionController();
                 } elseif ($sub === 'holds') {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();

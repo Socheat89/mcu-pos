@@ -24,6 +24,14 @@ class PosController {
         }
 
         $tenantId = Tenant::getId();
+        $db = Database::getInstance();
+        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        if (!$activeSession) {
+            $prefix = mc_base_path();
+            header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/open");
+            exit;
+        }
+
         $products = Product::getAll();
         $customers = $this->getCustomers();
         $pendingMenuOrders = Order::getPending($tenantId);
