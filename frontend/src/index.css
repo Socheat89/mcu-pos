@@ -430,3 +430,114 @@ select:focus,
     transform: none;
   }
 }
+
+/* ==========================================================================
+   Clean POS Terminal
+   Plain, readable surfaces for cashier workflow.
+   ========================================================================== */
+
+:root {
+  --terminal-bg: #f5f7fb;
+  --terminal-surface: #ffffff;
+  --terminal-surface-strong: #ffffff;
+  --terminal-border: #e5e7eb;
+  --terminal-text: #111827;
+  --terminal-muted: #64748b;
+  --terminal-primary: #2563eb;
+  --terminal-secondary: #0f766e;
+  --terminal-success: #059669;
+  --terminal-danger: #dc2626;
+}
+
+body,
+.dark {
+  background: var(--terminal-bg) !important;
+  color: var(--terminal-text);
+}
+
+#root {
+  background: var(--terminal-bg);
+}
+
+.glass,
+.dark .glass,
+.glass-card,
+.dark .glass-card {
+  background: #ffffff !important;
+  border: 1px solid var(--terminal-border) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glass-card {
+  border-radius: 12px;
+}
+
+.glass-card:hover,
+.dark .glass-card:hover {
+  transform: none;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.btn-primary {
+  background: #2563eb;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  box-shadow: none;
+}
+
+.text-gradient {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: #2563eb;
+}
+
+.pill-active {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+input,
+select {
+  background: #ffffff !important;
+  border-color: var(--terminal-border) !important;
+  border-radius: 10px;
+  color: var(--terminal-text) !important;
+}
+
+input:focus,
+select:focus,
+.dark input:focus,
+.dark select:focus {
+  border-color: var(--terminal-primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+.modal-backdrop {
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.stock-ok {
+  background: #ecfdf5;
+  color: var(--terminal-success);
+  border-color: #bbf7d0;
+}
+
+.stock-low {
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.stock-out {
+  background: #fef2f2;
+  color: var(--terminal-danger);
+  border-color: #fecaca;
+}
