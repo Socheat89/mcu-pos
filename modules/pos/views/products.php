@@ -7,7 +7,7 @@ $urlPrefix = mc_base_path();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+    <title><?php echo __('inventory'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,10 +19,10 @@ $urlPrefix = mc_base_path();
         }
         .search-container { position: relative; margin-bottom: 24px; }
         .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
-        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: 16px; border: 1.5px solid var(--pos-border); background: rgba(8, 10, 16, 0.4); color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
-        .search-container input:focus { border-color: var(--pos-primary); background: rgba(8, 10, 16, 0.6); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15); }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
-        .product-img { width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
+        .product-img { width: 44px; height: 44px; border-radius: var(--pos-radius); background: #ffffff; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
     </style>
 </head>
 <body class="pos-app">
@@ -31,7 +31,7 @@ $urlPrefix = mc_base_path();
     <div class="fade-in">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div class="pos-title">
-                <h1><?php echo __('products'); ?></h1>
+                <h1><?php echo __('inventory'); ?></h1>
                 <p><?php echo __('track_stock_msg'); ?></p>
             </div>
             <a href="<?php echo htmlspecialchars($posUrl('products/create')); ?>" class="btn btn-primary">

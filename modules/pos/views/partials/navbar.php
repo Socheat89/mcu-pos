@@ -1,7 +1,7 @@
 <?php
 // Shared POS layout shell (sidebar + topbar).
 // Expected optional vars from caller:
-//   - $activeNav: one of dashboard|pos|holds|products|orders|customers|reports
+//   - $activeNav: one of dashboard|pos|holds|products|customers|reports|settings
 
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $helperCandidates = [
@@ -61,6 +61,20 @@ $posUrl = function (string $path) use ($posBase): string {
 $activeClass = function (string $key) use ($activeNav): string {
     return ($activeNav === $key) ? 'active' : '';
 };
+
+$navLabel = function (string $key): string {
+    $labels = [
+        'dashboard' => __('dashboard'),
+        'pos' => __('pos'),
+        'holds' => __('on_hold'),
+        'products' => __('inventory'),
+        'customers' => __('customers'),
+        'reports' => __('analytics'),
+        'settings' => __('settings'),
+    ];
+
+    return $labels[$key] ?? __($key);
+};
 ?>
 
 <div class="pos-shell" id="posShell">
@@ -111,61 +125,47 @@ $activeClass = function (string $key) use ($activeNav): string {
 
             <?php if ($hasFeature('pos', 'core')): ?>
             <a class="pos-side-link <?php echo $activeClass('dashboard'); ?>" href="<?php echo htmlspecialchars($posUrl('dashboard')); ?>">
-                <i class="fas fa-chart-pie"></i><span><?php echo __('dashboard'); ?></span>
+                <i class="fas fa-chart-pie"></i><span><?php echo $navLabel('dashboard'); ?></span>
             </a>
             <a class="pos-side-link <?php echo $activeClass('pos'); ?>" href="<?php echo htmlspecialchars($posUrl('pos')); ?>">
-                <i class="fas fa-desktop"></i><span><?php echo __('pos'); ?></span>
+                <i class="fas fa-desktop"></i><span><?php echo $navLabel('pos'); ?></span>
             </a>
             <?php endif; ?>
 
             <?php if ($hasFeature('pos', 'holds')): ?>
             <a class="pos-side-link <?php echo $activeClass('holds'); ?>" href="<?php echo htmlspecialchars($posUrl('holds')); ?>">
-                <i class="fas fa-clock-rotate-left"></i><span><?php echo __('on_hold'); ?></span>
+                <i class="fas fa-clock-rotate-left"></i><span><?php echo $navLabel('holds'); ?></span>
             </a>
             <?php endif; ?>
 
-            <?php if ($hasFeature('pos', 'orders')): ?>
-            <a class="pos-side-link <?php echo $activeClass('orders'); ?>" href="<?php echo htmlspecialchars($posUrl('orders')); ?>">
-                <i class="fas fa-list-ul"></i><span><?php echo __('orders'); ?></span>
-            </a>
-            <?php endif; ?>
-            
             <?php 
-            $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings') || $hasFeature('pos', 'digital_menu');
+            $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings');
             if ($canManage): 
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
                 <?php if ($hasFeature('pos', 'inventory')): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
-                    <i class="fas fa-boxes-stacked"></i><span><?php echo __('inventory'); ?></span>
+                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
                 </a>
                 <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'customers')): ?>
                 <a class="pos-side-link <?php echo $activeClass('customers'); ?>" href="<?php echo htmlspecialchars($posUrl('customers')); ?>">
-                    <i class="fas fa-user-group"></i><span><?php echo __('customers'); ?></span>
+                    <i class="fas fa-user-group"></i><span><?php echo $navLabel('customers'); ?></span>
                 </a>
                 <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'reports')): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
-                    <i class="fas fa-chart-line"></i><span><?php echo __('analytics'); ?></span>
+                    <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'digital_menu') || $hasFeature('pos', 'settings')): ?>
-                    <?php if ($hasFeature('pos', 'digital_menu')): ?>
-                    <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
-                        <i class="fas fa-qrcode"></i><span><?php echo __('digital_menu'); ?></span>
-                    </a>
-                    <?php endif; ?>
-                    
-                    <?php if ($hasFeature('pos', 'settings')): ?>
-                    <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
-                        <i class="fas fa-gear"></i><span><?php echo __('settings'); ?></span>
-                    </a>
-                    <?php endif; ?>
+                <?php if ($hasFeature('pos', 'settings')): ?>
+                <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
+                    <i class="fas fa-gear"></i><span><?php echo $navLabel('settings'); ?></span>
+                </a>
                 <?php endif; ?>
             <?php endif; ?>
         </nav>
@@ -186,7 +186,7 @@ $activeClass = function (string $key) use ($activeNav): string {
                 <div class="pos-status-indicator">
                     <div class="pos-status-dot"></div>
                     <span class="pos-status-text">
-                        <?php echo htmlspecialchars($pageTitle ?? ($activeNav === 'pos' ? __('terminal') : ($activeNav ? __($activeNav) : __('dashboard')))); ?>
+                        <?php echo htmlspecialchars($pageTitle ?? ($activeNav ? $navLabel($activeNav) : $navLabel('dashboard'))); ?>
                     </span>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../../core/helpers/url.php';
 // modules/pos/views/settings/index.php
-$pageTitle = 'POS Settings';
+$pageTitle = __('settings');
 $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -9,7 +9,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Settings - <?php echo htmlspecialchars(Tenant::getCurrent()['name']); ?></title>
+    <title><?php echo __('settings'); ?> - <?php echo htmlspecialchars(Tenant::getCurrent()['name']); ?></title>
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -31,7 +31,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         .pos-form-control:focus { 
             border-color: var(--pos-primary); 
             background: rgba(8, 10, 16, 0.6);
-            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
+            box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15);
         }
         
         .pos-tabs {
@@ -60,9 +60,9 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         
         .pos-tab-link:hover { color: var(--pos-text); }
         .pos-tab-link.active { 
-            background: rgba(6, 182, 212, 0.15); 
+            background: rgba(var(--pos-primary-rgb), 0.15); 
             color: var(--pos-primary); 
-            border: 1px solid rgba(6, 182, 212, 0.25);
+            border: 1px solid rgba(var(--pos-primary-rgb), 0.25);
             box-shadow: var(--pos-shadow-sm);
         }
         
@@ -118,7 +118,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
     
     <div class="pos-row" style="margin-bottom: 32px; align-items: flex-end;">
         <div class="pos-title">
-            <h1>Intelligence Settings</h1>
+            <h1><?php echo __('settings'); ?></h1>
             <p>Configure ecosystem preferences and security policy</p>
         </div>
     </div>

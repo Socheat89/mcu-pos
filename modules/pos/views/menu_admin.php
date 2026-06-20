@@ -52,9 +52,9 @@ $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : '
             border: 1px solid var(--pos-border);
         }
         .copy-input {
-            background: rgba(8, 10, 16, 0.4);
+            background: #ffffff;
             border: 1.5px solid var(--pos-border);
-            border-radius: 12px;
+            border-radius: var(--pos-radius);
             padding: 12px 16px;
             width: 100%;
             font-family: 'Outfit', sans-serif;
@@ -66,8 +66,8 @@ $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : '
         }
         .copy-input:focus {
             border-color: var(--pos-primary);
-            background: rgba(8, 10, 16, 0.6);
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(var(--pos-primary-rgb), 0.2);
         }
     </style>
 </head>

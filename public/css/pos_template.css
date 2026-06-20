@@ -1708,3 +1708,395 @@ textarea:focus {
         white-space: nowrap;
     }
 }
+
+/* ============================================================================
+   POS Clean UI - Odoo POS Style
+   Simple, calm, easy-to-scan light interface for business operations.
+   ============================================================================ */
+
+:root {
+    --pos-primary: #714B67;
+    --pos-primary-rgb: 113, 75, 103;
+    --pos-primary-light: rgba(113, 75, 103, 0.08);
+    --pos-secondary: #00A09D;
+    --pos-accent: #00A09D;
+    --pos-success: #2c8a3c;
+    --pos-warning: #ec9a29;
+    --pos-danger: #e05038;
+    --pos-bg: #f3f4f6;
+    --pos-card: #ffffff;
+    --pos-card-solid: #ffffff;
+    --pos-elevated: #ffffff;
+    --pos-text: #1f2937;
+    --pos-text-muted: #4b5563;
+    --pos-text-dim: #9ca3af;
+    --pos-border: #dee2e6;
+    --pos-border-light: #e5e7eb;
+    --pos-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --pos-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --pos-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --pos-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    --pos-shadow-glow: none;
+    --pos-gradient-primary: linear-gradient(135deg, #714B67 0%, #00A09D 100%);
+    --pos-gradient-dark: linear-gradient(135deg, #714B67 0%, #5a3c52 100%);
+    --pos-gradient-surface: #ffffff;
+    --pos-gradient-sidebar: #ffffff;
+    --pos-sidebar-glow: none;
+    --pos-radius: 6px;
+    --pos-radius-lg: 8px;
+    --pos-radius-xl: 12px;
+}
+
+body.pos-app {
+    background: var(--pos-bg) !important;
+    color: var(--pos-text);
+}
+
+.pos-main {
+    background: var(--pos-bg) !important;
+}
+
+.pos-sidebar {
+    background: #ffffff !important;
+    background-image: none !important;
+    border-right: 1px solid var(--pos-border);
+    box-shadow: none;
+    color: var(--pos-text);
+}
+
+.pos-brand,
+.pos-sidebar__summary,
+.pos-topbar,
+.pos-status-indicator,
+.pos-clock-widget,
+.pos-user-profile,
+.pos-lang-btn {
+    background: #ffffff !important;
+    border-color: var(--pos-border) !important;
+    box-shadow: var(--pos-shadow-sm) !important;
+}
+
+.pos-brand:hover,
+.pos-user-profile:hover,
+.pos-sidebar-toggle:hover {
+    transform: none;
+    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+}
+
+.pos-brand__logo,
+.pos-avatar {
+    background: var(--pos-gradient-primary);
+    box-shadow: none;
+}
+
+.pos-brand__title,
+.pos-sidebar__summary-title,
+.pos-sidebar__summary-card .v {
+    color: var(--pos-text);
+}
+
+.pos-brand__sub,
+.pos-sidebar__summary-card .k {
+    color: var(--pos-text-muted);
+}
+
+.pos-sidebar__summary {
+    background: #f8fafc !important;
+}
+
+.pos-sidebar__summary-card {
+    background: #ffffff;
+    border-color: var(--pos-border);
+}
+
+.pos-side-link {
+    color: #475569;
+    border-radius: 6px;
+}
+
+.pos-side-link:hover {
+    color: var(--pos-primary);
+    background: var(--pos-primary-light);
+    transform: none;
+}
+
+.pos-side-link.active {
+    color: #ffffff;
+    background: var(--pos-primary);
+    border-color: var(--pos-primary);
+    box-shadow: none;
+}
+
+.pos-side-link.active::before,
+.pos-brand::after {
+    display: none;
+}
+
+.pos-nav-header {
+    color: #94a3b8;
+}
+
+.pos-sidebar__footer {
+    border-top-color: var(--pos-border);
+}
+
+.pos-sidebar__footer .pos-side-link {
+    background: #fef2f2;
+    color: var(--pos-danger);
+    border-color: #fee2e2;
+}
+
+.pos-topbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid var(--pos-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.pos-status-text,
+.pos-clock-time,
+.pos-user-name,
+.pos-lang-btn {
+    color: var(--pos-text) !important;
+}
+
+.pos-clock-date,
+.pos-user-role {
+    color: var(--pos-text-muted);
+}
+
+.pos-sidebar-toggle {
+    background: #ffffff;
+    color: var(--pos-text);
+    border-color: var(--pos-border);
+}
+
+.pos-page {
+    max-width: 1560px;
+}
+
+.pos-card,
+.pos-stat,
+.pos-table-container,
+.report-card,
+.form-card,
+.detail-card,
+.hold-card,
+.user-card,
+.subscription-plan,
+.notification-card,
+.leaderboard-item {
+    background: #ffffff !important;
+    border: 1px solid var(--pos-border) !important;
+    border-radius: var(--pos-radius-lg) !important;
+    box-shadow: var(--pos-shadow-sm) !important;
+    backdrop-filter: none !important;
+}
+
+.pos-card:hover,
+.pos-stat:hover,
+.report-card:hover,
+.form-card:hover,
+.detail-card:hover,
+.hold-card:hover,
+.user-card:hover,
+.subscription-plan:hover,
+.notification-card:hover,
+.leaderboard-item:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: var(--pos-shadow-md) !important;
+    transform: none !important;
+}
+
+.pos-card-header,
+.pos-modal__header,
+.pos-modal__actions {
+    border-color: var(--pos-border);
+}
+
+.pos-card-title,
+.pos-title h1,
+.pos-modal__title h3,
+.plan-name,
+.pos-table td {
+    color: var(--pos-text);
+}
+
+.pos-title p,
+.pos-card-sub,
+.subscription-helper,
+.plan-meta,
+.pos-form-text,
+.pos-small {
+    color: var(--pos-text-muted) !important;
+}
+
+.pos-stat::before {
+    display: none;
+}
+
+.pos-stat {
+    min-height: 104px;
+}
+
+.pos-stat .k,
+.pos-table th,
+.pos-form-label {
+    color: var(--pos-text-muted);
+    letter-spacing: 0.04em;
+}
+
+.pos-stat .v {
+    color: var(--pos-text);
+}
+
+.pos-stat .chip,
+.pos-icon-btn,
+.pos-modal__icon,
+.avatar-circle,
+.product-img {
+    background: #f1f5f9 !important;
+    border-color: var(--pos-border) !important;
+    box-shadow: none !important;
+}
+
+.pos-table th {
+    background: #f8fafc;
+}
+
+.pos-table td {
+    border-bottom-color: var(--pos-border);
+}
+
+.pos-table tr:hover td {
+    background: #f8fafc;
+}
+
+.btn {
+    border-radius: 6px;
+    box-shadow: none !important;
+}
+
+.btn-primary {
+    background: var(--pos-primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: #5b3c53;
+    transform: none;
+}
+
+.btn-outline {
+    background: #ffffff;
+    color: var(--pos-text);
+    border-color: var(--pos-border);
+}
+
+.btn-outline:hover,
+.pos-icon-btn:hover {
+    background: var(--pos-primary-light) !important;
+    color: var(--pos-primary);
+    border-color: #d8c2d4 !important;
+    transform: none;
+}
+
+.pos-form-control,
+.search-container input,
+.user-card input,
+select,
+textarea {
+    background-color: #ffffff !important;
+    border-color: var(--pos-border) !important;
+    color: var(--pos-text) !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+}
+
+.pos-form-control:focus,
+.search-container input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--pos-primary) !important;
+    box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.12) !important;
+}
+
+.badge-primary {
+    background: #f7f4f7;
+    color: var(--pos-primary);
+    border-color: #ebdbe8;
+}
+
+.badge-success {
+    background: #ecfdf5;
+    color: var(--pos-success);
+    border-color: #bbf7d0;
+}
+
+.badge-warning {
+    background: #fffbeb;
+    color: var(--pos-warning);
+    border-color: #fde68a;
+}
+
+.badge-danger {
+    background: #fef2f2;
+    color: var(--pos-danger);
+    border-color: #fecaca;
+}
+
+.dashboard-hero {
+    min-height: 230px;
+    background: linear-gradient(135deg, #714B67 0%, #5a3c52 100%) !important;
+    border: 0 !important;
+    box-shadow: var(--pos-shadow-md) !important;
+}
+
+.dashboard-hero::before,
+.dashboard-hero::after {
+    display: none;
+}
+
+.dashboard-hero h1,
+.dashboard-hero p {
+    color: #ffffff !important;
+}
+
+.dashboard-hero p {
+    opacity: 0.88;
+}
+
+.dashboard-hero .btn-outline {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.32) !important;
+}
+
+.pos-modal,
+.pos-toast,
+.pos-lang-dropdown-inner {
+    background: #ffffff;
+    border-color: var(--pos-border);
+    box-shadow: var(--pos-shadow-lg);
+}
+
+.pos-modal-overlay {
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.plan-stats .stat,
+.subscription-empty,
+.preview-pane,
+.pos-empty {
+    background: #f8fafc !important;
+    border-color: var(--pos-border) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

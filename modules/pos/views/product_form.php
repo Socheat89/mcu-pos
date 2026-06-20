@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('product_management'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+    <title><?php echo __('inventory'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
      <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,11 +14,11 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
-        .form-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: 24px; padding: 40px; border: 1.5px solid var(--pos-border); max-width: 900px; margin: 0 auto; }
-        .upload-zone { border: 2.5px dashed var(--pos-border); border-radius: 20px; padding: 48px; text-align: center; background: rgba(8, 10, 16, 0.4); transition: all 0.3s; cursor: pointer; position: relative; }
-        .upload-zone:hover { border-color: var(--pos-primary); background: rgba(6, 182, 212, 0.04); }
-        .upload-zone.dragover { border-color: var(--pos-primary); background: rgba(6, 182, 212, 0.1); }
-        .preview-img { max-width: 100%; max-height: 280px; border-radius: 16px; margin-top: 20px; box-shadow: var(--pos-shadow-lg); border: 4px solid var(--pos-border); }
+        .form-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: var(--pos-radius-xl); padding: 40px; border: 1.5px solid var(--pos-border); max-width: 900px; margin: 0 auto; }
+        .upload-zone { border: 2.5px dashed var(--pos-border); border-radius: var(--pos-radius-lg); padding: 48px; text-align: center; background: #ffffff; transition: all 0.3s; cursor: pointer; position: relative; }
+        .upload-zone:hover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
+        .upload-zone.dragover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
+        .preview-img { max-width: 100%; max-height: 280px; border-radius: var(--pos-radius-lg); margin-top: 20px; box-shadow: var(--pos-shadow-lg); border: 4px solid var(--pos-border); }
     </style>
 </head>
 <body class="pos-app">
@@ -26,7 +26,7 @@
 
     <div class="fade-in">
         <div style="text-align: center; margin-bottom: 40px;">
-            <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: rgba(6, 182, 212, 0.1); padding: 8px 16px; border-radius: 12px; color: var(--pos-primary); border: 1px solid rgba(6, 182, 212, 0.2); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: var(--pos-primary-light); padding: 8px 16px; border-radius: var(--pos-radius); color: var(--pos-primary); border: 1px solid rgba(var(--pos-primary-rgb), 0.2); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
                 <i class="fas fa-box-open"></i> <?php echo __('inventory_control'); ?>
             </div>
             <h1 style="font-size: 36px; font-weight: 900; color: var(--pos-text); margin: 0;"><?php echo isset($product) ? __('record_refinement') : __('new_product_entry'); ?></h1>

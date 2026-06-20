@@ -379,7 +379,7 @@ export default function App() {
   const [orderStatus, setOrderStatus] = useState('completed');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [darkMode, setDarkMode] = useState(true); // Dark-first
+  const [darkMode, setDarkMode] = useState(false); // Light-first
 
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cash');
