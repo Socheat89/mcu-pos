@@ -24,13 +24,13 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             font-size: 15px; 
             font-weight: 600;
             color: var(--pos-text);
-            background: rgba(8, 10, 16, 0.4);
+            background: #ffffff;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
         }
         .pos-form-control:focus { 
             border-color: var(--pos-primary); 
-            background: rgba(8, 10, 16, 0.6);
+            background: #ffffff;
             box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15);
         }
         
@@ -39,7 +39,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             gap: 8px;
             margin-bottom: 32px;
             padding: 6px;
-            background: rgba(8, 10, 16, 0.5);
+            background: #eaecef;
             border-radius: 18px;
             width: fit-content;
             border: 1px solid var(--pos-border);
@@ -96,20 +96,21 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         /* Toggle Switch Premium */
         .pos-toggle { position: relative; display: inline-block; width: 48px; height: 26px; }
         .pos-toggle input { opacity: 0; width: 0; height: 0; }
-        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.08); transition: .3s; border-radius: 34px; border: 1px solid var(--pos-border); }
+        .pos-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .3s; border-radius: 34px; border: 1px solid var(--pos-border); }
         .pos-toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         input:checked + .pos-toggle-slider { background-color: var(--pos-primary); border-color: var(--pos-primary); }
         input:checked + .pos-toggle-slider:before { transform: translateX(22px); }
         
         .preview-pane { 
-            background: #1e293b; 
+            background: #f3f4f6; 
             padding: 40px; 
             border-radius: 24px; 
             display: flex; 
             justify-content: center; 
             align-items: flex-start; 
             min-height: 600px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            border: 1.5px solid var(--pos-border);
+            box-shadow: none;
         }
     </style>
 </head>
@@ -440,7 +441,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                         <p class="pos-card-title">KHQR Configuration</p>
                         <p class="pos-card-sub" style="margin-bottom: 20px;">Upload your static KHQR image for customers to scan.</p>
                         
-                        <div style="text-align: center; background: rgba(8, 10, 16, 0.4); padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
+                        <div style="text-align: center; background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
                             <img src="<?php echo htmlspecialchars($settings['pos_method_khqr_image']); ?>" style="width: 200px; height: 200px; object-fit: contain; background: white; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: block; margin: 0 auto; box-shadow: var(--pos-shadow-sm);">
                             <div style="margin-top: 15px;">
                                 <input type="file" name="khqr_upload" class="pos-form-control" accept="image/*" style="max-width: 250px; font-size: 12px; padding: 8px;">

@@ -374,9 +374,17 @@ export default function App() {
   const [pendingOrders] = useState(initialPendingOrders);
   const [resumeOrder] = useState(initialResumeOrder);
 
-  const [cart, setCart] = useState([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState('');
-  const [orderStatus, setOrderStatus] = useState('completed');
+  // Multi-Order states mimicking Odoo POS tabs
+  const [orders, setOrders] = useState([
+    { id: Date.now(), name: 'Order 1', cart: [], selectedCustomerId: '', orderStatus: 'completed' }
+  ]);
+  const [activeOrderId, setActiveOrderId] = useState(orders[0].id);
+
+  // Keypad / Numpad state for Odoo POS controls
+  const [keypadMode, setKeypadMode] = useState('quantity'); // 'quantity' | 'discount' | 'price'
+  const [activeProductId, setActiveProductId] = useState(null);
+  const [keypadValue, setKeypadValue] = useState('');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [darkMode, setDarkMode] = useState(false); // Light-first
@@ -392,6 +400,48 @@ export default function App() {
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
+
+  // Dynamic references to active order details
+  const activeOrder = orders.find(o => o.id === activeOrderId) || orders[0];
+  const cart = activeOrder.cart;
+  const selectedCustomerId = activeOrder.selectedCustomerId;
+  const orderStatus = activeOrder.orderStatus;
+
+  const updateActiveOrder = (updater) => {
+    setOrders(prev => prev.map(o => o.id === activeOrderId ? { ...o, ...updater(o) } : o));
+  };
+
+  const setSelectedCustomerId = (val) => updateActiveOrder(() => ({ selectedCustomerId: val }));
+  const setOrderStatus = (val) => updateActiveOrder(() => ({ orderStatus: val }));
+
+  const addNewOrder = () => {
+    const nextNum = orders.length + 1;
+    const newOrd = {
+      id: Date.now(),
+      name: `Order ${nextNum}`,
+      cart: [],
+      selectedCustomerId: '',
+      orderStatus: 'completed'
+    };
+    setOrders([...orders, newOrd]);
+    setActiveOrderId(newOrd.id);
+  };
+
+  const removeOrder = (id, e) => {
+    e.stopPropagation();
+    if (orders.length === 1) {
+      updateActiveOrder(() => ({ cart: [], selectedCustomerId: '', orderStatus: 'completed' }));
+      setActiveProductId(null);
+      return;
+    }
+    const index = orders.findIndex(o => o.id === id);
+    const nextOrders = orders.filter(o => o.id !== id);
+    setOrders(nextOrders);
+    if (activeOrderId === id) {
+      const nextActive = nextOrders[Math.max(0, index - 1)];
+      setActiveOrderId(nextActive.id);
+    }
+  };
 
   // Translation State & Dropdown Handlers
   const [currentLang, setCurrentLang] = useState(window.CURRENT_LANG || 'km');
@@ -446,12 +496,22 @@ export default function App() {
       resumeOrder.items.forEach(item => {
         const prod = products.find(p => p.id === item.product_id);
         if (prod) {
-          restoredCart.push({ product: prod, quantity: item.quantity });
+          restoredCart.push({ product: prod, quantity: item.quantity, discount: 0, customPrice: undefined });
         }
       });
-      setCart(restoredCart);
-      if (resumeOrder.customer_id) {
-        setSelectedCustomerId(resumeOrder.customer_id.toString());
+      setOrders([
+        {
+          id: resumeOrder.id,
+          name: `Resumed #${resumeOrder.id}`,
+          cart: restoredCart,
+          selectedCustomerId: resumeOrder.customer_id ? resumeOrder.customer_id.toString() : '',
+          orderStatus: 'completed'
+        }
+      ]);
+      setActiveOrderId(resumeOrder.id);
+      if (restoredCart.length > 0) {
+        setActiveProductId(restoredCart[0].product.id);
+        setKeypadValue(String(restoredCart[0].quantity));
       }
       showToast('info', t('toast_recovered', 'បានស្ដារ Order'), t('toast_recovered_msg', 'កំពុងបន្ត order #:id').replace(':id', resumeOrder.id));
     }
@@ -470,16 +530,30 @@ export default function App() {
       return;
     }
     const existing = cart.find(item => item.product.id === product.id);
+    let newCart;
     if (existing) {
       if (existing.quantity >= product.stock) {
         showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', product.stock));
         return;
       }
-      setCart(cart.map(item =>
+      newCart = cart.map(item =>
         item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      ));
+      );
     } else {
-      setCart([...cart, { product, quantity: 1 }]);
+      newCart = [...cart, { product, quantity: 1, discount: 0, customPrice: undefined }];
+    }
+    
+    updateActiveOrder(() => ({ cart: newCart }));
+    
+    // Auto-select/focus added product
+    setActiveProductId(product.id);
+    const addedItem = newCart.find(item => item.product.id === product.id);
+    if (keypadMode === 'quantity') {
+      setKeypadValue(String(addedItem.quantity));
+    } else if (keypadMode === 'discount') {
+      setKeypadValue(String(addedItem.discount || 0));
+    } else if (keypadMode === 'price') {
+      setKeypadValue(String(addedItem.customPrice !== undefined ? addedItem.customPrice : addedItem.product.price));
     }
   };
 
@@ -487,23 +561,32 @@ export default function App() {
     const existing = cart.find(item => item.product.id === productId);
     if (!existing) return;
     const nextQty = existing.quantity + delta;
+    let newCart;
     if (nextQty <= 0) {
-      setCart(cart.filter(item => item.product.id !== productId));
+      newCart = cart.filter(item => item.product.id !== productId);
+      if (activeProductId === productId) {
+        setActiveProductId(null);
+      }
     } else {
       if (nextQty > existing.product.stock) {
         showToast('warning', t('toast_limit_stock', 'ដល់កម្រិតស្តុក'), t('toast_limit_stock_msg', 'មានតែ :qty ​គ្រាប់នៅសល់។').replace(':qty', existing.product.stock));
         return;
       }
-      setCart(cart.map(item =>
+      newCart = cart.map(item =>
         item.product.id === productId ? { ...item, quantity: nextQty } : item
-      ));
+      );
+      if (activeProductId === productId && keypadMode === 'quantity') {
+        setKeypadValue(String(nextQty));
+      }
     }
+    updateActiveOrder(() => ({ cart: newCart }));
   };
 
   const clearCart = () => {
     if (cart.length === 0) return;
     if (window.confirm(t('clear_cart_confirm', 'លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?'))) {
-      setCart([]);
+      updateActiveOrder(() => ({ cart: [] }));
+      setActiveProductId(null);
       showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
     }
   };
@@ -523,8 +606,104 @@ export default function App() {
     }
   };
 
+  // ─── Keypad Actions ───────────────────────────────────────
+  const changeKeypadMode = (mode) => {
+    setKeypadMode(mode);
+    if (activeProductId) {
+      const activeItem = cart.find(item => item.product.id === activeProductId);
+      if (activeItem) {
+        if (mode === 'quantity') {
+          setKeypadValue(String(activeItem.quantity));
+        } else if (mode === 'discount') {
+          setKeypadValue(String(activeItem.discount || 0));
+        } else if (mode === 'price') {
+          setKeypadValue(String(activeItem.customPrice !== undefined ? activeItem.customPrice : activeItem.product.price));
+        }
+      }
+    }
+  };
+
+  const handleSelectCartItem = (productId) => {
+    setActiveProductId(productId);
+    const activeItem = cart.find(item => item.product.id === productId);
+    if (activeItem) {
+      if (keypadMode === 'quantity') {
+        setKeypadValue(String(activeItem.quantity));
+      } else if (keypadMode === 'discount') {
+        setKeypadValue(String(activeItem.discount || 0));
+      } else if (keypadMode === 'price') {
+        setKeypadValue(String(activeItem.customPrice !== undefined ? activeItem.customPrice : activeItem.product.price));
+      }
+    }
+  };
+
+  const handleKeypadPress = (val) => {
+    if (!activeProductId) return;
+    
+    let currentValStr = keypadValue;
+    if (val === 'backspace') {
+      currentValStr = currentValStr.slice(0, -1);
+      if (currentValStr === '') currentValStr = '0';
+    } else if (val === '+/-') {
+      if (currentValStr.startsWith('-')) {
+        currentValStr = currentValStr.substring(1);
+      } else if (currentValStr !== '0' && currentValStr !== '') {
+        currentValStr = '-' + currentValStr;
+      }
+    } else if (val === '.') {
+      if (!currentValStr.includes('.')) {
+        currentValStr = (currentValStr || '0') + '.';
+      }
+    } else {
+      if (currentValStr === '0' || currentValStr === '') {
+        currentValStr = val;
+      } else {
+        currentValStr += val;
+      }
+    }
+    
+    setKeypadValue(currentValStr);
+    const numVal = parseFloat(currentValStr) || 0;
+    
+    updateActiveOrder(order => {
+      const updatedCart = order.cart.map(item => {
+        if (item.product.id === activeProductId) {
+          if (keypadMode === 'quantity') {
+            if (numVal > item.product.stock) {
+              showToast('warning', t('toast_limit_stock'), t('toast_limit_stock_msg').replace(':qty', item.product.stock));
+              return item;
+            }
+            return { ...item, quantity: numVal };
+          } else if (keypadMode === 'discount') {
+            return { ...item, discount: Math.min(100, Math.max(0, numVal)) };
+          } else if (keypadMode === 'price') {
+            return { ...item, customPrice: Math.max(0, numVal) };
+          }
+        }
+        return item;
+      }).filter(item => item.quantity > 0 || (item.product.id === activeProductId && keypadMode !== 'quantity'));
+      
+      const hasActiveItem = updatedCart.some(item => item.product.id === activeProductId);
+      if (!hasActiveItem && keypadMode === 'quantity') {
+        setActiveProductId(null);
+      }
+      
+      return { cart: updatedCart };
+    });
+  };
+
   // ─── Helpers ──────────────────────────────────────────────
-  const getSubtotal = () => cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const getItemUnitPrice = (item) => {
+    const base = item.customPrice !== undefined ? item.customPrice : item.product.price;
+    const disc = item.discount || 0;
+    return base * (1 - disc / 100);
+  };
+
+  const getItemTotal = (item) => {
+    return getItemUnitPrice(item) * item.quantity;
+  };
+
+  const getSubtotal = () => cart.reduce((sum, item) => sum + getItemTotal(item), 0);
   const getGrandTotal = () => getSubtotal();
   const getCategories = () => ['All', ...new Set(products.map(p => p.category))];
 
@@ -657,6 +836,7 @@ export default function App() {
           <React.Fragment key={item.product.id}>
             <input type="hidden" name={`items[${index}][product_id]`} value={item.product.id} />
             <input type="hidden" name={`items[${index}][quantity]`} value={item.quantity} />
+            <input type="hidden" name={`items[${index}][unit_price]`} value={getItemUnitPrice(item)} />
           </React.Fragment>
         ))}
       </form>
@@ -681,17 +861,16 @@ export default function App() {
 
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
-        <div className="accent-line" />
-        <div className="glass px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3 shadow-md">
+        <div className="glass px-4 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200">
           {/* Left: Branding */}
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-glow-cyan transition-transform hover:rotate-12 duration-300">
-              <Layers className="h-5 w-5 text-white" />
+            <div className="h-9 w-9 flex-shrink-0 rounded-md bg-brand-cyan flex items-center justify-center">
+              <Layers className="h-4 w-4 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="max-w-[180px] truncate text-[9px] font-black uppercase tracking-[0.25em] text-brand-muted sm:max-w-none">{settings.store_label}</div>
+              <div className="max-w-[180px] truncate text-[8px] font-bold uppercase tracking-wider text-brand-muted sm:max-w-none">{settings.store_label}</div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black tracking-tight text-gradient leading-tight">Mekong POS</h1>
+                <h1 className="text-xs font-black tracking-tight text-brand-cyan">Mekong POS</h1>
                 <span className="hidden xs:inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold bg-brand-success/15 text-brand-success border border-brand-success/20">
                   <span className="h-1 w-1 rounded-full bg-brand-success animate-ping"></span>
                   Terminal Live
@@ -720,7 +899,7 @@ export default function App() {
               onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all duration-300 ${
                 analyticsViewOpen
-                  ? 'bg-gradient-to-r from-brand-cyan to-brand-violet text-white shadow-glow-cyan'
+                  ? 'bg-brand-cyan text-white shadow-sm'
                   : `${darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'}`
               }`}
             >
@@ -1029,7 +1208,7 @@ export default function App() {
                             {/* In-cart quantity overlay */}
                             {inCartItem && (
                               <div className="product-overlay" style={{ opacity: 1 }}>
-                                <span className="bg-gradient-to-r from-brand-cyan to-brand-violet text-white rounded-full px-3 py-1 text-xs font-black shadow-lg shadow-glow-cyan">
+                                <span className="bg-brand-cyan text-white rounded-full px-3 py-1 text-xs font-black shadow-sm">
                                   ×{inCartItem.quantity}
                                 </span>
                               </div>
@@ -1037,9 +1216,9 @@ export default function App() {
 
                             {/* Hover overlay */}
                             {!inCartItem && !isOutOfStock && (
-                              <div className="product-overlay bg-black/10 dark:bg-black/30 backdrop-blur-[2px]">
-                                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                  <Plus className="h-5 w-5 text-white" />
+                              <div className="product-overlay bg-black/5 dark:bg-black/20">
+                                <div className="h-8 w-8 rounded-full bg-brand-cyan flex items-center justify-center shadow-sm transform scale-90 group-hover:scale-100 transition-transform duration-200">
+                                  <Plus className="h-4.5 w-4.5 text-white" />
                                 </div>
                               </div>
                             )}
@@ -1067,26 +1246,67 @@ export default function App() {
             <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
+              {/* Odoo POS Order Tabs */}
+              <div className="flex-shrink-0 px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                {orders.map(order => {
+                  const isActive = order.id === activeOrderId;
+                  return (
+                    <div
+                      key={order.id}
+                      onClick={() => {
+                        setActiveOrderId(order.id);
+                        if (order.cart.length > 0) {
+                          setActiveProductId(order.cart[0].product.id);
+                          setKeypadValue(String(order.cart[0].quantity));
+                        } else {
+                          setActiveProductId(null);
+                          setKeypadValue('');
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold cursor-pointer transition-all border ${
+                        isActive
+                          ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
+                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{order.name}</span>
+                      <button
+                        onClick={(e) => removeOrder(order.id, e)}
+                        className={`h-3.5 w-3.5 rounded flex items-center justify-center text-[9px] hover:bg-black/10 hover:text-black font-black ${
+                          isActive ? 'text-white/80 hover:text-white' : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+                <button
+                  onClick={addNewOrder}
+                  className="px-2.5 py-1.5 rounded bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 flex items-center justify-center transition-all cursor-pointer shadow-sm text-[11px] font-bold"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
               {/* Cart Header */}
-              <div className={`flex-shrink-0 px-5 py-3.5 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
+              <div className={`flex-shrink-0 px-5 py-3 flex items-center justify-between border-b ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
                 <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center">
+                  <div className="h-6 w-6 rounded bg-brand-cyan flex items-center justify-center">
                     <Receipt className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <h3 className="text-sm font-extrabold tracking-tight">{t('cart', 'កន្ត្រក')}</h3>
+                  <h3 className="text-xs font-bold tracking-tight text-slate-800">{t('cart', 'កន្ត្រក')}</h3>
                 </div>
-                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                  darkMode ? 'bg-brand-bgDark text-brand-cyan' : 'bg-gray-100 text-brand-cyan'
-                }`}>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-brand-cyan">
                   {cartItemCount} {t('items', 'items')}
                 </span>
               </div>
 
               {/* Cart Items */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-2">
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-1 bg-white">
                 {cart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center">
-                    <ShoppingBag className={`h-10 w-10 mb-3 ${darkMode ? 'text-slate-700' : 'text-gray-200'}`} />
+                  <div className="h-full flex flex-col items-center justify-center text-center py-10">
+                    <ShoppingBag className="h-8 w-8 mb-2 text-gray-300" />
                     <p className="text-xs font-bold text-brand-muted">{t('cart_empty', 'កន្ត្រកទទេ')}</p>
                     <p className="text-[10px] text-brand-muted/60 mt-0.5">{t('select_products', 'ជ្រើសរើសទំនិញដើម្បីចាប់ផ្តើម')}</p>
                   </div>
@@ -1094,44 +1314,36 @@ export default function App() {
                   cart.map(item => (
                     <div
                       key={item.product.id}
-                      className={`cart-item flex items-center gap-3 p-2.5 rounded-lg transition ${
-                        darkMode ? 'bg-brand-bgDark/40 border border-white/5' : 'bg-gray-50 border border-gray-100'
+                      onClick={() => handleSelectCartItem(item.product.id)}
+                      className={`cart-item flex flex-col gap-1 p-2 rounded cursor-pointer transition-all border ${
+                        item.product.id === activeProductId
+                          ? 'bg-brand-cyan/5 border-brand-cyan ring-1 ring-brand-cyan shadow-sm'
+                          : 'border-transparent hover:bg-gray-50/50'
                       }`}
                     >
-                      {/* Thumb */}
-                      <div className={`h-9 w-9 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center ${
-                        darkMode ? 'bg-brand-bgDark' : 'bg-gray-100'
-                      }`}>
-                        {item.product.image ? (
-                          <img src={item.product.image} className="h-full w-full object-cover" alt="" />
-                        ) : (
-                          <Package className="h-4 w-4 text-brand-muted/40" />
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-bold text-[11px] truncate text-slate-800">{item.product.name}</div>
+                        <div className="font-black text-[11px] text-brand-cyan">${getItemTotal(item).toFixed(2)}</div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-0.5 text-[9px] text-brand-muted font-semibold pl-2 border-l border-brand-cyan/30">
+                        <div>
+                          {item.quantity} {item.quantity === 1 ? 'Unit' : 'Units'} at{' '}
+                          {item.customPrice !== undefined ? (
+                            <span>
+                              <span className="line-through text-gray-400 mr-1">${item.product.price.toFixed(2)}</span>
+                              <span className="text-brand-cyan font-bold">${item.customPrice.toFixed(2)}</span>
+                            </span>
+                          ) : (
+                            `$${item.product.price.toFixed(2)}`
+                          )}{' '}
+                          / Unit
+                        </div>
+                        {item.discount > 0 && (
+                          <div className="text-brand-danger font-bold">
+                            With a {item.discount}% discount
+                          </div>
                         )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold truncate">{item.product.name}</div>
-                        <div className="text-[11px] font-extrabold text-brand-cyan mt-0.5">${(item.product.price * item.quantity).toFixed(2)}</div>
-                      </div>
-
-                      {/* Qty controls */}
-                      <div className={`flex items-center gap-0.5 rounded-full p-0.5 border ${
-                        darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
-                      }`}>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, -1); }}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-danger/20 hover:text-brand-danger transition text-brand-muted text-xs"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-5 text-center text-[11px] font-bold">{item.quantity}</span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(item.product.id, 1); }}
-                          className="h-6 w-6 rounded-full flex items-center justify-center hover:bg-brand-success/20 hover:text-brand-success transition text-brand-muted text-xs"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
                       </div>
                     </div>
                   ))
@@ -1139,128 +1351,128 @@ export default function App() {
               </div>
 
               {/* Cart Footer */}
-              <div className={`flex-shrink-0 px-3 pb-3 pt-2 sm:px-4 sm:pb-4 space-y-3 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`}>
-                {/* Customer + Mode selectors */}
-                <div className="space-y-2">
-                  <div className="relative">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('customer', 'អតិថិជន')}</label>
-                    
-                    {selectedCustomerId ? (
-                      // Beautiful active customer card
-                      <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
-                        darkMode ? 'bg-brand-bgDark/60 border-brand-cyan/25' : 'bg-slate-50 border-brand-cyan/20'
-                      }`}>
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center font-bold text-xs shadow-md">
-                            {(() => {
-                              const match = customers.find(c => String(c.id) === String(selectedCustomerId));
-                              if (!match) return 'CU';
-                              return match.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                            })()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-black truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.name}</p>
-                            <p className="text-[9px] text-brand-muted font-bold truncate">{customers.find(c => String(c.id) === String(selectedCustomerId))?.phone || 'No phone'}</p>
-                          </div>
-                        </div>
+              <div className="flex-shrink-0 px-3 pb-3 pt-2 bg-gray-50 border-t border-gray-200 flex flex-col gap-2">
+                {/* Odoo style Customer Select Button */}
+                <div className="relative">
+                  {selectedCustomerId ? (
+                    <button
+                      onClick={() => setSelectedCustomerId('')}
+                      className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-white hover:bg-gray-100 border border-brand-cyan rounded text-[11px] font-bold text-brand-cyan transition-all shadow-sm"
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <UserCircle className="h-4 w-4 text-brand-cyan flex-shrink-0" />
+                        <span className="truncate">{selectedCustomer?.name || 'Walk-in'}</span>
+                      </span>
+                      <X className="h-3.5 w-3.5 hover:text-brand-danger" />
+                    </button>
+                  ) : (
+                    <div className="relative">
+                      <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <select
+                        value={selectedCustomerId}
+                        onChange={(e) => setSelectedCustomerId(e.target.value)}
+                        className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-bold rounded border border-gray-200 bg-white text-gray-600 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
+                      >
+                        <option value="">{t('customer', 'អតិថិជន')} : {t('walk_in', 'Walk-in')}</option>
+                        {customers.map(c => (
+                          <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Keypad Grid & Checkout Action */}
+                <div className="flex gap-2 items-stretch">
+                  {/* Numpad Keypad (left/center) */}
+                  <div className="flex-1 grid grid-cols-4 gap-1 select-none">
+                    {[
+                      { val: '1', label: '1' },
+                      { val: '2', label: '2' },
+                      { val: '3', label: '3' },
+                      { val: 'qty', label: 'Qty', isMode: true, modeName: 'quantity' },
+                      { val: '4', label: '4' },
+                      { val: '5', label: '5' },
+                      { val: '6', label: '6' },
+                      { val: 'disc', label: 'Disc', isMode: true, modeName: 'discount' },
+                      { val: '7', label: '7' },
+                      { val: '8', label: '8' },
+                      { val: '9', label: '9' },
+                      { val: 'price', label: 'Price', isMode: true, modeName: 'price' },
+                      { val: '+/-', label: '+/-' },
+                      { val: '0', label: '0' },
+                      { val: '.', label: '.' },
+                      { val: 'backspace', label: '⌫' }
+                    ].map(btn => {
+                      const isSelectedMode = btn.isMode && keypadMode === btn.modeName;
+                      return (
                         <button
-                          onClick={() => setSelectedCustomerId('')}
-                          className="h-6 w-6 rounded-lg bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger flex items-center justify-center transition-all"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      // Select input
-                      <div className="relative">
-                        <UserCircle className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-muted" />
-                        <select
-                          value={selectedCustomerId}
-                          onChange={(e) => setSelectedCustomerId(e.target.value)}
-                          className={`w-full appearance-none py-2 pl-8 pr-8 text-[11px] font-medium rounded-lg border transition ${
-                            darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200 text-brand-textLight'
+                          key={btn.val}
+                          type="button"
+                          onClick={() => {
+                            if (btn.isMode) {
+                              changeKeypadMode(btn.modeName);
+                            } else {
+                              handleKeypadPress(btn.val);
+                            }
+                          }}
+                          className={`h-9 rounded text-center text-xs font-black transition-all border ${
+                            isSelectedMode
+                              ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
+                              : btn.isMode
+                              ? 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
+                              : btn.val === 'backspace'
+                              ? 'bg-gray-100 border-gray-200 text-brand-danger hover:bg-red-50'
+                              : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-100'
                           }`}
                         >
-                          <option value="">{t('walk_in', 'Walk-in (អតិថិជនទូទៅ)')}</option>
-                          {customers.map(c => (
-                            <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-brand-muted pointer-events-none" />
-                      </div>
-                    )}
+                          {btn.label}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('mode', 'Mode')}</label>
-                      <select
-                        value={orderStatus}
-                        onChange={(e) => setOrderStatus(e.target.value)}
-                        className={`w-full py-2 px-2.5 text-[11px] font-medium rounded-lg border transition ${
-                          darkMode ? 'bg-brand-bgDark border-white/5 text-brand-textDark' : 'bg-gray-50 border-gray-200'
-                        }`}
-                      >
-                        <option value="completed">{t('mode_sell', 'លក់ Sell')}</option>
-                        <option value="pending">{t('mode_hold', 'រង់ចាំ Hold')}</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1">{t('receipt', 'Receipt')}</label>
-                      <div className={`py-2 px-2.5 text-[11px] font-bold rounded-lg text-center ${
-                        darkMode ? 'bg-brand-success/10 text-brand-success border border-brand-success/20' : 'bg-green-50 text-brand-success border border-green-200'
-                      }`}>
-                        {t('auto_print', 'Auto-Print')}
-                      </div>
-                    </div>
+                  {/* Payment checkout Action Button (right) */}
+                  <div className="w-[96px] flex flex-col gap-1">
+                    <button
+                      onClick={clearCart}
+                      title={t('clear_cart', 'Clear Cart')}
+                      className="h-8 border border-brand-danger/20 bg-brand-danger/5 text-brand-danger hover:bg-brand-danger/10 rounded flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    
+                    <button
+                      disabled={cart.length === 0}
+                      onClick={() => {
+                        if (orderStatus === 'pending') {
+                          handleCheckoutSubmit();
+                        } else {
+                          setPaymentModalOpen(true);
+                        }
+                      }}
+                      className="flex-1 bg-brand-success text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed rounded flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
+                    >
+                      <Zap className="h-4 w-4" />
+                      <span className="text-[10px] font-black tracking-wider uppercase">
+                        {orderStatus === 'pending' ? 'Hold' : 'Payment'}
+                      </span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Receipt Totals */}
-                <div className={`p-3 rounded-lg space-y-1.5 ${darkMode ? 'bg-brand-bgDark/50 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
-                  <div className="flex justify-between gap-3 text-[11px] font-medium text-brand-muted">
-                    <span>{t('customer', 'Customer')}</span>
-                    <span className="truncate text-right">{selectedCustomer?.name || t('walk_in', 'Walk-in')}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
+                {/* Receipt Totals summary */}
+                <div className="p-2.5 rounded bg-white border border-gray-200 space-y-1 text-[11px] font-medium text-brand-muted">
+                  <div className="flex justify-between items-center">
                     <span>{t('subtotal', 'Subtotal')}</span>
                     <span>${getSubtotal().toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-[11px] font-medium text-brand-muted">
-                    <span>{t('tax', 'Tax (0%)')}</span>
-                    <span>$0.00</span>
+                  <div className="flex justify-between items-center text-xs font-black text-slate-800 border-t border-gray-100 pt-1.5 mt-1">
+                    <span>{t('total', 'Total')}</span>
+                    <span className="text-sm font-black text-brand-cyan">${getGrandTotal().toFixed(2)}</span>
                   </div>
-                  <div className="receipt-divider my-1.5" />
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-extrabold">{t('total', 'សរុប Total')}</span>
-                    <span className="text-lg font-black text-gradient">${getGrandTotal().toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={clearCart}
-                    title={t('clear_cart', 'Clear Cart')}
-                    className="h-10 w-10 rounded-lg flex items-center justify-center border border-brand-danger/20 bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 transition-all flex-shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    disabled={cart.length === 0}
-                    onClick={() => {
-                      if (orderStatus === 'pending') {
-                        handleCheckoutSubmit();
-                      } else {
-                        setPaymentModalOpen(true);
-                      }
-                    }}
-                    className="btn-primary flex-1 h-10 text-[11px] font-extrabold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Zap className="h-3.5 w-3.5" />
-                    <span>{orderStatus === 'pending' ? t('hold_order', 'ដាក់រង់ចាំ Hold') : t('checkout', 'ទូទាត់ Checkout')}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
                 </div>
               </div>
             </aside>
@@ -1396,39 +1608,39 @@ export default function App() {
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'cash'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <Wallet className="h-5 w-5" />
+                    <Wallet className="h-4 w-4" />
                     <span className="text-[10px] font-bold">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('khqr')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'khqr'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <QrCode className="h-5 w-5" />
+                    <QrCode className="h-4 w-4" />
                     <span className="text-[10px] font-bold">KHQR</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
                   <button
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'card'
-                        ? 'border-brand-cyan bg-brand-cyan/10 text-brand-cyan font-extrabold shadow-glow-cyan scale-102'
-                        : `${darkMode ? 'border-white/5 text-brand-muted hover:border-brand-cyan/20 hover:text-brand-cyan' : 'border-slate-200 text-slate-500 hover:border-brand-cyan/35 hover:text-brand-cyan'}`
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <CreditCard className="h-5 w-5" />
+                    <CreditCard className="h-4 w-4" />
                     <span className="text-[10px] font-bold">{t('card', 'Card')}</span>
                   </button>
                 )}
@@ -1449,10 +1661,10 @@ export default function App() {
                         placeholder="0.00"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
-                        className={`w-full py-3.5 pl-9 pr-4 text-lg font-black rounded-2xl border transition-all duration-300 ${
+                        className={`w-full py-2.5 pl-9 pr-4 text-lg font-black rounded-lg border transition-all duration-200 ${
                           darkMode
-                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50 focus:shadow-glow-cyan'
-                            : 'bg-slate-50 border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:shadow-glow-cyan'
+                            ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50'
+                            : 'bg-white border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan'
                         }`}
                       />
                     </div>

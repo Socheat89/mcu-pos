@@ -179,7 +179,7 @@ class OrderController {
                         }
                     }
 
-                    $unitPrice = (float)$product['price'];
+                    $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
@@ -264,7 +264,7 @@ class OrderController {
                         throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . '. Upgrade to Standard ($50) for inventory management.');
                     }
                 }
-                $unitPrice = (float)$product['price'];
+                $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [
