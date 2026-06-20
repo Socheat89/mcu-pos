@@ -1365,6 +1365,7 @@ body {
 
     body.pos-app {
         background: white;
+    }
 }
 /* ── Global Scrollbar Customization ──────────────────────────────────────── */
 ::-webkit-scrollbar {
@@ -1380,4 +1381,330 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================================
+   POS UI Refresh
+   Shared dark operational layer for dashboard, management pages, and settings.
+   ============================================================================ */
+
+:root {
+    --pos-primary: #22d3ee;
+    --pos-primary-rgb: 34, 211, 238;
+    --pos-primary-light: rgba(34, 211, 238, 0.12);
+    --pos-secondary: #818cf8;
+    --pos-accent: #a78bfa;
+    --pos-success: #34d399;
+    --pos-warning: #f59e0b;
+    --pos-danger: #fb7185;
+    --pos-bg: #05070d;
+    --pos-card: rgba(12, 17, 31, 0.82);
+    --pos-card-solid: #0c111f;
+    --pos-elevated: #111827;
+    --pos-text: #f8fafc;
+    --pos-text-muted: #a7b0c2;
+    --pos-text-dim: #64748b;
+    --pos-border: rgba(148, 163, 184, 0.16);
+    --pos-border-light: rgba(148, 163, 184, 0.08);
+    --pos-shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.24);
+    --pos-shadow-md: 0 18px 36px rgba(0, 0, 0, 0.32);
+    --pos-shadow-lg: 0 28px 70px rgba(0, 0, 0, 0.45);
+    --pos-shadow-xl: 0 36px 90px rgba(0, 0, 0, 0.55);
+    --pos-shadow-glow: 0 0 32px rgba(34, 211, 238, 0.16);
+    --pos-gradient-primary: linear-gradient(135deg, #14b8a6 0%, #22d3ee 52%, #6366f1 100%);
+    --pos-gradient-dark: linear-gradient(135deg, #111827 0%, #0f1b2d 48%, #1e2546 100%);
+    --pos-gradient-surface: linear-gradient(180deg, rgba(13, 19, 34, 0.96) 0%, rgba(5, 7, 13, 0.98) 100%);
+    --pos-gradient-sidebar: linear-gradient(180deg, #09202a 0%, #07111e 42%, #0b1020 100%);
+    --pos-sidebar-glow: radial-gradient(circle at 24% 0%, rgba(34, 211, 238, 0.28) 0%, transparent 48%);
+    --pos-sidebar-w: 272px;
+    --pos-topbar-h: 74px;
+    --pos-radius: 14px;
+    --pos-radius-lg: 18px;
+    --pos-radius-xl: 24px;
+}
+
+body.pos-app {
+    min-height: 100vh;
+    background:
+        linear-gradient(180deg, rgba(34, 211, 238, 0.045) 0, transparent 220px),
+        radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.14) 0, transparent 360px),
+        var(--pos-bg);
+    color: var(--pos-text);
+}
+
+.pos-shell {
+    background: transparent;
+}
+
+.pos-main {
+    background: linear-gradient(180deg, rgba(8, 13, 24, 0.78) 0%, rgba(5, 7, 13, 0.98) 42%);
+}
+
+.pos-sidebar {
+    padding: 20px 16px;
+    background-image: var(--pos-sidebar-glow), var(--pos-gradient-sidebar);
+    border-right: 1px solid rgba(34, 211, 238, 0.08);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.02);
+}
+
+.pos-brand,
+.pos-sidebar__summary,
+.pos-topbar,
+.pos-status-indicator,
+.pos-clock-widget,
+.pos-user-profile,
+.pos-lang-btn {
+    background: rgba(10, 15, 28, 0.72) !important;
+    border-color: var(--pos-border) !important;
+}
+
+.pos-brand,
+.pos-sidebar__summary,
+.pos-card,
+.pos-stat,
+.pos-table-container,
+.report-card,
+.form-card,
+.detail-card,
+.hold-card,
+.user-card {
+    box-shadow: var(--pos-shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.pos-brand__logo,
+.pos-avatar {
+    border-radius: 12px;
+    box-shadow: 0 12px 26px rgba(34, 211, 238, 0.22);
+}
+
+.pos-topbar {
+    min-height: var(--pos-topbar-h);
+    padding: 0 28px;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+}
+
+.pos-page {
+    max-width: 1640px;
+    padding: 26px 40px 34px;
+}
+
+.pos-title h1 {
+    font-size: clamp(24px, 2vw, 34px);
+    line-height: 1.15;
+}
+
+.pos-title p {
+    color: var(--pos-text-muted);
+}
+
+.pos-card,
+.pos-stat,
+.pos-table-container,
+.report-card,
+.form-card,
+.detail-card,
+.hold-card {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(10, 15, 28, 0.84)) !important;
+    border: 1px solid var(--pos-border) !important;
+    border-radius: var(--pos-radius-lg) !important;
+}
+
+.pos-card:hover,
+.pos-stat:hover,
+.report-card:hover,
+.form-card:hover,
+.detail-card:hover,
+.hold-card:hover,
+.user-card:hover {
+    border-color: rgba(34, 211, 238, 0.34) !important;
+    box-shadow: var(--pos-shadow-md), var(--pos-shadow-glow);
+}
+
+.pos-stat {
+    min-height: 106px;
+    padding: 24px 22px;
+}
+
+.pos-stat::before {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(99, 102, 241, 0.06) 44%, transparent 70%);
+}
+
+.pos-stat .k,
+.pos-table th,
+.pos-form-label {
+    letter-spacing: 0.08em;
+}
+
+.pos-stat .v {
+    font-size: clamp(26px, 2.3vw, 34px);
+}
+
+.pos-stat .chip {
+    border-radius: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.pos-table-container {
+    overflow-x: auto;
+}
+
+.pos-table th {
+    background: rgba(255, 255, 255, 0.025);
+    white-space: nowrap;
+}
+
+.pos-table td {
+    vertical-align: middle;
+}
+
+.pos-table tr:hover td {
+    background: rgba(34, 211, 238, 0.045);
+}
+
+.btn,
+.pos-icon-btn,
+.pos-sidebar-toggle,
+.pos-tab-link,
+.pos-modal-btn {
+    min-height: 40px;
+}
+
+.btn-primary {
+    background: var(--pos-gradient-primary);
+    box-shadow: 0 12px 24px rgba(34, 211, 238, 0.18);
+}
+
+.btn-outline {
+    background: rgba(255, 255, 255, 0.025);
+    border-color: var(--pos-border);
+}
+
+.btn-outline:hover,
+.pos-icon-btn:hover {
+    border-color: rgba(34, 211, 238, 0.38);
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--pos-primary);
+}
+
+.pos-form-control,
+.search-container input,
+select,
+textarea {
+    background-color: rgba(5, 7, 13, 0.48) !important;
+    border-color: var(--pos-border) !important;
+    color: var(--pos-text) !important;
+}
+
+.pos-form-control:focus,
+.search-container input:focus,
+select:focus,
+textarea:focus {
+    border-color: rgba(34, 211, 238, 0.72) !important;
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14) !important;
+}
+
+.badge {
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    font-weight: 800;
+}
+
+.dashboard-hero {
+    min-height: 270px;
+    background:
+        radial-gradient(circle at 92% 18%, rgba(129, 140, 248, 0.24), transparent 30%),
+        linear-gradient(135deg, rgba(16, 24, 43, 0.98), rgba(11, 28, 43, 0.96) 52%, rgba(30, 37, 70, 0.96)) !important;
+    border-radius: var(--pos-radius-xl) !important;
+}
+
+.dashboard-hero h1 {
+    letter-spacing: 0 !important;
+    max-width: 680px;
+}
+
+.pos-footer {
+    padding: 20px 40px 28px;
+    color: var(--pos-text-dim);
+    font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+    .pos-page {
+        padding: 22px;
+    }
+
+    .dashboard-hero {
+        padding: 36px !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .pos-topbar {
+        padding: 0 16px;
+    }
+
+    .pos-header-right {
+        gap: 10px;
+    }
+
+    .pos-status-indicator {
+        max-width: 44vw;
+    }
+
+    .pos-status-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hold-card {
+        align-items: stretch !important;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .report-card[style*="grid-column"] {
+        grid-column: auto !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .pos-page {
+        padding: 18px 14px 24px;
+    }
+
+    .dashboard-hero {
+        padding: 28px 22px !important;
+        min-height: auto;
+        align-items: flex-start !important;
+    }
+
+    .dashboard-hero h1 {
+        font-size: 30px !important;
+    }
+
+    .dashboard-hero > div:last-child {
+        display: none !important;
+    }
+
+    .pos-grid.cols-2,
+    .pos-grid.cols-3,
+    .pos-grid.cols-4 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .pos-row,
+    .fade-in > div[style*="justify-content: space-between"] {
+        align-items: stretch !important;
+        flex-direction: column;
+    }
+
+    .pos-tabs {
+        width: 100% !important;
+        overflow-x: auto;
+    }
+
+    .pos-tab-link {
+        white-space: nowrap;
+    }
 }
