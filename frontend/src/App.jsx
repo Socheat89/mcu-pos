@@ -397,6 +397,7 @@ export default function App() {
   const [pendingOrdersOpen, setPendingOrdersOpen] = useState(false);
   const [analyticsViewOpen, setAnalyticsViewOpen] = useState(false);
   const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null); // { message, onConfirm }
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
@@ -584,11 +585,14 @@ export default function App() {
 
   const clearCart = () => {
     if (cart.length === 0) return;
-    if (window.confirm(t('clear_cart_confirm', 'លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?'))) {
-      updateActiveOrder(() => ({ cart: [] }));
-      setActiveProductId(null);
-      showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
-    }
+    setConfirmModal({
+      message: t('clear_cart_confirm', 'លុបទំនិញទាំងអស់ក្នុងកន្ត្រក?'),
+      onConfirm: () => {
+        updateActiveOrder(() => ({ cart: [] }));
+        setActiveProductId(null);
+        showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
+      }
+    });
   };
 
   const handleQuickAdd = (e) => {
@@ -1823,6 +1827,51 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* ═══ Custom Confirm Modal ═══ */}
+      {confirmModal && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+          onClick={() => setConfirmModal(null)}
+        >
+          <div
+            className={`w-full max-w-sm rounded-3xl shadow-glass-lg border p-7 flex flex-col gap-5 animate-scale-in ${
+              darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-slate-200 text-brand-textLight'
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4">
+              <div className="h-11 w-11 rounded-2xl bg-brand-warning/15 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-brand-warning" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black tracking-tight mb-1">
+                  {currentLang === 'km' ? 'បញ្ជាក់សកម្មភាព' : currentLang === 'zh' ? '确认操作' : 'Confirm Action'}
+                </h3>
+                <p className="text-xs text-brand-muted font-semibold leading-relaxed">{confirmModal.message}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black border transition-all ${
+                  darkMode ? 'border-white/10 text-brand-muted hover:bg-white/5' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {t('cancel', 'Cancel')}
+              </button>
+              <button
+                onClick={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+                className="flex-1 py-2.5 rounded-xl text-xs font-black bg-brand-danger text-white hover:opacity-90 transition-all shadow-sm"
+              >
+                {currentLang === 'km' ? 'យល់ព្រម' : currentLang === 'zh' ? '确定' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

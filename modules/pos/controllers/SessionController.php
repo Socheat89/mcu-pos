@@ -192,7 +192,7 @@ class SessionController {
             [$id, $tenantId]
         );
 
-        // Get payment breakdown
+        // Get payment breakdown (summary)
         $payments = $db->fetchAll(
             "SELECT p.method, COALESCE(SUM(p.amount), 0) as total_amount
              FROM payments p
@@ -207,7 +207,24 @@ class SessionController {
             $paymentSummary[$p['method']] = (float)$p['total_amount'];
         }
 
-        // Get sold products breakdown (Odoo POS style)
+        // Get items sold per payment method (for the detailed payment tab breakdown)
+        $paymentMethods = array_keys($paymentSummary);
+        $itemsByPayment = [];
+        foreach ($paymentMethods as $method) {
+            $itemsByPayment[$method] = $db->fetchAll(
+                "SELECT prod.name, prod.sku, SUM(oi.quantity) as qty_sold, SUM(oi.total) as total_revenue
+                 FROM order_items oi
+                 JOIN orders o ON oi.order_id = o.id
+                 JOIN payments pay ON pay.order_id = o.id
+                 JOIN products prod ON oi.product_id = prod.id
+                 WHERE o.session_id = ? AND o.status = 'completed' AND pay.method = ?
+                 GROUP BY prod.id, prod.name, prod.sku
+                 ORDER BY qty_sold DESC",
+                [$id, $method]
+            );
+        }
+
+        // Get sold products breakdown (Odoo POS style — all methods combined)
         $soldProducts = $db->fetchAll(
             "SELECT p.id, p.name, p.sku, SUM(oi.quantity) as qty_sold, SUM(oi.total) as total_revenue
              FROM order_items oi
