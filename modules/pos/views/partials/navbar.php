@@ -438,6 +438,7 @@ $navLabel = function (string $key): string {
 
         var overlay = document.createElement('div');
         overlay.className = 'pos-modal-overlay';
+        overlay.style.display = 'grid';
 
         var modal = document.createElement('div');
         modal.className = 'pos-modal pos-modal--' + type;
