@@ -469,6 +469,145 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             animation: shake 0.4s ease-in-out;
         }
 
+        /* ===== Custom Modal ===== */
+        .mc-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .mc-modal-overlay.visible { opacity: 1; }
+
+        .mc-modal {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 0;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.12);
+            transform: scale(0.85) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .mc-modal-overlay.visible .mc-modal {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .mc-modal-icon-wrap {
+            padding: 36px 36px 20px;
+            text-align: center;
+        }
+        .mc-modal-icon {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 4px;
+            position: relative;
+        }
+        .mc-modal-icon.success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #059669;
+            animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        }
+        .mc-modal-icon.error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        }
+        .mc-modal-icon.warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #d97706;
+            animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        }
+        @keyframes iconPop {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+
+        .mc-modal-ring {
+            position: absolute; inset: -6px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+        }
+        .mc-modal-icon.success .mc-modal-ring { border-color: rgba(16,185,129,0.25); }
+        .mc-modal-icon.error   .mc-modal-ring { border-color: rgba(220,38,38,0.2); }
+        .mc-modal-icon.warning .mc-modal-ring { border-color: rgba(217,119,6,0.25); }
+
+        .mc-modal-body {
+            padding: 0 32px 28px;
+            text-align: center;
+        }
+        .mc-modal-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        .mc-modal-msg {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .mc-modal-actions {
+            padding: 0 24px 24px;
+        }
+        .mc-modal-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .mc-modal-btn.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+        }
+        .mc-modal-btn.success:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(16,185,129,0.45); }
+        .mc-modal-btn.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 8px 20px rgba(239,68,68,0.3);
+        }
+        .mc-modal-btn.error:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(239,68,68,0.4); }
+        .mc-modal-btn.warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+        }
+        .mc-modal-btn.warning:hover { transform: translateY(-2px); }
+
+        /* Confetti dots for success */
+        .mc-confetti {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            animation: confettiFly 0.8s ease-out 0.2s both;
+        }
+        @keyframes confettiFly {
+            from { transform: translate(0,0) scale(1); opacity: 1; }
+            to   { opacity: 0; }
+        }
 
     </style>
 </head>
@@ -542,6 +681,25 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
+</div>
+
+<!-- ===== Custom Modal ===== -->
+<div class="mc-modal-overlay" id="mcModalOverlay" onclick="closeMcModal()" style="display:none;">
+    <div class="mc-modal" id="mcModal" onclick="event.stopPropagation()">
+        <div class="mc-modal-icon-wrap">
+            <div class="mc-modal-icon" id="mcModalIcon">
+                <div class="mc-modal-ring"></div>
+                <i id="mcModalIconI"></i>
+            </div>
+        </div>
+        <div class="mc-modal-body">
+            <div class="mc-modal-title" id="mcModalTitle"></div>
+            <p class="mc-modal-msg" id="mcModalMsg"></p>
+        </div>
+        <div class="mc-modal-actions">
+            <button class="mc-modal-btn" id="mcModalBtn" onclick="closeMcModal()"></button>
+        </div>
+    </div>
 </div>
 
 <div class="cart-floating-btn" id="cartBtn" onclick="toggleCart()">
@@ -719,7 +877,11 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
         const customerName = document.getElementById('cartCustomerName').value;
 
         if (!tableNumber) {
-            alert('<?php echo __('enter_table_msg'); ?>');
+            showModal('warning',
+                '<?php echo __('table_number_location'); ?>',
+                '<?php echo __('enter_table_msg'); ?>',
+                '<?php echo __('ok'); ?>'
+            );
             return;
         }
 
@@ -741,19 +903,32 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             const result = await response.json();
 
             if (result.success) {
-                alert('<?php echo __('order_success_msg'); ?>');
-                cart = [];
-                updateCartUI();
-                toggleCart(false);
-                // Restore prefilled table (from QR scan) or clear if manually entered
-                const prefilledTable = <?php echo json_encode($prefilledTable); ?>;
-                document.getElementById('tableNumber').value = prefilledTable || '';
-                document.getElementById('cartCustomerName').value = '';
+                showModal('success',
+                    '<?php echo __('success'); ?>',
+                    '<?php echo __('order_success_msg'); ?>',
+                    '<?php echo __('ok'); ?>',
+                    function() {
+                        cart = [];
+                        updateCartUI();
+                        toggleCart(false);
+                        const prefilledTable = <?php echo json_encode($prefilledTable); ?>;
+                        document.getElementById('tableNumber').value = prefilledTable || '';
+                        document.getElementById('cartCustomerName').value = '';
+                    }
+                );
             } else {
-                alert('<?php echo __('order_failed_msg'); ?>' + result.message);
+                showModal('error',
+                    '<?php echo __('error'); ?>',
+                    '<?php echo __('order_failed_msg'); ?>' + result.message,
+                    '<?php echo __('ok'); ?>'
+                );
             }
         } catch (error) {
-            alert('<?php echo __('something_wrong_msg'); ?>');
+            showModal('error',
+                '<?php echo __('error'); ?>',
+                '<?php echo __('something_wrong_msg'); ?>',
+                '<?php echo __('ok'); ?>'
+            );
         } finally {
             btn.disabled = false;
             btn.innerText = '<?php echo __('place_order_now'); ?>';
@@ -762,6 +937,57 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
 
     // Initialize
     updateCartUI();
+
+    /* ===== Custom Modal System ===== */
+    let _mcCallback = null;
+
+    function showModal(type, title, message, btnText, callback) {
+        const overlay  = document.getElementById('mcModalOverlay');
+        const icon     = document.getElementById('mcModalIcon');
+        const iconI    = document.getElementById('mcModalIconI');
+        const titleEl  = document.getElementById('mcModalTitle');
+        const msgEl    = document.getElementById('mcModalMsg');
+        const btn      = document.getElementById('mcModalBtn');
+
+        const icons = {
+            success: 'fas fa-check',
+            error:   'fas fa-xmark',
+            warning: 'fas fa-triangle-exclamation'
+        };
+        const titles = {
+            success: title,
+            error:   title,
+            warning: title
+        };
+
+        // Reset icon classes
+        icon.className   = 'mc-modal-icon ' + type;
+        iconI.className  = icons[type] || 'fas fa-circle-info';
+        btn.className    = 'mc-modal-btn ' + type;
+        titleEl.textContent = titles[type];
+        msgEl.textContent   = message;
+        btn.textContent     = btnText || 'OK';
+
+        _mcCallback = callback || null;
+
+        // Show overlay
+        overlay.style.display = 'flex';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => overlay.classList.add('visible'));
+        });
+    }
+
+    function closeMcModal() {
+        const overlay = document.getElementById('mcModalOverlay');
+        overlay.classList.remove('visible');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            if (typeof _mcCallback === 'function') {
+                _mcCallback();
+                _mcCallback = null;
+            }
+        }, 270);
+    }
 
 </script>
 
