@@ -185,8 +185,10 @@ class CashierController {
                 $newPassword = $_POST['new_password'] ?? '';
                 if ($userId && strlen($newPassword) >= 6) {
                     $hash = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $db->update('users', ['password_hash' => $hash],
-                        'id = ? AND tenant_id = ?', [$userId, $tenantId]);
+                    $db->update('users', [
+                        'password_hash' => $hash,
+                        'password_changed_at' => date('Y-m-d H:i:s')
+                    ], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
                     $message = 'Password has been reset.';
                 } else {
                     $error = 'Password must be at least 6 characters.';

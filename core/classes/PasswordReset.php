@@ -114,7 +114,7 @@ class PasswordReset {
         try {
             $pdo->beginTransaction();
             $db->query(
-                "UPDATE users SET password_hash = ? WHERE id = ?",
+                "UPDATE users SET password_hash = ?, password_changed_at = NOW() WHERE id = ?",
                 [password_hash($password, PASSWORD_DEFAULT), $reset['user_id']]
             );
             $db->query(
@@ -211,7 +211,7 @@ class PasswordReset {
         }
 
         $db->query(
-            "UPDATE users SET password_hash = ? WHERE id = ?",
+            "UPDATE users SET password_hash = ?, password_changed_at = NOW() WHERE id = ?",
             [password_hash($password, PASSWORD_DEFAULT), $user['id']]
         );
 

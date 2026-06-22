@@ -5,7 +5,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 try {
-    // Harden Session Security
+    // Harden Session Security & Extend Session Lifetime to 30 Days (1 Month)
+    ini_set('session.cookie_lifetime', 2592000); // 30 days
+    ini_set('session.gc_maxlifetime', 2592000);   // 30 days
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_only_cookies', 1);
     ini_set('session.cookie_samesite', 'Lax');

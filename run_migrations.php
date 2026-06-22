@@ -152,6 +152,15 @@ try {
         echo "'session_id' column added.<br>";
     }
 
+    // 8. Add 'password_changed_at' column to 'users' table
+    echo "Checking 'users' table for 'password_changed_at' column...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM users LIKE 'password_changed_at'");
+    if (empty($columns)) {
+        echo "Adding 'password_changed_at' column to 'users'...<br>";
+        $db->query("ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER password_hash");
+        echo "'password_changed_at' column added.<br>";
+    }
+
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
     echo "Migration failed: " . $e->getMessage();
