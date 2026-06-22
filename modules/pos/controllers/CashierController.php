@@ -11,6 +11,10 @@ class CashierController {
 
     // ── Helper: assign permissions to a role ────────────────────
     private function assignPermissionsToRole(int $roleId, array $permissionIds, $db): void {
+        try {
+            $db->getConnection()->prepare("DELETE FROM role_permissions WHERE role_id = ?")->execute([$roleId]);
+        } catch (Exception $e) { /* ignore */ }
+
         foreach ($permissionIds as $permId) {
             $permId = (int)$permId;
             if (!$permId) continue;
@@ -51,35 +55,45 @@ class CashierController {
         $message  = '';
         $error    = '';
 
-        // ── Load ALL available permissions (seed defaults if table is empty) ──
-        $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
-
-        if (empty($allPermissions)) {
-            // Seed the default permission set from schema
-            $defaultPerms = [
-                ['name' => 'pos_read',        'module' => 'pos',       'action' => 'read'],
-                ['name' => 'pos_write',       'module' => 'pos',       'action' => 'write'],
-                ['name' => 'pos_delete',      'module' => 'pos',       'action' => 'delete'],
-                ['name' => 'inventory_read',  'module' => 'inventory', 'action' => 'read'],
-                ['name' => 'inventory_write', 'module' => 'inventory', 'action' => 'write'],
-                ['name' => 'hr_read',         'module' => 'hr',        'action' => 'read'],
-                ['name' => 'hr_write',        'module' => 'hr',        'action' => 'write'],
-            ];
-            foreach ($defaultPerms as $perm) {
+        // ── Seed default permissions if they don't exist ──
+        $defaultPerms = [
+            ['name' => 'pos_read',        'module' => 'pos',       'action' => 'read'],
+            ['name' => 'pos_write',       'module' => 'pos',       'action' => 'write'],
+            ['name' => 'pos_delete',      'module' => 'pos',       'action' => 'delete'],
+            ['name' => 'inventory_read',  'module' => 'inventory', 'action' => 'read'],
+            ['name' => 'inventory_write', 'module' => 'inventory', 'action' => 'write'],
+            ['name' => 'hr_read',         'module' => 'hr',        'action' => 'read'],
+            ['name' => 'hr_write',        'module' => 'hr',        'action' => 'write'],
+        ];
+        foreach ($defaultPerms as $perm) {
+            $exists = $db->fetchOne(
+                "SELECT id FROM permissions WHERE module = ? AND action = ?",
+                [$perm['module'], $perm['action']]
+            );
+            if (!$exists) {
                 try {
                     $db->getConnection()->prepare(
-                        "INSERT IGNORE INTO permissions (name, module, action) VALUES (?, ?, ?)"
+                        "INSERT INTO permissions (name, module, action) VALUES (?, ?, ?)"
                     )->execute([$perm['name'], $perm['module'], $perm['action']]);
                 } catch (Exception $e) { /* ignore */ }
             }
-            // Reload after seeding
-            $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
         }
+        $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
 
         // ── Get cashier role (level=1) ────────────────────────────
         $cashierRole = $db->fetchOne(
             "SELECT id FROM roles WHERE level = 1 ORDER BY id LIMIT 1"
         );
+        if (!$cashierRole) {
+            try {
+                $db->getConnection()->prepare(
+                    "INSERT INTO roles (name, description, level) VALUES ('staff', 'Staff / Cashier', 1)"
+                )->execute();
+                $cashierRole = $db->fetchOne(
+                    "SELECT id FROM roles WHERE level = 1 ORDER BY id LIMIT 1"
+                );
+            } catch (Exception $e) { /* ignore */ }
+        }
         if (!$cashierRole) {
             $cashierRole = $db->fetchOne("SELECT id FROM roles ORDER BY level ASC LIMIT 1");
         }
