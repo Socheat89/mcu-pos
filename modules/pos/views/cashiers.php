@@ -82,7 +82,9 @@
     // Group permissions by module
     $permsByModule = [];
     foreach ($allPermissions as $p) {
-        $permsByModule[$p['module']][] = $p;
+        if ($p['module'] === 'pos') {
+            $permsByModule[$p['module']][] = $p;
+        }
     }
 
     // Check if cashier role is missing critical POS permissions

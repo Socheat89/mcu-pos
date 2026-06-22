@@ -40,7 +40,7 @@ class MenuController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'read')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission');
         }
 

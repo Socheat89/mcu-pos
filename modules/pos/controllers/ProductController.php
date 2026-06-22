@@ -20,7 +20,7 @@ class ProductController {
             die('Upgrade to POS Starter or higher to manage products.');
         }
 
-        if (!Auth::hasPermission('pos', 'read')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to view products');
         }
 
@@ -34,7 +34,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'write')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to create products');
         }
 
@@ -50,7 +50,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'write')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to edit products');
         }
 
@@ -71,7 +71,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'delete')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to delete products');
         }
 

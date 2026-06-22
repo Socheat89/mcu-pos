@@ -145,12 +145,13 @@ $navLabel = function (string $key): string {
             <?php endif; ?>
 
             <?php 
+            $isTenantAdmin = class_exists('Auth') && Auth::isTenantAdmin();
             $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings');
             if ($canManage): 
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
-                <?php if ($hasFeature('pos', 'inventory')): ?>
+                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
                     <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
                 </a>
@@ -162,27 +163,29 @@ $navLabel = function (string $key): string {
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'reports')): ?>
+                <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
                     <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'settings')): ?>
+                <?php if ($hasFeature('pos', 'settings') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
                     <i class="fas fa-gear"></i><span><?php echo $navLabel('settings'); ?></span>
                 </a>
                 <?php endif; ?>
 
-                <?php if (class_exists('Auth') && Auth::isTenantAdmin()): ?>
+                <?php if ($isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('cashiers'); ?>" href="<?php echo htmlspecialchars($posUrl('cashiers')); ?>">
                     <i class="fas fa-user-tie"></i><span><?php echo $navLabel('cashiers'); ?></span>
                 </a>
                 <?php endif; ?>
 
+                <?php if ($isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
                     <i class="fas fa-qrcode"></i><span><?php echo $navLabel('digital_menu'); ?></span>
                 </a>
+                <?php endif; ?>
             <?php endif; ?>
         </nav>
 
