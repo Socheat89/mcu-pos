@@ -51,8 +51,30 @@ class CashierController {
         $message  = '';
         $error    = '';
 
-        // ── Load ALL available permissions ────────────────────────
+        // ── Load ALL available permissions (seed defaults if table is empty) ──
         $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
+
+        if (empty($allPermissions)) {
+            // Seed the default permission set from schema
+            $defaultPerms = [
+                ['name' => 'pos_read',        'module' => 'pos',       'action' => 'read'],
+                ['name' => 'pos_write',       'module' => 'pos',       'action' => 'write'],
+                ['name' => 'pos_delete',      'module' => 'pos',       'action' => 'delete'],
+                ['name' => 'inventory_read',  'module' => 'inventory', 'action' => 'read'],
+                ['name' => 'inventory_write', 'module' => 'inventory', 'action' => 'write'],
+                ['name' => 'hr_read',         'module' => 'hr',        'action' => 'read'],
+                ['name' => 'hr_write',        'module' => 'hr',        'action' => 'write'],
+            ];
+            foreach ($defaultPerms as $perm) {
+                try {
+                    $db->getConnection()->prepare(
+                        "INSERT IGNORE INTO permissions (name, module, action) VALUES (?, ?, ?)"
+                    )->execute([$perm['name'], $perm['module'], $perm['action']]);
+                } catch (Exception $e) { /* ignore */ }
+            }
+            // Reload after seeding
+            $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
+        }
 
         // ── Get cashier role (level=1) ────────────────────────────
         $cashierRole = $db->fetchOne(
