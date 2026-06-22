@@ -8,6 +8,11 @@ $error = '';
 
 if (isset($_POST['action']) && $_POST['action'] === 'fix') {
     try {
+        // Run database migrations first to ensure columns/tables exist
+        ob_start();
+        include __DIR__ . '/run_migrations.php';
+        $migration_output = ob_get_clean();
+
         $db->getConnection()->beginTransaction();
 
         // 1. Ensure basic roles exist
@@ -80,7 +85,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'fix') {
         }
 
         $db->getConnection()->commit();
-        $message = "Database roles, permissions, and cashier mappings have been successfully repaired!";
+        $message = "Database roles, permissions, and cashier mappings have been successfully repaired!<br><br><strong>Migration Output:</strong><br>" . $migration_output;
     } catch (Exception $e) {
         $db->getConnection()->rollBack();
         $error = "Failed to run repair: " . $e->getMessage();
@@ -148,7 +153,7 @@ foreach ($rolePermsRaw as $rp) {
         <p style="color: #94a3b8; margin-top: -10px; margin-bottom: 30px;">Helper utility to diagnose and resolve permission errors for POS cashier logins.</p>
 
         <?php if ($message): ?>
-            <div class="alert-success">✓ <?php echo htmlspecialchars($message); ?></div>
+            <div class="alert-success">✓ <?php echo $message; ?></div>
         <?php endif; ?>
 
         <?php if ($error): ?>
