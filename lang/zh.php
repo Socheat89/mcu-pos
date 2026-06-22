@@ -373,4 +373,5 @@ return [
     'qr_print_all'         => '全部打印',
     'qr_table'             => '桌',
     'qr_scan_hint'         => '请用手机摄像头扫描此二维码以查看菜单。',
+    'qr_table_auto_detected' => '桌号已通过 QR 码自动检测',
 ];

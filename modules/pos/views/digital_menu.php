@@ -563,7 +563,22 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
         <div class="checkout-form">
             <div class="form-group">
                 <label><?php echo __('table_number_location'); ?></label>
-                <input type="text" id="tableNumber" class="form-control" placeholder="<?php echo __('table_number_placeholder'); ?>" value="<?php echo $prefilledTable; ?>">
+                <?php if (!empty($prefilledTable)): ?>
+                    <div style="position: relative;">
+                        <input type="text" id="tableNumber" class="form-control"
+                               value="<?php echo $prefilledTable; ?>"
+                               readonly
+                               style="background: rgba(99,102,241,0.07); border-color: #6366f1; color: #4338ca; font-weight: 800; padding-right: 48px; cursor: default;">
+                        <span style="position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#6366f1; font-size:0.85rem;">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </div>
+                    <small style="color:#6366f1; font-size:0.75rem; font-weight:700; margin-top:4px; display:block;">
+                        <i class="fas fa-qrcode" style="margin-right:4px;"></i><?php echo __('qr_table_auto_detected'); ?>
+                    </small>
+                <?php else: ?>
+                    <input type="text" id="tableNumber" class="form-control" placeholder="<?php echo __('table_number_placeholder'); ?>">
+                <?php endif; ?>
             </div>
             <div class="form-group">
                 <label><?php echo __('your_name_optional'); ?></label>
@@ -730,7 +745,9 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                 cart = [];
                 updateCartUI();
                 toggleCart(false);
-                document.getElementById('tableNumber').value = '';
+                // Restore prefilled table (from QR scan) or clear if manually entered
+                const prefilledTable = <?php echo json_encode($prefilledTable); ?>;
+                document.getElementById('tableNumber').value = prefilledTable || '';
                 document.getElementById('cartCustomerName').value = '';
             } else {
                 alert('<?php echo __('order_failed_msg'); ?>' + result.message);

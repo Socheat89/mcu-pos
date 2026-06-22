@@ -373,4 +373,5 @@ return [
     'qr_print_all'         => 'Print All',
     'qr_table'             => 'Table',
     'qr_scan_hint'         => 'Scan this QR code with your phone camera to view the menu.',
+    'qr_table_auto_detected' => 'Table auto-detected from QR code',
 ];
