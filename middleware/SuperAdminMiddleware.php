@@ -5,9 +5,7 @@ require_once __DIR__ . '/../core/helpers/url.php';
 
 class SuperAdminMiddleware {
     public static function handle() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        require_once __DIR__ . '/../core/bootstrap_session.php';
 
         $urlPrefix = mc_base_path();
 

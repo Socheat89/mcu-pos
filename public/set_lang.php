@@ -3,9 +3,7 @@
 require_once __DIR__ . '/../core/classes/Language.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../core/bootstrap_session.php';
 
 if (isset($_GET['lang'])) {
     $lang = $_GET['lang'];

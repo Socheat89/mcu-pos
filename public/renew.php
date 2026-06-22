@@ -1,11 +1,11 @@
 <?php
 // public/renew.php
+require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Auth.php';
 require_once __DIR__ . '/../core/classes/Tenant.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
-session_start();
 
 $urlPrefix = mc_base_path();
 

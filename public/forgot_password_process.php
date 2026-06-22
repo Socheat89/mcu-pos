@@ -1,6 +1,6 @@
 <?php
 // public/forgot_password_process.php
-session_start();
+require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/classes/PasswordReset.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 

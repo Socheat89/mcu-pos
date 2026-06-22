@@ -1,9 +1,6 @@
 <?php
 // admin/login_process.php
-// Extend Session Lifetime to 30 Days (1 Month) before starting session
-ini_set('session.cookie_lifetime', 2592000); // 30 days
-ini_set('session.gc_maxlifetime', 2592000);   // 30 days
-session_start();
+require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/classes/Database.php';
 
         // Dynamic URL Prefix

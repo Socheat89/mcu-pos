@@ -6,9 +6,7 @@ require_once __DIR__ . '/../../../core/helpers/url.php';
 
 class SettingsController {
     public function index() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        require_once __DIR__ . '/../../../core/bootstrap_session.php';
         
         // Add middleware checks if they are available/standard
         // Assuming they are needed as in other controllers
@@ -60,9 +58,7 @@ class SettingsController {
     }
 
     public function update() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        require_once __DIR__ . '/../../../core/bootstrap_session.php';
 
         require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
         require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
 $success = $_SESSION['password_reset_success'] ?? '';
