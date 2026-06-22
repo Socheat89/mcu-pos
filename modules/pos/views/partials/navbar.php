@@ -64,15 +64,16 @@ $activeClass = function (string $key) use ($activeNav): string {
 
 $navLabel = function (string $key): string {
     $labels = [
-        'dashboard' => __('dashboard'),
-        'pos' => __('pos'),
-        'sessions' => __('sessions'),
-        'holds' => __('on_hold'),
-        'products' => __('inventory'),
-        'customers' => __('customers'),
-        'reports' => __('analytics'),
-        'settings' => __('settings'),
-        'cashiers' => __('cashiers'),
+        'dashboard'    => __('dashboard'),
+        'pos'          => __('pos'),
+        'sessions'     => __('sessions'),
+        'holds'        => __('on_hold'),
+        'products'     => __('inventory'),
+        'customers'    => __('customers'),
+        'reports'      => __('analytics'),
+        'settings'     => __('settings'),
+        'cashiers'     => __('cashiers'),
+        'digital_menu' => __('qr_menu'),
     ];
 
     return $labels[$key] ?? __($key);
@@ -178,6 +179,10 @@ $navLabel = function (string $key): string {
                     <i class="fas fa-user-tie"></i><span><?php echo $navLabel('cashiers'); ?></span>
                 </a>
                 <?php endif; ?>
+
+                <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
+                    <i class="fas fa-qrcode"></i><span><?php echo $navLabel('digital_menu'); ?></span>
+                </a>
             <?php endif; ?>
         </nav>
 

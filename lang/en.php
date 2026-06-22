@@ -365,4 +365,12 @@ return [
     'session_opened_success' => 'Session opened successfully.',
     'enter_opening_balance' => 'Please enter opening balance',
     'enter_closing_balance' => 'Please enter closing balance',
+    'qr_menu'              => 'QR Menu',
+    'qr_menu_subtitle'     => 'Share your digital menu via QR code. Guests can scan and order directly from their phone.',
+    'qr_general_menu'      => 'General Menu',
+    'qr_per_table'         => 'Per-Table QR Codes',
+    'qr_number_of_tables'  => 'Number of Tables',
+    'qr_print_all'         => 'Print All',
+    'qr_table'             => 'Table',
+    'qr_scan_hint'         => 'Scan this QR code with your phone camera to view the menu.',
 ];

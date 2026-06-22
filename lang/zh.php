@@ -365,4 +365,12 @@ return [
     'session_opened_success' => '会话成功开启。',
     'enter_opening_balance' => '请输入开户金额',
     'enter_closing_balance' => '请输入收盘金额',
+    'qr_menu'              => 'QR 菜单',
+    'qr_menu_subtitle'     => '通过二维码分享您的电子菜单。顾客可扫描并直接用手机下单。',
+    'qr_general_menu'      => '通用菜单',
+    'qr_per_table'         => '按桌二维码',
+    'qr_number_of_tables'  => '桌子数量',
+    'qr_print_all'         => '全部打印',
+    'qr_table'             => '桌',
+    'qr_scan_hint'         => '请用手机摄像头扫描此二维码以查看菜单。',
 ];

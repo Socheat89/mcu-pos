@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../../../core/helpers/url.php'; ?>
+<?php
+require_once __DIR__ . '/../../../core/helpers/url.php';
+$prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table'])) : '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -477,6 +480,12 @@
     <?php endif; ?>
     <div class="logo"><?php echo htmlspecialchars($tenant['name']); ?></div>
     <div class="tagline"><?php echo __('explore_menu_msg'); ?></div>
+    <?php if (!empty($prefilledTable)): ?>
+        <div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 8px 18px; border-radius: 99px; font-size: 0.9rem; font-weight: 700; backdrop-filter: blur(8px);">
+            <i class="fas fa-chair"></i>
+            <?php echo __('qr_table'); ?> <?php echo $prefilledTable; ?>
+        </div>
+    <?php endif; ?>
 </header>
 
 <div class="container">
@@ -554,7 +563,7 @@
         <div class="checkout-form">
             <div class="form-group">
                 <label><?php echo __('table_number_location'); ?></label>
-                <input type="text" id="tableNumber" class="form-control" placeholder="<?php echo __('table_number_placeholder'); ?>">
+                <input type="text" id="tableNumber" class="form-control" placeholder="<?php echo __('table_number_placeholder'); ?>" value="<?php echo $prefilledTable; ?>">
             </div>
             <div class="form-group">
                 <label><?php echo __('your_name_optional'); ?></label>
