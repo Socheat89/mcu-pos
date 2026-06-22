@@ -9,6 +9,32 @@ require_once __DIR__ . '/../../../core/helpers/url.php';
 
 class CashierController {
 
+    // ── Helper: assign permissions to a role ────────────────────
+    private function assignPermissionsToRole(int $roleId, array $permissionIds, $db): void {
+        foreach ($permissionIds as $permId) {
+            $permId = (int)$permId;
+            if (!$permId) continue;
+            // INSERT IGNORE to avoid duplicate key errors
+            try {
+                $db->getConnection()->prepare(
+                    "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)"
+                )->execute([$roleId, $permId]);
+            } catch (Exception $e) { /* already exists */ }
+        }
+    }
+
+    // ── Helper: get permissions assigned to a role ───────────────
+    private function getRolePermissions(int $roleId, $db): array {
+        $rows = $db->fetchAll(
+            "SELECT p.id, p.module, p.action, p.name
+             FROM role_permissions rp
+             JOIN permissions p ON rp.permission_id = p.id
+             WHERE rp.role_id = ?",
+            [$roleId]
+        );
+        return $rows ?: [];
+    }
+
     public function index() {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -25,29 +51,34 @@ class CashierController {
         $message  = '';
         $error    = '';
 
-        // ── Handle POST actions ──────────────────────────────
+        // ── Load ALL available permissions ────────────────────────
+        $allPermissions = $db->fetchAll("SELECT * FROM permissions ORDER BY module, action") ?: [];
+
+        // ── Get cashier role (level=1) ────────────────────────────
+        $cashierRole = $db->fetchOne(
+            "SELECT id FROM roles WHERE level = 1 ORDER BY id LIMIT 1"
+        );
+        if (!$cashierRole) {
+            $cashierRole = $db->fetchOne("SELECT id FROM roles ORDER BY level ASC LIMIT 1");
+        }
+        $cashierRoleId = $cashierRole ? (int)$cashierRole['id'] : 0;
+
+        // ── Handle POST actions ──────────────────────────────────
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $action = $_POST['_action'] ?? '';
 
             // Create cashier
             if ($action === 'create') {
-                $username = trim($_POST['username'] ?? '');
-                $email    = trim($_POST['email'] ?? '');
-                $password = $_POST['password'] ?? '';
+                $username   = trim($_POST['username'] ?? '');
+                $email      = trim($_POST['email'] ?? '');
+                $password   = $_POST['password'] ?? '';
+                $permIds    = $_POST['permissions'] ?? [];
 
                 if (!$username || !$email || !$password) {
                     $error = 'Please fill in all required fields.';
                 } elseif (strlen($password) < 6) {
                     $error = 'Password must be at least 6 characters.';
                 } else {
-                    // Get cashier role id (lowest level, typically level=1)
-                    $cashierRole = $db->fetchOne(
-                        "SELECT id FROM roles WHERE level = 1 ORDER BY id LIMIT 1"
-                    );
-                    if (!$cashierRole) {
-                        $cashierRole = $db->fetchOne("SELECT id FROM roles ORDER BY level ASC LIMIT 1");
-                    }
-
                     // Check duplicate username in tenant
                     $existing = $db->fetchOne(
                         "SELECT id FROM users WHERE username = ? AND tenant_id = ?",
@@ -64,15 +95,40 @@ class CashierController {
                                 'username' => $username,
                                 'email'    => $email,
                                 'password' => $password,
-                                'role_id'  => $cashierRole['id'],
+                                'role_id'  => $cashierRoleId,
                                 'status'   => 'active',
                             ], $tenantId);
+
+                            // Auto-assign selected permissions (or default pos read+write)
+                            if (empty($permIds)) {
+                                // Default: pos read + write
+                                $defaultPerms = $db->fetchAll(
+                                    "SELECT id FROM permissions WHERE module = 'pos' AND action IN ('read','write')"
+                                );
+                                $permIds = array_column($defaultPerms ?: [], 'id');
+                            }
+                            $this->assignPermissionsToRole($cashierRoleId, $permIds, $db);
+
                             $message = "Cashier \"$username\" created successfully!";
                         } catch (Exception $e) {
                             $error = $e->getMessage();
                         }
                     }
                 }
+            }
+
+            // Fix permissions for all cashiers
+            if ($action === 'fix_permissions') {
+                $permIds = $_POST['fix_perm_ids'] ?? [];
+                if (empty($permIds)) {
+                    // Default: pos read + write
+                    $defaultPerms = $db->fetchAll(
+                        "SELECT id FROM permissions WHERE module = 'pos' AND action IN ('read','write')"
+                    );
+                    $permIds = array_column($defaultPerms ?: [], 'id');
+                }
+                $this->assignPermissionsToRole($cashierRoleId, $permIds, $db);
+                $message = 'Permissions updated for cashier role successfully!';
             }
 
             // Toggle status
@@ -102,7 +158,7 @@ class CashierController {
             }
         }
 
-        // ── Load cashier users (role level = 1) ─────────────
+        // ── Load cashier users (role level = 1) ──────────────────
         $cashiers = $db->fetchAll(
             "SELECT u.*, r.name as role_name, r.level as role_level
              FROM users u
@@ -111,6 +167,13 @@ class CashierController {
              ORDER BY u.created_at DESC",
             [$tenantId]
         );
+
+        // ── Load current cashier role permissions ─────────────────
+        $cashierRolePerms = [];
+        if ($cashierRoleId) {
+            $cashierRolePerms = $this->getRolePermissions($cashierRoleId, $db);
+        }
+        $cashierPermIds = array_column($cashierRolePerms, 'id');
 
         // Count usage
         $totalUsers    = User::countUsers($tenantId);
