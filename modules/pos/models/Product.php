@@ -67,6 +67,41 @@ class Product {
             [$tenantId, $searchTerm, $searchTerm, $searchTerm]
         );
     }
+
+    public static function findBySkuOrBarcode($sku, $barcode, $tenantId = null) {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        $sku     = trim((string)$sku);
+        $barcode = trim((string)$barcode);
+
+        if ($sku === '' && $barcode === '') {
+            return null;
+        }
+
+        $conditions = [];
+        $params     = [];
+
+        if ($sku !== '') {
+            $conditions[] = 'p.sku = ?';
+            $params[]     = $sku;
+        }
+
+        if ($barcode !== '') {
+            $conditions[] = 'p.barcode = ?';
+            $params[]     = $barcode;
+        }
+
+        $where = 'p.tenant_id = ? AND (' . implode(' OR ', $conditions) . ')';
+        array_unshift($params, $tenantId);
+
+        $result = self::$db->fetchOne(
+            "SELECT p.*, c.name as category_name FROM products p
+             LEFT JOIN categories c ON p.category_id = c.id
+             WHERE {$where}
+             LIMIT 1",
+            $params
+        );
+        return $result ?: null;
+    }
 }
 
 Product::init();

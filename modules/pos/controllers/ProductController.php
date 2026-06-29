@@ -401,17 +401,38 @@ class ProductController {
             throw new Exception(__('product_import_sheet_url_error'));
         }
 
-        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/e\/([^\/?#]+)/', $url, $matches)) {
-            $gid = $this->extractGoogleSheetGid($url);
-            return 'https://docs.google.com/spreadsheets/d/e/' . $matches[1] . '/pub?output=csv&gid=' . urlencode($gid);
+        // Already a CSV output URL — use as-is
+        if (preg_match('/[?&](output|format)=csv/i', $url)) {
+            return $url;
         }
 
-        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/([^\/?#]+)/', $url, $matches)) {
-            $gid = $this->extractGoogleSheetGid($url);
-            return 'https://docs.google.com/spreadsheets/d/' . $matches[1] . '/export?format=csv&gid=' . urlencode($gid);
+        // Matches published spreadsheet (d/e/...) — pubhtml or pub path
+        // e.g. https://docs.google.com/spreadsheets/d/e/2PACX-.../pubhtml?gid=123
+        // e.g. https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=123
+        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/e\/([^\/?\#]+)/', $url, $matches)) {
+            $docId = $matches[1];
+            $gid   = $this->extractGoogleSheetGid($url);
+            $csvUrl = 'https://docs.google.com/spreadsheets/d/e/' . $docId . '/pub?output=csv';
+            if ($gid !== '0') {
+                $csvUrl .= '&gid=' . urlencode($gid);
+            }
+            return $csvUrl;
         }
 
-        if (preg_match('/\.csv($|[?#])|[?&](output|format)=csv/i', $url)) {
+        // Regular editable spreadsheet URL
+        // e.g. https://docs.google.com/spreadsheets/d/SHEET_ID/edit?gid=123
+        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/([^\/?\#]+)/', $url, $matches)) {
+            $sheetId = $matches[1];
+            $gid     = $this->extractGoogleSheetGid($url);
+            $csvUrl  = 'https://docs.google.com/spreadsheets/d/' . $sheetId . '/export?format=csv';
+            if ($gid !== '0') {
+                $csvUrl .= '&gid=' . urlencode($gid);
+            }
+            return $csvUrl;
+        }
+
+        // Plain CSV URL
+        if (preg_match('/\.csv($|[?#])/i', $url)) {
             return $url;
         }
 
