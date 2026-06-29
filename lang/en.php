@@ -11,6 +11,10 @@ return [
     'customers' => 'Customers',
     'reports' => 'Reports',
     'menu' => 'Digital Menu',
+<<<<<<< HEAD
+=======
+    'cashiers' => 'Cashiers',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'language' => 'Language',
     'english' => 'English',
     'khmer' => 'Khmer',
@@ -32,7 +36,11 @@ return [
     'name' => 'Name',
     'description' => 'Description',
     'category' => 'Category',
+<<<<<<< HEAD
     'inventory' => 'Product',
+=======
+    'inventory' => 'Ju Inventory',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'stock' => 'Stock',
     'low_stock' => 'Low Stock',
     'out_of_stock' => 'Out of Stock',
@@ -138,7 +146,11 @@ return [
     'save_receipt_settings' => 'Save Receipt Settings',
     'live_preview' => 'Live Preview',
     'on_hold' => 'On Hold',
+<<<<<<< HEAD
     'inventory' => 'Product',
+=======
+    'inventory' => 'Ju Inventory',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'analytics' => 'Analytics',
     'digital_menu' => 'Digital Menu',
     'cyber_unit_pos' => 'Cyber Unit POS',
@@ -162,6 +174,7 @@ return [
     'start_adding_products' => 'Start by adding your first product items.',
     'in_stock_msg' => ':count in stock',
     'confirm_delete_product' => 'Are you sure you want to delete this product?',
+<<<<<<< HEAD
     'import_products' => 'Import Products',
     'import_from_excel' => 'Import from Excel',
     'excel_import_hint' => 'Supports .xlsx and .csv files.',
@@ -189,6 +202,8 @@ return [
     'product_import_more_errors' => 'More rows were skipped. Review the file and import again.',
     'product_import_xlsx_unavailable' => 'XLSX import is not available because the PHP Zip extension is disabled. Please upload CSV instead.',
     'product_import_xlsx_error' => 'Could not read the XLSX file. Please save it again as .xlsx or CSV.',
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'transaction_history' => 'Transaction History',
     'orders_management_msg' => 'Review and manage all order records, payments and invoices.',
     'open_terminal' => 'Open Terminal',
@@ -362,4 +377,45 @@ return [
     'customer_management_upgrade_msg' => 'Customer management is available in our Standard and Premium plans. Upgrade today to start building lasting relationships with your customers!',
     'upgrade_to_standard' => 'Upgrade to Standard ($50)',
     'maybe_later' => 'Maybe Later',
+<<<<<<< HEAD
+=======
+    'sessions' => 'Sessions',
+    'session' => 'Session',
+    'open_session' => 'Open Session',
+    'close_session' => 'Close Session',
+    'opening_balance' => 'Opening Balance',
+    'closing_balance' => 'Closing Balance',
+    'session_list' => 'Session List',
+    'opened_by' => 'Opened By',
+    'opened_at' => 'Opened At',
+    'closed_at' => 'Closed At',
+    'status_open' => 'Open',
+    'status_closed' => 'Closed',
+    'expected_balance' => 'Expected Balance',
+    'cash_control' => 'Cash Control',
+    'items_sold' => 'Items Sold',
+    'sold_qty' => 'Sold Qty',
+    'revenue' => 'Revenue',
+    'view_details' => 'View Details',
+    'session_details' => 'Session Details',
+    'session_summary' => 'Session Summary',
+    'active_session' => 'Active Session',
+    'close_session_confirm' => 'Are you sure you want to close this session?',
+    'no_sessions_found' => 'No sessions found.',
+    'no_active_session' => 'No Active POS Session',
+    'session_active_alert' => 'A session is already active.',
+    'session_closed_success' => 'Session closed successfully.',
+    'session_opened_success' => 'Session opened successfully.',
+    'enter_opening_balance' => 'Please enter opening balance',
+    'enter_closing_balance' => 'Please enter closing balance',
+    'qr_menu'              => 'QR Menu',
+    'qr_menu_subtitle'     => 'Share your digital menu via QR code. Guests can scan and order directly from their phone.',
+    'qr_general_menu'      => 'General Menu',
+    'qr_per_table'         => 'Per-Table QR Codes',
+    'qr_number_of_tables'  => 'Number of Tables',
+    'qr_print_all'         => 'Print All',
+    'qr_table'             => 'Table',
+    'qr_scan_hint'         => 'Scan this QR code with your phone camera to view the menu.',
+    'qr_table_auto_detected' => 'Table auto-detected from QR code',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 ];

@@ -10,13 +10,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
+<<<<<<< HEAD
         .customer-meta { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(14, 165, 233, 0.08); color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+=======
+        .search-container { position: relative; margin-bottom: 24px; }
+        .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
+        
+        .avatar-circle { width: 44px; height: 44px; border-radius: var(--pos-radius); background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-weight: 900; font-size: 16px; border: 1px solid rgba(var(--pos-primary-rgb), 0.2); }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     </style>
 </head>
 <body class="pos-app">
     <?php $activeNav = 'customers'; include __DIR__ . '/partials/navbar.php'; ?>
 
     <div class="fade-in">
+<<<<<<< HEAD
         <div class="pos-page-hero">
             <div style="position: relative; z-index: 2;">
                 <div class="pos-kicker"><i class="fas fa-users"></i> <?php echo __('customers'); ?></div>
@@ -28,6 +38,16 @@
                     </a>
                 </div>
             </div>
+=======
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+            <div class="pos-title">
+                <h1><?php echo __('customers'); ?></h1>
+                <p><?php echo __('customer_management_msg'); ?></p>
+            </div>
+            <a href="<?php echo htmlspecialchars($posUrl('customers/create')); ?>" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> <?php echo __('add_customer'); ?>
+            </a>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -43,12 +63,20 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="pos-input-shell" style="margin-bottom: 24px; max-width: 560px;">
+=======
+        <div class="search-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_customers_placeholder'); ?>" onkeyup="searchCustomers()">
         </div>
 
+<<<<<<< HEAD
         <div class="pos-panel">
+=======
+        <div class="pos-table-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <table class="pos-table" id="customersTable">
                 <thead>
                     <tr>
@@ -62,25 +90,43 @@
                 <tbody>
                     <?php if (empty($customers)): ?>
                         <tr>
+<<<<<<< HEAD
                             <td colspan="5" class="pos-empty-state">
                                 <div class="pos-empty-state__icon">
                                     <i class="fas fa-users" style="font-size: 30px;"></i>
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 900; margin: 0;"><?php echo __('no_customers_yet'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px; font-weight: 600;"><?php echo __('client_database_msg'); ?></p>
+=======
+                            <td colspan="5" style="padding: 100px; text-align: center;">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+                                    <i class="fas fa-users" style="font-size: 32px; color: var(--pos-text-dim);"></i>
+                                </div>
+                                <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_customers_yet'); ?></h3>
+                                <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('client_database_msg'); ?></p>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                             </td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($customers as $c): ?>
                             <tr class="customer-row">
                                 <td>
+<<<<<<< HEAD
                                     <div class="pos-avatar-circle">
+=======
+                                    <div class="avatar-circle">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                         <?php echo strtoupper(substr($c['name'], 0, 1)); ?>
                                     </div>
                                 </td>
                                 <td>
+<<<<<<< HEAD
                                     <div style="font-weight: 900; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($c['name']); ?></div>
                                     <div class="customer-meta" style="margin-top: 8px;">ID: #100<?php echo $c['id']; ?></div>
+=======
+                                    <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($c['name']); ?></div>
+                                    <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">ID: #100<?php echo $c['id']; ?></div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                 </td>
                                 <td>
                                     <div style="display: flex; flex-direction: column; gap: 4px;">

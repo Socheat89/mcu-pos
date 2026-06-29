@@ -1,9 +1,12 @@
 <?php
 require_once __DIR__ . '/../../../core/helpers/url.php';
 $urlPrefix = mc_base_path();
+<<<<<<< HEAD
 $pageTitle = __('inventory');
 $importFlash = $_SESSION['product_import_flash'] ?? null;
 unset($_SESSION['product_import_flash']);
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +20,7 @@ unset($_SESSION['product_import_flash']);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
+<<<<<<< HEAD
         .product-img { width: 48px; height: 48px; border-radius: 14px; background: #f1f5f9; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
         .product-import-toggle { padding: 14px 22px; border-radius: 18px; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); color: white; }
         .product-import-panel { background: white; border: 1.5px solid var(--pos-border); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: var(--pos-shadow-sm); }
@@ -43,12 +47,24 @@ unset($_SESSION['product_import_flash']);
             .product-import-actions { justify-content: stretch; flex-wrap: wrap; }
             .product-import-actions .btn { flex: 1 1 auto; }
         }
+=======
+        body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
+            font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
+        }
+        .search-container { position: relative; margin-bottom: 24px; }
+        .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
+        
+        .product-img { width: 44px; height: 44px; border-radius: var(--pos-radius); background: #ffffff; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     </style>
 </head>
 <body class="pos-app">
     <?php $activeNav = 'products'; include __DIR__ . '/partials/navbar.php'; ?>
     
     <div class="fade-in">
+<<<<<<< HEAD
         <div class="pos-page-hero">
             <div style="position: relative; z-index: 2;">
                 <div class="pos-kicker"><i class="fas fa-boxes-stacked"></i> <?php echo __('inventory'); ?></div>
@@ -128,6 +144,16 @@ unset($_SESSION['product_import_flash']);
                     </div>
                 </form>
             </div>
+=======
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+            <div class="pos-title">
+                <h1><?php echo __('inventory'); ?></h1>
+                <p><?php echo __('track_stock_msg'); ?></p>
+            </div>
+            <a href="<?php echo htmlspecialchars($posUrl('products/create')); ?>" class="btn btn-primary">
+                <i class="fas fa-plus"></i> <?php echo __('add'); ?>
+            </a>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -138,17 +164,29 @@ unset($_SESSION['product_import_flash']);
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_categories'); ?></span>
+<<<<<<< HEAD
                 <p class="v"><?php echo count($categories); ?></p>
+=======
+                <p class="v">12</p>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-tags"></i></div>
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="pos-input-shell" style="margin-bottom: 24px; max-width: 560px;">
+=======
+        <div class="search-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_product_placeholder'); ?>" onkeyup="searchProducts()">
         </div>
 
+<<<<<<< HEAD
         <div class="pos-panel">
+=======
+        <div class="pos-table-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <table class="pos-table" id="productsTable">
                 <thead>
                     <tr>
@@ -162,12 +200,21 @@ unset($_SESSION['product_import_flash']);
                 <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
+<<<<<<< HEAD
                             <td colspan="5" class="pos-empty-state">
                                 <div class="pos-empty-state__icon">
                                     <i class="fas fa-box-open" style="font-size: 30px;"></i>
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 900; margin: 0;"><?php echo __('no_products_found'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px; font-weight: 600;"><?php echo __('start_adding_products'); ?></p>
+=======
+                            <td colspan="5" style="padding: 100px; text-align: center;">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+                                    <i class="fas fa-box-open" style="font-size: 32px; color: var(--pos-text-dim);"></i>
+                                </div>
+                                <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_products_found'); ?></h3>
+                                <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('start_adding_products'); ?></p>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                             </td>
                         </tr>
                     <?php else: ?>
@@ -188,8 +235,13 @@ unset($_SESSION['product_import_flash']);
                                     </div>
                                 </td>
                                 <td>
+<<<<<<< HEAD
                                     <div style="font-weight: 900; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($p['name']); ?></div>
                                     <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 3px;">SKU: <?php echo htmlspecialchars($p['sku'] ?: 'N/A'); ?></div>
+=======
+                                    <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($p['name']); ?></div>
+                                    <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">SKU: <?php echo htmlspecialchars($p['sku'] ?: 'N/A'); ?></div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                 </td>
                                 <td>
                                     <span class="badge <?php echo $badge; ?>">
@@ -226,6 +278,7 @@ unset($_SESSION['product_import_flash']);
                 row.style.display = text.includes(filter) ? '' : 'none';
             });
         }
+<<<<<<< HEAD
 
         function toggleProductImport() {
             const panel = document.getElementById('productImportPanel');
@@ -234,6 +287,8 @@ unset($_SESSION['product_import_flash']);
             panel.style.display = isHidden ? '' : 'none';
             if (isHidden) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     </script>
     
     <?php include __DIR__ . '/partials/footer.php'; ?>

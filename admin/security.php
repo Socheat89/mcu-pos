@@ -28,7 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         if ($user && password_verify($currentPass, $user['password_hash'])) {
             $newHash = password_hash($newPass, PASSWORD_DEFAULT);
+<<<<<<< HEAD
             $db->update('users', ['password_hash' => $newHash], 'id = ?', [$userId]);
+=======
+            $db->update('users', [
+                'password_hash' => $newHash,
+                'password_changed_at' => date('Y-m-d H:i:s')
+            ], 'id = ?', [$userId]);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             $message = 'Password updated successfully!';
         } else {
             $error = 'Current password is incorrect.';

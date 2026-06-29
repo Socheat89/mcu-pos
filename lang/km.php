@@ -11,6 +11,10 @@ return [
     'customers' => 'អតិថិជន',
     'reports' => 'របាយការណ៍',
     'menu' => 'មីនុយឌីជីថល',
+<<<<<<< HEAD
+=======
+    'cashiers' => 'អ្នកលក់ (Cashier)',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'language' => 'ភាសា',
     'english' => 'អង់គ្លេស',
     'khmer' => 'ខ្មែរ',
@@ -32,7 +36,11 @@ return [
     'name' => 'ឈ្មោះ',
     'description' => 'ការពិពណ៌នា',
     'category' => 'ប្រភេទ',
+<<<<<<< HEAD
     'inventory' => 'ផលិតផល',
+=======
+    'inventory' => 'សារពើភ័ណ្ឌ',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'stock' => 'ស្តុក',
     'low_stock' => 'ស្តុកតិច',
     'out_of_stock' => 'អស់ពីស្តុក',
@@ -138,7 +146,11 @@ return [
     'save_receipt_settings' => 'រក្សាទុកការកំណត់វិក្កយបត្រ',
     'live_preview' => 'ទិដ្ឋភាពជាក់ស្តែង',
     'on_hold' => 'ផ្អាកទុក',
+<<<<<<< HEAD
     'inventory' => 'ផលិតផល',
+=======
+    'inventory' => 'សារពើភ័ណ្ឌ',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'analytics' => 'ការវិភាគ',
     'digital_menu' => 'ម៉ឺនុយឌីជីថល',
     'cyber_unit_pos' => 'ប្រព័ន្ធលក់ Cyber Unit',
@@ -162,6 +174,7 @@ return [
     'start_adding_products' => 'ចាប់ផ្តើមដោយបន្ថែមផលិតផលដំបូងរបស់អ្នក។',
     'in_stock_msg' => ':count ក្នុងស្តុក',
     'confirm_delete_product' => 'តើអ្នកប្រាកដថាចង់លុបផលិតផលនេះមែនទេ?',
+<<<<<<< HEAD
     'import_products' => 'នាំចូលផលិតផល',
     'import_from_excel' => 'នាំចូលពី Excel',
     'excel_import_hint' => 'គាំទ្រឯកសារ .xlsx និង .csv។',
@@ -189,6 +202,8 @@ return [
     'product_import_more_errors' => 'មានជួរបន្ថែមត្រូវបានរំលង។ សូមពិនិត្យឯកសារ ហើយនាំចូលម្តងទៀត។',
     'product_import_xlsx_unavailable' => 'មិនអាចនាំចូល XLSX បានទេ ព្រោះ PHP Zip extension ត្រូវបានបិទ។ សូមផ្ទុកឡើង CSV ជំនួស។',
     'product_import_xlsx_error' => 'មិនអាចអានឯកសារ XLSX បានទេ។ សូមរក្សាទុកវាម្តងទៀតជា .xlsx ឬ CSV។',
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'transaction_history' => 'ប្រវត្តិកត់ត្រាប្រតិបត្តិការ',
     'orders_management_msg' => 'ពិនិត្យ និងគ្រប់គ្រងរាល់កំណត់ត្រាការបញ្ជាទិញ ការទូទាត់ និងវិក្កយបត្រ។',
     'open_terminal' => 'បើកបញ្ជរលក់',
@@ -362,4 +377,45 @@ return [
     'customer_management_upgrade_msg' => 'ការគ្រប់គ្រងអតិថិជនមាននៅក្នុងគម្រោង Standard និង Premium របស់យើង។ ធ្វើបច្ចុប្បន្នភាពថ្ងៃនេះ ដើម្បីចាប់ផ្តើមបង្កើតទំនាក់ទំនងយូរអង្វែងជាមួយអតិថិជនរបស់អ្នក!',
     'upgrade_to_standard' => 'ធ្វើបច្ចុប្បន្នភាពទៅ Standard ($50)',
     'maybe_later' => 'ទុកពេលក្រោយ',
+<<<<<<< HEAD
+=======
+    'sessions' => 'វគ្គលក់',
+    'session' => 'វគ្គលក់',
+    'open_session' => 'បើកវគ្គលក់',
+    'close_session' => 'បិទវគ្គលក់',
+    'opening_balance' => 'សមតុល្យបើកវគ្គ',
+    'closing_balance' => 'សមតុល្យបិទវគ្គ',
+    'session_list' => 'បញ្ជីវគ្គលក់',
+    'opened_by' => 'បើកដោយ',
+    'opened_at' => 'បើកនៅ',
+    'closed_at' => 'បិទនៅ',
+    'status_open' => 'កំពុងលក់',
+    'status_closed' => 'បានបិទ',
+    'expected_balance' => 'សមតុល្យរំពឹងទុក',
+    'cash_control' => 'ការត្រួតពិនិត្យសាច់ប្រាក់',
+    'items_sold' => 'ទំនិញលក់បាន',
+    'sold_qty' => 'ចំនួនលក់',
+    'revenue' => 'ចំណូល',
+    'view_details' => 'មើលលម្អិត',
+    'session_details' => 'ព័ត៌មានលម្អិតវគ្គលក់',
+    'session_summary' => 'សេចក្តីសង្ខេបវគ្គលក់',
+    'active_session' => 'វគ្គលក់បច្ចុប្បន្ន',
+    'close_session_confirm' => 'តើអ្នកប្រាកដថាចង់បិទវគ្គលក់នេះមែនទេ?',
+    'no_sessions_found' => 'រកមិនឃើញវគ្គលក់ទេ',
+    'no_active_session' => 'មិនទាន់មានវគ្គលក់កំពុងបើកទេ',
+    'session_active_alert' => 'មានវគ្គលក់កំពុងបើកដំណើរការរួចហើយ។',
+    'session_closed_success' => 'បានបិទវគ្គលក់ដោយជោគជ័យ។',
+    'session_opened_success' => 'បានបើកវគ្គលក់ដោយជោគជ័យ។',
+    'enter_opening_balance' => 'សូមបញ្ចូលទឹកប្រាក់បើកវគ្គ',
+    'enter_closing_balance' => 'សូមបញ្ចូលទឹកប្រាក់បិទវគ្គ',
+    'qr_menu'              => 'ម៉ឺនុយ QR',
+    'qr_menu_subtitle'     => 'ចែករំលែកម៉ឺនុយឌីជីថលរបស់អ្នកតាមរយៈកូដ QR ។ ភ្ញៀវអាចស្កែន និងបញ្ជាទិញផ្ទាល់ពីទូរស័ព្ទរបស់ពួកគេ។',
+    'qr_general_menu'      => 'ម៉ឺនុយទូទៅ',
+    'qr_per_table'         => 'កូដ QR ក្នុងមួយតុ',
+    'qr_number_of_tables'  => 'ចំនួនតុ',
+    'qr_print_all'         => 'បោះពុម្ពទាំងអស់',
+    'qr_table'             => 'តុ',
+    'qr_scan_hint'         => 'ស្កែនកូដ QR នេះដោយប្រើកាមេរ៉ាទូរស័ព្ទរបស់អ្នក ដើម្បីមើលម៉ឺនុយ។',
+    'qr_table_auto_detected' => 'លេខតុត្រូវបានរកឃើញដោយស្វ័យប្រវត្តិពីកូដ QR',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 ];

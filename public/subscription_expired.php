@@ -6,6 +6,7 @@
     <title>Subscription Expired - Mekong CyberUnit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/landing.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -59,14 +60,34 @@
 <body>
     <div class="error-card">
         <div class="icon-box">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+</head>
+<body class="status-page">
+    <main class="auth-shell">
+    <div class="status-card">
+        <div class="status-icon error">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <i class="ph-bold ph-clock-countdown"></i>
         </div>
         <h2>Subscription Expired</h2>
         <p>Your workspace subscription has expired. Please contact our support team or renew your plan to continue using Mekong CyberUnit.</p>
+<<<<<<< HEAD
         <div style="display: flex; gap: 1rem; justify-content: center;">
             <a href="login.php" class="btn" style="background: #64748b;">Return to Login</a>
             <a href="renew.php" class="btn">Renew Now</a>
         </div>
     </div>
+=======
+        <div class="btn-group">
+            <a href="login.php" class="btn btn-outline">Return to Login</a>
+            <a href="renew.php" class="btn btn-primary">Renew Now</a>
+        </div>
+    </div>
+    </main>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 </body>
 </html>

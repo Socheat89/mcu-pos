@@ -20,7 +20,11 @@ class ProductController {
             die('Upgrade to POS Starter or higher to manage products.');
         }
 
+<<<<<<< HEAD
         if (!Auth::hasPermission('pos', 'read')) {
+=======
+        if (!Auth::isTenantAdmin()) {
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             die('No permission to view products');
         }
 
@@ -34,7 +38,11 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+<<<<<<< HEAD
         if (!Auth::hasPermission('pos', 'write')) {
+=======
+        if (!Auth::isTenantAdmin()) {
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             die('No permission to create products');
         }
 
@@ -50,7 +58,11 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+<<<<<<< HEAD
         if (!Auth::hasPermission('pos', 'write')) {
+=======
+        if (!Auth::isTenantAdmin()) {
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             die('No permission to edit products');
         }
 
@@ -71,7 +83,11 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+<<<<<<< HEAD
         if (!Auth::hasPermission('pos', 'delete')) {
+=======
+        if (!Auth::isTenantAdmin()) {
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             die('No permission to delete products');
         }
 
@@ -81,6 +97,7 @@ class ProductController {
         exit;
     }
 
+<<<<<<< HEAD
     public function import() {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -153,6 +170,8 @@ class ProductController {
         exit;
     }
 
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     private function store() {
         $data = [
             'name' => $_POST['name'],
@@ -199,6 +218,7 @@ class ProductController {
         exit;
     }
 
+<<<<<<< HEAD
     private function redirectToProducts() {
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
@@ -716,6 +736,8 @@ class ProductController {
         ]);
     }
 
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     private function getCategories() {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
@@ -781,4 +803,8 @@ class ProductController {
         }
     }
 }
+<<<<<<< HEAD
 ?>
+=======
+?>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77

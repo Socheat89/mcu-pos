@@ -9,7 +9,11 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -21,6 +25,7 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
+<<<<<<< HEAD
     <style>
         body {
             display: flex;
@@ -496,6 +501,11 @@
     </style>
 </head>
 <body>
+=======
+    
+</head>
+<body class="auth-page">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -507,6 +517,7 @@
             <div class="loader-progress"><span></span></div>
         </div>
     </div>
+<<<<<<< HEAD
     <div class="auth-card">
         <div class="auth-header">
             <a href="index.php" class="auth-logo">
@@ -518,6 +529,20 @@
             <h3>Create Account</h3>
             <p>Complete payment via Bakong to setup your workspace</p>
         </div>
+=======
+    <main class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="index.php" class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="ph-bold ph-cube"></i>
+                    </div>
+                    <span>Mekong CyberUnit</span>
+                </a>
+                <h3>Create Account</h3>
+                <p>Complete payment via Bakong to setup your workspace</p>
+            </div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-error">
@@ -563,6 +588,7 @@
                         $features = $db->fetchAll("SELECT feature_key FROM system_modules WHERE system_id = ?", [$plan['id']]);
                         $featureList = array_column($features, 'feature_key');
                     ?>
+<<<<<<< HEAD
                     <label class="checkbox-card" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $plan['price']; ?>, '<?php echo $planCode; ?>')" style="flex-direction: column; align-items: flex-start; gap: 10px;">
                         <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -578,6 +604,23 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px;">
                             <?php foreach ($featureList as $feat): ?>
                                 <span style="font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #475569; border: 1px solid #e2e8f0; text-transform: capitalize;">
+=======
+                    <label class="checkbox-card checkbox-card--stack" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $plan['price']; ?>, '<?php echo $planCode; ?>')">
+                        <div class="checkbox-card__row">
+                            <div class="checkbox-card__row-left">
+                                <input type="radio" name="plan_select" value="<?php echo $plan['id']; ?>" class="plan-radio" data-plan-code="<?php echo $planCode; ?>" data-plan-price="<?php echo number_format($plan['price'], 2, '.', ''); ?>">
+                                <span><?php echo htmlspecialchars($plan['name']); ?></span>
+                            </div>
+                            <div class="checkbox-price">$<?php echo number_format($plan['price'], 2); ?>/mo</div>
+                        </div>
+                        
+                        <div class="checkbox-desc"><?php echo htmlspecialchars($plan['description']); ?></div>
+                        
+                        <?php if (!empty($featureList)): ?>
+                        <div class="plan-chip-row">
+                            <?php foreach ($featureList as $feat): ?>
+                                <span class="plan-chip">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                     <?php echo str_replace('_', ' ', $feat); ?>
                                 </span>
                             <?php endforeach; ?>
@@ -589,15 +632,23 @@
             </div>
 
             <!-- Subscription Duration Selection -->
+<<<<<<< HEAD
             <div class="system-selection" id="duration_section" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem; display: none;">
                 <h3>2. Select Duration</h3>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <select id="duration_select" class="form-control" onchange="updateTotalPrice()" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-family: inherit; font-size: 0.95rem;">
+=======
+            <div class="system-selection" id="duration_section" style="display: none;">
+                <h3>2. Select Duration</h3>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <select id="duration_select" class="form-control" onchange="updateTotalPrice()">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         <?php for($i=1; $i<=12; $i++): ?>
                             <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
+<<<<<<< HEAD
                 <div id="bonus_notice" style="display: none; padding: 0.75rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; color: #1e40af; font-size: 0.85rem; margin-bottom: 1rem;">
                     <i class="ph-bold ph-gift" style="margin-right: 4px;"></i> 
                     <strong>Special Offer!</strong> Get <span id="bonus_months">0</span> months free for 1-year subscription.
@@ -605,18 +656,37 @@
                 <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 500;">Total Amount:</span>
                     <span id="total_price_display" style="font-size: 1.25rem; font-weight: 800; color: #E31E26;">$0.00</span>
+=======
+                <div id="bonus_notice" class="notice-card" style="display: none;">
+                    <i class="ph-bold ph-gift"></i>
+                    <strong>Special Offer!</strong> Get <span id="bonus_months">0</span> months free for 1-year subscription.
+                </div>
+                <div class="price-summary">
+                    <span style="font-weight: 500;">Total Amount:</span>
+                    <span id="total_price_display" class="price-highlight">$0.00</span>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 </div>
             </div>
 
             <!-- Payment Method Selection -->
+<<<<<<< HEAD
             <div class="system-selection" id="payment_method_section" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem;">
+=======
+            <div class="system-selection" id="payment_method_section" style="display: none;">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <h3>3. Select Payment Method</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-card method-card" onclick="selectPaymentMethod('bakong')">
                         <input type="radio" name="payment_method" value="bakong" class="method-radio" checked>
+<<<<<<< HEAD
                         <div style="flex:1;">
                             <span>Bakong QR</span>
                             <div style="font-size:0.8rem; color:#64748b;">Scan with Bakong or any Banking App</div>
+=======
+                        <div class="method-card__content">
+                            <span>Bakong QR</span>
+                            <div class="checkbox-desc">Scan with Bakong or any Banking App</div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         </div>
                         <div class="checkbox-price">Dynamic</div>
                     </label>
@@ -624,24 +694,41 @@
             </div>
 
             <!-- Pay CTA moved here -->
+<<<<<<< HEAD
             <div class="total-display" id="payment_cta" style="display:none; flex-direction:column; gap:10px; border:none; margin-top: 2rem; padding: 1.5rem; background: #fff; border: 1px solid var(--border-color); border-radius: 1rem; box-shadow: var(--shadow-sm);">
                 <button type="button" class="btn btn-primary btn-full" onclick="showModal()" style="background: #E31E26; border-color: #E31E26; height: 3.5rem; font-size: 1.1rem; font-weight: 700;">
                     <i class="ph-bold ph-qr-code"></i> <span id="pay_btn_text">Proceed to Payment</span>
                 </button>
                 <p style="text-align:center; font-size:0.85rem; color:#64748b; margin: 0;">
                     <i class="ph-bold ph-shield-check" style="color: #10b981;"></i> Secure payment powered by Bakong KHQR
+=======
+            <div class="payment-cta" id="payment_cta" style="display:none;">
+                <button type="button" class="btn btn-primary full-width" onclick="showModal()">
+                    <i class="ph-bold ph-qr-code"></i> <span id="pay_btn_text">Proceed to Payment</span>
+                </button>
+                <p class="payment-cta__note">
+                    <i class="ph-bold ph-shield-check"></i> Secure payment powered by Bakong KHQR
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 </p>
             </div>
         </form>
         
         <div class="auth-footer">
+<<<<<<< HEAD
             Already have an account? <a href="login.php">Sign in</a>
         </div>
     </div>
+=======
+            Already have an account? <a href="login.php" class="link-strong">Sign in</a>
+        </div>
+        </div>
+    </main>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 
     <!-- Payment Modal (Bakong Branded) -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
+<<<<<<< HEAD
             <div class="modal-header" style="background: #E31E26; color: white;">
                 <h3 style="font-weight: 600;">
                     <div style="background: white; border-radius: 4px; padding: 2px;">
@@ -650,14 +737,30 @@
                     Scan to Pay (Bakong)
                 </h3>
                 <button type="button" class="modal-close" onclick="closeModal()" style="color: rgba(255,255,255,0.8);">&times;</button>
+=======
+            <div class="modal-header modal-header--brand">
+                <h3>
+                    <div class="modal-badge">
+                        <i class="ph-bold ph-qr-code"></i>
+                    </div>
+                    Scan to Pay (Bakong)
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             </div>
             <div class="modal-body">
                 <div class="payment-amount" id="modalAmount">$0.00</div>
                 <div class="payment-instruction">Scan with Bakong or any Banking App</div>
                 
+<<<<<<< HEAD
                 <div class="qr-code-container" style="border-color: #E31E26; min-height: 200px; display: flex; align-items: center; justify-content: center;">
                     <div id="qrPlaceholder" style="display: none;">
                          <i class="ph-bold ph-spinner ph-spin" style="font-size: 2rem; color: #E31E26;"></i>
+=======
+                <div class="qr-code-container qr-code-container--center">
+                    <div id="qrPlaceholder" style="display: none;">
+                         <i class="ph-bold ph-spinner ph-spin"></i>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                     </div>
                     <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
                 </div>
@@ -677,8 +780,13 @@
                     <div id="apiStatus" style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">Status: INITIALIZING...</div>
                 </div>
             </div>
+<<<<<<< HEAD
             <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 1rem; background: #f8fafc;">
                 <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none; background: #16a34a; border-color: #16a34a;" onclick="notifyAdmin()">
+=======
+            <div class="modal-footer">
+                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="notifyAdmin()">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                     <i class="ph-bold ph-check-circle"></i> I Have Paid (Notify Admin)
                 </button>
                 <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>
@@ -688,6 +796,7 @@
 
     <!-- Payment Success Modal -->
     <div id="successModal" class="modal">
+<<<<<<< HEAD
         <div class="modal-content" style="max-width: 400px; padding: 3rem 2rem; text-align: center;">
             <div style="width: 80px; height: 80px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
                 <i class="ph-bold ph-check"></i>
@@ -695,6 +804,15 @@
             <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #0f172a;">Payment Successful!</h3>
             <p style="color: #64748b; margin-bottom: 2rem;">Thank you for your payment. Your workspace setup is being initialized.</p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--primary); font-weight: 600;">
+=======
+        <div class="modal-content modal-content--sm modal-content--center">
+            <div class="modal-icon modal-icon--success">
+                <i class="ph-bold ph-check"></i>
+            </div>
+            <h3>Payment Successful!</h3>
+            <p>Thank you for your payment. Your workspace setup is being initialized.</p>
+            <div class="status-inline">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
             </div>
         </div>
@@ -702,6 +820,7 @@
 
     <!-- Waiting for Approval Modal -->
     <div id="waitingModal" class="modal">
+<<<<<<< HEAD
         <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header" style="background: #0088cc; color: white; border-bottom: none;">
                 <h3 style="font-weight: 600;">
@@ -710,6 +829,16 @@
                 <button type="button" class="modal-close" onclick="closeWaitingModal()" style="color: white;">&times;</button>
             </div>
             <div class="modal-body" style="padding: 3rem 2rem;">
+=======
+        <div class="modal-content">
+            <div class="modal-header modal-header--telegram">
+                <h3>
+                    <i class="ph-bold ph-telegram-logo"></i> Awaiting Approval
+                </h3>
+                <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <div class="waiting-status">
                     <div class="countdown-container">
                         <svg class="countdown-svg">
@@ -747,6 +876,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <style>
         @keyframes scaleIn {
             0% { transform: scale(0); }
@@ -754,6 +884,8 @@
         }
     </style>
 
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     <script>
         // State
         const form = document.getElementById('registerForm');
@@ -865,12 +997,15 @@
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
             
+<<<<<<< HEAD
             // Branding
             const modalHeader = document.querySelector('.modal-header');
             const modalTitle = modalHeader.querySelector('h3');
             modalHeader.style.background = '#E31E26'; 
             modalTitle.innerHTML = '<div style="background: white; border-radius: 4px; padding: 2px;"><i class="ph-bold ph-qr-code" style="color: #E31E26;"></i></div> Scan to Pay (Bakong)';
 
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             // Reset UI
             const qrImage = document.getElementById('qrImage');
             const qrPlaceholder = document.getElementById('qrPlaceholder');

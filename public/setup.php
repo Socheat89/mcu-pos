@@ -26,7 +26,11 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -38,6 +42,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
+<<<<<<< HEAD
     <style>
         body {
             display: flex;
@@ -257,6 +262,11 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     </style>
 </head>
 <body>
+=======
+    
+</head>
+<body class="auth-page">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -268,6 +278,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             <div class="loader-progress"><span></span></div>
         </div>
     </div>
+<<<<<<< HEAD
     <div class="auth-card">
         <div class="auth-header">
             <a href="/" class="auth-logo">
@@ -282,6 +293,25 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             <h2>Business Information</h2>
             <p>Complete your setup to activate your <span style="text-transform: capitalize; font-weight: 700; color: var(--primary);"><?php echo htmlspecialchars($plan); ?></span> workspace</p>
         </div>
+=======
+    <main class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="/" class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="ph-bold ph-cube"></i>
+                    </div>
+                    <span>Mekong CyberUnit</span>
+                </a>
+                <div class="badge-success">
+                    <i class="ph-bold ph-check-circle"></i> Payment Confirmed
+                </div>
+                <h2>Business Information</h2>
+                <p>Complete your setup to activate your <span class="link-strong" style="text-transform: capitalize;">
+                    <?php echo htmlspecialchars($plan); ?>
+                </span> workspace</p>
+            </div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 
         <div class="system-preview">
             <div class="system-icon-mini">
@@ -382,6 +412,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
             </div>
             
+<<<<<<< HEAD
             <button type="submit" class="btn btn-primary btn-full" style="margin-top: 1rem; height: 3.5rem; font-size: 1.1rem; font-weight: 700;">
                 Activate My Workspace <i class="ph-bold ph-arrow-right" style="margin-left: 8px;"></i>
             </button>
@@ -391,6 +422,18 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <!-- Creation Loading Modal -->
     <div id="creationModal" class="modal">
         <div class="modal-content">
+=======
+            <button type="submit" class="btn btn-primary full-width" style="margin-top: 1rem;">
+                Activate My Workspace <i class="ph-bold ph-arrow-right"></i>
+            </button>
+        </form>
+        </div>
+    </main>
+
+    <!-- Creation Loading Modal -->
+    <div id="creationModal" class="modal">
+        <div class="modal-content modal-content--sm modal-content--center">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <div id="creationSpinner" style="margin-bottom: 2rem;">
                 <i class="ph-bold ph-spinner ph-spin" style="font-size: 4rem; color: var(--primary);"></i>
             </div>

@@ -101,6 +101,69 @@ try {
         echo "'tenant_features' table created.<br>";
     }
 
+<<<<<<< HEAD
+=======
+    // 5. Create password reset token table
+    echo "Ensuring 'password_resets' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'password_resets'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE password_resets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            token_hash CHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used_at DATETIME NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_password_reset_token (token_hash),
+            INDEX idx_password_reset_user (user_id),
+            INDEX idx_password_reset_expires (expires_at)
+        )");
+        echo "'password_resets' table created.<br>";
+    }
+
+    // 6. Create 'pos_sessions' table
+    echo "Ensuring 'pos_sessions' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'pos_sessions'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE pos_sessions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            user_id INT NOT NULL,
+            opening_balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            closing_balance DECIMAL(10,2) NULL DEFAULT NULL,
+            total_sales DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            status ENUM('open', 'closed') DEFAULT 'open',
+            opened_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            closed_at TIMESTAMP NULL DEFAULT NULL,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_tenant_id (tenant_id),
+            INDEX idx_status (status)
+        )");
+        echo "'pos_sessions' table created.<br>";
+    }
+
+    // 7. Add 'session_id' column to 'orders' table
+    echo "Checking 'orders' table for 'session_id' column...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM orders LIKE 'session_id'");
+    if (empty($columns)) {
+        echo "Adding 'session_id' column to 'orders'...<br>";
+        $db->query("ALTER TABLE orders ADD COLUMN session_id INT NULL AFTER tenant_id");
+        $db->query("ALTER TABLE orders ADD CONSTRAINT fk_orders_session_id FOREIGN KEY (session_id) REFERENCES pos_sessions(id) ON DELETE SET NULL");
+        echo "'session_id' column added.<br>";
+    }
+
+    // 8. Add 'password_changed_at' column to 'users' table
+    echo "Checking 'users' table for 'password_changed_at' column...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM users LIKE 'password_changed_at'");
+    if (empty($columns)) {
+        echo "Adding 'password_changed_at' column to 'users'...<br>";
+        $db->query("ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER password_hash");
+        echo "'password_changed_at' column added.<br>";
+    }
+
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
     echo "Migration failed: " . $e->getMessage();

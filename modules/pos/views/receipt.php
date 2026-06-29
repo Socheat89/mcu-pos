@@ -26,6 +26,7 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+<<<<<<< HEAD
         body { font-family: 'Battambang', 'Courier New', monospace; margin: 0; padding: 0; background: #f8f9fa; }
         .receipt-wrap { padding: 20px; }
         .receipt { max-width: <?php echo $paperWidth; ?>px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #ddd; font-size: <?php echo $fontSize; ?>px; line-height: 1.4; }
@@ -36,11 +37,35 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
         .order-info { margin-bottom: 15px; }
         .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
         .items { margin-bottom: 15px; }
+=======
+        body { font-family: 'Battambang', 'Courier New', monospace; margin: 0; padding: 0; background: var(--pos-bg, #080A10); color: var(--pos-text, #f8fafc); }
+        .receipt-wrap { padding: 20px; }
+        .receipt { 
+            max-width: <?php echo $paperWidth; ?>px; 
+            margin: 0 auto; 
+            background: white; 
+            color: #000;
+            padding: 20px; 
+            border: 1px solid rgba(0,0,0,0.1); 
+            font-size: <?php echo $fontSize; ?>px; 
+            line-height: 1.4; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+        }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+        .header img { display: block; margin: 0 auto 10px; }
+        .header h1 { margin: 0; font-size: <?php echo $fontSize + 6; ?>px; color: #000; }
+        .header p { margin: 5px 0; color: #333; }
+        .order-info { margin-bottom: 15px; color: #000; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .items { margin-bottom: 15px; color: #000; }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         .item { display: flex; justify-content: space-between; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc; }
         .item:last-child { border-bottom: none; }
         .item-name { flex: 2; }
         .item-qty { flex: 1; text-align: center; }
         .item-price { flex: 1; text-align: right; }
+<<<<<<< HEAD
         .total { border-top: 1px solid #000; padding-top: 10px; font-weight: bold; }
         .footer { text-align: center; margin-top: 20px; border-top: 1px dashed #000; padding-top: 10px; }
         .btn { background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 5px; }
@@ -49,11 +74,66 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             body { background: white; }
             .receipt { box-shadow: none; border: none; }
             .btn { display: none; }
+=======
+        .total { border-top: 1px solid #000; padding-top: 10px; font-weight: bold; color: #000; }
+        .footer { text-align: center; margin-top: 20px; border-top: 1px dashed #000; padding-top: 10px; color: #333; }
+        
+        .receipt-actions {
+            text-align: center;
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn { 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            display: inline-flex; 
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--pos-primary, #06b6d4);
+            background: var(--pos-gradient-primary, linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--pos-text, #f8fafc) !important;
+            border: 1.5px solid var(--pos-border, rgba(255,255,255,0.08));
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--pos-primary, #06b6d4) !important;
+            border-color: var(--pos-primary, #06b6d4);
+            transform: translateY(-1px);
+        }
+        
+        @media print {
+            body { background: white; color: #000; }
+            .receipt { box-shadow: none; border: none; padding: 0; margin: 0; }
+            .receipt-actions, .btn { display: none !important; }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             .pos-shell, .pos-sidebar, .pos-topbar, .pos-overlay, .pos-footer { display: none !important; }
             .receipt-wrap { padding: 0; }
             .header img { max-width: 120px !important; max-height: 60px !important; }
             .header img[src=""] { display: none; }
+<<<<<<< HEAD
             .header img[src=""] { display: none; }
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         }
     </style>
 </head>
@@ -189,11 +269,19 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
         </div>
     </div>
 
+<<<<<<< HEAD
     <div style="text-align: center; margin-top: 20px;">
         <a href="javascript:window.print()" class="btn" style="background: var(--pos-gradient-primary); border: none; font-weight: 800; padding: 14px 28px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);">
             <i class="fas fa-print"></i> <?php echo __('print_receipt'); ?>
         </a>
         <a href="<?php echo mc_url($subdomain . '/pos/pos'); ?>" class="btn" style="background: #f8fafc; color: var(--pos-text); border: 1.5px solid var(--pos-border); font-weight: 700; padding: 14px 28px; border-radius: 12px;">
+=======
+    <div class="receipt-actions">
+        <a href="javascript:window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> <?php echo __('print_receipt'); ?>
+        </a>
+        <a href="<?php echo mc_url($subdomain . '/pos/pos'); ?>" class="btn btn-secondary">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <i class="fas fa-arrow-left"></i> <?php echo __('back_to_terminal'); ?>
         </a>
     </div>

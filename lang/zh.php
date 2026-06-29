@@ -11,6 +11,10 @@ return [
     'customers' => '客户',
     'reports' => '报告',
     'menu' => '数字化菜单',
+<<<<<<< HEAD
+=======
+    'cashiers' => '收银员',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'language' => '语言',
     'english' => '英语',
     'khmer' => '高棉语',
@@ -32,7 +36,11 @@ return [
     'name' => '名称',
     'description' => '描述',
     'category' => '类别',
+<<<<<<< HEAD
     'inventory' => '产品',
+=======
+    'inventory' => '库存',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'stock' => '库存',
     'low_stock' => '低库存',
     'out_of_stock' => '缺货',
@@ -138,7 +146,11 @@ return [
     'save_receipt_settings' => '保存收据设置',
     'live_preview' => '实时预览',
     'on_hold' => '挂单',
+<<<<<<< HEAD
     'inventory' => '产品',
+=======
+    'inventory' => '库存',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'analytics' => '分析',
     'digital_menu' => '数字菜单',
     'cyber_unit_pos' => 'Cyber Unit POS',
@@ -162,6 +174,7 @@ return [
     'start_adding_products' => '从添加您的第一个产品开始。',
     'in_stock_msg' => ':count 正在库存',
     'confirm_delete_product' => '您确定要删除此产品吗？',
+<<<<<<< HEAD
     'import_products' => '导入产品',
     'import_from_excel' => '从 Excel 导入',
     'excel_import_hint' => '支持 .xlsx 和 .csv 文件。',
@@ -189,6 +202,8 @@ return [
     'product_import_more_errors' => '更多行已被跳过。请检查文件后重新导入。',
     'product_import_xlsx_unavailable' => '无法导入 XLSX，因为 PHP Zip 扩展未启用。请改为上传 CSV。',
     'product_import_xlsx_error' => '无法读取 XLSX 文件。请重新保存为 .xlsx 或 CSV。',
+=======
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     'transaction_history' => '交易历史',
     'orders_management_msg' => '查看并管理所有订单记录、付款和发票。',
     'open_terminal' => '打开终端',
@@ -362,4 +377,45 @@ return [
     'customer_management_upgrade_msg' => '客户管理包含在我们的标准版和高级版计划中。立即升级，开始与客户建立持久的关系！',
     'upgrade_to_standard' => '升级至标准版 ($50)',
     'maybe_later' => '以后再说',
+<<<<<<< HEAD
+=======
+    'sessions' => '销售会话',
+    'session' => '会话',
+    'open_session' => '开启会话',
+    'close_session' => '关闭会话',
+    'opening_balance' => '开户金额',
+    'closing_balance' => '收盘金额',
+    'session_list' => '会话列表',
+    'opened_by' => '开启人',
+    'opened_at' => '开启时间',
+    'closed_at' => '关闭时间',
+    'status_open' => '进行中',
+    'status_closed' => '已关闭',
+    'expected_balance' => '应有金额',
+    'cash_control' => '现金控制',
+    'items_sold' => '售出商品',
+    'sold_qty' => '售出数量',
+    'revenue' => '营业额',
+    'view_details' => '查看详情',
+    'session_details' => '会话详情',
+    'session_summary' => '会话摘要',
+    'active_session' => '当前会话',
+    'close_session_confirm' => '您确定要关闭此会话吗？',
+    'no_sessions_found' => '未找到会话。',
+    'no_active_session' => '没有进行中的销售会话',
+    'session_active_alert' => '已有会话处于开启状态。',
+    'session_closed_success' => '会话成功关闭。',
+    'session_opened_success' => '会话成功开启。',
+    'enter_opening_balance' => '请输入开户金额',
+    'enter_closing_balance' => '请输入收盘金额',
+    'qr_menu'              => 'QR 菜单',
+    'qr_menu_subtitle'     => '通过二维码分享您的电子菜单。顾客可扫描并直接用手机下单。',
+    'qr_general_menu'      => '通用菜单',
+    'qr_per_table'         => '按桌二维码',
+    'qr_number_of_tables'  => '桌子数量',
+    'qr_print_all'         => '全部打印',
+    'qr_table'             => '桌',
+    'qr_scan_hint'         => '请用手机摄像头扫描此二维码以查看菜单。',
+    'qr_table_auto_detected' => '桌号已通过 QR 码自动检测',
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 ];

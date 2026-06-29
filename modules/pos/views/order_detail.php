@@ -13,7 +13,11 @@
         body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
+<<<<<<< HEAD
         .detail-card { background: white; border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
+=======
+        .detail-card { background: var(--pos-card); backdrop-filter: blur(12px); border-radius: 24px; padding: 32px; border: 1.5px solid var(--pos-border); }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         .detail-group { margin-bottom: 24px; }
         .detail-label { font-size: 11px; font-weight: 800; color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
         .detail-value { font-size: 15px; font-weight: 700; color: var(--pos-text); }
@@ -107,7 +111,11 @@
                         <tr>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 12px;">
+<<<<<<< HEAD
                                     <div style="width: 40px; height: 40px; border-radius: 10px; background: #f8fafc; border: 1px solid var(--pos-border); display: grid; place-items: center;">
+=======
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); display: grid; place-items: center;">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                         <i class="fas fa-barcode" style="color: var(--pos-text-muted); font-size: 14px;"></i>
                                     </div>
                                     <div>
@@ -124,7 +132,11 @@
                 </tbody>
             </table>
             
+<<<<<<< HEAD
             <div style="padding: 40px; background: #f8fafc; display: flex; justify-content: flex-end; border-top: 1.5px solid var(--pos-border);">
+=======
+            <div style="padding: 40px; background: rgba(255,255,255,0.01); display: flex; justify-content: flex-end; border-top: 1.5px solid var(--pos-border);">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <div style="width: 320px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                         <span style="font-weight: 700; color: var(--pos-text-muted);"><?php echo __('line_subtotal'); ?></span>
@@ -152,7 +164,11 @@
             <a href="<?php echo htmlspecialchars($posUrl('orders/' . $order['id'] . '/receipt')); ?>" class="btn btn-outline" style="padding: 16px 32px;" target="_blank">
                 <i class="fas fa-print"></i> <?php echo __('generate_receipt'); ?>
             </a>
+<<<<<<< HEAD
             <a href="<?php echo htmlspecialchars($posUrl('orders')); ?>" class="btn" style="padding: 16px 32px; background: white; color: var(--pos-text-muted); border: 1.5px solid var(--pos-border);">
+=======
+            <a href="<?php echo htmlspecialchars($posUrl('orders')); ?>" class="btn" style="padding: 16px 32px; background: transparent; color: var(--pos-text-muted); border: 1.5px solid var(--pos-border);">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <i class="fas fa-history"></i> <?php echo __('return_to_logs'); ?>
             </a>
         </div>

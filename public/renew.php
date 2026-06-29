@@ -41,13 +41,18 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
     <link rel="icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
     <link rel="shortcut icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<<<<<<< HEAD
     <style>
         body { background: #f8fafc; padding: 40px 20px; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
         .auth-card { background: white; padding: 2.5rem; border-radius: 1.5rem; box-shadow: var(--shadow-xl); width: 100%; max-width: 550px; border: 1px solid var(--border-color); }
@@ -71,6 +76,11 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     </style>
 </head>
 <body>
+=======
+    
+</head>
+<body class="auth-page">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -82,6 +92,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
             <div class="loader-progress"><span></span></div>
         </div>
     </div>
+<<<<<<< HEAD
     <div class="auth-card">
         <div class="auth-header">
             <a href="/" class="auth-logo">
@@ -94,6 +105,21 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
         <form id="renewForm">
             <div class="plan-group">
                 <label style="display: block; font-weight: 700; font-size: 0.85rem; color: #475569; text-transform: uppercase; margin-bottom: 1rem;">Select Plan</label>
+=======
+    <main class="auth-shell">
+        <div class="auth-card auth-card--compact">
+            <div class="auth-header">
+                <a href="/" class="auth-logo">
+                    <i class="ph-bold ph-cube"></i> <span>Mekong CyberUnit</span>
+                </a>
+                <h2>Renew Your Subscription</h2>
+                <p>Business: <strong><?php echo htmlspecialchars($tenant['name']); ?></strong></p>
+            </div>
+
+        <form id="renewForm">
+            <div class="plan-group">
+                <label style="display: block; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 1rem;">Select Plan</label>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <?php foreach ($plans as $p): ?>
                 <?php $isSelected = ($currentPlan && $currentPlan['id'] == $p['id']); ?>
                 <div class="plan-item <?php echo $isSelected ? 'active' : ''; ?>" onclick="selectPlan(<?php echo $p['id']; ?>, <?php echo $p['price']; ?>, '<?php echo strtolower($p['name']); ?>')">
@@ -101,7 +127,11 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <div style="font-weight: 700;"><?php echo htmlspecialchars($p['name']); ?></div>
+<<<<<<< HEAD
                             <div style="font-size: 0.8rem; color: #64748b;"><?php echo htmlspecialchars($p['description']); ?></div>
+=======
+                            <div class="checkbox-desc"><?php echo htmlspecialchars($p['description']); ?></div>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         </div>
                         <div class="plan-price">$<?php echo number_format($p['price'], 2); ?></div>
                     </div>
@@ -109,13 +139,20 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                 <?php endforeach; ?>
             </div>
 
+<<<<<<< HEAD
             <div class="duration-box">
                 <label style="font-weight: 700; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 0.5rem;">Renewal Period</label>
                 <select id="duration" class="form-control" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1.5px solid #e2e8f0;" onchange="updateTotal()">
+=======
+            <div class="panel-card" style="margin-top: 1.5rem;">
+                <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Renewal Period</label>
+                <select id="duration" class="form-control" onchange="updateTotal()">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                     <?php for($i=1; $i<=12; $i++): ?>
                         <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                     <?php endfor; ?>
                 </select>
+<<<<<<< HEAD
                 <div class="total-box">
                     <span>Total Payment:</span>
                     <span id="totalDisplay" style="color: #E31E26; font-size: 1.3rem;">$0.00</span>
@@ -145,6 +182,38 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                 I Have Paid (Notify Admin)
             </button>
             <button type="button" class="btn btn-outline btn-full" style="margin-top: 10px;" onclick="closeModal()">Close</button>
+=======
+                <div class="price-summary" style="margin-top: 1rem;">
+                    <span>Total Payment:</span>
+                    <span id="totalDisplay" class="price-highlight">$0.00</span>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary full-width" style="margin-top: 2rem;" onclick="startRenewal()">
+                Proceed to Payment <i class="ph-bold ph-arrow-right"></i>
+            </button>
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="login.php" class="link-strong">Cancel and Back</a>
+            </div>
+        </form>
+        </div>
+    </main>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content modal-content--sm modal-content--center">
+            <h3>Bakong KHQR</h3>
+            <div class="payment-amount" id="modalAmount">$0.00</div>
+            <div class="qr-code-container qr-code-container--center" id="qrContainer">
+                <i class="ph-bold ph-spinner ph-spin"></i>
+            </div>
+            <p class="payment-instruction">Scan with any banking app and notify us.</p>
+            
+            <button type="button" id="confirmBtn" class="btn btn-primary full-width" style="display: none;" onclick="notifyAdmin()">
+                I Have Paid (Notify Admin)
+            </button>
+            <button type="button" class="btn btn-outline full-width" style="margin-top: 10px;" onclick="closeModal()">Close</button>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <div id="apiStatus" style="font-size: 10px; color: #94a3b8; margin-top: 10px; font-family: monospace;"></div>
         </div>
     </div>

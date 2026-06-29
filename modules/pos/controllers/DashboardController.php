@@ -19,6 +19,12 @@ class DashboardController {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
 
+<<<<<<< HEAD
+=======
+        // Get active session
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         // Get stats
         $stats = [];
 

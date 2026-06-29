@@ -10,13 +10,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
+<<<<<<< HEAD
         .order-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(99, 102, 241, 0.08); color: var(--pos-primary); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+=======
+        .search-container { position: relative; margin-bottom: 24px; }
+        .search-container i { position: absolute; left: 20px; top: 16px; color: var(--pos-primary); font-size: 18px; }
+        .search-container input { width: 100%; padding: 14px 20px 14px 54px; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); background: #ffffff; color: var(--pos-text); font-size: 15px; font-weight: 600; outline: none; transition: all 0.3s; }
+        .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
+        
+        .avatar-box { width: 36px; height: 36px; border-radius: var(--pos-radius); background: var(--pos-primary-light); display: grid; place-items: center; font-size: 14px; font-weight: 900; color: var(--pos-primary); border: 1px solid rgba(var(--pos-primary-rgb), 0.2); }
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     </style>
 </head>
 <body class="pos-app">
     <?php $activeNav = 'orders'; include __DIR__ . '/partials/navbar.php'; ?>
 
     <div class="fade-in">
+<<<<<<< HEAD
         <div class="pos-page-hero">
             <div style="position: relative; z-index: 2;">
                 <div class="pos-kicker"><i class="fas fa-receipt"></i> <?php echo __('sales'); ?></div>
@@ -28,6 +38,16 @@
                     </a>
                 </div>
             </div>
+=======
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+            <div class="pos-title">
+                <h1><?php echo __('transaction_history'); ?></h1>
+                <p><?php echo __('orders_management_msg'); ?></p>
+            </div>
+            <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary">
+                <i class="fas fa-desktop"></i> <?php echo __('open_terminal'); ?>
+            </a>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -48,12 +68,20 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="pos-input-shell" style="margin-bottom: 24px; max-width: 560px;">
+=======
+        <div class="search-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_orders_placeholder'); ?>" onkeyup="searchOrders()">
         </div>
 
+<<<<<<< HEAD
         <div class="pos-panel">
+=======
+        <div class="pos-table-container">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             <table class="pos-table" id="ordersTable">
                 <thead>
                     <tr>
@@ -68,12 +96,21 @@
                 <tbody>
                     <?php if (empty($orders)): ?>
                         <tr>
+<<<<<<< HEAD
                             <td colspan="6" class="pos-empty-state">
                                 <div class="pos-empty-state__icon">
                                     <i class="fas fa-history" style="font-size: 30px;"></i>
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 900; margin: 0;"><?php echo __('no_transactions_found'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px; font-weight: 600;"><?php echo __('sales_history_msg'); ?></p>
+=======
+                            <td colspan="6" style="padding: 100px; text-align: center;">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+                                    <i class="fas fa-history" style="font-size: 32px; color: var(--pos-text-dim);"></i>
+                                </div>
+                                <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_transactions_found'); ?></h3>
+                                <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('sales_history_msg'); ?></p>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                             </td>
                         </tr>
                     <?php else: ?>
@@ -85,7 +122,11 @@
                                 <td style="font-weight: 800; color: var(--pos-primary);">#<?php echo $o['id']; ?></td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 12px;">
+<<<<<<< HEAD
                                         <div class="pos-avatar-circle" style="width: 38px; height: 38px; font-size: 13px;">
+=======
+                                        <div class="avatar-box">
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                                             <?php echo strtoupper(substr($o['customer_name'] ?? 'W', 0, 1)); ?>
                                         </div>
                                         <div style="font-weight: 700; color: var(--pos-text);"><?php echo htmlspecialchars($o['customer_name'] ?? 'Walk-in Customer'); ?></div>

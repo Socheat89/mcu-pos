@@ -73,6 +73,22 @@ CREATE TABLE users (
     UNIQUE KEY unique_tenant_email (tenant_id, email)
 );
 
+<<<<<<< HEAD
+=======
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_password_reset_token (token_hash),
+    INDEX idx_password_reset_user (user_id),
+    INDEX idx_password_reset_expires (expires_at)
+);
+
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 -- Settings Table for tenant-specific configurations
 CREATE TABLE settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -241,4 +257,8 @@ SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'staff' AND p.modul
 -- receipt_header_text: Point of Sale Receipt
 -- receipt_footer_text: Thank you for your business!
 -- receipt_font_size: 12
+<<<<<<< HEAD
 -- receipt_paper_width: 400
+=======
+-- receipt_paper_width: 400
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77

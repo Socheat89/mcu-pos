@@ -1,5 +1,11 @@
 <?php
 // admin/login_process.php
+<<<<<<< HEAD
+=======
+// Extend Session Lifetime to 30 Days (1 Month) before starting session
+ini_set('session.cookie_lifetime', 2592000); // 30 days
+ini_set('session.gc_maxlifetime', 2592000);   // 30 days
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 session_start();
 require_once __DIR__ . '/../core/classes/Database.php';
 

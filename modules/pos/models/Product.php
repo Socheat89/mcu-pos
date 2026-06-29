@@ -67,6 +67,7 @@ class Product {
             [$tenantId, $searchTerm, $searchTerm, $searchTerm]
         );
     }
+<<<<<<< HEAD
 
     public static function findBySkuOrBarcode($sku = '', $barcode = '', $tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
@@ -99,3 +100,9 @@ class Product {
 
 Product::init();
 ?>
+=======
+}
+
+Product::init();
+?>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77

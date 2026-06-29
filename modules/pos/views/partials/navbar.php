@@ -1,7 +1,11 @@
 <?php
 // Shared POS layout shell (sidebar + topbar).
 // Expected optional vars from caller:
+<<<<<<< HEAD
 //   - $activeNav: one of dashboard|pos|holds|products|orders|customers|reports
+=======
+//   - $activeNav: one of dashboard|pos|holds|products|customers|reports|settings
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $helperCandidates = [
@@ -61,6 +65,26 @@ $posUrl = function (string $path) use ($posBase): string {
 $activeClass = function (string $key) use ($activeNav): string {
     return ($activeNav === $key) ? 'active' : '';
 };
+<<<<<<< HEAD
+=======
+
+$navLabel = function (string $key): string {
+    $labels = [
+        'dashboard'    => __('dashboard'),
+        'pos'          => __('pos'),
+        'sessions'     => __('sessions'),
+        'holds'        => __('on_hold'),
+        'products'     => __('inventory'),
+        'customers'    => __('customers'),
+        'reports'      => __('analytics'),
+        'settings'     => __('settings'),
+        'cashiers'     => __('cashiers'),
+        'digital_menu' => __('qr_menu'),
+    ];
+
+    return $labels[$key] ?? __($key);
+};
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 ?>
 
 <div class="pos-shell" id="posShell">
@@ -111,15 +135,26 @@ $activeClass = function (string $key) use ($activeNav): string {
 
             <?php if ($hasFeature('pos', 'core')): ?>
             <a class="pos-side-link <?php echo $activeClass('dashboard'); ?>" href="<?php echo htmlspecialchars($posUrl('dashboard')); ?>">
+<<<<<<< HEAD
                 <i class="fas fa-chart-pie"></i><span><?php echo __('dashboard'); ?></span>
             </a>
             <a class="pos-side-link <?php echo $activeClass('pos'); ?>" href="<?php echo htmlspecialchars($posUrl('pos')); ?>">
                 <i class="fas fa-desktop"></i><span><?php echo __('pos'); ?></span>
+=======
+                <i class="fas fa-chart-pie"></i><span><?php echo $navLabel('dashboard'); ?></span>
+            </a>
+            <a class="pos-side-link <?php echo $activeClass('pos'); ?>" href="<?php echo htmlspecialchars($posUrl('pos')); ?>">
+                <i class="fas fa-desktop"></i><span><?php echo $navLabel('pos'); ?></span>
+            </a>
+            <a class="pos-side-link <?php echo $activeClass('sessions'); ?>" href="<?php echo htmlspecialchars($posUrl('sessions')); ?>">
+                <i class="fas fa-history"></i><span><?php echo $navLabel('sessions'); ?></span>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             </a>
             <?php endif; ?>
 
             <?php if ($hasFeature('pos', 'holds')): ?>
             <a class="pos-side-link <?php echo $activeClass('holds'); ?>" href="<?php echo htmlspecialchars($posUrl('holds')); ?>">
+<<<<<<< HEAD
                 <i class="fas fa-clock-rotate-left"></i><span><?php echo __('on_hold'); ?></span>
             </a>
             <?php endif; ?>
@@ -132,18 +167,34 @@ $activeClass = function (string $key) use ($activeNav): string {
             
             <?php 
             $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings') || $hasFeature('pos', 'digital_menu');
+=======
+                <i class="fas fa-clock-rotate-left"></i><span><?php echo $navLabel('holds'); ?></span>
+            </a>
+            <?php endif; ?>
+
+            <?php 
+            $isTenantAdmin = class_exists('Auth') && Auth::isTenantAdmin();
+            $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings');
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             if ($canManage): 
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
+<<<<<<< HEAD
                 <?php if ($hasFeature('pos', 'inventory')): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
                     <i class="fas fa-boxes-stacked"></i><span><?php echo __('inventory'); ?></span>
+=======
+                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
+                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 </a>
                 <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'customers')): ?>
                 <a class="pos-side-link <?php echo $activeClass('customers'); ?>" href="<?php echo htmlspecialchars($posUrl('customers')); ?>">
+<<<<<<< HEAD
                     <i class="fas fa-user-group"></i><span><?php echo __('customers'); ?></span>
                 </a>
                 <?php endif; ?>
@@ -166,6 +217,34 @@ $activeClass = function (string $key) use ($activeNav): string {
                         <i class="fas fa-gear"></i><span><?php echo __('settings'); ?></span>
                     </a>
                     <?php endif; ?>
+=======
+                    <i class="fas fa-user-group"></i><span><?php echo $navLabel('customers'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
+                    <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($hasFeature('pos', 'settings') && $isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
+                    <i class="fas fa-gear"></i><span><?php echo $navLabel('settings'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('cashiers'); ?>" href="<?php echo htmlspecialchars($posUrl('cashiers')); ?>">
+                    <i class="fas fa-user-tie"></i><span><?php echo $navLabel('cashiers'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
+                    <i class="fas fa-qrcode"></i><span><?php echo $navLabel('digital_menu'); ?></span>
+                </a>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                 <?php endif; ?>
             <?php endif; ?>
         </nav>
@@ -186,7 +265,11 @@ $activeClass = function (string $key) use ($activeNav): string {
                 <div class="pos-status-indicator">
                     <div class="pos-status-dot"></div>
                     <span class="pos-status-text">
+<<<<<<< HEAD
                         <?php echo htmlspecialchars($pageTitle ?? ($activeNav === 'pos' ? __('terminal') : ($activeNav ? __($activeNav) : __('dashboard')))); ?>
+=======
+                        <?php echo htmlspecialchars($pageTitle ?? ($activeNav ? $navLabel($activeNav) : $navLabel('dashboard'))); ?>
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                     </span>
                 </div>
             </div>
@@ -207,18 +290,28 @@ $activeClass = function (string $key) use ($activeNav): string {
                         align-items: center;
                     }
                     .pos-lang-btn {
+<<<<<<< HEAD
                         background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
                         border: 1px solid rgba(226, 232, 240, 0.95);
+=======
+                        background: rgba(14, 19, 34, 0.6);
+                        border: 1px solid var(--pos-border);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         padding: 10px 14px;
                         border-radius: 16px;
                         font-weight: 800;
                         font-family: 'Space Grotesk', 'Battambang', sans-serif;
                         font-size: 13px;
+<<<<<<< HEAD
                         color: #334155;
+=======
+                        color: var(--pos-text);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         cursor: pointer;
                         display: flex;
                         align-items: center;
                         gap: 8px;
+<<<<<<< HEAD
                         box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
                         transition: all 0.2s;
                     }
@@ -226,6 +319,15 @@ $activeClass = function (string $key) use ($activeNav): string {
                         border-color: rgba(99, 102, 241, 0.25);
                         background: #ffffff;
                         color: #4f46e5;
+=======
+                        box-shadow: var(--pos-shadow-sm);
+                        transition: all 0.2s;
+                    }
+                    .pos-lang-btn:hover {
+                        border-color: var(--pos-primary);
+                        background: rgba(14, 19, 34, 0.8);
+                        color: var(--pos-primary);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         transform: translateY(-1px);
                     }
                     .pos-lang-dropdown { 
@@ -238,10 +340,17 @@ $activeClass = function (string $key) use ($activeNav): string {
                         z-index: 1000;
                     }
                     .pos-lang-dropdown-inner {
+<<<<<<< HEAD
                         background: white;
                         border-radius: 18px;
                         box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
                         border: 1px solid rgba(226, 232, 240, 0.95);
+=======
+                        background: var(--pos-elevated);
+                        border-radius: 18px;
+                        box-shadow: var(--pos-shadow-xl);
+                        border: 1px solid var(--pos-border);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         min-width: 160px;
                         padding: 6px;
                         overflow: hidden;
@@ -256,19 +365,32 @@ $activeClass = function (string $key) use ($activeNav): string {
                         gap: 12px;
                         padding: 10px 14px;
                         text-decoration: none;
+<<<<<<< HEAD
                         color: #475569;
+=======
+                        color: var(--pos-text-muted);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                         font-size: 13px;
                         font-weight: 700;
                         border-radius: 12px;
                         transition: all 0.2s;
                     }
                     .pos-lang-item:hover {
+<<<<<<< HEAD
                         background: #f8fafc;
                         color: #4f46e5;
                     }
                     .pos-lang-item.active {
                         background: #eef2ff;
                         color: #4f46e5;
+=======
+                        background: rgba(255, 255, 255, 0.05);
+                        color: var(--pos-primary);
+                    }
+                    .pos-lang-item.active {
+                        background: var(--pos-primary-light);
+                        color: var(--pos-primary);
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
                     }
                 </style>
                 <div class="pos-lang-switcher" id="posLangSwitcher">
@@ -419,6 +541,10 @@ $activeClass = function (string $key) use ($activeNav): string {
 
         var overlay = document.createElement('div');
         overlay.className = 'pos-modal-overlay';
+<<<<<<< HEAD
+=======
+        overlay.style.display = 'grid';
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 
         var modal = document.createElement('div');
         modal.className = 'pos-modal pos-modal--' + type;

@@ -17,6 +17,13 @@ class SettingsController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+<<<<<<< HEAD
+=======
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         if (class_exists('Tenant') && Tenant::getPosLevel() < 1) {
              die('POS access required.');
         }
@@ -60,6 +67,18 @@ class SettingsController {
             session_start();
         }
 
+<<<<<<< HEAD
+=======
+        require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
+        require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
+        TenantMiddleware::handle();
+        AuthMiddleware::handle();
+
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         if (class_exists('Tenant') && Tenant::getPosLevel() < 1) {
              die('POS access required.');
         }

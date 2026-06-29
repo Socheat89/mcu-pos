@@ -1,5 +1,11 @@
 <?php
 // public/login_process.php
+<<<<<<< HEAD
+=======
+// Extend Session Lifetime to 30 Days (1 Month) before starting session
+ini_set('session.cookie_lifetime', 2592000); // 30 days
+ini_set('session.gc_maxlifetime', 2592000);   // 30 days
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
 session_start();
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Auth.php';
@@ -20,7 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         echo json_encode(['success' => false, 'error' => 'Invalid request method']);
         exit;
     }
+<<<<<<< HEAD
     header("Location: $urlPrefix/public/login.php");
+=======
+    header("Location: $urlPrefix/login.php");
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     exit;
 }
 
@@ -32,7 +42,11 @@ if (empty($username) || empty($password)) {
         echo json_encode(['success' => false, 'error' => 'Username and password are required']);
         exit;
     }
+<<<<<<< HEAD
     header("Location: $urlPrefix/public/login.php?error=" . urlencode('Username and password are required'));
+=======
+    header("Location: $urlPrefix/login.php?error=" . urlencode('Username and password are required'));
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     exit;
 }
 
@@ -76,7 +90,11 @@ try {
             echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
             exit;
         }
+<<<<<<< HEAD
         header("Location: $urlPrefix/public/login.php?error=" . urlencode('Invalid username or password'));
+=======
+        header("Location: $urlPrefix/login.php?error=" . urlencode('Invalid username or password'));
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
         exit;
     }
 } catch (Exception $e) {
@@ -87,7 +105,11 @@ try {
         echo json_encode(['success' => false, 'error' => 'System error: ' . $e->getMessage()]);
         exit;
     }
+<<<<<<< HEAD
     header("Location: $urlPrefix/public/login.php?error=" . urlencode('System error occurred. Please try again.'));
+=======
+    header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred. Please try again.'));
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
     exit;
 }
 ?>

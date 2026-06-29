@@ -19,7 +19,11 @@ class ReportsController {
              die('Upgrade to POS Premium to view advanced reports.');
         }
 
+<<<<<<< HEAD
         if (!Auth::hasPermission('pos', 'read')) {
+=======
+        if (!Auth::isTenantAdmin()) {
+>>>>>>> 062e3cc8d9b9f40dc40c6d6c6835e28f6f8a0d77
             die('No permission to access POS Reports');
         }
 
