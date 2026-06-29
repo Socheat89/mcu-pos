@@ -1123,7 +1123,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
                     productCard.onclick = () => addToCart(product.id, product.name, product.price, product.stock_quantity);
-                    const imageSrc = product.image ? (PRODUCT_IMAGE_BASE + product.image) : PRODUCT_FALLBACK_IMAGE;
+                    const imageSrc = product.image ? (product.image.startsWith('http://') || product.image.startsWith('https://') ? product.image : PRODUCT_IMAGE_BASE + product.image) : PRODUCT_FALLBACK_IMAGE;
                     productCard.innerHTML = `
                         <img src="${imageSrc}" alt="${product.name}" class="product-image">
                         <div class="product-name">${product.name}</div>

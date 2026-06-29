@@ -147,8 +147,8 @@ class ProductController {
         header('Content-Disposition: attachment; filename="product-import-template.csv"');
 
         $out = fopen('php://output', 'w');
-        fputcsv($out, ['name', 'sku', 'barcode', 'price', 'stock_quantity', 'category', 'status', 'description']);
-        fputcsv($out, ['Iced Latte', 'DRINK-001', '8850000000012', '2.50', '25', 'Drinks', 'active', 'Cold coffee drink']);
+        fputcsv($out, ['name', 'sku', 'barcode', 'price', 'stock_quantity', 'category', 'status', 'description', 'image']);
+        fputcsv($out, ['Iced Latte', 'DRINK-001', '8850000000012', '2.50', '25', 'Drinks', 'active', 'Cold coffee drink', 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=400']);
         fclose($out);
         exit;
     }
