@@ -629,6 +629,14 @@ class ProductController {
                 $data['_category_name'] = $this->importValue($row, $headerMap, 'category_name');
             }
 
+            if (array_key_exists('image', $headerMap)) {
+                $imageUrl = $this->importValue($row, $headerMap, 'image');
+                $importedImageName = $this->importImageFromUrl($imageUrl);
+                if ($importedImageName) {
+                    $data['image'] = $importedImageName;
+                }
+            }
+
             $items[] = ['data' => $data];
         }
 
@@ -644,7 +652,8 @@ class ProductController {
             'sku' => ['sku', 'code', 'product_code', 'reference', 'ref'],
             'barcode' => ['barcode', 'bar_code', 'ean', 'upc'],
             'category_name' => ['category', 'category_name', 'type', 'group'],
-            'status' => ['status', 'active', 'visibility']
+            'status' => ['status', 'active', 'visibility'],
+            'image' => ['image', 'img', 'picture', 'photo', 'url', 'image_url', 'thumb', 'thumbnail', 'pic']
         ];
 
         $lookup = [];
@@ -663,6 +672,93 @@ class ProductController {
         }
 
         return $map;
+    }
+
+    private function importImageFromUrl($imageUrl) {
+        $imageUrl = trim($imageUrl);
+        if ($imageUrl === '' || !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        try {
+            $content = $this->fetchUrl($imageUrl);
+            if ($content === false || empty($content)) {
+                return null;
+            }
+
+            $uploadDir = __DIR__ . '/../../../uploads/products/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            // Create temporary file
+            $tmpFile = tempnam(sys_get_temp_dir(), 'img_import_');
+            if (!$tmpFile) {
+                return null;
+            }
+            file_put_contents($tmpFile, $content);
+
+            $imageInfo = @getimagesize($tmpFile);
+            if (!$imageInfo) {
+                @unlink($tmpFile);
+                return null;
+            }
+
+            $mime = $imageInfo['mime'] ?? '';
+            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($mime, $allowedTypes)) {
+                @unlink($tmpFile);
+                return null;
+            }
+
+            // Generate unique filename with .webp extension
+            $fileName = uniqid() . '.webp';
+            $targetPath = $uploadDir . $fileName;
+
+            // Convert image to WebP
+            $image = null;
+            switch ($mime) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    $image = @imagecreatefromjpeg($tmpFile);
+                    break;
+                case 'image/png':
+                    $image = @imagecreatefrompng($tmpFile);
+                    if ($image) {
+                        imagepalettetotruecolor($image);
+                        imagealphablending($image, true);
+                        imagesavealpha($image, true);
+                    }
+                    break;
+                case 'image/gif':
+                    $image = @imagecreatefromgif($tmpFile);
+                    break;
+                case 'image/webp':
+                    // If already webp, just copy it
+                    if (@copy($tmpFile, $targetPath)) {
+                        @unlink($tmpFile);
+                        return $fileName;
+                    }
+                    break;
+            }
+
+            @unlink($tmpFile);
+
+            if ($image === null) {
+                return null;
+            }
+
+            // Convert and save as WebP with 80% quality
+            if (imagewebp($image, $targetPath, 80)) {
+                imagedestroy($image);
+                return $fileName;
+            } else {
+                imagedestroy($image);
+                return null;
+            }
+        } catch (Throwable $e) {
+            return null;
+        }
     }
 
     private function normalizeImportHeader($value) {
