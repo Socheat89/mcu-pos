@@ -1,0 +1,38 @@
+# Security: Disable Directory Listing
+# Options -Indexes
+
+RewriteEngine On
+
+# ── Detect environment ──────────────────────────────────────────────────────
+# On live (domain root), RewriteBase is /.
+# On local XAMPP (subfolder), RewriteBase is /Mekong_CyberUnit/.
+# We auto-set it based on the server name.
+# If you deploy to root on live, change to: RewriteBase /
+
+RewriteBase /
+
+# SEO endpoints
+RewriteRule ^sitemap\.xml$ public/sitemap.php [L]
+RewriteRule ^robots\.txt$ public/robots.php [L]
+
+# Favicon shortcuts
+RewriteRule ^favicon\.(ico|png)$ public/images/logo.png [L]
+
+# Redirect root to public folder
+RewriteRule ^$ public/ [L,R=301]
+
+# Security: Block direct access to core system folders
+RewriteRule ^(config|core|middleware|database|logs|vendor|modules)/(.*)$ - [F,L]
+
+# Handle PHP files directly - Allow specific access to existing PHP files
+RewriteCond %{REQUEST_FILENAME} \.php$ [NC]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule . - [L]
+
+# Allow access to existing files and directories (images, css, js)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule . - [L]
+
+# Route EVERYTHING else to index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
