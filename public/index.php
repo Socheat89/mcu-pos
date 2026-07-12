@@ -1266,6 +1266,91 @@ $structuredData = [
                 closeAuthModal();
             }
         }
+
+        // ═══════════════════════════════════════════════════════
+        // SCROLL ANIMATIONS — Intersection Observer
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, idx) => {
+                    if (entry.isIntersecting) {
+                        // Staggered delay based on index within parent
+                        const siblings = entry.target.parentElement ? 
+                            Array.from(entry.target.parentElement.children).filter(c => c.classList.contains('animate-on-scroll')) : [];
+                        const delay = siblings.indexOf(entry.target) * 80;
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, Math.min(delay, 400));
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all elements with animate-on-scroll class
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Also observe existing sections for staggered entrance
+            const sectionSelectors = [
+                '.feature-card', '.testimonial-card', '.system-card',
+                '.faq-item', '.metric-card', '.stat-card'
+            ];
+            
+            sectionSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach((el, idx) => {
+                    el.classList.add('animate-on-scroll');
+                    el.style.transitionDelay = (idx % 6) * 60 + 'ms';
+                    observer.observe(el);
+                });
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // HEADER SCROLL SHADOW
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const header = document.querySelector('.main-header');
+            if (!header) return;
+            
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                if (currentScroll > 10) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                lastScroll = currentScroll;
+            }, { passive: true });
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // ACTIVE NAV LINK HIGHLIGHT ON SCROLL
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-links .nav-item, .mobile-drawer .nav-item');
+            if (!sections.length || !navLinks.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                        });
+                    }
+                });
+            }, { threshold: 0.3, rootMargin: '-80px 0px -20% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+        })();
     </script>
 </body>
 </html>
