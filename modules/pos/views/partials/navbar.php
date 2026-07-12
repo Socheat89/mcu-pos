@@ -19,6 +19,12 @@ foreach ($helperCandidates as $helperPath) {
 if (!function_exists('mc_base_path')) {
     throw new RuntimeException('Unable to load core/helpers/url.php');
 }
+
+// Load Store class for store switcher
+$storeClassPath = dirname(__DIR__, 4) . '/core/classes/Store.php';
+if (is_file($storeClassPath) && !class_exists('Store')) {
+    require_once $storeClassPath;
+}
 $basePath = mc_base_path();
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
 
