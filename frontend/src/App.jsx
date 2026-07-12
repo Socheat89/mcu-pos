@@ -412,7 +412,8 @@ export default function App() {
   const [pendingOrdersOpen, setPendingOrdersOpen] = useState(false);
   const [analyticsViewOpen, setAnalyticsViewOpen] = useState(false);
   const [toast, setToast] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null); // { message, onConfirm }
+  const [confirmModal, setConfirmModal] = useState(null);
+  const [mobileTab, setMobileTab] = useState('products'); // 'products' | 'cart' // { message, onConfirm }
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
@@ -1122,7 +1123,7 @@ export default function App() {
           /* ═══ POS Terminal View ═══ */
           <>
             {/* ─── Left: Products ─── */}
-            <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <main className={`lg:flex-1 min-h-0 flex flex-col overflow-hidden ${mobileTab !== 'products' ? 'hidden lg:flex' : 'flex-1'}`}>
               {/* Search + Categories bar */}
               <div className={`flex-shrink-0 px-3 py-3 sm:px-5 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
                 {/* Search input */}
@@ -1256,7 +1257,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
+            <aside className={`lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Odoo POS Order Tabs */}
@@ -1480,6 +1481,38 @@ export default function App() {
                 </div>
               </div>
             </aside>
+
+            {/* 📱 Mobile Bottom Tab Bar */}
+            <div className="lg:hidden flex-shrink-0 flex border-t border-gray-200 bg-white">
+              <button
+                onClick={() => setMobileTab('products')}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all ${
+                  mobileTab === 'products' ? 'text-[#E76F51] bg-[#FFF8F0]' : 'text-gray-400'
+                }`}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="text-[10px] font-bold">{t('products_label', 'Products')}</span>
+              </button>
+
+              <button
+                onClick={() => setMobileTab('cart')}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all relative ${
+                  mobileTab === 'cart' ? 'text-[#E76F51] bg-[#FFF8F0]' : 'text-gray-400'
+                }`}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                </svg>
+                <span className="text-[10px] font-bold">{t('cart', 'Cart')} ({cartItemCount})</span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-0.5 right-1/4 bg-[#E76F51] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </>
         )}
       </div>

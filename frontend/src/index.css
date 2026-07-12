@@ -792,6 +792,14 @@ select:focus,
   --cafe-text: #1a1a2e;
   --cafe-muted: #999;
 }
+
+/* ── Mobile Bottom Tab Bar ───────────────────────────────── */
+@media (max-width: 1023px) {
+  .lg\:hidden.flex-shrink-0.flex.border-t {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+  }
+}
 /* ═══════════════════════════════════════════════════════════════════════════
    📱 MOBILE TOUCH OPTIMIZATION — Big tap targets, thumb-friendly layout
    ═══════════════════════════════════════════════════════════════════════════ */
