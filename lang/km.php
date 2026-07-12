@@ -379,4 +379,24 @@ return [
     'qr_scan_hint'         => 'ស្កែនកូដ QR នេះដោយប្រើកាមេរ៉ាទូរស័ព្ទរបស់អ្នក ដើម្បីមើលម៉ឺនុយ។',
     'qr_table_auto_detected' => 'លេខតុត្រូវបានរកឃើញដោយស្វ័យប្រវត្តិពីកូដ QR',
 
+    // Multi-Store
+    'manage_stores'           => 'គ្រប់គ្រងហាង',
+    'manage_stores_desc'      => 'គ្រប់គ្រងសាខាហាង និងទីតាំងរបស់អ្នក។',
+    'add_store'               => 'បន្ថែមហាង',
+    'add_new_store'           => 'បន្ថែមហាងថ្មី',
+    'edit_store'              => 'កែសម្រួលហាង',
+    'store_name'              => 'ឈ្មោះហាង',
+    'store_code'              => 'កូដហាង',
+    'store_name_required'     => 'ត្រូវការឈ្មោះហាង។',
+    'store_name_placeholder'  => 'ឧ. សាខាធំ, ទួលគោក',
+    'store_address_placeholder' => 'អាសយដ្ឋានហាង...',
+    'save_store'              => 'រក្សាទុកហាង',
+    'default_store'           => 'លំនាំដើម',
+    'current_store'           => 'ហាងបច្ចុប្បន្ន',
+    'switch_to'               => 'ប្តូរទៅ',
+    'set_as_default_store'    => 'កំណត់ជាហាងលំនាំដើម',
+    'confirm_delete_store'    => 'តើអ្នកប្រាកដថាចង់លុបហាងនេះមែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។',
+    'invalid_store'           => 'ហាងមិនត្រឹមត្រូវ។',
+    'no_permission'           => 'អ្នកមិនមានសិទ្ធិអនុវត្តសកម្មភាពនេះទេ។',
+
 ];

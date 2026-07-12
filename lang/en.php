@@ -379,4 +379,25 @@ return [
     'qr_scan_hint'         => 'Scan this QR code with your phone camera to view the menu.',
     'qr_table_auto_detected' => 'Table auto-detected from QR code',
 
+    // Multi-Store
+    'manage_stores'           => 'Stores',
+    'manage_stores_desc'      => 'Manage your store branches and locations.',
+    'add_store'               => 'Add Store',
+    'add_new_store'           => 'Add New Store',
+    'edit_store'              => 'Edit Store',
+    'store_name'              => 'Store Name',
+    'store_code'              => 'Store Code',
+    'store_name_required'     => 'Store name is required.',
+    'store_name_placeholder'  => 'e.g. Main Branch, Toul Kork',
+    'store_address_placeholder' => 'Store address...',
+    'save_store'              => 'Save Store',
+    'default_store'           => 'Default',
+    'current_store'           => 'Current Store',
+    'switch_to'               => 'Switch',
+    'set_as_default_store'    => 'Set as default store',
+    'confirm_delete_store'    => 'Are you sure you want to delete this store? This action cannot be undone.',
+    'invalid_store'           => 'Invalid store.',
+    'no_permission'           => 'You do not have permission to perform this action.',
+    'no_permission'           => 'You do not have permission to perform this action.',
+
 ];

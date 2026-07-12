@@ -182,6 +182,11 @@ try {
                     require_once $baseDir . '/core/classes/Settings.php';
                     $controller = new CashierController();
 
+                } elseif ($sub === 'stores') {
+                    require_once $baseDir . '/core/classes/Store.php';
+                    require_once $baseDir . '/modules/pos/controllers/StoreController.php';
+                    $controller = new StoreController();
+
                 } elseif ($sub === 'holds') {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();

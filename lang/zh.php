@@ -379,4 +379,24 @@ return [
     'qr_scan_hint'         => '请用手机摄像头扫描此二维码以查看菜单。',
     'qr_table_auto_detected' => '桌号已通过 QR 码自动检测',
 
+    // Multi-Store
+    'manage_stores'           => '管理门店',
+    'manage_stores_desc'      => '管理您的门店分支和位置。',
+    'add_store'               => '添加门店',
+    'add_new_store'           => '添加新门店',
+    'edit_store'              => '编辑门店',
+    'store_name'              => '门店名称',
+    'store_code'              => '门店代码',
+    'store_name_required'     => '门店名称为必填项。',
+    'store_name_placeholder'  => '例如：总店，堆谷分店',
+    'store_address_placeholder' => '门店地址...',
+    'save_store'              => '保存门店',
+    'default_store'           => '默认',
+    'current_store'           => '当前门店',
+    'switch_to'               => '切换',
+    'set_as_default_store'    => '设为默认门店',
+    'confirm_delete_store'    => '确定要删除此门店吗？此操作无法撤销。',
+    'invalid_store'           => '无效的门店。',
+    'no_permission'           => '您没有执行此操作的权限。',
+
 ];
