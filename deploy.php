@@ -19,11 +19,14 @@ if ($secretKey !== $requiredKey) {
 echo '<pre style="font-family:monospace;padding:20px;">';
 echo "🚀 Starting deploy...\n\n";
 
-// Run git pull
+// Run git pull with hard reset to avoid local conflicts
 $output = [];
 $returnCode = 0;
 chdir(__DIR__);
-exec('git pull 2>&1', $output, $returnCode);
+exec('git fetch origin 2>&1', $output, $returnCode);
+exec('git reset --hard origin/main 2>&1', $output2, $returnCode2);
+$output = array_merge($output, $output2);
+$returnCode = $returnCode !== 0 ? $returnCode : $returnCode2;
 
 foreach ($output as $line) {
     echo htmlspecialchars($line) . "\n";
