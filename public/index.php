@@ -125,7 +125,7 @@ $structuredData = [
                 </div>
                 <div class="modal-body">
                     <div id="authError" class="alert alert-danger d-none py-2"></div>
-                    <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                    <form id="authForm" action="login_process.php" method="POST">
                         <div class="mb-3">
                             <label for="modal-username" class="form-label">Username</label>
                             <input type="text" id="modal-username" class="form-control" placeholder="Enter your username" required>
@@ -625,15 +625,6 @@ $structuredData = [
             const pollingNotice = document.getElementById('pollingNotice');
             const qrImage = document.getElementById('qrImage');
             const qrPlaceholder = document.getElementById('qrPlaceholder');
-            currentPlan = plan;
-            currentAmount = price;
-            document.getElementById('modalAmount').textContent = '$' + price.toFixed(2);
-            document.getElementById('planName').textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
-            
-            // Reset modal state
-            const confirmBtn = document.getElementById('confirmBtn');
-            const staticNotice = document.getElementById('staticNotice');
-            const pollingNotice = document.getElementById('pollingNotice');
             
             qrImage.style.display = 'none';
             qrPlaceholder.classList.remove('d-none');
