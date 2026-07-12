@@ -64,13 +64,17 @@ $activeClass = function (string $key) use ($activeNav): string {
 
 $navLabel = function (string $key): string {
     $labels = [
-        'dashboard' => __('dashboard'),
-        'pos' => __('pos'),
-        'holds' => __('on_hold'),
-        'products' => __('inventory'),
-        'customers' => __('customers'),
-        'reports' => __('analytics'),
-        'settings' => __('settings'),
+        'dashboard'    => __('dashboard'),
+        'pos'          => __('pos'),
+        'sessions'     => __('sessions'),
+        'holds'        => __('on_hold'),
+        'orders'       => __('orders'),
+        'products'     => __('inventory'),
+        'customers'    => __('customers'),
+        'reports'      => __('analytics'),
+        'settings'     => __('settings'),
+        'cashiers'     => __('cashiers'),
+        'digital_menu' => __('qr_menu'),
     ];
 
     return $labels[$key] ?? __($key);
@@ -130,6 +134,9 @@ $navLabel = function (string $key): string {
             <a class="pos-side-link <?php echo $activeClass('pos'); ?>" href="<?php echo htmlspecialchars($posUrl('pos')); ?>">
                 <i class="fas fa-desktop"></i><span><?php echo $navLabel('pos'); ?></span>
             </a>
+            <a class="pos-side-link <?php echo $activeClass('sessions'); ?>" href="<?php echo htmlspecialchars($posUrl('sessions')); ?>">
+                <i class="fas fa-history"></i><span><?php echo $navLabel('sessions'); ?></span>
+            </a>
             <?php endif; ?>
 
             <?php if ($hasFeature('pos', 'holds')): ?>
@@ -138,13 +145,20 @@ $navLabel = function (string $key): string {
             </a>
             <?php endif; ?>
 
+            <?php if ($hasFeature('pos', 'orders')): ?>
+            <a class="pos-side-link <?php echo $activeClass('orders'); ?>" href="<?php echo htmlspecialchars($posUrl('orders')); ?>">
+                <i class="fas fa-list-ul"></i><span><?php echo $navLabel('orders'); ?></span>
+            </a>
+            <?php endif; ?>
+
             <?php 
+            $isTenantAdmin = class_exists('Auth') && Auth::isTenantAdmin();
             $canManage = $hasFeature('pos', 'inventory') || $hasFeature('pos', 'customers') || $hasFeature('pos', 'reports') || $hasFeature('pos', 'settings');
             if ($canManage): 
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
-                <?php if ($hasFeature('pos', 'inventory')): ?>
+                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
                     <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
                 </a>
@@ -156,15 +170,27 @@ $navLabel = function (string $key): string {
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'reports')): ?>
+                <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
                     <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'settings')): ?>
+                <?php if ($hasFeature('pos', 'settings') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('settings'); ?>" href="<?php echo htmlspecialchars($posUrl('settings')); ?>">
                     <i class="fas fa-gear"></i><span><?php echo $navLabel('settings'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('cashiers'); ?>" href="<?php echo htmlspecialchars($posUrl('cashiers')); ?>">
+                    <i class="fas fa-user-tie"></i><span><?php echo $navLabel('cashiers'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
+                    <i class="fas fa-qrcode"></i><span><?php echo $navLabel('digital_menu'); ?></span>
                 </a>
                 <?php endif; ?>
             <?php endif; ?>
@@ -419,6 +445,7 @@ $navLabel = function (string $key): string {
 
         var overlay = document.createElement('div');
         overlay.className = 'pos-modal-overlay';
+        overlay.style.display = 'grid';
 
         var modal = document.createElement('div');
         modal.className = 'pos-modal pos-modal--' + type;

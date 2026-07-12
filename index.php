@@ -5,7 +5,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 try {
-    // Harden Session Security
+    // Harden Session Security & Extend Session Lifetime to 30 Days (1 Month)
+    ini_set('session.cookie_lifetime', 2592000); // 30 days
+    ini_set('session.gc_maxlifetime', 2592000);   // 30 days
+
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_only_cookies', 1);
     ini_set('session.cookie_samesite', 'Lax');
@@ -77,6 +80,7 @@ try {
         exit;
     };
 
+
     // 1. Static/Public Routing (Explicit /public or /admin)
     if (strpos($path, '/public/') === 0 || strpos($path, '/admin/') === 0) {
         $cleanPath = str_replace('/', DIRECTORY_SEPARATOR, $path);
@@ -87,6 +91,7 @@ try {
             } else {
                 $serveStatic($file);
             }
+
             exit;
         }
     }
@@ -101,6 +106,7 @@ try {
         } else {
             $serveStatic($publicPath);
         }
+
         exit;
     }
 
@@ -167,6 +173,15 @@ try {
                 } elseif ($sub === 'menu') {
                     require_once $baseDir . '/modules/pos/controllers/MenuController.php';
                     $controller = new MenuController();
+                } elseif ($sub === 'sessions') {
+                    require_once $baseDir . '/modules/pos/controllers/SessionController.php';
+                    $controller = new SessionController();
+                } elseif ($sub === 'cashiers') {
+                    require_once $baseDir . '/modules/pos/controllers/CashierController.php';
+                    require_once $baseDir . '/core/classes/User.php';
+                    require_once $baseDir . '/core/classes/Settings.php';
+                    $controller = new CashierController();
+
                 } elseif ($sub === 'holds') {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();

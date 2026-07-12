@@ -16,6 +16,7 @@
         .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
         .avatar-circle { width: 44px; height: 44px; border-radius: var(--pos-radius); background: var(--pos-primary-light); color: var(--pos-primary); display: grid; place-items: center; font-weight: 900; font-size: 16px; border: 1px solid rgba(var(--pos-primary-rgb), 0.2); }
+
     </style>
 </head>
 <body class="pos-app">
@@ -30,6 +31,7 @@
             <a href="<?php echo htmlspecialchars($posUrl('customers/create')); ?>" class="btn btn-primary">
                 <i class="fas fa-user-plus"></i> <?php echo __('add_customer'); ?>
             </a>
+
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -46,11 +48,13 @@
         </div>
 
         <div class="search-container">
+
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_customers_placeholder'); ?>" onkeyup="searchCustomers()">
         </div>
 
         <div class="pos-table-container">
+
             <table class="pos-table" id="customersTable">
                 <thead>
                     <tr>
@@ -70,6 +74,7 @@
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_customers_yet'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('client_database_msg'); ?></p>
+
                             </td>
                         </tr>
                     <?php else: ?>
@@ -77,12 +82,14 @@
                             <tr class="customer-row">
                                 <td>
                                     <div class="avatar-circle">
+
                                         <?php echo strtoupper(substr($c['name'], 0, 1)); ?>
                                     </div>
                                 </td>
                                 <td>
                                     <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($c['name']); ?></div>
                                     <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">ID: #100<?php echo $c['id']; ?></div>
+
                                 </td>
                                 <td>
                                     <div style="display: flex; flex-direction: column; gap: 4px;">

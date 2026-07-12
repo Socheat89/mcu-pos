@@ -99,8 +99,14 @@ class OrderController {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
 
-        // Update order status to completed
-        $result = $db->update('orders', ['status' => 'completed'], 'id = ? AND tenant_id = ? AND status = ?', [$id, $tenantId, 'pending']);
+        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        if (!$activeSession) {
+            die('No active POS session. Please open a session first.');
+        }
+
+        // Update order status to completed and set session_id
+        $result = $db->update('orders', ['status' => 'completed', 'session_id' => $activeSession['id']], 'id = ? AND tenant_id = ? AND status = ?', [$id, $tenantId, 'pending']);
+
 
         if ($result) {
             $prefix = mc_base_path();
@@ -114,6 +120,13 @@ class OrderController {
     private function processOrder() {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
+
+        // Enforce active session check
+        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        if (!$activeSession) {
+            die('Order creation failed: No active POS session. Please open a session first.');
+        }
+
 
         // Start transaction
         $db->getConnection()->beginTransaction();
@@ -179,7 +192,8 @@ class OrderController {
                         }
                     }
 
-                    $unitPrice = (float)$product['price'];
+                    $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
@@ -208,7 +222,9 @@ class OrderController {
                 $db->update('orders', [
                     'customer_id' => $customerId,
                     'total' => $total,
-                    'status' => $status
+                    'status' => $status,
+                    'session_id' => $activeSession['id']
+
                 ], 'id = ? AND tenant_id = ?', [$resumeOrderId, $tenantId]);
 
                 // Keep payments clean
@@ -240,7 +256,9 @@ class OrderController {
                 'tenant_id' => $tenantId,
                 'customer_id' => $customerId,
                 'total' => 0, // Calculate later
-                'status' => $status
+                'status' => $status,
+                'session_id' => $activeSession['id']
+
             ];
 
             $orderId = $db->insert('orders', $orderData);
@@ -264,7 +282,8 @@ class OrderController {
                         throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . '. Upgrade to Standard ($50) for inventory management.');
                     }
                 }
-                $unitPrice = (float)$product['price'];
+                $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [

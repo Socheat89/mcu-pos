@@ -64,6 +64,7 @@ $structuredData = [
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css?v=2.2">
+
     
     <!-- Favicon -->
     <link rel="icon" href="images/logo.png" type="image/png">
@@ -84,6 +85,7 @@ $structuredData = [
             <h3>Payment Successful!</h3>
             <p>Thank you for your payment. Your workspace setup is being initialized.</p>
             <div class="status-inline">
+
                 <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
             </div>
         </div>
@@ -99,6 +101,7 @@ $structuredData = [
                 <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
             </div>
             <div class="modal-body">
+
                 <div class="waiting-status">
                     <div class="countdown-container">
                         <svg class="countdown-svg">
@@ -129,11 +132,13 @@ $structuredData = [
         <div class="modal-content modal-content--sm">
             <div class="modal-header">
                 <h3>
+
                     <i class="ph-bold ph-user-circle"></i> Welcome Back
                 </h3>
                 <button type="button" class="modal-close" onclick="closeAuthModal()">&times;</button>
             </div>
             <div class="modal-body">
+
                 <div id="authError" class="auth-error"></div>
                 <form id="authForm" onsubmit="handleAuthSubmit(event)">
                     <div class="auth-form-group">
@@ -145,18 +150,21 @@ $structuredData = [
                         <div style="display: flex; justify-content: space-between;">
                             <label for="modal-password">Password</label>
                             <a href="forgot_password.php" class="link-strong" style="font-size: 0.8rem;">Forgot?</a>
+
                         </div>
                         <input type="password" id="modal-password" name="password" placeholder="Enter your password" required>
                     </div>
                     
                     <button type="submit" id="signInBtn" class="btn btn-primary full-width">
                         Sign In <i class="ph-bold ph-sign-in"></i>
+
                     </button>
                     
                     <div class="auth-divider">or</div>
                     
                     <p>
                         New here? <a href="register.php" class="link-strong">Create an account</a>
+
                     </p>
                 </form>
             </div>
@@ -168,6 +176,7 @@ $structuredData = [
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="landing-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -196,6 +205,7 @@ $structuredData = [
                 <a href="#pricing" class="nav-item">Pricing</a>
                 <a href="#faq" class="nav-item">FAQ</a>
                 <a href="#contact" class="nav-item">Contact</a>
+
             </nav>
             
             <div class="flex items-center gap-4 nav-actions">
@@ -216,6 +226,7 @@ $structuredData = [
             <a href="#pricing" class="nav-item" onclick="closeMobileDrawer()">Pricing</a>
             <a href="#faq" class="nav-item" onclick="closeMobileDrawer()">FAQ</a>
             <a href="#contact" class="nav-item" onclick="closeMobileDrawer()">Contact</a>
+
         </nav>
         <div class="mobile-cta">
             <a href="login.php" class="btn btn-outline" onclick="closeMobileDrawer(); openAuthModal();">Sign In</a>
@@ -351,6 +362,7 @@ $structuredData = [
                     </div>
                     <h3>Multi-outlet Management / គ្រប់គ្រងសាខាច្រើន</h3>
                     <p>Manage multiple branch locations, centralize warehouse stock, and compare store performances from a single dashboard.</p>
+
                 </div>
             </div>
         </div>
@@ -430,11 +442,13 @@ $structuredData = [
         <div class="container">
             <div class="section-header">
                 <div class="section-kicker">Cloud POS Plans</div>
+
                 <h2>Simple, Transparent Pricing</h2>
                 <p>Choose the right plan for your business needs.</p>
             </div>
             
             <div class="systems-grid">
+
                 <?php
                 try {
                 $db = Database::getInstance();
@@ -443,6 +457,7 @@ $structuredData = [
                     echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 1rem; border: 1px dashed rgba(99, 102, 241, 0.3); color: #cbd5e1;">
                             <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--accent);"></i>
                             No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700; color: var(--primary);">Admin Panel</a>.
+
                           </div>';
                 } else {
                 foreach ($plans as $index => $plan):
@@ -461,6 +476,7 @@ $structuredData = [
                     <p class="system-desc"><?php echo htmlspecialchars($plan['description']); ?></p>
                     
                     <div class="price-tag">
+
                         <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
                         <span class="price-period">/month</span>
                     </div>
@@ -487,6 +503,7 @@ $structuredData = [
                     </ul>
                     
                     <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?> full-width">
+
                         Choose <?php echo htmlspecialchars($plan['name']); ?>
                     </a>
                 </div>
@@ -496,6 +513,7 @@ $structuredData = [
                     echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
                             <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
                            </div>';
+
                 }
                 ?>
             </div>
@@ -711,6 +729,7 @@ $structuredData = [
         </div>
     </section>
 
+
     <!-- Features / CTA -->
     <section class="cta-section">
         <div class="container">
@@ -722,6 +741,7 @@ $structuredData = [
                         Create Free Account
                     </a>
                     <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn btn-ghost">
+
                         Contact Sales
                     </a>
                 </div>
@@ -736,6 +756,7 @@ $structuredData = [
                 <div class="footer-brand">
                     <div class="logo">
                         <div class="logo-icon">
+
                             <i class="ph-bold ph-cube"></i>
                         </div>
                         <span>Mekong CyberUnit</span>
@@ -797,6 +818,7 @@ $structuredData = [
                 <div class="qr-code-container qr-code-container--center">
                     <div id="qrPlaceholder" style="display: none;">
                          <i class="ph-bold ph-spinner ph-spin"></i>
+
                     </div>
                     <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
                 </div>
@@ -825,6 +847,7 @@ $structuredData = [
             </div>
             <div class="modal-footer">
                 <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="confirmStaticPayment()">
+
                     <i class="ph-bold ph-check-circle"></i> I Have Paid
                 </button>
                 <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>
@@ -1211,6 +1234,7 @@ $structuredData = [
             });
         });
 
+
         window.onclick = function(event) {
             if (event.target == modal) {
                 closeModal();
@@ -1222,3 +1246,4 @@ $structuredData = [
     </script>
 </body>
 </html>
+

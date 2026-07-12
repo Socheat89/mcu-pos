@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -24,6 +25,7 @@
     
 </head>
 <body class="auth-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -47,6 +49,7 @@
                 <h3>Create Account</h3>
                 <p>Complete payment via Bakong to setup your workspace</p>
             </div>
+
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-error">
@@ -107,6 +110,7 @@
                         <div class="plan-chip-row">
                             <?php foreach ($featureList as $feat): ?>
                                 <span class="plan-chip">
+
                                     <?php echo str_replace('_', ' ', $feat); ?>
                                 </span>
                             <?php endforeach; ?>
@@ -122,6 +126,7 @@
                 <h3>2. Select Duration</h3>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <select id="duration_select" class="form-control" onchange="updateTotalPrice()">
+
                         <?php for($i=1; $i<=12; $i++): ?>
                             <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                         <?php endfor; ?>
@@ -134,11 +139,13 @@
                 <div class="price-summary">
                     <span style="font-weight: 500;">Total Amount:</span>
                     <span id="total_price_display" class="price-highlight">$0.00</span>
+
                 </div>
             </div>
 
             <!-- Payment Method Selection -->
             <div class="system-selection" id="payment_method_section" style="display: none;">
+
                 <h3>3. Select Payment Method</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-card method-card" onclick="selectPaymentMethod('bakong')">
@@ -146,6 +153,7 @@
                         <div class="method-card__content">
                             <span>Bakong QR</span>
                             <div class="checkbox-desc">Scan with Bakong or any Banking App</div>
+
                         </div>
                         <div class="checkbox-price">Dynamic</div>
                     </label>
@@ -159,6 +167,7 @@
                 </button>
                 <p class="payment-cta__note">
                     <i class="ph-bold ph-shield-check"></i> Secure payment powered by Bakong KHQR
+
                 </p>
             </div>
         </form>
@@ -168,6 +177,7 @@
         </div>
         </div>
     </main>
+
 
     <!-- Payment Modal (Bakong Branded) -->
     <div id="paymentModal" class="modal">
@@ -180,6 +190,7 @@
                     Scan to Pay (Bakong)
                 </h3>
                 <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+
             </div>
             <div class="modal-body">
                 <div class="payment-amount" id="modalAmount">$0.00</div>
@@ -188,6 +199,7 @@
                 <div class="qr-code-container qr-code-container--center">
                     <div id="qrPlaceholder" style="display: none;">
                          <i class="ph-bold ph-spinner ph-spin"></i>
+
                     </div>
                     <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
                 </div>
@@ -209,6 +221,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="notifyAdmin()">
+
                     <i class="ph-bold ph-check-circle"></i> I Have Paid (Notify Admin)
                 </button>
                 <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>
@@ -225,6 +238,7 @@
             <h3>Payment Successful!</h3>
             <p>Thank you for your payment. Your workspace setup is being initialized.</p>
             <div class="status-inline">
+
                 <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
             </div>
         </div>
@@ -240,6 +254,7 @@
                 <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
             </div>
             <div class="modal-body">
+
                 <div class="waiting-status">
                     <div class="countdown-container">
                         <svg class="countdown-svg">
@@ -276,6 +291,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         // State
@@ -388,6 +404,7 @@
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
             
+
             // Reset UI
             const qrImage = document.getElementById('qrImage');
             const qrPlaceholder = document.getElementById('qrPlaceholder');

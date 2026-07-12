@@ -21,6 +21,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             align-items: center;
             justify-content: center;
             background: var(--pos-bg);
+
             padding: 20px;
         }
 
@@ -30,12 +31,14 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             padding: 50px 40px;
             border-radius: 24px;
             box-shadow: var(--pos-shadow-xl);
+
             max-width: 500px;
             width: 100%;
             text-align: center;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--pos-border);
+
         }
 
         .upgrade-card::before {
@@ -46,18 +49,21 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             right: 0;
             height: 6px;
             background: var(--pos-gradient-primary);
+
         }
 
         .upgrade-icon {
             width: 100px;
             height: 100px;
             background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1));
+
             border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 30px;
             color: var(--pos-primary);
+
             font-size: 45px;
             transform: rotate(-5deg);
         }
@@ -71,6 +77,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
         .upgrade-card p {
             color: var(--pos-text-muted);
+
             line-height: 1.6;
             margin-bottom: 30px;
             font-size: 16px;
@@ -81,6 +88,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             align-items: center;
             background: rgba(139, 92, 246, 0.15);
             color: var(--pos-accent);
+
             padding: 6px 16px;
             border-radius: 999px;
             font-weight: 700;
@@ -88,6 +96,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             margin-bottom: 25px;
             gap: 6px;
             border: 1px solid rgba(139, 92, 246, 0.2);
+
         }
 
         .upgrade-footer {
@@ -98,6 +107,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
         .btn-upgrade {
             background: var(--pos-gradient-primary);
+
             color: white;
             text-decoration: none;
             padding: 16px 30px;
@@ -106,6 +116,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             font-size: 16px;
             transition: all 0.3s ease;
             box-shadow: 0 10px 20px rgba(6, 182, 212, 0.2);
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,6 +131,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         .btn-secondary {
             background: rgba(255, 255, 255, 0.03);
             color: var(--pos-text-muted);
+
             text-decoration: none;
             padding: 14px 30px;
             border-radius: 14px;
@@ -132,6 +144,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.08);
             color: var(--pos-text);
+
         }
 
         .sparkle {

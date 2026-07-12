@@ -16,6 +16,7 @@
         .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
         .avatar-box { width: 36px; height: 36px; border-radius: var(--pos-radius); background: var(--pos-primary-light); display: grid; place-items: center; font-size: 14px; font-weight: 900; color: var(--pos-primary); border: 1px solid rgba(var(--pos-primary-rgb), 0.2); }
+
     </style>
 </head>
 <body class="pos-app">
@@ -30,6 +31,7 @@
             <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary">
                 <i class="fas fa-desktop"></i> <?php echo __('open_terminal'); ?>
             </a>
+
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -51,11 +53,13 @@
         </div>
 
         <div class="search-container">
+
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_orders_placeholder'); ?>" onkeyup="searchOrders()">
         </div>
 
         <div class="pos-table-container">
+
             <table class="pos-table" id="ordersTable">
                 <thead>
                     <tr>
@@ -76,6 +80,7 @@
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_transactions_found'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('sales_history_msg'); ?></p>
+
                             </td>
                         </tr>
                     <?php else: ?>
@@ -88,6 +93,7 @@
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <div class="avatar-box">
+
                                             <?php echo strtoupper(substr($o['customer_name'] ?? 'W', 0, 1)); ?>
                                         </div>
                                         <div style="font-weight: 700; color: var(--pos-text);"><?php echo htmlspecialchars($o['customer_name'] ?? 'Walk-in Customer'); ?></div>

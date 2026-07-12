@@ -47,6 +47,7 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
         .order-info { margin-bottom: 15px; color: #000; }
         .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
         .items { margin-bottom: 15px; color: #000; }
+
         .item { display: flex; justify-content: space-between; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc; }
         .item:last-child { border-bottom: none; }
         .item-name { flex: 2; }
@@ -102,10 +103,12 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             body { background: white; color: #000; }
             .receipt { box-shadow: none; border: none; padding: 0; margin: 0; }
             .receipt-actions, .btn { display: none !important; }
+
             .pos-shell, .pos-sidebar, .pos-topbar, .pos-overlay, .pos-footer { display: none !important; }
             .receipt-wrap { padding: 0; }
             .header img { max-width: 120px !important; max-height: 60px !important; }
             .header img[src=""] { display: none; }
+
         }
     </style>
 </head>
@@ -246,6 +249,7 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             <i class="fas fa-print"></i> <?php echo __('print_receipt'); ?>
         </a>
         <a href="<?php echo mc_url($subdomain . '/pos/pos'); ?>" class="btn btn-secondary">
+
             <i class="fas fa-arrow-left"></i> <?php echo __('back_to_terminal'); ?>
         </a>
     </div>

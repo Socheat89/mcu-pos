@@ -22,6 +22,7 @@ $workspaceDisplayUrl = $workspaceBase . $subdomain;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -35,6 +36,7 @@ $workspaceDisplayUrl = $workspaceBase . $subdomain;
     <main class="auth-shell">
     <div class="status-card">
         <div class="status-icon success">
+
             <i class="ph-bold ph-check"></i>
         </div>
         
@@ -88,6 +90,7 @@ $workspaceDisplayUrl = $workspaceBase . $subdomain;
                 Go to Sign In <i class="ph-bold ph-arrow-right"></i>
             </a>
             <a href="/" class="btn btn-outline">
+
                 Back to Home
             </a>
         </div>
@@ -97,6 +100,7 @@ $workspaceDisplayUrl = $workspaceBase . $subdomain;
         </div>
     </div>
     </main>
+
 
     <script>
         function copyUrl() {

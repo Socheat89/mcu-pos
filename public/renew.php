@@ -42,6 +42,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
@@ -51,6 +52,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     
 </head>
 <body class="auth-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -75,6 +77,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
         <form id="renewForm">
             <div class="plan-group">
                 <label style="display: block; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 1rem;">Select Plan</label>
+
                 <?php foreach ($plans as $p): ?>
                 <?php $isSelected = ($currentPlan && $currentPlan['id'] == $p['id']); ?>
                 <div class="plan-item <?php echo $isSelected ? 'active' : ''; ?>" onclick="selectPlan(<?php echo $p['id']; ?>, <?php echo $p['price']; ?>, '<?php echo strtolower($p['name']); ?>')">
@@ -83,6 +86,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                         <div>
                             <div style="font-weight: 700;"><?php echo htmlspecialchars($p['name']); ?></div>
                             <div class="checkbox-desc"><?php echo htmlspecialchars($p['description']); ?></div>
+
                         </div>
                         <div class="plan-price">$<?php echo number_format($p['price'], 2); ?></div>
                     </div>
@@ -93,6 +97,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
             <div class="panel-card" style="margin-top: 1.5rem;">
                 <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Renewal Period</label>
                 <select id="duration" class="form-control" onchange="updateTotal()">
+
                     <?php for($i=1; $i<=12; $i++): ?>
                         <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                     <?php endfor; ?>
@@ -127,6 +132,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
                 I Have Paid (Notify Admin)
             </button>
             <button type="button" class="btn btn-outline full-width" style="margin-top: 10px;" onclick="closeModal()">Close</button>
+
             <div id="apiStatus" style="font-size: 10px; color: #94a3b8; margin-top: 10px; font-family: monospace;"></div>
         </div>
     </div>

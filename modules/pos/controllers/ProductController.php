@@ -20,7 +20,7 @@ class ProductController {
             die('Upgrade to POS Starter or higher to manage products.');
         }
 
-        if (!Auth::hasPermission('pos', 'read')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to view products');
         }
 
@@ -34,7 +34,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'write')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to create products');
         }
 
@@ -50,7 +50,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'write')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to edit products');
         }
 
@@ -71,7 +71,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'delete')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to delete products');
         }
 
@@ -85,7 +85,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'write')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to import products');
         }
 
@@ -139,7 +139,7 @@ class ProductController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Auth::hasPermission('pos', 'read')) {
+        if (!Auth::isTenantAdmin()) {
             die('No permission to download product template');
         }
 
@@ -147,8 +147,8 @@ class ProductController {
         header('Content-Disposition: attachment; filename="product-import-template.csv"');
 
         $out = fopen('php://output', 'w');
-        fputcsv($out, ['name', 'sku', 'barcode', 'price', 'stock_quantity', 'category', 'status', 'description', 'image']);
-        fputcsv($out, ['Iced Latte', 'DRINK-001', '8850000000012', '2.50', '25', 'Drinks', 'active', 'Cold coffee drink', 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=400']);
+        fputcsv($out, ['name', 'sku', 'barcode', 'price', 'stock_quantity', 'category', 'status', 'description']);
+        fputcsv($out, ['Iced Latte', 'DRINK-001', '8850000000012', '2.50', '25', 'Drinks', 'active', 'Cold coffee drink']);
         fclose($out);
         exit;
     }
@@ -401,38 +401,17 @@ class ProductController {
             throw new Exception(__('product_import_sheet_url_error'));
         }
 
-        // Already a CSV output URL — use as-is
-        if (preg_match('/[?&](output|format)=csv/i', $url)) {
-            return $url;
+        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/e\/([^\/?#]+)/', $url, $matches)) {
+            $gid = $this->extractGoogleSheetGid($url);
+            return 'https://docs.google.com/spreadsheets/d/e/' . $matches[1] . '/pub?output=csv&gid=' . urlencode($gid);
         }
 
-        // Matches published spreadsheet (d/e/...) — pubhtml or pub path
-        // e.g. https://docs.google.com/spreadsheets/d/e/2PACX-.../pubhtml?gid=123
-        // e.g. https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=123
-        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/e\/([^\/?\#]+)/', $url, $matches)) {
-            $docId = $matches[1];
-            $gid   = $this->extractGoogleSheetGid($url);
-            $csvUrl = 'https://docs.google.com/spreadsheets/d/e/' . $docId . '/pub?output=csv';
-            if ($gid !== '0') {
-                $csvUrl .= '&gid=' . urlencode($gid);
-            }
-            return $csvUrl;
+        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/([^\/?#]+)/', $url, $matches)) {
+            $gid = $this->extractGoogleSheetGid($url);
+            return 'https://docs.google.com/spreadsheets/d/' . $matches[1] . '/export?format=csv&gid=' . urlencode($gid);
         }
 
-        // Regular editable spreadsheet URL
-        // e.g. https://docs.google.com/spreadsheets/d/SHEET_ID/edit?gid=123
-        if (preg_match('/docs\.google\.com\/spreadsheets\/d\/([^\/?\#]+)/', $url, $matches)) {
-            $sheetId = $matches[1];
-            $gid     = $this->extractGoogleSheetGid($url);
-            $csvUrl  = 'https://docs.google.com/spreadsheets/d/' . $sheetId . '/export?format=csv';
-            if ($gid !== '0') {
-                $csvUrl .= '&gid=' . urlencode($gid);
-            }
-            return $csvUrl;
-        }
-
-        // Plain CSV URL
-        if (preg_match('/\.csv($|[?#])/i', $url)) {
+        if (preg_match('/\.csv($|[?#])|[?&](output|format)=csv/i', $url)) {
             return $url;
         }
 
@@ -629,14 +608,6 @@ class ProductController {
                 $data['_category_name'] = $this->importValue($row, $headerMap, 'category_name');
             }
 
-            if (array_key_exists('image', $headerMap)) {
-                $imageUrl = $this->importValue($row, $headerMap, 'image');
-                $importedImageName = $this->importImageFromUrl($imageUrl);
-                if ($importedImageName) {
-                    $data['image'] = $importedImageName;
-                }
-            }
-
             $items[] = ['data' => $data];
         }
 
@@ -652,8 +623,7 @@ class ProductController {
             'sku' => ['sku', 'code', 'product_code', 'reference', 'ref'],
             'barcode' => ['barcode', 'bar_code', 'ean', 'upc'],
             'category_name' => ['category', 'category_name', 'type', 'group'],
-            'status' => ['status', 'active', 'visibility'],
-            'image' => ['image', 'img', 'picture', 'photo', 'url', 'image_url', 'thumb', 'thumbnail', 'pic']
+            'status' => ['status', 'active', 'visibility']
         ];
 
         $lookup = [];
@@ -672,93 +642,6 @@ class ProductController {
         }
 
         return $map;
-    }
-
-    private function importImageFromUrl($imageUrl) {
-        $imageUrl = trim($imageUrl);
-        if ($imageUrl === '' || !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-            return null;
-        }
-
-        try {
-            $content = $this->fetchUrl($imageUrl);
-            if ($content === false || empty($content)) {
-                return null;
-            }
-
-            $uploadDir = __DIR__ . '/../../../uploads/products/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
-            // Create temporary file
-            $tmpFile = tempnam(sys_get_temp_dir(), 'img_import_');
-            if (!$tmpFile) {
-                return null;
-            }
-            file_put_contents($tmpFile, $content);
-
-            $imageInfo = @getimagesize($tmpFile);
-            if (!$imageInfo) {
-                @unlink($tmpFile);
-                return null;
-            }
-
-            $mime = $imageInfo['mime'] ?? '';
-            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            if (!in_array($mime, $allowedTypes)) {
-                @unlink($tmpFile);
-                return null;
-            }
-
-            // Generate unique filename with .webp extension
-            $fileName = uniqid() . '.webp';
-            $targetPath = $uploadDir . $fileName;
-
-            // Convert image to WebP
-            $image = null;
-            switch ($mime) {
-                case 'image/jpeg':
-                case 'image/jpg':
-                    $image = @imagecreatefromjpeg($tmpFile);
-                    break;
-                case 'image/png':
-                    $image = @imagecreatefrompng($tmpFile);
-                    if ($image) {
-                        imagepalettetotruecolor($image);
-                        imagealphablending($image, true);
-                        imagesavealpha($image, true);
-                    }
-                    break;
-                case 'image/gif':
-                    $image = @imagecreatefromgif($tmpFile);
-                    break;
-                case 'image/webp':
-                    // If already webp, just copy it
-                    if (@copy($tmpFile, $targetPath)) {
-                        @unlink($tmpFile);
-                        return $fileName;
-                    }
-                    break;
-            }
-
-            @unlink($tmpFile);
-
-            if ($image === null) {
-                return null;
-            }
-
-            // Convert and save as WebP with 80% quality
-            if (imagewebp($image, $targetPath, 80)) {
-                imagedestroy($image);
-                return $fileName;
-            } else {
-                imagedestroy($image);
-                return null;
-            }
-        } catch (Throwable $e) {
-            return null;
-        }
     }
 
     private function normalizeImportHeader($value) {

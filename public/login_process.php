@@ -1,5 +1,9 @@
 <?php
 // public/login_process.php
+// Extend Session Lifetime to 30 Days (1 Month) before starting session
+ini_set('session.cookie_lifetime', 2592000); // 30 days
+ini_set('session.gc_maxlifetime', 2592000);   // 30 days
+
 session_start();
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Auth.php';
@@ -21,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         exit;
     }
     header("Location: $urlPrefix/login.php");
+
     exit;
 }
 
@@ -33,6 +38,7 @@ if (empty($username) || empty($password)) {
         exit;
     }
     header("Location: $urlPrefix/login.php?error=" . urlencode('Username and password are required'));
+
     exit;
 }
 
@@ -77,6 +83,7 @@ try {
             exit;
         }
         header("Location: $urlPrefix/login.php?error=" . urlencode('Invalid username or password'));
+
         exit;
     }
 } catch (Exception $e) {
@@ -88,6 +95,7 @@ try {
         exit;
     }
     header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred. Please try again.'));
+
     exit;
 }
 ?>

@@ -13,6 +13,7 @@ require_once __DIR__ . '/../core/helpers/url.php';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link rel="stylesheet" href="<?php echo mc_url('public/css/landing.css'); ?>">
@@ -27,6 +28,7 @@ require_once __DIR__ . '/../core/helpers/url.php';
     
 </head>
 <body class="landing-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -53,11 +55,13 @@ require_once __DIR__ . '/../core/helpers/url.php';
                 <a href="<?php echo mc_url('public/index.php#features'); ?>" class="nav-item">Features</a>
                 <a href="<?php echo mc_url('public/index.php#pricing'); ?>" class="nav-item">Pricing</a>
                 <a href="<?php echo mc_url('public/index.php#contact'); ?>" class="nav-item">Contact</a>
+
             </nav>
             
             <div class="flex items-center gap-4">
                 <a href="<?php echo mc_url('public/login.php'); ?>" class="nav-item">Sign In</a>
                 <a href="<?php echo mc_url('public/register.php'); ?>" class="btn btn-primary">Get Started</a>
+
             </div>
         </div>
     </header>
@@ -119,6 +123,7 @@ require_once __DIR__ . '/../core/helpers/url.php';
                         <li><i class="ph-bold ph-check"></i> 24/7 Phone Support</li>
                     </ul>
                     <a href="<?php echo mc_url('public/register.php?plan=enterprise'); ?>" class="btn btn-outline full-width">Choose Enterprise</a>
+
                 </div>
             </div>
         </div>
@@ -128,12 +133,14 @@ require_once __DIR__ . '/../core/helpers/url.php';
     <footer>
         <div class="container text-center">
             <div class="logo footer-brand footer-brand--center">
+
                 <div class="logo-icon">
                     <i class="ph-bold ph-cube"></i>
                 </div>
                 <span>Mekong CyberUnit</span>
             </div>
             <p class="copyright">&copy; 2026 Mekong CyberUnit. All rights reserved.</p>
+
         </div>
     </footer>
 

@@ -122,11 +122,13 @@ p {
     max-width: 1220px;
     margin: 0 auto;
     padding: 0 24px;
+
 }
 
 .flex {
     display: flex;
 }
+
 
 .items-center {
     align-items: center;
@@ -136,6 +138,7 @@ p {
     justify-content: space-between;
 }
 
+
 .gap-2 {
     gap: 0.5rem;
 }
@@ -143,6 +146,7 @@ p {
 .gap-3 {
     gap: 0.75rem;
 }
+
 
 .gap-4 {
     gap: 1rem;
@@ -154,6 +158,7 @@ p {
 
 .full-width {
     width: 100%;
+
 }
 
 .page-loader {
@@ -164,6 +169,7 @@ p {
     place-items: center;
     z-index: 9999;
     transition: opacity 0.6s var(--ease-out), visibility 0.6s;
+
 }
 
 .page-loader.hidden {
@@ -236,6 +242,7 @@ p {
     margin-top: 1.6rem;
     background: rgba(31, 29, 25, 0.1);
     border-radius: 999px;
+
     overflow: hidden;
 }
 
@@ -250,6 +257,7 @@ p {
 @keyframes progressSlide {
     0% { transform: translateX(-120%); }
     100% { transform: translateX(140%); }
+
 }
 
 @keyframes spin {
@@ -332,6 +340,7 @@ p {
     justify-content: center;
     font-size: 1.2rem;
     color: var(--ink);
+
 }
 
 .mobile-drawer {
@@ -344,6 +353,7 @@ p {
     z-index: 95;
     padding: 1.5rem 2rem;
     border-top: 1px solid rgba(31, 29, 25, 0.08);
+
 }
 
 .mobile-drawer.active {
@@ -361,6 +371,7 @@ p {
     margin-top: 1.5rem;
     display: grid;
     gap: 0.75rem;
+
 }
 
 .btn {
@@ -522,6 +533,7 @@ p {
 .hero-card__item span {
     font-weight: 600;
     color: var(--ink);
+
 }
 
 .section-header {
@@ -741,6 +753,7 @@ p {
 .system-desc {
     color: var(--ink-muted);
     margin-bottom: 1.2rem;
+
 }
 
 .price-tag {
@@ -990,6 +1003,7 @@ footer .logo-icon {
     width: 28px;
     height: 28px;
     font-size: 0.9rem;
+
 }
 
 .footer-grid {
@@ -1012,6 +1026,7 @@ footer .logo-icon {
 
 .footer-col h4 {
     margin-bottom: 0.6rem;
+
 }
 
 .footer-links {
@@ -1733,6 +1748,7 @@ footer .logo-icon {
     .nav-links,
     .nav-actions .btn,
     .nav-actions .nav-item {
+
         display: none;
     }
 
@@ -1762,3 +1778,4 @@ footer .logo-icon {
         grid-template-columns: 1fr;
     }
 }
+

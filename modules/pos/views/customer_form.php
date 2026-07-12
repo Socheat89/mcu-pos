@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo __('customers'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +15,7 @@
             font-family: 'Battambang', 'Outfit', 'Inter', sans-serif !important;
         }
         .form-card { background: var(--pos-card); border-radius: 24px; padding: 40px; border: 1.5px solid var(--pos-border); max-width: 800px; margin: 0 auto; backdrop-filter: blur(12px); }
+
     </style>
 </head>
 <body class="pos-app">

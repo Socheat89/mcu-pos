@@ -27,6 +27,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
@@ -41,6 +42,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     
 </head>
 <body class="auth-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
@@ -69,6 +71,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                     <?php echo htmlspecialchars($plan); ?>
                 </span> workspace</p>
             </div>
+
 
         <div class="system-preview">
             <div class="system-icon-mini">
@@ -179,6 +182,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <!-- Creation Loading Modal -->
     <div id="creationModal" class="modal">
         <div class="modal-content modal-content--sm modal-content--center">
+
             <div id="creationSpinner" style="margin-bottom: 2rem;">
                 <i class="ph-bold ph-spinner ph-spin" style="font-size: 4rem; color: var(--primary);"></i>
             </div>

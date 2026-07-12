@@ -541,3 +541,62 @@ select:focus,
   color: var(--terminal-danger);
   border-color: #fecaca;
 }
+
+/* ==========================================================================
+   Odoo POS Layout and Flow Visual Enhancements
+   ========================================================================== */
+
+/* Active Cart Item Highlight with Left Accent Bar */
+.cart-item {
+  position: relative;
+  border-radius: 6px !important;
+  transition: all 0.15s ease-in-out;
+}
+.cart-item.border-brand-cyan {
+  background-color: rgba(113, 75, 103, 0.05) !important;
+  border-color: #714B67 !important;
+  box-shadow: inset 2px 0 0 #714B67, 0 1px 3px rgba(113, 75, 103, 0.08);
+}
+.cart-item.border-brand-cyan::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #714B67;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Order Tabs Styling matching Odoo header purple */
+.bg-gray-50.border-b.border-gray-200 {
+  background-color: #eaecef !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+.bg-brand-cyan.border-brand-cyan.text-white {
+  background-color: #714B67 !important;
+  border-color: #714B67 !important;
+  color: #ffffff !important;
+}
+
+/* Compact Keypad Custom Transitions and Scale Effects */
+.grid-cols-4.gap-1 button {
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  transition: all 0.08s ease-in-out;
+}
+.grid-cols-4.gap-1 button:active {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+.grid-cols-4.gap-1 button.bg-brand-cyan {
+  background-color: #714B67 !important;
+  border-color: #714B67 !important;
+  color: #ffffff !important;
+}
+.grid-cols-4.gap-1 button.text-brand-danger {
+  color: #e05038 !important;
+}
+
