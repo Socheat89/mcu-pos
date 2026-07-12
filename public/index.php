@@ -66,7 +66,7 @@ $structuredData = [
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css?v=4.0">
+    <link rel="stylesheet" href="css/landing.css?v=4.1">
 
     
     <!-- Favicon -->
@@ -128,14 +128,14 @@ $structuredData = [
                     <form id="authForm" action="login_process.php" method="POST">
                         <div class="mb-3">
                             <label for="modal-username" class="form-label">Username</label>
-                            <input type="text" id="modal-username" class="form-control" placeholder="Enter your username" required>
+                            <input type="text" id="modal-username" name="username" class="form-control" placeholder="Enter your username" required>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between">
                                 <label for="modal-password" class="form-label">Password</label>
                                 <a href="forgot_password.php" class="small fw-semibold" style="color:var(--mc-primary)">Forgot?</a>
                             </div>
-                            <input type="password" id="modal-password" class="form-control" placeholder="Enter your password" required>
+                            <input type="password" id="modal-password" name="password" class="form-control" placeholder="Enter your password" required>
                         </div>
                         <button type="submit" id="signInBtn" class="btn btn-primary w-100">Sign In <i class="ph-bold ph-sign-in"></i></button>
                         <div class="text-center my-3 text-muted small">or</div>
