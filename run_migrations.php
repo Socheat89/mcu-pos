@@ -161,6 +161,94 @@ try {
         echo "'password_changed_at' column added.<br>";
     }
 
+    // 9. Multi-Store: Create 'stores' table
+    echo "Checking 'stores' table...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'stores'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE stores (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            code VARCHAR(50) DEFAULT NULL,
+            address TEXT DEFAULT NULL,
+            phone VARCHAR(50) DEFAULT NULL,
+            email VARCHAR(255) DEFAULT NULL,
+            is_default TINYINT(1) DEFAULT 0,
+            is_active TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            INDEX idx_tenant_id (tenant_id),
+            INDEX idx_is_default (tenant_id, is_default)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        echo "'stores' table created.<br>";
+    }
+
+    // 10. Add store_id to products
+    echo "Checking 'products.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM products LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE products ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'products.store_id' added.<br>";
+    }
+
+    // 11. Add store_id to orders
+    echo "Checking 'orders.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM orders LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE orders ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'orders.store_id' added.<br>";
+    }
+
+    // 12. Add store_id to customers
+    echo "Checking 'customers.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM customers LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE customers ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'customers.store_id' added.<br>";
+    }
+
+    // 13. Add store_id to categories
+    echo "Checking 'categories.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM categories LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE categories ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'categories.store_id' added.<br>";
+    }
+
+    // 14. Add store_id to stock_logs
+    echo "Checking 'stock_logs.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM stock_logs LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE stock_logs ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'stock_logs.store_id' added.<br>";
+    }
+
+    // 15. Add current_store_id to users
+    echo "Checking 'users.current_store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM users LIKE 'current_store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE users ADD COLUMN current_store_id INT DEFAULT NULL AFTER role_id");
+        echo "'users.current_store_id' added.<br>";
+    }
+
+    // 16. Seed default stores for existing tenants
+    echo "Seeding default stores for existing tenants...<br>";
+    $tenants = $db->fetchAll("SELECT id, name FROM tenants WHERE status = 'active'");
+    foreach ($tenants as $tenant) {
+        $existing = $db->fetchOne("SELECT COUNT(*) as cnt FROM stores WHERE tenant_id = ?", [$tenant['id']]);
+        if ($existing['cnt'] == 0) {
+            $db->insert('stores', [
+                'tenant_id'  => $tenant['id'],
+                'name'       => $tenant['name'] . ' Main',
+                'code'       => 'MAIN',
+                'is_default' => 1,
+                'is_active'  => 1,
+            ]);
+            echo "→ Default store created for: {$tenant['name']}<br>";
+        }
+    }
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
