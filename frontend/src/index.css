@@ -928,6 +928,108 @@ select:focus,
   }
 }
 
+/* ── Medium phones / tablet portrait ── */
+@media (max-width: 768px) {
+  /* 🔥 CAFÉ CART — Big, readable, tappable */
+  .pos-cart-item {
+    min-height: 64px !important;
+    padding: 14px 12px !important;
+    gap: 14px !important;
+  }
+
+  .pos-cart-item-img {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+  }
+
+  .pos-cart-item-name {
+    font-size: 15px !important;
+  }
+
+  .pos-cart-item-price {
+    font-size: 13px !important;
+  }
+
+  /* Cart total/price in cart item */
+  .pos-cart-item > div:last-child {
+    font-size: 16px !important;
+  }
+
+  /* Order tabs — bigger */
+  aside [class*="items-center"][class*="gap-1"] {
+    padding: 8px 10px !important;
+  }
+
+  aside button .text-\[11px\] {
+    font-size: 14px !important;
+  }
+
+  /* Customer selector — bigger */
+  aside select,
+  aside .relative select {
+    font-size: 14px !important;
+    padding: 12px 32px 12px 32px !important;
+    min-height: 48px !important;
+  }
+
+  /* Cart subtotal/total section — bigger */
+  aside .text-\[11px\].font-medium {
+    font-size: 14px !important;
+  }
+
+  aside .text-xs.font-black {
+    font-size: 15px !important;
+  }
+
+  aside .text-sm.font-black {
+    font-size: 18px !important;
+  }
+
+  /* Cart empty state — bigger */
+  aside .h-8.w-8.mb-2 {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Product cards — even bigger on mobile */
+  .pos-product-card {
+    min-height: 180px !important;
+  }
+
+  .pos-product-name {
+    font-size: 14px !important;
+  }
+
+  .pos-product-sku {
+    font-size: 11px !important;
+  }
+
+  .pos-price-badge {
+    font-size: 16px !important;
+    padding: 6px 14px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+  }
+
+  /* Category pills — bigger */
+  .pos-category-pill {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    border-radius: 24px !important;
+  }
+
+  /* Cart footer area spacing */
+  aside .flex-shrink-0.px-3 {
+    padding: 12px 14px !important;
+  }
+
+  /* "Cart (2 items)" heading */
+  aside h3, aside .font-bold.text-\[11px\] {
+    font-size: 15px !important;
+  }
+}
+
 /* ── Very small phones (≤380px) ── */
 @media (max-width: 380px) {
   .glass-card {
