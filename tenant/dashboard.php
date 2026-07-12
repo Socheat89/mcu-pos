@@ -50,20 +50,20 @@ if ($hasPOS) {
     <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6a5cff;
-            --primary-dark: #5648d4;
-            --secondary: #8a3ffc;
-            --accent: #2dd4ff;
+            --primary: #E76F51;
+            --primary-dark: #d45a3a;
+            --secondary: #F4A261;
+            --accent: #2A9D8F;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --bg: #f6f7fb;
+            --bg: #FFF8F0;
             --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: rgba(30, 41, 59, 0.08);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --text: #1a1a2e;
+            --text-muted: #8a8590;
+            --border: rgba(231, 111, 81, 0.08);
+            --shadow: 0 10px 30px rgba(26, 26, 46, 0.06);
+            --shadow-hover: 0 15px 40px rgba(26, 26, 46, 0.10);
         }
 
         * { 
