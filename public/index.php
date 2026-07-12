@@ -121,7 +121,7 @@ $structuredData = [
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="ph-bold ph-user-circle"></i> Welcome Back</h5>
-                    <button type="button" class="btn-close" onclick="closeAuthModal()"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="authError" class="alert alert-danger d-none py-2"></div>
@@ -179,7 +179,7 @@ $structuredData = [
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
-                    <a href="#" onclick="openAuthModal();return false" class="nav-link">Sign In</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link">Sign In</a>
                     <a href="register.php" class="btn btn-primary btn-sm">Get Started</a>
                 </div>
             </div>
