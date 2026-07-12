@@ -102,107 +102,6 @@ $navLabel = function (string $key): string {
                     <span class="pos-brand__sub"><?php echo __('cyber_unit_pos'); ?></span>
                 </div>
             </a>
-
-            <?php $sidebarUser = Auth::user(); ?>
-            <div class="pos-sidebar__summary">
-                <div class="pos-sidebar__summary-top">
-                    <div class="pos-sidebar__summary-title"><?php echo htmlspecialchars($tenantName); ?></div>
-                    <div class="pos-sidebar__summary-badge">
-                        <i class="fas fa-signal"></i>
-                        Live
-                    </div>
-                </div>
-                <div class="pos-sidebar__summary-grid">
-                    <div class="pos-sidebar__summary-card">
-                        <span class="k"><?php echo __('mode'); ?></span>
-                        <span class="v"><?php echo __('terminal'); ?></span>
-                    </div>
-                    <div class="pos-sidebar__summary-card">
-                        <span class="k"><?php echo __('role'); ?></span>
-                        <span class="v"><?php echo htmlspecialchars($sidebarUser['role_name'] ?? 'POS'); ?></span>
-                    </div>
-                </div>
-            </div>
-
-            <?php
-            // Store Switcher
-            if (class_exists('Store')) {
-                $currentStore = Store::getCurrent();
-                $allStores = Store::getAll();
-                if (count($allStores) > 1):
-            ?>
-            <div class="pos-store-switcher">
-                <div class="pos-store-switcher__label">
-                    <i class="fas fa-store-alt"></i> <?php echo __('current_store'); ?>
-                </div>
-                <div class="pos-store-switcher__select-wrap">
-                    <select class="pos-store-switcher__select" onchange="switchStore(this.value)">
-                        <?php foreach ($allStores as $st): ?>
-                            <option value="<?php echo $st['id']; ?>" <?php echo ($currentStore && (int)$currentStore['id'] === (int)$st['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <i class="fas fa-chevron-down pos-store-switcher__arrow"></i>
-                </div>
-            </div>
-            <script>
-                function switchStore(storeId) {
-                    var basePath = '<?php echo htmlspecialchars($posBase); ?>';
-                    window.location.href = basePath + '/stores/switch?store_id=' + storeId;
-                }
-            </script>
-            <style>
-                .pos-store-switcher {
-                    margin: 12px 12px 0;
-                    padding: 12px 14px;
-                    background: rgba(var(--pos-primary-rgb), 0.04);
-                    border: 1px solid var(--pos-border);
-                    border-radius: 14px;
-                }
-                .pos-store-switcher__label {
-                    font-size: 10px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    color: var(--pos-text-muted);
-                    margin-bottom: 8px;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                }
-                .pos-store-switcher__select-wrap {
-                    position: relative;
-                }
-                .pos-store-switcher__select {
-                    width: 100%;
-                    padding: 10px 32px 10px 12px;
-                    border: 1px solid var(--pos-border);
-                    border-radius: 10px;
-                    background: var(--pos-card);
-                    color: var(--pos-text);
-                    font-size: 13px;
-                    font-weight: 700;
-                    font-family: 'Space Grotesk', 'Battambang', sans-serif;
-                    appearance: none;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    outline: none;
-                }
-                .pos-store-switcher__select:hover, .pos-store-switcher__select:focus {
-                    border-color: var(--pos-primary);
-                }
-                .pos-store-switcher__arrow {
-                    position: absolute;
-                    right: 12px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    font-size: 10px;
-                    color: var(--pos-text-muted);
-                    pointer-events: none;
-                }
-            </style>
-            <?php endif; } ?>
         </div>
 
         <nav class="pos-side-nav">
@@ -459,8 +358,6 @@ $navLabel = function (string $key): string {
         if (window.innerWidth >= 980) {
             // Desktop: toggle collapse
             shell.classList.toggle('pos-shell--collapsed');
-            // Persist preference
-            localStorage.setItem('pos_sidebar_collapsed', shell.classList.contains('pos-shell--collapsed'));
         } else {
             // Mobile: toggle drawer
             setOpen(!shell.classList.contains('pos-shell--open'));
@@ -468,13 +365,6 @@ $navLabel = function (string $key): string {
     }
 
     window.__posToggleSidebar = toggle;
-
-    // Restore state on load
-    if (window.innerWidth >= 980) {
-        var collapsed = localStorage.getItem('pos_sidebar_collapsed') === 'true';
-        var shell = document.getElementById('posShell');
-        if (shell && collapsed) shell.classList.add('pos-shell--collapsed');
-    }
 
     var overlay = document.getElementById('posOverlay');
     if (overlay) {
