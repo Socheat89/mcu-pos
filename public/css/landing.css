@@ -1777,5 +1777,26 @@ footer .logo-icon {
     .hero-metrics {
         grid-template-columns: 1fr;
     }
+
+    /* Better mobile spacing */
+    .container { padding: 0 16px; }
+    section { padding: 48px 0; }
+    
+    .hero h1 { font-size: 28px !important; line-height: 1.2 !important; }
+    .hero p { font-size: 15px !important; }
+    .section-header h2 { font-size: 24px !important; }
+    
+    .system-card { padding: 24px 20px !important; }
+    .price-amount { font-size: 32px !important; }
+    .plan-list li { font-size: 13px !important; padding: 8px 0 !important; }
+    
+    .about-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .about-profile { order: -1; }
+    .profile-stats { grid-template-columns: 1fr 1fr !important; }
+    
+    .btn { width: 100% !important; justify-content: center !important; padding: 14px 20px !important; }
+    
+    .main-header { padding: 8px 0; }
+    .logo span { font-size: 14px; }
 }
 

@@ -613,33 +613,22 @@ if ($hasPOS) {
         }
         
         @media (max-width: 768px) {
-            .navbar-container {
-                padding: 0 16px;
-            }
-            
-            .container {
-                padding: 16px;
-            }
-            
-            .welcome-header {
-                padding: 32px 24px;
-            }
-            
-            .welcome-header h1 {
-                font-size: 1.75rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-links a span {
-                display: none;
-            }
-            
-            .action-grid {
-                grid-template-columns: 1fr;
-            }
+            .navbar-container { padding: 0 16px; }
+            .container { padding: 16px; }
+            .welcome-header { padding: 32px 24px; border-radius: 16px; }
+            .welcome-header h1 { font-size: 1.5rem; }
+            .welcome-header p { font-size: 0.9rem; }
+            .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+            .stat-card { padding: 20px; }
+            .stat-content h3 { font-size: 1.5rem; }
+            .stat-icon { width: 48px; height: 48px; font-size: 1.3rem; }
+            .nav-links a span { display: none; }
+            .action-grid { grid-template-columns: 1fr; }
+            .btn { width: 100%; justify-content: center; }
+            table { font-size: 12px; }
+            th, td { padding: 10px 8px; }
+            .card-header { padding: 16px 20px; }
+            .card-body { padding: 20px; }
         }
     </style>
 </head>
