@@ -583,6 +583,12 @@ $navLabel = function (string $key): string {
                 t.setAttribute('data-scrollable', 'true');
             }
         });
+
+        // Prevent pinch-zoom on mobile
+        var vp = document.querySelector('meta[name="viewport"]');
+        if (vp) {
+            vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
     });
 })();
 </script>
