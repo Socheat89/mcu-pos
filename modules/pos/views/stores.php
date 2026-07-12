@@ -216,11 +216,22 @@ $currentStore = $currentStore ?? Store::getCurrent($tenantId);
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div class="pos-title">
                 <h1><?php echo __('manage_stores'); ?></h1>
-                <p><?php echo __('manage_stores_desc'); ?></p>
+                <p><?php echo __('manage_stores_desc'); ?> 
+                    <strong style="color:var(--pos-primary);">
+                        <?php echo count($stores); ?>/<?php echo Tenant::getStoreLimit() == 0 ? '∞' : Tenant::getStoreLimit(); ?>
+                    </strong> <?php echo __('stores_used'); ?>
+                </p>
             </div>
+            <?php $canAddStore = Tenant::getStoreLimit() == 0 || count($stores) < Tenant::getStoreLimit(); ?>
+            <?php if ($canAddStore): ?>
             <button class="btn btn-primary" onclick="openAddModal()">
                 <i class="fas fa-plus-circle"></i> <?php echo __('add_store'); ?>
             </button>
+            <?php else: ?>
+            <span class="btn" style="background:rgba(245,158,11,0.1);color:#f59e0b;cursor:default;">
+                <i class="fas fa-triangle-exclamation"></i> <?php echo __('store_limit_reached'); ?>
+            </span>
+            <?php endif; ?>
         </div>
 
         <!-- Store Cards -->

@@ -75,6 +75,16 @@ class StoreController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $tenantId = Tenant::getId();
+
+            // Check store limit
+            $storeLimit = Tenant::getStoreLimit();
+            $currentCount = count(Store::getAll($tenantId));
+
+            if ($storeLimit > 0 && $currentCount >= $storeLimit) {
+                die(__('store_limit_reached') . " ({$currentCount}/{$storeLimit})");
+            }
+
             $data = [
                 'name'    => trim($_POST['name'] ?? ''),
                 'code'    => trim($_POST['code'] ?? ''),
@@ -87,7 +97,6 @@ class StoreController
                 die(__('store_name_required'));
             }
 
-            $tenantId = Tenant::getId();
             $storeId = Store::create($data, $tenantId);
 
             if ($storeId) {

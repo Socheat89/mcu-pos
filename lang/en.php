@@ -399,5 +399,10 @@ return [
     'invalid_store'           => 'Invalid store.',
     'no_permission'           => 'You do not have permission to perform this action.',
     'no_permission'           => 'You do not have permission to perform this action.',
+    'stores_used'             => 'stores used.',
+    'store_limit_reached'     => 'Store limit reached! Upgrade your plan to add more stores.',
+    'cashier_limit_reached'   => 'Cashier limit reached! Upgrade your plan to add more cashiers.',
+    'assign_store'            => 'Assign Store',
+    'all_stores'              => 'All Stores',
 
 ];

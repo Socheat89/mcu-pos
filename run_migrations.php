@@ -249,6 +249,40 @@ try {
         }
     }
 
+    // 17. Add 'store_limit' to systems (plans)
+    echo "Checking 'systems.store_limit'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM systems LIKE 'store_limit'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE systems ADD COLUMN store_limit INT DEFAULT 1 COMMENT 'Max stores allowed (0=unlimited)' AFTER price");
+        echo "'systems.store_limit' added.<br>";
+    }
+
+    // 18. Add 'cashier_limit' to systems (plans)
+    echo "Checking 'systems.cashier_limit'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM systems LIKE 'cashier_limit'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE systems ADD COLUMN cashier_limit INT DEFAULT 1 COMMENT 'Max cashiers allowed (0=unlimited)' AFTER store_limit");
+        echo "'systems.cashier_limit' added.<br>";
+    }
+
+    // 19. Set default limits for existing plans
+    echo "Setting default plan limits...<br>";
+    $systems = $db->fetchAll("SELECT id, name, price FROM systems");
+    foreach ($systems as $s) {
+        $price = (float)$s['price'];
+        if ($price <= 5) {
+            // $5 plan → 1 store, 1 cashier
+            $db->query("UPDATE systems SET store_limit = 1, cashier_limit = 1 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        } elseif ($price <= 50) {
+            // $30 plan → 5 stores, 5 cashiers
+            $db->query("UPDATE systems SET store_limit = 5, cashier_limit = 5 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        } else {
+            // $99.99+ → unlimited
+            $db->query("UPDATE systems SET store_limit = 0, cashier_limit = 0 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        }
+    }
+    echo "Plan limits updated.<br>";
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {

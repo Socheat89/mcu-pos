@@ -11,7 +11,9 @@ if (isset($_POST['action'])) {
             'name' => $_POST['name'],
             'price' => $_POST['price'],
             'description' => $_POST['description'],
-            'status' => $_POST['status']
+            'status' => $_POST['status'],
+            'store_limit' => (int)($_POST['store_limit'] ?? 1),
+            'cashier_limit' => (int)($_POST['cashier_limit'] ?? 1),
         ];
         if (!empty($_POST['id'])) {
             $db->update('systems', $data, 'id = ?', [$_POST['id']]);
@@ -62,6 +64,8 @@ include 'header.php';
                 <tr>
                     <th>Name</th>
                     <th>Price</th>
+                    <th># Stores</th>
+                    <th># Cashiers</th>
                     <th>Description</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -72,6 +76,8 @@ include 'header.php';
                 <tr>
                     <td><strong><?php echo htmlspecialchars($system['name']); ?></strong></td>
                     <td style="color: var(--primary); font-weight: 700;">$<?php echo number_format($system['price'], 2); ?></td>
+                    <td style="font-weight: 700;"><?php echo ($system['store_limit'] ?? 1) == 0 ? '∞ Unlimited' : (int)($system['store_limit'] ?? 1); ?></td>
+                    <td style="font-weight: 700;"><?php echo ($system['cashier_limit'] ?? 1) == 0 ? '∞ Unlimited' : (int)($system['cashier_limit'] ?? 1); ?></td>
                     <td style="color: var(--text-muted); font-size: 0.875rem;"><?php echo htmlspecialchars($system['description']); ?></td>
                     <td>
                         <span class="badge <?php echo $system['status'] == 'active' ? 'badge-success' : 'badge-danger'; ?>">
@@ -110,6 +116,17 @@ include 'header.php';
                 <label>Price ($)</label>
                 <input type="number" step="0.01" name="price" id="plan_price" class="form-control" required>
             </div>
+
+            <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div>
+                    <label># Stores <span style="font-size:11px;color:#888;">(0=unlimited)</span></label>
+                    <input type="number" name="store_limit" id="plan_store_limit" class="form-control" value="1" min="0" required>
+                </div>
+                <div>
+                    <label># Cashiers <span style="font-size:11px;color:#888;">(0=unlimited)</span></label>
+                    <input type="number" name="cashier_limit" id="plan_cashier_limit" class="form-control" value="1" min="0" required>
+                </div>
+            </div>
             
             <div class="form-group">
                 <label>Description</label>
@@ -138,6 +155,8 @@ function openModal() {
     document.getElementById('plan_id').value = '';
     document.getElementById('plan_name').value = '';
     document.getElementById('plan_price').value = '';
+    document.getElementById('plan_store_limit').value = '1';
+    document.getElementById('plan_cashier_limit').value = '1';
     document.getElementById('plan_desc').value = '';
     document.getElementById('plan_status').value = 'active';
     document.getElementById('planModal').style.display = 'flex';
@@ -148,6 +167,8 @@ function editPlan(plan) {
     document.getElementById('plan_id').value = plan.id;
     document.getElementById('plan_name').value = plan.name;
     document.getElementById('plan_price').value = plan.price;
+    document.getElementById('plan_store_limit').value = plan.store_limit ?? 1;
+    document.getElementById('plan_cashier_limit').value = plan.cashier_limit ?? 1;
     document.getElementById('plan_desc').value = plan.description;
     document.getElementById('plan_status').value = plan.status;
     document.getElementById('planModal').style.display = 'flex';

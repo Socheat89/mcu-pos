@@ -398,5 +398,10 @@ return [
     'confirm_delete_store'    => '确定要删除此门店吗？此操作无法撤销。',
     'invalid_store'           => '无效的门店。',
     'no_permission'           => '您没有执行此操作的权限。',
+    'stores_used'             => '已使用门店。',
+    'store_limit_reached'     => '门店数量已达上限！请升级计划以添加更多门店。',
+    'cashier_limit_reached'   => '收银员数量已达上限！请升级计划以添加更多收银员。',
+    'assign_store'            => '分配门店',
+    'all_stores'              => '所有门店',
 
 ];

@@ -181,6 +181,20 @@
                             </div>
                         </div>
 
+                        <?php if (!empty($allStores)): ?>
+                        <div class="pos-form-group">
+                            <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i>Assign Store</label>
+                            <select name="store_id" class="pos-form-control" <?php echo !$canCreate ? 'disabled' : ''; ?>>
+                                <option value="">-- All Stores --</option>
+                                <?php foreach ($allStores as $st): ?>
+                                    <option value="<?php echo $st['id']; ?>">
+                                        <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
+
                         <!-- ── Permissions Section ── -->
                         <div style="border-top: 1px solid var(--pos-border); margin: 20px 0 18px; padding-top: 18px;">
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
@@ -280,6 +294,10 @@
                                     <div class="csh-name"><?php echo htmlspecialchars($c['username']); ?></div>
                                     <div class="csh-email"><?php echo htmlspecialchars($c['email']); ?></div>
                                     <div class="csh-meta">
+                                        <?php if (!empty($c['store_name'])): ?>
+                                            <span style="color:var(--pos-primary);"><i class="fas fa-store-alt"></i> <?php echo htmlspecialchars($c['store_code'] ? '[' . $c['store_code'] . '] ' : '') . htmlspecialchars($c['store_name']); ?></span>
+                                            &nbsp;·&nbsp;
+                                        <?php endif; ?>
                                         <span>Added <?php echo date('d M Y', strtotime($c['created_at'])); ?></span>
                                         &nbsp;·&nbsp;
                                         <?php echo $c['status'] === 'active'

@@ -109,6 +109,7 @@ class CashierController {
                 $email      = trim($_POST['email'] ?? '');
                 $password   = $_POST['password'] ?? '';
                 $permIds    = $_POST['permissions'] ?? [];
+                $storeId    = !empty($_POST['store_id']) ? (int)$_POST['store_id'] : null;
 
                 if (!$username || !$email || !$password) {
                     $error = 'Please fill in all required fields.';
@@ -123,16 +124,18 @@ class CashierController {
 
                     if ($existing) {
                         $error = 'Username already exists. Please choose another.';
-                    } elseif (!User::canCreateUser($tenantId)) {
-                        $error = 'User limit reached. Upgrade your plan to add more users.';
+                    } elseif (!$canCreate) {
+                        $limitText = $maxUsers === 0 ? '∞' : $maxUsers;
+                        $error = __('cashier_limit_reached') . " ({$totalUsers}/{$limitText})";
                     } else {
                         try {
                             User::create([
-                                'username' => $username,
-                                'email'    => $email,
-                                'password' => $password,
-                                'role_id'  => $cashierRoleId,
-                                'status'   => 'active',
+                                'username'          => $username,
+                                'email'             => $email,
+                                'password'          => $password,
+                                'role_id'           => $cashierRoleId,
+                                'status'            => 'active',
+                                'current_store_id'  => $storeId,
                             ], $tenantId);
 
                             // Auto-assign selected permissions (or default pos read+write)
@@ -198,13 +201,19 @@ class CashierController {
 
         // ── Load cashier users (role level = 1) ──────────────────
         $cashiers = $db->fetchAll(
-            "SELECT u.*, r.name as role_name, r.level as role_level
+            "SELECT u.*, r.name as role_name, r.level as role_level,
+                    s.name as store_name, s.code as store_code
              FROM users u
              JOIN roles r ON u.role_id = r.id
+             LEFT JOIN stores s ON u.current_store_id = s.id
              WHERE u.tenant_id = ? AND r.level = 1
              ORDER BY u.created_at DESC",
             [$tenantId]
         );
+
+        // ── Load all stores for the dropdown ─────────────────────
+        require_once __DIR__ . '/../../../core/classes/Store.php';
+        $allStores = Store::getAll($tenantId);
 
         // ── Load current cashier role permissions ─────────────────
         $cashierRolePerms = [];
@@ -213,10 +222,10 @@ class CashierController {
         }
         $cashierPermIds = array_column($cashierRolePerms, 'id');
 
-        // Count usage
-        $totalUsers    = User::countUsers($tenantId);
-        $maxUsers      = (int)\Settings::get('max_free_users', $tenantId, 5);
-        $canCreate     = User::canCreateUser($tenantId);
+        // Count usage (cashiers only, not all users)
+        $totalUsers    = count($cashiers);
+        $maxUsers      = Tenant::getCashierLimit();
+        $canCreate     = ($maxUsers === 0) || ($totalUsers < $maxUsers);
         $tenantName    = Tenant::getCurrent()['name'] ?? '';
 
         include __DIR__ . '/../views/cashiers.php';
