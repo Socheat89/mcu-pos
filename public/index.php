@@ -240,63 +240,73 @@ $structuredData = [
             <div class="hero-copy">
                 <div class="hero-pill">
                     <i class="ph-fill ph-sparkle"></i>
-                    Khmer-first cloud POS
+                    Trusted by 120+ Cambodian Businesses
                 </div>
-                <h1>Run sales, inventory, and subscriptions in one Mekong workspace.</h1>
+                <h1>The POS system that speaks Khmer, thinks local, and scales with you.</h1>
                 <p>
-                    Mekong CyberUnit keeps Khmer and English teams in sync with POS, inventory, HR, and billing
-                    across every branch. One dashboard, one subscription, zero chaos.
+                    Ditch the spreadsheets and paper receipts. Mekong CyberUnit gives you one dashboard 
+                    for sales, inventory, staff, and billing — with built-in Bakong KHQR payments 
+                    and offline mode that keeps you selling even when the internet drops.
                 </p>
                 <div class="btn-group hero-actions">
                     <a href="register.php" class="btn btn-primary">
                         Start Free Trial <i class="ph-bold ph-arrow-right"></i>
                     </a>
-                    <a href="#pricing" class="btn btn-outline">See Pricing</a>
+                    <a href="#features" class="btn btn-outline">Explore Features</a>
                 </div>
                 <div class="hero-metrics">
                     <div class="metric-card">
                         <strong>120+</strong>
-                        <span>SMEs onboarded</span>
+                        <span>Active Merchants</span>
                     </div>
                     <div class="metric-card">
-                        <strong>3</strong>
-                        <span>Languages shipped</span>
+                        <strong>99.9%</strong>
+                        <span>Uptime SLA</span>
                     </div>
                     <div class="metric-card">
-                        <strong>24 hr</strong>
-                        <span>Average rollout</span>
+                        <strong>3 min</strong>
+                        <span>To First Sale</span>
                     </div>
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="hero-card">
-                    <div class="hero-card__title">Live sales pulse</div>
-                    <div class="hero-card__item">
-                        <span>Morning rush</span>
-                        <strong>$1,240</strong>
+                <div class="hero-dashboard">
+                    <div class="hero-dashboard__header">
+                        <span class="hero-dot hero-dot--red"></span>
+                        <span class="hero-dot hero-dot--yellow"></span>
+                        <span class="hero-dot hero-dot--green"></span>
+                        <span class="hero-dashboard__title">Live Dashboard — Phnom Penh Branch</span>
                     </div>
-                    <div class="hero-card__item">
-                        <span>Low stock alerts</span>
-                        <strong>8 items</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Open tabs</span>
-                        <strong>12 orders</strong>
-                    </div>
-                </div>
-                <div class="hero-card hero-card--accent">
-                    <div class="hero-card__title">Why teams switch</div>
-                    <div class="hero-card__item">
-                        <span>KHQR + cash</span>
-                        <strong>2 taps</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Multi-outlet view</span>
-                        <strong>Unified</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Offline friendly</span>
-                        <strong>Always on</strong>
+                    <div class="hero-dashboard__body">
+                        <div class="hero-stat-row">
+                            <div class="hero-stat">
+                                <span class="hero-stat__label">Today's Sales</span>
+                                <strong class="hero-stat__value hero-stat__value--up">៛ 4,250,000</strong>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="hero-stat__label">Orders</span>
+                                <strong class="hero-stat__value">47</strong>
+                            </div>
+                        </div>
+                        <div class="hero-stat-row">
+                            <div class="hero-stat">
+                                <span class="hero-stat__label">KHQR Payments</span>
+                                <strong class="hero-stat__value hero-stat__value--accent">32 txns</strong>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="hero-stat__label">Low Stock Alerts</span>
+                                <strong class="hero-stat__value hero-stat__value--warn">3 items</strong>
+                            </div>
+                        </div>
+                        <div class="hero-bar-chart">
+                            <div class="hero-bar" style="height:60%"><span>Mon</span></div>
+                            <div class="hero-bar" style="height:80%"><span>Tue</span></div>
+                            <div class="hero-bar hero-bar--peak" style="height:100%"><span>Wed</span></div>
+                            <div class="hero-bar" style="height:70%"><span>Thu</span></div>
+                            <div class="hero-bar" style="height:90%"><span>Fri</span></div>
+                            <div class="hero-bar" style="height:50%"><span>Sat</span></div>
+                            <div class="hero-bar" style="height:40%"><span>Sun</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -308,130 +318,168 @@ $structuredData = [
         <div class="container">
             <div class="section-header">
                 <div class="section-kicker">
-                    <i class="ph-bold ph-sparkle"></i> Platform Highlights
+                    <i class="ph-bold ph-sparkle"></i> Why Teams Love MCU
                 </div>
-                <h2>Packed with Enterprise-grade Features</h2>
-                <p>Everything you need to scale your retail, cafe, or restaurant business in Cambodia.</p>
+                <h2>Everything your business needs. Nothing you don't.</h2>
+                <p>Purpose-built for Cambodian retailers, cafés, and restaurants — from single counters to multi-branch chains.</p>
             </div>
             
             <div class="features-grid">
-                <!-- Feature 1 -->
+                <!-- Feature 1: POS -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-arrows-clockwise"></i>
-                    </div>
-                    <h3>Real-time Cloud Sync / ការសមកាលកម្មពេលវេលាជាក់ស្តែង</h3>
-                    <p>Transactions and stock updates sync instantly across all devices. Never worry about losing data even if your connection drops.</p>
+                    <div class="feature-icon"><i class="ph-bold ph-cash-register"></i></div>
+                    <h3>Lightning-Fast POS</h3>
+                    <p>Process sales in under 2 seconds. Hold orders, split bills, apply discounts, and print Khmer/English receipts — all from one screen.</p>
                 </div>
-                <!-- Feature 2 -->
+                <!-- Feature 2: KHQR -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-translate"></i>
-                    </div>
-                    <h3>Bilingual Khmer & English / គាំទ្រពីរភាសា ខ្មែរ និង អង់គ្លេស</h3>
-                    <p>Designed with Khmer-first usability. Seamlessly toggle languages to support local cashiers and international managers.</p>
+                    <div class="feature-icon"><i class="ph-bold ph-qr-code"></i></div>
+                    <h3>Bakong KHQR Built-In</h3>
+                    <p>Generate dynamic QR codes with amount and metadata. Auto-verify payments in real-time. No more manual bank slip checks.</p>
                 </div>
-                <!-- Feature 3 -->
+                <!-- Feature 3: Inventory -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-qr-code"></i>
-                    </div>
-                    <h3>Bakong KHQR Payments / ការទូទាត់តាម KHQR បាគង</h3>
-                    <p>Generate dynamic KHQR codes for instant customer scanning. Automatically verifies payments with real-time notifications.</p>
+                    <div class="feature-icon"><i class="ph-bold ph-package"></i></div>
+                    <h3>Smart Inventory</h3>
+                    <p>Track stock across all branches in real-time. Get low-stock alerts, manage purchase orders, and never run out of best-sellers again.</p>
                 </div>
-                <!-- Feature 4 -->
+                <!-- Feature 4: Offline -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-package"></i>
-                    </div>
-                    <h3>Smart Inventory Control / ការគ្រប់គ្រងសារពើភ័ណ្ឌឆ្លាតវៃ</h3>
-                    <p>Track raw ingredients and products. Receive automated low-stock warnings and manage purchase orders easily.</p>
+                    <div class="feature-icon"><i class="ph-bold ph-wifi-slash"></i></div>
+                    <h3>Offline-First Mode</h3>
+                    <p>Internet down? Keep selling. All transactions sync automatically when your connection returns. Zero data loss, zero downtime.</p>
                 </div>
-                <!-- Feature 5 -->
+                <!-- Feature 5: Analytics -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-chart-line-up"></i>
-                    </div>
-                    <h3>Sales & Analytics / របាយការណ៍លក់លម្អិត</h3>
-                    <p>Access deep sales performance charts, top-selling items, and profit margin analysis anywhere, anytime.</p>
+                    <div class="feature-icon"><i class="ph-bold ph-chart-bar"></i></div>
+                    <h3>Live Analytics</h3>
+                    <p>Daily sales dashboards, top-product rankings, profit margin reports, and custom date-range comparisons — accessible from any device.</p>
                 </div>
-                <!-- Feature 6 -->
+                <!-- Feature 6: Multi-Branch -->
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-storefront"></i>
-                    </div>
-                    <h3>Multi-outlet Management / គ្រប់គ្រងសាខាច្រើន</h3>
-                    <p>Manage multiple branch locations, centralize warehouse stock, and compare store performances from a single dashboard.</p>
-
+                    <div class="feature-icon"><i class="ph-bold ph-buildings"></i></div>
+                    <h3>Multi-Branch Control</h3>
+                    <p>Manage unlimited outlets from a single login. Compare branch performance, transfer stock between locations, and centralize reporting.</p>
+                </div>
+                <!-- Feature 7: Bilingual -->
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="ph-bold ph-translate"></i></div>
+                    <h3>Khmer & English UI</h3>
+                    <p>Toggle between ខ្មែរ and English instantly. Every label, receipt, and report supports both languages. Your cashiers will love it.</p>
+                </div>
+                <!-- Feature 8: Staff & HR -->
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="ph-bold ph-users-three"></i></div>
+                    <h3>Staff & Cashier Management</h3>
+                    <p>Track shifts, manage permissions, monitor cash control sessions, and run payroll reports — all integrated with your POS.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Me Section -->
+    <!-- Why MCU Section -->
     <section id="about" class="about-section">
         <div class="container">
-            <div class="about-grid">
-                <div class="about-intro">
-                    <span class="about-pill">
-                        <i class="ph-bold ph-user-focus"></i>
-                        Meet the Builder
-                    </span>
-                    <h2>Human-centered Khmer POS systems for Cambodian operators</h2>
-                    <p>
-                        I design Mekong CyberUnit the way I run my own businesses: fast iterations, transparent pricing,
-                        and obsessive care for local workflows. Every release blends field interviews with rapid prototyping,
-                        so features feel like a teammate instead of another SaaS chore—and keeps us ranking whenever teams search for POS Khmer or modern POS systems in the Mekong.
-                    </p>
-                    <ul class="about-list">
-                        <li>
-                            <i class="ph-bold ph-lightning"></i>
-                            Built the first unified POS, HR, and inventory stack tailored for Khmer + English crews.
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-flask"></i>
-                            Ship weekly experiments so the Khmer POS experience stays fast across menus, tax rules, and subscription rails.
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-handshake"></i>
-                            Partner with cafés, clinics, and franchise brands to co-create playbooks that scale and boost search visibility for Cambodian POS system keywords.
-                        </li>
-                    </ul>
-                    <div class="signature">
-                        <strong>— The Mekong CyberUnit maker</strong>
-                        <span>Product, engineering, and customer success in one desk.</span>
-                    </div>
+            <div class="section-header">
+                <div class="section-kicker">
+                    <i class="ph-bold ph-shield-check"></i> Why Mekong CyberUnit
                 </div>
-                <div class="about-profile">
-                    <div class="profile-meta">
-                        <span>Independent Founder</span>
-                        <span>Est. 2020</span>
-                    </div>
-                    <h3 class="profile-name">Your operator-in-residence</h3>
-                    <div class="profile-role">Builder · Systems Thinker · Customer Partner</div>
-                    <p class="profile-bio">
-                        I grew up between restaurant back offices and dusty warehouses, so I obsess over practical UX:
-                        offline-friendly flows, bilingual interfaces, and automations your team trusts after one shift.
-                        If something feels clunky, ping me—I'm the one answering support chats too.
-                    </p>
-                    <div class="profile-stats">
-                        <div class="stat-card">
-                            <span class="stat-value">120+</span>
-                            <span class="stat-label">SMEs onboarded</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-value">9.4/10</span>
-                            <span class="stat-label">Support CSAT</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-value">3</span>
-                            <span class="stat-label">Languages shipped</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-value">24 hr</span>
-                            <span class="stat-label">Average rollout</span>
-                        </div>
-                    </div>
+                <h2>Built in Cambodia, for Cambodian businesses.</h2>
+                <p>We're not a generic POS translated into Khmer. We're a team that lives and works here, building features that match how local shops actually operate.</p>
+            </div>
+
+            <div class="why-grid">
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-bank"></i></div>
+                    <h3>Bakong-First Payments</h3>
+                    <p>Deep KHQR integration means your customers pay with any banking app. No extra hardware, no manual reconciliation, no transaction fees on our side.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-clock-countdown"></i></div>
+                    <h3>10-Minute Setup</h3>
+                    <p>Create your account, add products via CSV import or manual entry, and start selling — all before your first morning customer walks in.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-cloud-arrow-down"></i></div>
+                    <h3>Works Offline, Syncs Online</h3>
+                    <p>Cambodia's internet can be unpredictable. MCU stores transactions locally and syncs everything when you're back online. You won't lose a single sale.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-headset"></i></div>
+                    <h3>Khmer-Speaking Support</h3>
+                    <p>Stuck at 8 PM on a Saturday? Our Telegram support responds in Khmer within minutes. No ticket systems, no chatbots — real humans who understand your context.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-shield"></i></div>
+                    <h3>Enterprise Security</h3>
+                    <p>All data is encrypted in transit and at rest. Role-based access controls, session timeouts, and audit logs keep your business data safe from unauthorized access.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-card__icon"><i class="ph-bold ph-rocket-launch"></i></div>
+                    <h3>Weekly Improvements</h3>
+                    <p>We ship updates every week based on merchant feedback. Your feature request today could be live on your dashboard by next Monday.</p>
+                </div>
+            </div>
+
+            <div class="trust-strip">
+                <div class="trust-item">
+                    <strong>120+</strong>
+                    <span>Active Merchants</span>
+                </div>
+                <div class="trust-divider"></div>
+                <div class="trust-item">
+                    <strong>3</strong>
+                    <span>Languages (EN/KM/ZH)</span>
+                </div>
+                <div class="trust-divider"></div>
+                <div class="trust-item">
+                    <strong>24/7</strong>
+                    <span>Telegram Support</span>
+                </div>
+                <div class="trust-divider"></div>
+                <div class="trust-item">
+                    <strong>2020</strong>
+                    <span>Established Since</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-kicker">
+                    <i class="ph-bold ph-path"></i> Get Started in Minutes
+                </div>
+                <h2>From sign-up to first sale in 3 simple steps.</h2>
+                <p>No technical skills needed. No hardware to install. Just a browser and a dream.</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="ph-bold ph-user-plus"></i></div>
+                    <h3>Create Your Account</h3>
+                    <p>Sign up in 60 seconds. Choose your plan, pick your workspace name, and you're in. No credit card required for the trial.</p>
+                </div>
+                <div class="step-connector">
+                    <i class="ph-bold ph-arrow-right"></i>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="ph-bold ph-file-csv"></i></div>
+                    <h3>Add Your Products</h3>
+                    <p>Import your product list via CSV, or add items one by one. Set prices in USD or KHR, upload images, and organize by category.</p>
+                </div>
+                <div class="step-connector">
+                    <i class="ph-bold ph-arrow-right"></i>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="ph-bold ph-cash-register"></i></div>
+                    <h3>Start Selling</h3>
+                    <p>Open your POS terminal on any device. Accept cash or KHQR, print receipts, and watch your dashboard come alive in real-time.</p>
                 </div>
             </div>
         </div>
@@ -441,10 +489,12 @@ $structuredData = [
     <section class="pricing-section" id="pricing">
         <div class="container">
             <div class="section-header">
-                <div class="section-kicker">Cloud POS Plans</div>
+                <div class="section-kicker">
+                    <i class="ph-bold ph-credit-card"></i> Transparent Pricing
+                </div>
 
-                <h2>Simple, Transparent Pricing</h2>
-                <p>Choose the right plan for your business needs.</p>
+                <h2>One subscription. All features. No surprises.</h2>
+                <p>Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
             </div>
             
             <div class="systems-grid">
@@ -548,51 +598,54 @@ $structuredData = [
         <div class="container">
             <div class="section-header">
                 <div class="section-kicker">
-                    <i class="ph-bold ph-chats"></i> Customer Reviews
+                    <i class="ph-bold ph-chats-circle"></i> Merchant Stories
                 </div>
-                <h2>Loved by Operators Across Cambodia</h2>
-                <p>See how local cafes, retail stores, and pharmacies scale their businesses with Mekong CyberUnit.</p>
+                <h2>Trusted by businesses across Cambodia</h2>
+                <p>From street-side coffee carts to multi-branch pharmacies — hear why they chose MCU.</p>
             </div>
             
             <div class="testimonials-grid">
                 <!-- Testimonial 1 -->
                 <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-quote">
-                        "Mekong CyberUnit changed the way we handle morning rushes. Toggling between Khmer and English works perfectly for our baristas, and the KHQR Bakong integration means we don't have to check manual bank slips anymore."
+                        "We switched from a paper ledger to MCU and it transformed our morning rush. The KHQR integration alone saves us 30 minutes of reconciliation every day. Our baristas picked it up in one shift."
                     </p>
                     <div class="testimonial-author">
                         <div class="testimonial-avatar">☕</div>
                         <div class="testimonial-info">
-                            <h4>Sokha Pich / ពេជ្រ សុខា</h4>
-                            <p>Owner, Brown & Bloom Cafe (Phnom Penh)</p>
+                            <h4>Sokha Pich</h4>
+                            <p>Owner, Brown & Bloom Cafe — Phnom Penh</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Testimonial 2 -->
                 <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-quote">
-                        "Managing three outlets from my phone is a breeze. The smart inventory alerts help us restock before running out. The offline mode saved us multiple times during internet outages."
+                        "Managing 3 outlets from my phone is a game-changer. The inventory alerts tell me what to restock before I run out. The offline mode has saved us multiple times during rainy season outages."
                     </p>
                     <div class="testimonial-author">
                         <div class="testimonial-avatar">🛍️</div>
                         <div class="testimonial-info">
-                            <h4>Piseth Vong / វង្ស ពិសិដ្ឋ</h4>
-                            <p>Founder, Kravan Retail Shop (Siem Reap)</p>
+                            <h4>Piseth Vong</h4>
+                            <p>Founder, Kravan Retail — Siem Reap</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Testimonial 3 -->
                 <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-quote">
-                        "We were searching for a POS Khmer solution that can manage thousands of item SKUs. The cloud sync is instantaneous, and the automated reports give us exact daily margin insights."
+                        "We manage 4,000+ drug SKUs across two locations. MCU's cloud sync is instant, and the bilingual interface means our Khmer staff and I (English speaker) can both use it comfortably."
                     </p>
                     <div class="testimonial-author">
                         <div class="testimonial-avatar">💊</div>
                         <div class="testimonial-info">
-                            <h4>Chantrea Keo / កែវ ចាន់ទ្រា</h4>
-                            <p>General Manager, Angkor Pharmacy (Battambang)</p>
+                            <h4>Dr. Chantrea Keo</h4>
+                            <p>GM, Angkor Pharmacy — Battambang</p>
                         </div>
                     </div>
                 </div>
@@ -605,10 +658,10 @@ $structuredData = [
         <div class="container">
             <div class="section-header">
                 <div class="section-kicker">
-                    <i class="ph-bold ph-question"></i> Frequently Asked Questions
+                    <i class="ph-bold ph-question"></i> Quick Answers
                 </div>
-                <h2>Got Questions? We Have Answers</h2>
-                <p>Everything you need to know about setting up and using Mekong CyberUnit POS.</p>
+                <h2>Frequently asked questions</h2>
+                <p>Everything you need to know before getting started with MCU.</p>
             </div>
             
             <div class="faq-container">
@@ -672,10 +725,10 @@ $structuredData = [
         <div class="container">
             <div class="section-header">
                 <div class="section-kicker">
-                    <i class="ph-bold ph-envelope"></i> Contact Us
+                    <i class="ph-bold ph-envelope"></i> Get In Touch
                 </div>
-                <h2>Get in Touch with Our Team</h2>
-                <p>Have questions about pricing, features, or custom integrations? We're here to help.</p>
+                <h2>We're here to help</h2>
+                <p>Questions about features, pricing, or custom integrations? Reach out anytime.</p>
             </div>
             
             <div class="contact-grid">
@@ -757,15 +810,14 @@ $structuredData = [
     <section class="cta-section">
         <div class="container">
             <div class="cta-box">
-                <h2>Ready to transform your business?</h2>
-                <p>Join hundreds of businesses using Mekong CyberUnit to streamline operations.</p>
+                <h2>Ready to upgrade your shop?</h2>
+                <p>Join 120+ Cambodian businesses already running on Mekong CyberUnit. Free trial, no credit card, cancel anytime.</p>
                 <div class="btn-group">
                      <a href="register.php" class="btn btn-primary">
-                        Create Free Account
+                        Start Your Free Trial <i class="ph-bold ph-arrow-right"></i>
                     </a>
                     <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn btn-ghost">
-
-                        Contact Sales
+                        <i class="ph-bold ph-telegram-logo"></i> Chat on Telegram
                     </a>
                 </div>
             </div>
@@ -790,29 +842,29 @@ $structuredData = [
                 <div class="footer-col">
                     <h4>Product</h4>
                     <ul class="footer-links">
-                        <li><a href="#">POS</a></li>
-                        <li><a href="#">Inventory</a></li>
-                        <li><a href="#">HR Management</a></li>
-                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="register.php">Sign Up</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener">Telegram</a></li>
+                        <li><a href="mailto:support@mekongcyberunit.app">Email Us</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <ul class="footer-links">
+                        <li><a href="#about">About</a></li>
                         <li><a href="#">Privacy Policy</a></li>
                         <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Security</a></li>
                     </ul>
                 </div>
             </div>
