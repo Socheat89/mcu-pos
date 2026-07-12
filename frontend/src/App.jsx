@@ -1158,33 +1158,6 @@ export default function App() {
                     );
                   })}
                 </div>
-
-                <div className="hidden grid-cols-3 gap-2 sm:grid">
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Package className="h-3.5 w-3.5 text-brand-cyan" />
-                      <span>{t('products_label', 'Products')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{visibleProductCount}</div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <AlertTriangle className="h-3.5 w-3.5 text-brand-warning" />
-                      <span>{t('stock_alerts', 'Stock alerts')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">
-                      {lowStockCount}
-                      <span className="ml-1 text-[10px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
-                    </div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
-                      <span>{t('pending', 'Pending')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{pendingOrders.length}</div>
-                  </div>
-                </div>
               </div>
 
               {/* Product Grid */}
