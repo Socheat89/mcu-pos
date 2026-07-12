@@ -5,13 +5,21 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 try {
-    // Harden Session Security & Extend Session Lifetime to 30 Days (1 Month)
-    ini_set('session.cookie_lifetime', 2592000); // 30 days
-    ini_set('session.gc_maxlifetime', 2592000);   // 30 days
-
+    // Harden Session Security & Extend Session Lifetime to 1 Year (no auto-logout)
+    $sessionLifetime = 31536000; // 365 days
+    ini_set('session.cookie_lifetime', $sessionLifetime);
+    ini_set('session.gc_maxlifetime', $sessionLifetime);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_only_cookies', 1);
     ini_set('session.cookie_samesite', 'Lax');
+    ini_set('session.use_strict_mode', 1);
+
+    // Set custom session save path to avoid shared hosting gc issues
+    $sessionPath = $baseDir . '/sessions';
+    if (!is_dir($sessionPath)) {
+        mkdir($sessionPath, 0700, true);
+    }
+    session_save_path($sessionPath);
 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
