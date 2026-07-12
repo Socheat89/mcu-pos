@@ -1,0 +1,22 @@
+{
+  "name": "Mekong POS",
+  "short_name": "Mekong POS",
+  "description": "Mekong CyberUnit - Point of Sale System",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080a10",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "/public/images/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/public/images/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

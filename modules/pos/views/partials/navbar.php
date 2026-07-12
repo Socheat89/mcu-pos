@@ -576,6 +576,35 @@ $navLabel = function (string $key): string {
 
     // Add scroll hint on tables
     document.addEventListener('DOMContentLoaded', function() {
+        // Inject PWA meta tags for installable webapp
+        var head = document.head;
+
+        // Apple mobile webapp
+        if (!document.querySelector('meta[name="apple-mobile-web-app-capable"]')) {
+            var appleCapable = document.createElement('meta');
+            appleCapable.name = 'apple-mobile-web-app-capable';
+            appleCapable.content = 'yes';
+            head.appendChild(appleCapable);
+        }
+        if (!document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')) {
+            var appleStatus = document.createElement('meta');
+            appleStatus.name = 'apple-mobile-web-app-status-bar-style';
+            appleStatus.content = 'black-translucent';
+            head.appendChild(appleStatus);
+        }
+        if (!document.querySelector('link[rel="manifest"]')) {
+            var manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = '/public/manifest.json';
+            head.appendChild(manifestLink);
+        }
+        if (!document.querySelector('meta[name="theme-color"]')) {
+            var themeColor = document.createElement('meta');
+            themeColor.name = 'theme-color';
+            themeColor.content = '#06b6d4';
+            head.appendChild(themeColor);
+        }
+
         var tables = document.querySelectorAll('.pos-table-container, .pos-table');
         tables.forEach(function(t) {
             if (t.scrollWidth > t.clientWidth) {
@@ -588,6 +617,11 @@ $navLabel = function (string $key): string {
         var vp = document.querySelector('meta[name="viewport"]');
         if (vp) {
             vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/public/service-worker.js');
         }
     });
 })();
