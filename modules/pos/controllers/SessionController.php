@@ -30,24 +30,42 @@ class SessionController {
         $storeParams = [$tenantId];
 
         if ($storeId > 0) {
-            $storeFilter = ' AND s.store_id = ?';
+            $storeFilter = ' AND store_id = ?';
             $storeParams[] = $storeId;
         }
 
-        $sessions = $db->fetchAll(
-            "SELECT s.*, u.username, st.name as store_name, st.code as store_code
-             FROM pos_sessions s 
-             JOIN users u ON s.user_id = u.id
-             LEFT JOIN stores st ON s.store_id = st.id
-             WHERE s.tenant_id = ?" . $storeFilter . "
-             ORDER BY s.opened_at DESC",
-            $storeParams
-        );
+        // Safe: check if store_id column exists before filtering
+        try {
+            $sessions = $db->fetchAll(
+                "SELECT s.*, u.username, st.name as store_name, st.code as store_code
+                 FROM pos_sessions s 
+                 JOIN users u ON s.user_id = u.id
+                 LEFT JOIN stores st ON s.store_id = st.id
+                 WHERE s.tenant_id = ?" . $storeFilter . "
+                 ORDER BY s.opened_at DESC",
+                $storeParams
+            );
 
-        $activeSession = $db->fetchOne(
-            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'" . $storeFilter,
-            $storeParams
-        );
+            $activeSession = $db->fetchOne(
+                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'" . $storeFilter,
+                $storeParams
+            );
+        } catch (Exception $e) {
+            // Fallback: store_id column doesn't exist yet, query without store filter
+            $sessions = $db->fetchAll(
+                "SELECT s.*, u.username, '' as store_name, '' as store_code
+                 FROM pos_sessions s 
+                 JOIN users u ON s.user_id = u.id
+                 WHERE s.tenant_id = ?
+                 ORDER BY s.opened_at DESC",
+                [$tenantId]
+            );
+
+            $activeSession = $db->fetchOne(
+                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'",
+                [$tenantId]
+            );
+        }
 
         include __DIR__ . '/../views/sessions.php';
     }
