@@ -34,7 +34,7 @@ return [
     'name' => 'Name',
     'description' => 'Description',
     'category' => 'Category',
-    'inventory' => 'Ju Inventory',
+    'inventory' => 'Inventory',
 
     'stock' => 'Stock',
     'low_stock' => 'Low Stock',
@@ -141,7 +141,7 @@ return [
     'save_receipt_settings' => 'Save Receipt Settings',
     'live_preview' => 'Live Preview',
     'on_hold' => 'On Hold',
-    'inventory' => 'Ju Inventory',
+    'inventory' => 'Inventory',
 
     'analytics' => 'Analytics',
     'digital_menu' => 'Digital Menu',

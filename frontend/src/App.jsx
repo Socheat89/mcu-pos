@@ -1689,9 +1689,9 @@ export default function App() {
                           { val: 20.00, label: '$20' },
                           { val: 50.00, label: '$50' },
                           { val: 100.00, label: '$100' },
-                          { val: 2.50, label: '10K ៛' },
-                          { val: 5.00, label: '20K ៛' },
-                          { val: 12.50, label: '50K ៛' }
+                          { val: 2.50, label: '10K' },
+                          { val: 5.00, label: '20K' },
+                          { val: 12.50, label: '50K' }
                         ].map(bill => (
                           <button
                             key={bill.label}
