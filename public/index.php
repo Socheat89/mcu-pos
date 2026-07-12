@@ -464,8 +464,26 @@ $structuredData = [
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
                     $isPopular = ($index === 1); // Mark second plan as popular for UI
                     
-                    // Fetch linked modules for this plan
-                    $modules = $db->fetchAll("SELECT module_name FROM system_modules WHERE system_id = ?", [$plan['id']]);
+                    // Fetch linked features for this plan
+                    $features = $db->fetchAll("SELECT sm.module_name, sm.feature_key FROM system_modules sm WHERE sm.system_id = ?", [$plan['id']]);
+
+                    // Feature labels
+                    $featureLabels = [
+                        'pos_core'           => 'POS Terminal & Dashboard',
+                        'pos_orders'         => 'Order History',
+                        'pos_inventory'      => 'Product & Inventory',
+                        'pos_customers'      => 'Customer Management',
+                        'pos_reports'        => 'Sales Reports & Analytics',
+                        'pos_holds'          => 'Hold Orders',
+                        'pos_digital_menu'   => 'Digital Menu (QR)',
+                        'pos_settings'       => 'POS Settings',
+                        'pos_sessions'       => 'Cash Control Sessions',
+                        'pos_cashiers'       => 'Cashier Management',
+                        'inventory_stock_in' => 'Stock-In Management',
+                        'hr_staff'           => 'Staff Management',
+                    ];
+                    $storeLimit = (int)($plan['store_limit'] ?? 1);
+                    $cashierLimit = (int)($plan['cashier_limit'] ?? 1);
                 ?>
                 <div class="system-card <?php echo $isPopular ? 'popular-card' : ''; ?>">
                     <?php if ($isPopular): ?>
@@ -482,24 +500,29 @@ $structuredData = [
                     </div>
                     
                     <ul class="plan-list">
-                        <?php if (empty($modules)): ?>
+                        <?php foreach ($features as $f): ?>
+                            <?php $labelKey = $f['module_name'] . '_' . $f['feature_key']; ?>
                             <li>
-                                <i class="ph-bold ph-info"></i> Basic Platform Access
+                                <i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i>
+                                <?php echo htmlspecialchars($featureLabels[$labelKey] ?? ucfirst($f['feature_key'])); ?>
                             </li>
+                        <?php endforeach; ?>
+                        <?php if ($storeLimit > 0): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit > 1 ? 's' : ''; ?></li>
                         <?php else: ?>
-                            <?php foreach ($modules as $mod): ?>
-                            <li>
-                                <i class="ph-bold ph-check-circle"></i>
-                                <span><?php echo htmlspecialchars($mod['module_name']); ?> Module</span>
-                            </li>
-                            <?php endforeach; ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Unlimited Stores</li>
                         <?php endif; ?>
-                        <li>
-                            <i class="ph-bold ph-check-circle"></i> Cloud Storage
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-check-circle"></i> 24/7 Priority Support
-                        </li>
+                        <?php if ($cashierLimit > 0): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit > 1 ? 's' : ''; ?></li>
+                        <?php else: ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Unlimited Cashiers</li>
+                        <?php endif; ?>
+                        <?php if ($plan['price'] >= 30): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Cloud Storage</li>
+                        <?php endif; ?>
+                        <?php if ($plan['price'] >= 50): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> 24/7 Priority Support</li>
+                        <?php endif; ?>
                     </ul>
                     
                     <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?> full-width">
