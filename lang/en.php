@@ -410,5 +410,6 @@ return [
     'select_store'            => 'Select Store',
     'store'                   => 'Store',
     'edit_cashier'            => 'Edit Cashier',
+    'auto_detected'           => 'Auto-detected',
 
 ];

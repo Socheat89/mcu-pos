@@ -30,6 +30,25 @@
 
         <div class="form-card pos-shadow-xl">
             <form method="POST">
+                <?php
+                // Auto-detect current store
+                $currentStore = null;
+                if (class_exists('Store')) {
+                    $currentStore = Store::getCurrent();
+                }
+                if (!$currentStore) {
+                    $userStoreId = Auth::user()['current_store_id'] ?? null;
+                    if ($userStoreId && class_exists('Store')) {
+                        $currentStore = Store::getById($userStoreId);
+                    }
+                }
+                // Fallback: get default store
+                if (!$currentStore && class_exists('Store')) {
+                    $currentStore = Store::getDefault();
+                }
+                ?>
+                <input type="hidden" name="store_id" value="<?php echo $currentStore ? $currentStore['id'] : ''; ?>">
+
                 <section style="margin-bottom: 24px;">
                     <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
@@ -37,18 +56,26 @@
                     </h3>
 
                     <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                    <!-- Multiple stores: show dropdown to override -->
                     <div class="pos-form-group">
                         <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i><?php echo __('store'); ?></label>
-                        <select name="store_id" class="pos-form-control">
-                            <option value="">— <?php echo __('select_store'); ?> —</option>
-                            <?php 
-                            $userStoreId = Auth::user()['current_store_id'] ?? null;
-                            foreach ($allStores as $st): ?>
-                                <option value="<?php echo $st['id']; ?>" <?php echo $userStoreId == $st['id'] ? 'selected' : ''; ?>>
+                        <select name="store_id" class="pos-form-control" onchange="document.querySelector('input[name=store_id]').value=this.value">
+                            <?php foreach ($allStores as $st): ?>
+                                <option value="<?php echo $st['id']; ?>" <?php echo ($currentStore && $currentStore['id'] == $st['id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+                    <?php elseif ($currentStore): ?>
+                    <!-- Single store: show it as a badge -->
+                    <div class="pos-form-group">
+                        <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i><?php echo __('store'); ?></label>
+                        <div style="padding:14px 18px;background:rgba(var(--pos-primary-rgb),0.05);border:1.5px solid rgba(var(--pos-primary-rgb),0.15);border-radius:14px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;color:var(--pos-text);">
+                            <span style="background:var(--pos-primary-light);color:var(--pos-primary);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;"><?php echo htmlspecialchars($currentStore['code'] ?: 'ST'); ?></span>
+                            <?php echo htmlspecialchars($currentStore['name']); ?>
+                            <span style="margin-left:auto;font-size:11px;color:var(--pos-text-muted);"><i class="fas fa-check-circle" style="color:var(--pos-success);"></i> <?php echo __('auto_detected'); ?></span>
+                        </div>
                     </div>
                     <?php endif; ?>
 

@@ -86,11 +86,23 @@ class SessionController {
         $tenantId = Tenant::getId();
         $allStores = Store::getAll($tenantId);
 
-        // Check if there is already an active session
-        $activeSession = $db->fetchOne(
-            "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", 
-            [$tenantId]
-        );
+        // Auto-detect store: Store switcher → user's assigned store → default store
+        $currentStore = Store::getCurrent($tenantId);
+        $autoStoreId = $currentStore ? $currentStore['id'] : null;
+
+        // Check if there is already an active session (for this user or globally)
+        try {
+            $activeSession = $db->fetchOne(
+                "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?",
+                [$tenantId, Auth::user()['id']]
+            );
+        } catch (Exception $e) {
+            // Fallback without user_id filter
+            $activeSession = $db->fetchOne(
+                "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'",
+                [$tenantId]
+            );
+        }
 
         if ($activeSession) {
             $prefix = mc_base_path();
@@ -103,9 +115,16 @@ class SessionController {
             $storeId = !empty($_POST['store_id']) ? (int)$_POST['store_id'] : null;
             $userId = Auth::user()['id'];
 
-            // If no store selected, use user's current store
+            // Auto-detect: POSTed store → Store::getCurrent() → user's assigned store → default
+            if (!$storeId) {
+                $storeId = $autoStoreId;
+            }
             if (!$storeId && Auth::user()['current_store_id']) {
                 $storeId = (int)Auth::user()['current_store_id'];
+            }
+            if (!$storeId) {
+                $defaultStore = Store::getDefault($tenantId);
+                $storeId = $defaultStore ? $defaultStore['id'] : null;
             }
 
             $db->insert('pos_sessions', [

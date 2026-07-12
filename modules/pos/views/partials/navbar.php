@@ -641,3 +641,52 @@ $navLabel = function (string $key): string {
         if (s && !s.contains(e.target)) s.classList.remove('active');
     });
 </script>
+
+<!-- 📱 Mobile Touch Enhancements -->
+<script>
+(function() {
+    // Remove 300ms tap delay on all interactive elements
+    var style = document.createElement('style');
+    style.textContent = 'a, button, input, select, textarea, .btn, .pos-side-link, .pill-btn, .pos-tab-link { touch-action: manipulation; }';
+    document.head.appendChild(style);
+
+    // Swipe right to open sidebar on mobile
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        var diff = e.changedTouches[0].clientX - touchStartX;
+        // Swipe right > 80px from left edge → open sidebar
+        if (diff > 80 && touchStartX < 30 && window.innerWidth < 980) {
+            var shell = document.getElementById('posShell');
+            if (shell && !shell.classList.contains('pos-shell--open')) {
+                shell.classList.add('pos-shell--open');
+                var overlay = document.getElementById('posOverlay');
+                if (overlay) overlay.setAttribute('aria-hidden', 'false');
+            }
+        }
+        // Swipe left > 80px → close sidebar
+        if (diff < -80 && window.innerWidth < 980) {
+            var shell = document.getElementById('posShell');
+            if (shell && shell.classList.contains('pos-shell--open')) {
+                shell.classList.remove('pos-shell--open');
+                var overlay = document.getElementById('posOverlay');
+                if (overlay) overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
+    });
+
+    // Add scroll hint on tables
+    document.addEventListener('DOMContentLoaded', function() {
+        var tables = document.querySelectorAll('.pos-table-container, .pos-table');
+        tables.forEach(function(t) {
+            if (t.scrollWidth > t.clientWidth) {
+                t.style.setProperty('--table-scroll-hint', '"← swipe →"');
+                t.setAttribute('data-scrollable', 'true');
+            }
+        });
+    });
+})();
+</script>

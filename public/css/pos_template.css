@@ -1767,6 +1767,271 @@ textarea:focus {
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   📱 MOBILE-FIRST RESPONSIVE ENHANCEMENTS
+   Touch-friendly, readable, easy to tap on phones (320px – 768px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Phone (≤480px) ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    /* Typography */
+    h1, .pos-title h1 { font-size: 22px !important; }
+    h2 { font-size: 18px !important; }
+    h3, .pos-card-title { font-size: 15px !important; }
+    p, .pos-title p { font-size: 13px !important; }
+
+    /* Page padding */
+    .pos-page {
+        padding: 14px 10px 20px !important;
+    }
+
+    /* ── Tables: horizontal scroll ── */
+    .pos-table-container,
+    .pos-panel,
+    div[style*="overflow-x:auto"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -10px;
+        padding: 0 10px;
+        width: calc(100% + 20px);
+    }
+
+    .pos-table {
+        min-width: 600px;
+        font-size: 12px;
+    }
+
+    .pos-table th,
+    .pos-table td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+    }
+
+    /* ── Cards full width ── */
+    .report-card,
+    .store-sales-card,
+    .pos-card {
+        padding: 16px !important;
+    }
+
+    /* ── Grids: always single column ── */
+    .pos-grid.cols-2,
+    .pos-grid.cols-3,
+    .pos-grid.cols-4,
+    [style*="grid-template-columns: repeat(auto-fit"],
+    [style*="grid-template-columns: repeat(auto-fill"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* ── Stat cards ── */
+    .pos-stat .v { font-size: 22px !important; }
+    .pos-stat .k { font-size: 10px !important; }
+    .pos-stat { padding: 14px !important; }
+
+    /* ── Store filter bar ── */
+    .store-filter-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+    .store-filter-bar select {
+        width: 100% !important;
+    }
+
+    /* ── Header actions stack ── */
+    .fade-in > div[style*="display: flex"],
+    .fade-in > div[style*="display:flex"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .fade-in > div[style*="display: flex"] > .btn,
+    .fade-in > div[style*="display:flex"] > .btn,
+    .fade-in > div[style*="display: flex"] > a.btn,
+    .fade-in > div[style*="display:flex"] > a.btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* ── Buttons: touch-friendly ── */
+    .btn {
+        min-height: 44px;
+        padding: 12px 18px !important;
+        font-size: 13px !important;
+    }
+
+    .btn-sm, .pill-btn {
+        min-height: 38px;
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+    }
+
+    /* ── Form controls ── */
+    .pos-form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    select,
+    textarea {
+        font-size: 16px !important;  /* Prevents iOS zoom on focus */
+        padding: 14px 14px !important;
+        min-height: 48px;
+    }
+
+    .pos-form-label { font-size: 12px !important; }
+
+    /* ── Modals ── */
+    .pos-modal,
+    .csh-modal,
+    .modal {
+        width: 94% !important;
+        max-width: 94vw !important;
+        padding: 20px 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .csh-modal-backdrop {
+        padding: 10px !important;
+    }
+
+    /* ── Modal buttons full-width ── */
+    .pos-modal .pos-form-group + div[style*="display:flex"],
+    .csh-modal div[style*="display:flex"][style*="gap"] {
+        flex-direction: column !important;
+    }
+
+    .pos-modal .btn,
+    .csh-modal .btn {
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    /* ── Cashier list ── */
+    .csh-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .csh-row {
+        flex-wrap: wrap !important;
+        padding: 14px !important;
+        gap: 10px !important;
+    }
+
+    .csh-actions {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    .csh-form {
+        position: static !important;
+    }
+
+    /* ── Hold cards ── */
+    .hold-card {
+        flex-direction: column !important;
+        gap: 14px !important;
+        padding: 16px !important;
+    }
+
+    .hold-card > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* ── Session open form ── */
+    .form-card {
+        padding: 20px 16px !important;
+    }
+
+    /* ── Products page import panel ── */
+    .import-panel__header {
+        padding: 14px 16px !important;
+    }
+    .import-panel__body {
+        padding: 0 16px 16px !important;
+    }
+    .import-tabs {
+        flex-wrap: wrap !important;
+    }
+    .import-upload-zone {
+        padding: 20px 14px !important;
+    }
+
+    /* ── Tabs scroll ── */
+    .pos-tabs {
+        width: 100% !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Sidebar ── */
+    .pos-shell--open .pos-sidebar {
+        width: min(88vw, 300px) !important;
+    }
+}
+
+/* ── Tablet (481px – 768px) ─────────────────────────────────────────────── */
+@media (min-width: 481px) and (max-width: 768px) {
+    .pos-page {
+        padding: 18px 16px 24px !important;
+    }
+
+    .pos-grid.cols-3,
+    .pos-grid.cols-4 {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 14px !important;
+    }
+
+    .csh-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .csh-form {
+        position: static !important;
+    }
+
+    .fade-in > div[style*="display: flex"] {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+
+    .btn {
+        min-height: 44px;
+        padding: 12px 18px !important;
+    }
+
+    .pos-table {
+        min-width: 500px;
+    }
+}
+
+/* ── Medium (769px – 1024px) ────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .pos-grid.cols-4 {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .pos-grid.cols-3 {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .csh-layout {
+        grid-template-columns: 340px 1fr !important;
+        gap: 20px !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   END MOBILE ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 /* ============================================================================
    POS Clean UI - Odoo POS Style
    Simple, calm, easy-to-scan light interface for business operations.

@@ -409,5 +409,6 @@ return [
     'select_store'            => 'ជ្រើសរើសហាង',
     'store'                   => 'ហាង',
     'edit_cashier'            => 'កែសម្រួលអ្នកលក់',
+    'auto_detected'           => 'រកឃើញដោយស្វ័យប្រវត្តិ',
 
 ];
