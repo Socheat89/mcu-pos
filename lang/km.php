@@ -403,5 +403,10 @@ return [
     'cashier_limit_reached'   => 'ដល់កំណត់ចំនួនអ្នកលក់ហើយ! សូមធ្វើឱ្យប្រសើរផែនការដើម្បីបន្ថែមអ្នកលក់។',
     'assign_store'            => 'ចាត់តាំងហាង',
     'all_stores'              => 'ហាងទាំងអស់',
+    'filter_by_store'         => 'តម្រងតាមហាង',
+    'sales_by_store'          => 'ការលក់តាមហាង',
+    'products_sold_by_store'  => 'ផលិតផលដែលលក់តាមហាង',
+    'select_store'            => 'ជ្រើសរើសហាង',
+    'store'                   => 'ហាង',
 
 ];

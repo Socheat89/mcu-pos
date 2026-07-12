@@ -2,6 +2,7 @@
 // modules/pos/controllers/SessionController.php
 require_once __DIR__ . '/../../../core/classes/Database.php';
 require_once __DIR__ . '/../../../core/classes/Tenant.php';
+require_once __DIR__ . '/../../../core/classes/Store.php';
 require_once __DIR__ . '/../../../core/classes/Auth.php';
 require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
@@ -22,17 +23,30 @@ class SessionController {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
 
+        // Load stores for filter
+        $allStores = Store::getAll($tenantId);
+        $storeId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
+        $storeFilter = '';
+        $storeParams = [$tenantId];
+
+        if ($storeId > 0) {
+            $storeFilter = ' AND s.store_id = ?';
+            $storeParams[] = $storeId;
+        }
+
         $sessions = $db->fetchAll(
-            "SELECT s.*, u.username FROM pos_sessions s 
-             JOIN users u ON s.user_id = u.id 
-             WHERE s.tenant_id = ? 
-             ORDER BY s.opened_at DESC", 
-            [$tenantId]
+            "SELECT s.*, u.username, st.name as store_name, st.code as store_code
+             FROM pos_sessions s 
+             JOIN users u ON s.user_id = u.id
+             LEFT JOIN stores st ON s.store_id = st.id
+             WHERE s.tenant_id = ?" . $storeFilter . "
+             ORDER BY s.opened_at DESC",
+            $storeParams
         );
 
         $activeSession = $db->fetchOne(
-            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", 
-            [$tenantId]
+            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'" . $storeFilter,
+            $storeParams
         );
 
         include __DIR__ . '/../views/sessions.php';
@@ -52,6 +66,7 @@ class SessionController {
 
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
+        $allStores = Store::getAll($tenantId);
 
         // Check if there is already an active session
         $activeSession = $db->fetchOne(
@@ -67,14 +82,21 @@ class SessionController {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $openingBalance = isset($_POST['opening_balance']) ? (float)$_POST['opening_balance'] : 0.0;
+            $storeId = !empty($_POST['store_id']) ? (int)$_POST['store_id'] : null;
             $userId = Auth::user()['id'];
 
+            // If no store selected, use user's current store
+            if (!$storeId && Auth::user()['current_store_id']) {
+                $storeId = (int)Auth::user()['current_store_id'];
+            }
+
             $db->insert('pos_sessions', [
-                'tenant_id' => $tenantId,
-                'user_id' => $userId,
+                'tenant_id'       => $tenantId,
+                'store_id'        => $storeId,
+                'user_id'         => $userId,
                 'opening_balance' => $openingBalance,
-                'status' => 'open',
-                'opened_at' => date('Y-m-d H:i:s')
+                'status'          => 'open',
+                'opened_at'       => date('Y-m-d H:i:s')
             ]);
 
             $_SESSION['success_msg'] = __('session_opened_success');

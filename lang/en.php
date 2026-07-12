@@ -404,5 +404,10 @@ return [
     'cashier_limit_reached'   => 'Cashier limit reached! Upgrade your plan to add more cashiers.',
     'assign_store'            => 'Assign Store',
     'all_stores'              => 'All Stores',
+    'filter_by_store'         => 'Filter by Store',
+    'sales_by_store'          => 'Sales by Store',
+    'products_sold_by_store'  => 'Products Sold by Store',
+    'select_store'            => 'Select Store',
+    'store'                   => 'Store',
 
 ];

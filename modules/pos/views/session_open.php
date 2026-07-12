@@ -35,6 +35,23 @@
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
                         <?php echo __('cash_control'); ?>
                     </h3>
+
+                    <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                    <div class="pos-form-group">
+                        <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i><?php echo __('store'); ?></label>
+                        <select name="store_id" class="pos-form-control">
+                            <option value="">— <?php echo __('select_store'); ?> —</option>
+                            <?php 
+                            $userStoreId = Auth::user()['current_store_id'] ?? null;
+                            foreach ($allStores as $st): ?>
+                                <option value="<?php echo $st['id']; ?>" <?php echo $userStoreId == $st['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="pos-form-group">
                         <label class="pos-form-label"><?php echo __('opening_balance'); ?> (USD) <span style="color:red;">*</span></label>
                         <input type="number" step="0.01" min="0" name="opening_balance" class="pos-form-control" value="0.00" required style="font-size: 20px; font-weight: 800; text-align: center; color: var(--pos-primary);">

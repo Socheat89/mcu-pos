@@ -403,5 +403,10 @@ return [
     'cashier_limit_reached'   => '收银员数量已达上限！请升级计划以添加更多收银员。',
     'assign_store'            => '分配门店',
     'all_stores'              => '所有门店',
+    'filter_by_store'         => '按门店筛选',
+    'sales_by_store'          => '各门店销售',
+    'products_sold_by_store'  => '各门店售出产品',
+    'select_store'            => '选择门店',
+    'store'                   => '门店',
 
 ];

@@ -283,6 +283,14 @@ try {
     }
     echo "Plan limits updated.<br>";
 
+    // 20. Add store_id to pos_sessions
+    echo "Checking 'pos_sessions.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM pos_sessions LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE pos_sessions ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'pos_sessions.store_id' added.<br>";
+    }
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
