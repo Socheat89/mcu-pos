@@ -409,5 +409,6 @@ return [
     'products_sold_by_store'  => 'Products Sold by Store',
     'select_store'            => 'Select Store',
     'store'                   => 'Store',
+    'edit_cashier'            => 'Edit Cashier',
 
 ];

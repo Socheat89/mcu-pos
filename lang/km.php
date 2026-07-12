@@ -408,5 +408,6 @@ return [
     'products_sold_by_store'  => 'ផលិតផលដែលលក់តាមហាង',
     'select_store'            => 'ជ្រើសរើសហាង',
     'store'                   => 'ហាង',
+    'edit_cashier'            => 'កែសម្រួលអ្នកលក់',
 
 ];

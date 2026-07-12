@@ -197,6 +197,37 @@ class CashierController {
                     $error = 'Password must be at least 6 characters.';
                 }
             }
+
+            // Edit cashier
+            if ($action === 'edit') {
+                $userId   = (int)($_POST['user_id'] ?? 0);
+                $username = trim($_POST['username'] ?? '');
+                $email    = trim($_POST['email'] ?? '');
+                $storeId  = !empty($_POST['store_id']) ? (int)$_POST['store_id'] : null;
+                $status   = $_POST['status'] ?? 'active';
+                $status   = in_array($status, ['active', 'inactive']) ? $status : 'active';
+
+                if (!$userId || !$username || !$email) {
+                    $error = 'Please fill in all required fields.';
+                } else {
+                    // Check duplicate username (exclude current user)
+                    $existing = $db->fetchOne(
+                        "SELECT id FROM users WHERE username = ? AND tenant_id = ? AND id != ?",
+                        [$username, $tenantId, $userId]
+                    );
+                    if ($existing) {
+                        $error = 'Username already taken by another user.';
+                    } else {
+                        $db->update('users', [
+                            'username'         => $username,
+                            'email'            => $email,
+                            'current_store_id' => $storeId,
+                            'status'           => $status,
+                        ], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
+                        $message = "Cashier \"$username\" updated successfully!";
+                    }
+                }
+            }
         }
 
         // ── Load cashier users (role level = 1) ──────────────────

@@ -408,5 +408,6 @@ return [
     'products_sold_by_store'  => '各门店售出产品',
     'select_store'            => '选择门店',
     'store'                   => '门店',
+    'edit_cashier'            => '编辑收银员',
 
 ];

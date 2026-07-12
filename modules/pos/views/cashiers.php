@@ -317,6 +317,18 @@
                                     </div>
                                 </div>
                                 <div class="csh-actions">
+                                    <!-- Edit -->
+                                    <button type="button" class="pill-btn" style="color:var(--pos-primary);border-color:rgba(var(--pos-primary-rgb),0.3);"
+                                        onclick='openEditModal(<?php echo json_encode([
+                                            'id' => (int)$c['id'],
+                                            'username' => $c['username'],
+                                            'email' => $c['email'],
+                                            'current_store_id' => $c['current_store_id'] ?? null,
+                                            'status' => $c['status'],
+                                        ]); ?>)'>
+                                        <i class="fas fa-edit" style="margin-right:4px;"></i>Edit
+                                    </button>
+
                                     <!-- Reset Password -->
                                     <button type="button" class="pill-btn"
                                         onclick="openResetModal(<?php echo (int)$c['id']; ?>, '<?php echo htmlspecialchars(addslashes($c['username'])); ?>')">
@@ -371,6 +383,56 @@
         </div>
     </div>
 
+    <!-- ─── Edit Cashier Modal ─── -->
+    <div class="csh-modal-backdrop" id="editModal" onclick="closeEditModal()">
+        <div class="csh-modal" onclick="event.stopPropagation()" style="max-width:460px;">
+            <h3><i class="fas fa-edit" style="color:var(--pos-primary); margin-right:8px;"></i><?php echo __('edit_cashier'); ?></h3>
+            <form method="POST" id="editCashierForm">
+                <input type="hidden" name="_action" value="edit">
+                <input type="hidden" name="user_id" id="editUserId">
+
+                <div class="pos-form-group">
+                    <label class="pos-form-label">Username <span style="color:red;">*</span></label>
+                    <input type="text" name="username" id="editUsername" class="pos-form-control" required>
+                </div>
+
+                <div class="pos-form-group">
+                    <label class="pos-form-label">Email <span style="color:red;">*</span></label>
+                    <input type="email" name="email" id="editEmail" class="pos-form-control" required>
+                </div>
+
+                <?php if (!empty($allStores)): ?>
+                <div class="pos-form-group">
+                    <label class="pos-form-label"><i class="fas fa-store-alt"></i> <?php echo __('assign_store'); ?></label>
+                    <select name="store_id" id="editStoreId" class="pos-form-control">
+                        <option value="">— <?php echo __('all_stores'); ?> —</option>
+                        <?php foreach ($allStores as $st): ?>
+                            <option value="<?php echo $st['id']; ?>">
+                                <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+
+                <div class="pos-form-group">
+                    <label class="pos-form-label"><?php echo __('status'); ?></label>
+                    <select name="status" id="editStatus" class="pos-form-control">
+                        <option value="active"><?php echo __('active'); ?></option>
+                        <option value="inactive"><?php echo __('inactive'); ?></option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:24px;">
+                    <button type="button" onclick="closeEditModal()" class="btn btn-outline" style="flex:1;"><?php echo __('cancel'); ?></button>
+                    <button type="submit" class="btn" style="flex:1; background:var(--pos-primary); color:#fff; border:none;">
+                        <i class="fas fa-save" style="margin-right:6px;"></i><?php echo __('save'); ?>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function togglePwd(id, btn) {
             var inp = document.getElementById(id);
@@ -388,6 +450,22 @@
 
         function closeResetModal() {
             document.getElementById('resetModal').classList.remove('open');
+        }
+
+        function openEditModal(cashier) {
+            document.getElementById('editUserId').value = cashier.id;
+            document.getElementById('editUsername').value = cashier.username || '';
+            document.getElementById('editEmail').value = cashier.email || '';
+            var storeSelect = document.getElementById('editStoreId');
+            if (storeSelect) {
+                storeSelect.value = cashier.current_store_id || '';
+            }
+            document.getElementById('editStatus').value = cashier.status || 'active';
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('open');
         }
 
         function togglePermLabel(checkbox) {
