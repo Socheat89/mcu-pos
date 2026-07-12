@@ -1317,7 +1317,7 @@ $structuredData = [
             if (event.target == document.getElementById('authModal')) {
                 closeAuthModal();
             }
-        }
+        };
 
         // ═══════════════════════════════════════════════════════
         // SCROLL ANIMATIONS — Intersection Observer
