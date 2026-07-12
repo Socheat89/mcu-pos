@@ -2028,6 +2028,77 @@ textarea:focus {
     }
 }
 
+/* 📱 Mobile Sidebar Drawer — bigger, clearer */
+@media (max-width: 980px) {
+  .pos-sidebar {
+    padding: 12px !important;
+  }
+  .pos-brand {
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+  .pos-brand__logo {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .pos-brand__title {
+    font-size: 18px !important;
+  }
+  .pos-side-link {
+    padding: 14px 16px !important;
+    font-size: 15px !important;
+    gap: 14px !important;
+    margin-bottom: 2px;
+    min-height: 50px;
+  }
+  .pos-side-link i {
+    font-size: 18px !important;
+    width: 24px !important;
+  }
+  .pos-nav-header {
+    font-size: 11px !important;
+    margin: 24px 16px 10px !important;
+  }
+  .pos-sidebar__footer .pos-side-link {
+    font-size: 15px !important;
+    padding: 14px 16px !important;
+  }
+  
+  /* Sidebar drawer: wider */
+  .pos-shell--open .pos-sidebar {
+    width: min(88vw, 320px) !important;
+  }
+  .pos-sidebar-toggle {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* 📊 Dashboard Mobile Fixes */
+@media (max-width: 768px) {
+  .dashboard-hero {
+    padding: 24px 18px !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    border-radius: 20px !important;
+  }
+  .dashboard-hero h1 {
+    font-size: 24px !important;
+  }
+  .dashboard-hero p {
+    font-size: 13px !important;
+  }
+  .dashboard-hero .hero-right .big-number {
+    font-size: 36px !important;
+  }
+  
+  .notification-card {
+    flex-direction: column !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    END MOBILE ENHANCEMENTS
    ═══════════════════════════════════════════════════════════════════════════ */
