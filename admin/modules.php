@@ -16,7 +16,9 @@ $moduleDefinition = [
             'reports' => 'Sales Reporting & Analytics',
             'holds' => 'Hold Orders (Suspends)',
             'digital_menu' => 'Digital Menu (QR)',
-            'settings' => 'POS General Settings'
+            'settings' => 'POS General Settings',
+            'sessions' => 'Cash Control Sessions',
+            'cashiers' => 'Cashier Management'
         ]
     ],
     'inventory' => [

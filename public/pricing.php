@@ -1,6 +1,86 @@
 <?php
 session_start();
 require_once __DIR__ . '/../core/helpers/url.php';
+require_once __DIR__ . '/../core/classes/Database.php';
+
+// Load plans and their features from DB
+$db = Database::getInstance();
+$systems = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
+
+// Load module features mapping
+$existing = $db->fetchAll("SELECT * FROM system_modules");
+$mappings = [];
+foreach ($existing as $m) {
+    $mappings[$m['system_id']][$m['module_name']][] = $m['feature_key'];
+}
+
+// Feature labels
+$featureLabels = [
+    'pos_core'           => 'POS Terminal & Dashboard',
+    'pos_orders'         => 'Order History & Management',
+    'pos_inventory'      => 'Product & Inventory Management',
+    'pos_customers'      => 'Customer Management',
+    'pos_reports'        => 'Sales Reports & Analytics',
+    'pos_holds'          => 'Hold Orders (Suspend)',
+    'pos_digital_menu'   => 'Digital Menu (QR Code)',
+    'pos_settings'       => 'POS Settings',
+    'pos_sessions'       => 'Cash Control Sessions',
+    'pos_cashiers'       => 'Cashier Management',
+    'cloud_storage'      => 'Cloud Storage',
+    'priority_support'   => '24/7 Priority Support',
+];
+
+// Build feature lists for each plan
+$planFeatures = [];
+foreach ($systems as $system) {
+    $sid = $system['id'];
+    $features = [];
+    $systemModules = $mappings[$sid] ?? [];
+
+    // POS features
+    if (isset($systemModules['pos'])) {
+        foreach ($systemModules['pos'] as $feat) {
+            $key = 'pos_' . $feat;
+            if (isset($featureLabels[$key])) {
+                $features[] = $featureLabels[$key];
+            }
+        }
+    }
+
+    // Store limit info
+    $storeLimit = (int)($system['store_limit'] ?? 1);
+    $cashierLimit = (int)($system['cashier_limit'] ?? 1);
+    if ($storeLimit > 0) {
+        $features[] = "Up to {$storeLimit} Store" . ($storeLimit > 1 ? 's' : '');
+    } else {
+        $features[] = "Unlimited Stores";
+    }
+    if ($cashierLimit > 0) {
+        $features[] = "Up to {$cashierLimit} Cashier" . ($cashierLimit > 1 ? 's' : '');
+    } else {
+        $features[] = "Unlimited Cashiers";
+    }
+
+    // Add cloud storage & support for higher plans
+    if ($system['price'] >= 30) {
+        $features[] = $featureLabels['cloud_storage'];
+    }
+    if ($system['price'] >= 50) {
+        $features[] = $featureLabels['priority_support'];
+    }
+
+    $planFeatures[$sid] = $features;
+}
+
+// Plan card colors & badges
+$planMeta = [];
+foreach ($systems as $i => $system) {
+    $meta = ['badge' => '', 'accent' => '#06b6d4', 'btn' => 'btn-outline'];
+    if ($i === 1 && count($systems) >= 3) {
+        $meta = ['badge' => 'Popular', 'accent' => '#8b5cf6', 'btn' => 'btn-primary'];
+    }
+    $planMeta[$system['id']] = $meta;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -76,55 +156,37 @@ require_once __DIR__ . '/../core/helpers/url.php';
             </div>
 
             <div class="systems-grid">
-                <!-- Starter Plan -->
-                <div class="system-card">
-                    <h3 class="system-title">Starter</h3>
-                    <p class="system-desc">Perfect for small businesses just getting started.</p>
+                <?php foreach ($systems as $system):
+                    $meta = $planMeta[$system['id']];
+                    $features = $planFeatures[$system['id']] ?? [];
+                    $name = htmlspecialchars($system['name']);
+                    $price = number_format($system['price'], 0);
+                    $desc = htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.');
+                    $sid = $system['id'];
+                ?>
+                <div class="system-card <?php echo $meta['badge'] ? 'popular-card' : ''; ?>" style="<?php echo $meta['badge'] ? '' : 'border-top: 3px solid ' . $meta['accent']; ?>">
+                    <?php if ($meta['badge']): ?>
+                        <div class="plan-badge"><?php echo $meta['badge']; ?></div>
+                    <?php endif; ?>
+                    <h3 class="system-title"><?php echo $name; ?></h3>
+                    <p class="system-desc"><?php echo $desc; ?></p>
                     <div class="price-tag">
-                        <span class="price-amount">$10</span>
+                        <span class="price-amount">$<?php echo $price; ?></span>
                         <span class="price-period">/month</span>
                     </div>
                     <ul class="plan-list">
-                        <li><i class="ph-bold ph-check"></i> Basic POS features</li>
-                        <li><i class="ph-bold ph-check"></i> Single User</li>
-                        <li><i class="ph-bold ph-check"></i> Basic Reporting</li>
+                        <?php foreach ($features as $feat): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> <?php echo htmlspecialchars($feat); ?></li>
+                        <?php endforeach; ?>
+                        <?php if (empty($features)): ?>
+                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Basic POS Access</li>
+                        <?php endif; ?>
                     </ul>
-                    <a href="<?php echo mc_url('public/register.php?plan=starter'); ?>" class="btn btn-outline full-width">Choose Starter</a>
+                    <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo $meta['btn']; ?> full-width">
+                        Choose <?php echo $name; ?>
+                    </a>
                 </div>
-
-                <!-- Professional Plan -->
-                <div class="system-card popular-card">
-                    <div class="plan-badge">Popular</div>
-                    <h3 class="system-title">Professional</h3>
-                    <p class="system-desc">Advanced features for growing businesses.</p>
-                    <div class="price-tag">
-                        <span class="price-amount">$50</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <ul class="plan-list">
-                        <li><i class="ph-bold ph-check"></i> All Starter features</li>
-                        <li><i class="ph-bold ph-check"></i> 5 Staff Logins</li>
-                        <li><i class="ph-bold ph-check"></i> Inventory Management</li>
-                    </ul>
-                    <a href="<?php echo mc_url('public/register.php?plan=professional'); ?>" class="btn btn-primary full-width">Choose Professional</a>
-                </div>
-
-                <!-- Enterprise Plan -->
-                <div class="system-card">
-                    <h3 class="system-title">Enterprise</h3>
-                    <p class="system-desc">Full functionality for large operations.</p>
-                    <div class="price-tag">
-                        <span class="price-amount">$100</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <ul class="plan-list">
-                        <li><i class="ph-bold ph-check"></i> All Pro features</li>
-                        <li><i class="ph-bold ph-check"></i> Unlimited Staff</li>
-                        <li><i class="ph-bold ph-check"></i> 24/7 Phone Support</li>
-                    </ul>
-                    <a href="<?php echo mc_url('public/register.php?plan=enterprise'); ?>" class="btn btn-outline full-width">Choose Enterprise</a>
-
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
