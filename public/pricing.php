@@ -152,62 +152,93 @@ foreach ($systems as $i => $system) {
 
     <!-- Pricing Overview -->
     <section class="pricing-section" id="pricing">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">Choose Your Path</div>
-                <h1>Simple, Scalable Pricing</h1>
-                <p>Select the plan that fits your business stage. No hidden fees, cancel anytime.</p>
+        <div class="container py-5">
+            <div class="text-center mb-4">
+                <div class="section-kicker"><i class="ph-bold ph-credit-card"></i> Transparent Pricing</div>
+                <h1 class="fw-bold">Plans that scale with you</h1>
+                <p class="text-muted mx-auto" style="max-width:560px">No hidden fees, no per-transaction charges. Every plan includes unlimited transactions & free updates.</p>
+                
+                <!-- Monthly / Annual Toggle -->
+                <div class="pricing-toggle" id="pricingToggle">
+                    <button class="active" onclick="switchPricing('monthly', this)">Monthly</button>
+                    <button onclick="switchPricing('annual', this)">Annual <span class="save-badge">Save up to 25%</span></button>
+                </div>
             </div>
 
-            <div class="systems-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 align-items-stretch" id="pricingGrid">
                 <?php foreach ($systems as $system):
                     $meta = $planMeta[$system['id']];
                     $features = $planFeatures[$system['id']] ?? [];
                     $name = htmlspecialchars($system['name']);
                     $sysPrice = (float)$system['price'];
-                    $price = number_format($sysPrice, 0);
-                    $desc = htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.');
-                    $sid = $system['id'];
                     $isFreeTrial = ($sysPrice === 0.00);
+                    $isPopular = ($sysPrice > 0 && $sysPrice <= 30 && !$isFreeTrial);
                     
-                    // Annual bonus
+                    // Annual pricing
+                    $annualPrice = $sysPrice * 12;
                     $annualBonus = 0;
-                    if ($sysPrice == 30) $annualBonus = 1;
-                    elseif ($sysPrice >= 99) $annualBonus = 3;
-                    $annualMonthly = $annualBonus > 0 ? round(($sysPrice * 12) / (12 + $annualBonus), 0) : 0;
+                    if ($sysPrice >= 99) $annualBonus = 3;
+                    elseif ($sysPrice >= 30) $annualBonus = 1;
+                    $annualMonthly = $annualPrice / (12 + $annualBonus);
+                    
+                    $cardClass = '';
+                    if ($isFreeTrial) $cardClass = 'trial-card';
+                    elseif ($isPopular) $cardClass = 'popular';
                 ?>
-                <div class="system-card <?php echo $meta['badge'] ? 'popular-card' : ''; ?>" style="<?php echo $meta['badge'] ? '' : 'border-top: 3px solid ' . $meta['accent']; ?>">
-                    <?php if ($meta['badge']): ?>
-                        <div class="plan-badge" style="<?php echo $isFreeTrial ? 'background: #d1fae5; color: #065f46;' : ''; ?>"><?php echo $meta['badge']; ?></div>
+                <div class="col">
+                <div class="pricing-card <?php echo $cardClass; ?>">
+                    <?php if ($isPopular): ?>
+                    <div class="pricing-badge">Popular</div>
+                    <?php elseif ($isFreeTrial): ?>
+                    <div class="pricing-badge" style="background:linear-gradient(135deg,#059669,#047857);">Free</div>
                     <?php endif; ?>
-                    <h3 class="system-title"><?php echo $name; ?></h3>
-                    <p class="system-desc"><?php echo $desc; ?></p>
-                    <div class="price-tag">
+                    
+                    <div class="pricing-plan-name"><?php echo $name; ?></div>
+                    <div class="pricing-plan-desc"><?php echo htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.'); ?></div>
+                    
+                    <!-- Monthly Price -->
+                    <div class="pricing-price-row monthly-price">
                         <?php if ($isFreeTrial): ?>
-                            <span class="price-amount" style="font-size: 2.5rem;">Free</span>
-                            <span class="price-period">for 7 days</span>
+                            <span class="price-amount" style="color:#059669;">Free</span>
                         <?php else: ?>
-                            <span class="price-amount">$<?php echo $price; ?></span>
-                            <span class="price-period">/month</span>
+                            <span class="price-amount">$<?php echo number_format($sysPrice, 0); ?></span>
+                            <span class="price-period">/mo</span>
                         <?php endif; ?>
                     </div>
-                    <?php if (!$isFreeTrial && $annualBonus > 0): ?>
-                    <div class="annual-banner">
-                        <i class="ph-bold ph-sparkle"></i>
-                        <span>Annual: <strong>$<?php echo $annualMonthly; ?>/mo</strong> — 1 yr + <?php echo $annualBonus; ?> mo free</span>
+                    
+                    <!-- Annual Price -->
+                    <?php if (!$isFreeTrial): ?>
+                    <div class="pricing-price-row annual-price" style="display:none;">
+                        <span class="price-amount">$<?php echo number_format($annualMonthly, 0); ?></span>
+                        <span class="price-period">/mo</span>
+                    </div>
+                    <div class="annual-save annual-price" style="display:none;">
+                        <i class="ph-bold ph-arrow-down"></i> $<?php echo number_format($sysPrice, 0); ?>/mo when billed annually
                     </div>
                     <?php endif; ?>
-                    <ul class="plan-list">
+                    
+                    <?php if ($annualBonus > 0): ?>
+                    <div class="annual-bonus annual-price" style="display:none;">
+                        <i class="ph-bold ph-gift"></i>
+                        <span><strong><?php echo $annualBonus; ?> month<?php echo $annualBonus>1?'s':''; ?> free</strong> with annual plan</span>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <hr class="pricing-divider">
+                    
+                    <ul class="feature-list mb-3">
                         <?php foreach ($features as $feat): ?>
-                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> <?php echo htmlspecialchars($feat); ?></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($feat); ?></li>
                         <?php endforeach; ?>
                         <?php if (empty($features)): ?>
-                            <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Basic POS Access</li>
+                            <li><i class="ph-bold ph-check-circle"></i> Basic POS Access</li>
                         <?php endif; ?>
                     </ul>
-                    <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo $meta['btn']; ?> full-width" <?php echo $isFreeTrial ? 'style="background: #059669; border-color: #059669;"' : ''; ?>>
-                        <?php echo $isFreeTrial ? 'Start Free Trial' : ('Choose ' . $name); ?>
+                    
+                    <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo ($isPopular||$isFreeTrial) ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">
+                        <?php echo $isFreeTrial ? 'Start Free Trial' : 'Get Started'; ?>
                     </a>
+                </div>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -230,5 +261,21 @@ foreach ($systems as $i => $system) {
     </footer>
 
     <script src="<?php echo mc_url('public/js/loader.js'); ?>"></script>
+    <script>
+        // ═══════════════════════════════════════════
+        // PRICING TOGGLE — Monthly / Annual
+        // ═══════════════════════════════════════════
+        window.switchPricing = function(mode, btn) {
+            document.querySelectorAll('#pricingToggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            document.querySelectorAll('.monthly-price').forEach(el => {
+                el.style.display = mode === 'monthly' ? '' : 'none';
+            });
+            document.querySelectorAll('.annual-price').forEach(el => {
+                el.style.display = mode === 'annual' ? '' : 'none';
+            });
+        };
+    </script>
 </body>
 </html>

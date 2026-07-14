@@ -704,17 +704,16 @@
             selectedDuration = parseInt(durationSelect.value);
             totalPrice = selectedPrice * selectedDuration;
             
-            // Annual Bonus Logic (based on monthly price)
+            // Bonus Logic (based on price tiers)
             let bonus = 0;
             if (selectedDuration === 12) {
-                const price = parseFloat(selectedPrice);
-                if (price >= 99) bonus = 3;
-                else if (price >= 30) bonus = 1;
+                if (selectedPrice >= 99) bonus = 3;
+                else if (selectedPrice >= 30) bonus = 1;
             }
             
             if (bonus > 0) {
                 bonusMonths.textContent = bonus;
-                bonusNotice.style.display = 'flex';
+                bonusNotice.style.display = 'block';
             } else {
                 bonusNotice.style.display = 'none';
             }
