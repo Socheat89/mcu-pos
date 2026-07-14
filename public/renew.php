@@ -97,7 +97,22 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
             <div class="panel-card" style="margin-top: 1.5rem;">
                 <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Renewal Period</label>
                 <select id="duration" class="form-control" onchange="updateTotal()">
-
+                    <option value="1">1 Month</option>
+                    <option value="3">3 Months</option>
+                    <option value="6">6 Months</option>
+                    <option value="12" class="yearly-option">12 Months (1 Year)</option>
+                </select>
+                
+                <!-- Yearly Promo Info -->
+                <div id="yearlyPromoInfo" style="display:none; margin-top: 0.75rem; padding: 10px 14px; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #fcd34d; border-radius: 10px; font-size: 0.82rem; color: #92400e; font-weight: 600; text-align: center;">
+                    🎁 <span id="promoText"></span>
+                </div>
+                
+                <div class="price-summary" style="margin-top: 1rem;">
+                    <span>Total Payment:</span>
+                    <span id="totalDisplay" class="price-highlight">$0.00</span>
+                </div>
+            </div>
                     <?php for($i=1; $i<=12; $i++): ?>
                         <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                     <?php endfor; ?>
@@ -143,6 +158,12 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
         let selectedPlanName = '';
         let currentMd5 = null;
         let pollingInterval = null;
+        
+        // Yearly promo data (plan name => {yearlyPrice, freeMonths})
+        const yearlyPromos = {
+            'pos': { yearlyPrice: 30.00, freeMonths: 1 },
+            'full_pos': { yearlyPrice: 99.99, freeMonths: 3 }
+        };
 
         function selectPlan(id, price, name) {
             selectedPlanId = id;
@@ -157,7 +178,25 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
 
         function updateTotal() {
             const months = parseInt(document.getElementById('duration').value);
-            const total = selectedPrice * months;
+            let total = selectedPrice * months;
+            let promoHtml = '';
+            
+            // Check if this plan has a yearly promo and user selected 12 months
+            const promo = yearlyPromos[selectedPlanName.toLowerCase()];
+            if (promo && months === 12) {
+                total = promo.yearlyPrice;
+                document.getElementById('promoText').textContent = 
+                    'Buy 1 Year, Get ' + promo.freeMonths + ' Month' + (promo.freeMonths > 1 ? 's' : '') + ' Free! (Save $' + ((selectedPrice * 12) - promo.yearlyPrice).toFixed(2) + ')';
+                document.getElementById('yearlyPromoInfo').style.display = 'block';
+            } else if (promo && months >= 6) {
+                // Hint that yearly is better
+                document.getElementById('promoText').textContent = 
+                    '💡 Choose 12 Months to get ' + promo.freeMonths + ' month' + (promo.freeMonths > 1 ? 's' : '') + ' free!';
+                document.getElementById('yearlyPromoInfo').style.display = 'block';
+            } else {
+                document.getElementById('yearlyPromoInfo').style.display = 'none';
+            }
+            
             document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
         }
 
