@@ -46,8 +46,8 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
 </head>
@@ -56,7 +56,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Loading renewal portal</p>
@@ -68,7 +68,7 @@ $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY p
         <div class="auth-card auth-card--compact">
             <div class="auth-header">
                 <a href="/" class="auth-logo">
-                    <i class="ph-bold ph-cube"></i> <span>Mekong CyberUnit</span>
+                    <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:36px;height:36px;object-fit:contain;border-radius:10px;"> <span>Mekong CyberUnit</span>
                 </a>
                 <h2>Renew Your Subscription</h2>
                 <p>Business: <strong><?php echo htmlspecialchars($tenant['name']); ?></strong></p>

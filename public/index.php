@@ -3,7 +3,7 @@ require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
 $canonicalUrl = rtrim(mc_url('', true), '/') . '/';
-$ogImage = mc_url('public/images/logo.png', true);
+$ogImage = mc_url('public/images/my-logo.jpg', true);
 $structuredData = [
     '@context' => 'https://schema.org',
     '@type' => 'SoftwareApplication',
@@ -70,8 +70,8 @@ $structuredData = [
 
     
     <!-- Favicon -->
-    <link rel="icon" href="images/logo.png" type="image/png">
-    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="icon" href="images/my-logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="images/my-logo.jpg" type="image/jpeg">
     
     <script type="application/ld+json">
 <?php echo json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
@@ -163,7 +163,7 @@ $structuredData = [
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <span class="navbar-brand-icon"><i class="ph-bold ph-cube"></i></span>
+                <span class="navbar-brand-icon"><img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"></span>
                 Mekong CyberUnit
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -517,7 +517,7 @@ $structuredData = [
             <div class="row g-4">
                 <div class="col-md-5">
                     <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="navbar-brand-icon"><i class="ph-bold ph-cube"></i></span>
+                        <span class="navbar-brand-icon"><img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"></span>
                         <span class="fw-bold text-white">Mekong CyberUnit</span>
                     </div>
                     <p class="small">Empowering Cambodian businesses with enterprise-grade POS tools at a fraction of the cost.</p>

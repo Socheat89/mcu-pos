@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=2.3">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
 
     
     <!-- Icons -->
@@ -113,12 +113,13 @@
             width: 44px;
             height: 44px;
             border-radius: 14px;
-            background: linear-gradient(135deg, var(--brand), var(--brand-strong), #2563eb);
-            box-shadow: 0 10px 24px rgba(15, 118, 110, 0.35);
+            background: transparent;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.12);
             transition: transform 0.4s var(--ease-out);
+            overflow: hidden;
         }
         .auth-logo:hover .logo-icon {
-            transform: rotate(15deg) scale(1.08);
+            transform: scale(1.08);
         }
         .auth-logo span {
             font-family: 'Unbounded', sans-serif !important;
@@ -276,7 +277,7 @@
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Loading secure session</p>
@@ -290,7 +291,7 @@
             <div class="auth-header">
                 <a href="<?php echo mc_url('index.php'); ?>" class="auth-logo">
                     <div class="logo-icon">
-                        <i class="ph-bold ph-cube"></i>
+                        <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
                     </div>
                     <span>Mekong CyberUnit</span>
                 </a>

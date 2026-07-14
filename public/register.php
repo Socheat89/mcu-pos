@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
-    <link rel="icon" href="images/logo.png" type="image/png">
-    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="icon" href="images/my-logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="images/my-logo.jpg" type="image/jpeg">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -67,12 +67,12 @@
         .auth-logo { display:inline-flex; align-items:center; gap:10px; text-decoration:none; margin-bottom:8px; }
         .logo-icon {
             width:44px; height:44px; border-radius:14px;
-            background:linear-gradient(135deg,var(--brand),var(--brand-strong),#2563eb);
-            box-shadow:0 10px 24px rgba(15,118,110,0.35);
-            display:grid; place-items:center; color:#fff; font-size:1.2rem;
+            background:transparent;
+            box-shadow:0 4px 12px rgba(15,118,110,0.12);
+            display:grid; place-items:center; overflow:hidden;
             transition:transform 0.4s var(--ease-out);
         }
-        .auth-logo:hover .logo-icon { transform:rotate(15deg) scale(1.08); }
+        .auth-logo:hover .logo-icon { transform:scale(1.08); }
         .auth-logo span { font-family:'Unbounded',sans-serif; font-weight:800; color:#0f172a; font-size:1.12rem; letter-spacing:-0.03em; }
         .auth-header h3 { font-size:1.7rem; font-weight:850; color:#0f172a; letter-spacing:-0.04em; margin-top:15px; margin-bottom:6px; }
         .auth-header p { color:#64748b; font-weight:500; font-size:0.93rem; line-height:1.5; }
@@ -338,7 +338,7 @@
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Preparing sign-up flow</p>
@@ -351,7 +351,7 @@
             <div class="auth-header">
                 <a href="index.php" class="auth-logo">
                     <div class="logo-icon">
-                        <i class="ph-bold ph-cube"></i>
+                        <img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
                     </div>
                     <span>Mekong CyberUnit</span>
                 </a>

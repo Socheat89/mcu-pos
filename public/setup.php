@@ -41,8 +41,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -54,7 +54,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Provisioning workspace</p>
@@ -67,7 +67,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             <div class="auth-header">
                 <a href="/" class="auth-logo">
                     <div class="logo-icon">
-                        <i class="ph-bold ph-cube"></i>
+                        <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
                     </div>
                     <span>Mekong CyberUnit</span>
                 </a>

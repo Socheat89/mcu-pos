@@ -103,8 +103,8 @@ foreach ($systems as $i => $system) {
     <link rel="stylesheet" href="<?php echo mc_url('public/css/landing.css'); ?>">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -116,7 +116,7 @@ foreach ($systems as $i => $system) {
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Fetching pricing plans</p>
@@ -130,7 +130,7 @@ foreach ($systems as $i => $system) {
         <div class="container nav-container">
             <a href="<?php echo mc_url('public/index.php'); ?>" class="logo">
                 <div class="logo-icon">
-                    <i class="ph-bold ph-cube"></i>
+                    <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
                 </div>
                 <span>Mekong CyberUnit</span>
             </a>
@@ -208,7 +208,7 @@ foreach ($systems as $i => $system) {
             <div class="logo footer-brand footer-brand--center">
 
                 <div class="logo-icon">
-                    <i class="ph-bold ph-cube"></i>
+                    <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
                 </div>
                 <span>Mekong CyberUnit</span>
             </div>
