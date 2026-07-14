@@ -410,4 +410,14 @@ return [
     'store'                   => '门店',
     'edit_cashier'            => '编辑收银员',
 
+    // Landing Page
+    'sign_in'                 => '登录',
+    'get_started'             => '开始使用',
+    'why_mcu'                 => '为什么选MCU',
+    'features'                => '功能',
+    'how_it_works'            => '如何使用',
+    'pricing'                 => '价格',
+    'faq'                     => '常见问题',
+    'contact'                 => '联系我们',
+
 ];

@@ -412,4 +412,14 @@ return [
     'edit_cashier'            => 'Edit Cashier',
     'auto_detected'           => 'Auto-detected',
 
+    // Landing Page
+    'sign_in'                 => 'Sign In',
+    'get_started'             => 'Get Started',
+    'why_mcu'                 => 'Why MCU',
+    'features'                => 'Features',
+    'how_it_works'            => 'How It Works',
+    'pricing'                 => 'Pricing',
+    'faq'                     => 'FAQ',
+    'contact'                 => 'Contact',
+
 ];

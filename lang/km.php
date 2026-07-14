@@ -411,4 +411,14 @@ return [
     'edit_cashier'            => 'កែសម្រួលអ្នកលក់',
     'auto_detected'           => 'រកឃើញដោយស្វ័យប្រវត្តិ',
 
+    // Landing Page
+    'sign_in'                 => 'ចូលគណនី',
+    'get_started'             => 'ចាប់ផ្តើម',
+    'why_mcu'                 => 'ហេតុអ្វី MCU',
+    'features'                => 'មុខងារ',
+    'how_it_works'            => 'របៀបប្រើប្រាស់',
+    'pricing'                 => 'តម្លៃ',
+    'faq'                     => 'សំណួរញឹកញាប់',
+    'contact'                 => 'ទំនាក់ទំនង',
+
 ];

@@ -169,6 +169,12 @@ foreach ($systems as $i => $system) {
                     $desc = htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.');
                     $sid = $system['id'];
                     $isFreeTrial = ($sysPrice === 0.00);
+                    
+                    // Annual bonus
+                    $annualBonus = 0;
+                    if ($sysPrice == 30) $annualBonus = 1;
+                    elseif ($sysPrice >= 99) $annualBonus = 3;
+                    $annualMonthly = $annualBonus > 0 ? round(($sysPrice * 12) / (12 + $annualBonus), 0) : 0;
                 ?>
                 <div class="system-card <?php echo $meta['badge'] ? 'popular-card' : ''; ?>" style="<?php echo $meta['badge'] ? '' : 'border-top: 3px solid ' . $meta['accent']; ?>">
                     <?php if ($meta['badge']): ?>
@@ -185,6 +191,12 @@ foreach ($systems as $i => $system) {
                             <span class="price-period">/month</span>
                         <?php endif; ?>
                     </div>
+                    <?php if (!$isFreeTrial && $annualBonus > 0): ?>
+                    <div class="annual-banner">
+                        <i class="ph-bold ph-sparkle"></i>
+                        <span>Annual: <strong>$<?php echo $annualMonthly; ?>/mo</strong> — 1 yr + <?php echo $annualBonus; ?> mo free</span>
+                    </div>
+                    <?php endif; ?>
                     <ul class="plan-list">
                         <?php foreach ($features as $feat): ?>
                             <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> <?php echo htmlspecialchars($feat); ?></li>

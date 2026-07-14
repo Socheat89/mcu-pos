@@ -1,6 +1,13 @@
 <?php 
 require_once __DIR__ . '/../core/classes/Database.php'; 
 require_once __DIR__ . '/../core/helpers/url.php';
+require_once __DIR__ . '/../core/classes/Language.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+Language::init();
+$lang = Language::getCurrentLang();
 
 $canonicalUrl = rtrim(mc_url('', true), '/') . '/';
 $ogImage = mc_url('public/images/my-logo.jpg', true);
@@ -171,16 +178,33 @@ $structuredData = [
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
-                    <li class="nav-item"><a class="nav-link" href="#about">Why MCU</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about"><?php echo Language::get('why_mcu'); ?></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features"><?php echo Language::get('features'); ?></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how-it-works"><?php echo Language::get('how_it_works'); ?></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing"><?php echo Language::get('pricing'); ?></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq"><?php echo Language::get('faq'); ?></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact"><?php echo Language::get('contact'); ?></a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link">Sign In</a>
-                    <a href="register.php" class="btn btn-primary btn-sm">Get Started</a>
+                    <!-- Language Switcher -->
+                    <div class="lang-switcher dropdown">
+                        <button class="lang-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="<?php echo Language::get('language'); ?>">
+                            <?php if ($lang === 'km'): ?>
+                                <span class="lang-flag">🇰🇭</span> <span class="lang-label">ខ្មែរ</span>
+                            <?php elseif ($lang === 'zh'): ?>
+                                <span class="lang-flag">🇨🇳</span> <span class="lang-label">中文</span>
+                            <?php else: ?>
+                                <span class="lang-flag">🇬🇧</span> <span class="lang-label">EN</span>
+                            <?php endif; ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end lang-dropdown">
+                            <li><a class="dropdown-item <?php echo $lang === 'en' ? 'active' : ''; ?>" href="set_lang.php?lang=en"><span class="lang-flag">🇬🇧</span> English</a></li>
+                            <li><a class="dropdown-item <?php echo $lang === 'km' ? 'active' : ''; ?>" href="set_lang.php?lang=km"><span class="lang-flag">🇰🇭</span> ខ្មែរ (Khmer)</a></li>
+                            <li><a class="dropdown-item <?php echo $lang === 'zh' ? 'active' : ''; ?>" href="set_lang.php?lang=zh"><span class="lang-flag">🇨🇳</span> 中文 (Chinese)</a></li>
+                        </ul>
+                    </div>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link"><?php echo Language::get('sign_in'); ?></a>
+                    <a href="register.php" class="btn btn-primary btn-sm"><?php echo Language::get('get_started'); ?></a>
                 </div>
             </div>
         </div>
@@ -331,22 +355,23 @@ $structuredData = [
                 <h2 class="fw-bold">One subscription. All features. No surprises.</h2>
                 <p class="text-muted mx-auto" style="max-width:640px">Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
             </div>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-start">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-stretch">
 
                 <?php
                 try {
                 $db = Database::getInstance();
                 $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
                 if (empty($plans)) {
-                    echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 1rem; border: 1px dashed rgba(99, 102, 241, 0.3); color: #cbd5e1;">
-                            <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--accent);"></i>
-                            No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700; color: var(--primary);">Admin Panel</a>.
-
+                    echo '<div class="col-12 text-center p-4" style="background: rgba(13,148,136,0.06); border-radius: 1rem; border: 1px dashed rgba(13,148,136,0.2);">
+                            <i class="ph-bold ph-warning-circle d-block mb-3" style="font-size: 2rem; color: #F59E0B;"></i>
+                            <p class="text-muted mb-0">No active pricing plans found. Configure them in the <a href="admin/plans.php" class="fw-bold" style="color:var(--mc-primary)">Admin Panel</a>.</p>
                           </div>';
                 } else {
                 foreach ($plans as $index => $plan):
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
-                    $isPopular = ($index === 1); // Mark second plan as popular for UI
+                    $planPrice = (float)$plan['price'];
+                    $isFree = ($planPrice === 0.00);
+                    $isPopular = ($index === 1 && count($plans) >= 3);
                     
                     // Fetch linked features for this plan
                     $features = $db->fetchAll("SELECT sm.module_name, sm.feature_key FROM system_modules sm WHERE sm.system_id = ?", [$plan['id']]);
@@ -368,19 +393,55 @@ $structuredData = [
                     ];
                     $storeLimit = (int)($plan['store_limit'] ?? 1);
                     $cashierLimit = (int)($plan['cashier_limit'] ?? 1);
+                    
+                    // Annual bonus calculation
+                    $annualBonus = 0;
+                    if ($planPrice == 30) $annualBonus = 1;
+                    elseif ($planPrice >= 99) $annualBonus = 3;
+                    $annualPrice = $planPrice * 12;
+                    $annualMonthly = $annualBonus > 0 ? round($annualPrice / (12 + $annualBonus), 2) : $planPrice;
                 ?>
-                <div class="col">
-                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?>">
+                <div class="col d-flex">
+                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?> <?php echo $isFree ? 'free-trial' : ''; ?> w-100">
                     <?php if ($isPopular): ?>
-                    <div class="pricing-badge">Popular</div>
+                    <span class="pricing-badge">Most Popular</span>
+                    <?php elseif ($isFree): ?>
+                    <span class="pricing-badge pricing-badge--free">7 Days Free</span>
                     <?php endif; ?>
-                    <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($plan['name']); ?></h4>
-                    <p class="text-muted small mb-3"><?php echo htmlspecialchars($plan['description']); ?></p>
-                    <div class="d-flex align-items-baseline gap-1 mb-3 pb-3 border-bottom">
-                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
-                        <span class="text-muted">/month</span>
+                    
+                    <div class="pricing-icon">
+                        <?php if ($isFree): ?>
+                        <i class="ph-bold ph-gift"></i>
+                        <?php elseif ($planPrice <= 20): ?>
+                        <i class="ph-bold ph-storefront"></i>
+                        <?php elseif ($planPrice <= 60): ?>
+                        <i class="ph-bold ph-buildings"></i>
+                        <?php else: ?>
+                        <i class="ph-bold ph-crown"></i>
+                        <?php endif; ?>
                     </div>
-                    <ul class="feature-list mb-4">
+                    
+                    <h4 class="pricing-name"><?php echo htmlspecialchars($plan['name']); ?></h4>
+                    <p class="pricing-desc"><?php echo htmlspecialchars($plan['description']); ?></p>
+                    
+                    <div class="pricing-price">
+                        <?php if ($isFree): ?>
+                            <span class="price-value">Free</span>
+                            <span class="price-period">7-day trial</span>
+                        <?php else: ?>
+                            <span class="price-value">$<?php echo number_format($planPrice, 0); ?></span>
+                            <span class="price-period">/month</span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if (!$isFree && $annualBonus > 0): ?>
+                    <div class="annual-banner">
+                        <i class="ph-bold ph-sparkle"></i>
+                        <span>Annual: <strong>$<?php echo number_format($annualMonthly, 0); ?>/mo</strong> — 1 year + <?php echo $annualBonus; ?> month<?php echo $annualBonus > 1 ? 's' : ''; ?> free</span>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <ul class="feature-list">
                         <?php foreach ($features as $f): ?>
                             <?php $labelKey = $f['module_name'] . '_' . $f['feature_key']; ?>
                             <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($featureLabels[$labelKey] ?? ucfirst($f['feature_key'])); ?></li>
@@ -395,23 +456,30 @@ $structuredData = [
                         <?php else: ?>
                             <li><i class="ph-bold ph-check-circle"></i> Unlimited Cashiers</li>
                         <?php endif; ?>
-                        <?php if ($plan['price'] >= 30): ?>
+                        <?php if ($planPrice >= 30): ?>
                             <li><i class="ph-bold ph-check-circle"></i> Cloud Storage</li>
                         <?php endif; ?>
-                        <?php if ($plan['price'] >= 50): ?>
+                        <?php if ($planPrice >= 50): ?>
                             <li><i class="ph-bold ph-check-circle"></i> 24/7 Priority Support</li>
                         <?php endif; ?>
                     </ul>
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">Choose <?php echo htmlspecialchars($plan['name']); ?></a>
+                    
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="pricing-cta <?php echo ($isPopular || $isFree) ? 'pricing-cta--primary' : 'pricing-cta--outline'; ?>">
+                        <?php echo $isFree ? 'Start Free Trial' : 'Get Started'; ?> <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                    
+                    <?php if (!$isFree): ?>
+                    <p class="pricing-guarantee">
+                        <i class="ph-bold ph-shield-check"></i> Cancel anytime. No questions asked.
+                    </p>
+                    <?php endif; ?>
                 </div>
                 </div>
                 <?php endforeach; ?>
                 <?php } 
                 } catch (Exception $e) {
-                    echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
-                            <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
-                           </div>';
-
+                    echo '<div class="col-12 text-center p-3" style="color:#f87171; border:1px solid #ef4444; border-radius:0.5rem; background:rgba(239,68,68,0.06);">
+                            <strong>Error loading plans:</strong> ' . htmlspecialchars($e->getMessage()) . '</div>';
                 }
                 ?>
             </div>
