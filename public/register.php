@@ -22,9 +22,318 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-    
+    <style>
+        :root {
+            --brand: #0F766E;
+            --brand-strong: #0D9488;
+            --brand-light: #14B8A6;
+            --surface: rgba(255,255,255,0.52);
+            --border: rgba(15,118,110,0.12);
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ── Animated Blobs ── */
+        .blob-container { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+        .blob {
+            position:absolute; border-radius:50%; filter:blur(90px); opacity:0.55;
+            animation:floatBlob 18s infinite ease-in-out;
+        }
+        .blob-1 { width:500px; height:500px; background:rgba(13,148,136,0.18); top:-15%; left:-8%; animation-delay:0s; }
+        .blob-2 { width:420px; height:420px; background:rgba(245,158,11,0.13); bottom:-12%; right:-10%; animation-delay:-6s; }
+        .blob-3 { width:360px; height:360px; background:rgba(37,99,235,0.10); top:45%; left:55%; animation-delay:-12s; }
+        @keyframes floatBlob {
+            0%,100% { transform:translate(0,0) scale(1); }
+            33% { transform:translate(60px,-50px) scale(1.12); }
+            66% { transform:translate(-40px,40px) scale(0.92); }
+        }
+
+        /* ── Glassmorphism Card ── */
+        body.auth-page { background:linear-gradient(180deg,#fefbf6 0%,#f6eee0 100%) !important; position:relative; }
+        .auth-shell { position:relative; z-index:10; }
+        .auth-card {
+            background:rgba(255,255,255,0.45) !important;
+            backdrop-filter:blur(24px) !important;
+            -webkit-backdrop-filter:blur(24px) !important;
+            border:1.5px solid rgba(255,255,255,0.65) !important;
+            box-shadow:0 28px 75px rgba(15,118,110,0.08),0 10px 30px rgba(0,0,0,0.02) !important;
+            border-radius:28px !important;
+            padding:2.8rem 2.5rem !important;
+            max-width:620px; margin:0 auto;
+            transition:transform 0.3s ease,box-shadow 0.3s ease;
+        }
+        .auth-card:hover { box-shadow:0 35px 85px rgba(15,118,110,0.12),0 15px 35px rgba(0,0,0,0.03) !important; }
+
+        /* ── Logo & Header ── */
+        .auth-logo { display:inline-flex; align-items:center; gap:10px; text-decoration:none; margin-bottom:8px; }
+        .logo-icon {
+            width:44px; height:44px; border-radius:14px;
+            background:linear-gradient(135deg,var(--brand),var(--brand-strong),#2563eb);
+            box-shadow:0 10px 24px rgba(15,118,110,0.35);
+            display:grid; place-items:center; color:#fff; font-size:1.2rem;
+            transition:transform 0.4s var(--ease-out);
+        }
+        .auth-logo:hover .logo-icon { transform:rotate(15deg) scale(1.08); }
+        .auth-logo span { font-family:'Unbounded',sans-serif; font-weight:800; color:#0f172a; font-size:1.12rem; letter-spacing:-0.03em; }
+        .auth-header h3 { font-size:1.7rem; font-weight:850; color:#0f172a; letter-spacing:-0.04em; margin-top:15px; margin-bottom:6px; }
+        .auth-header p { color:#64748b; font-weight:500; font-size:0.93rem; line-height:1.5; }
+
+        /* ── Stepper ── */
+        .stepper { display:flex; gap:0; margin:1.8rem 0 1.5rem; position:relative; }
+        .stepper-item {
+            flex:1; display:flex; align-items:center; gap:10px; padding:10px 8px;
+            position:relative; opacity:0.45; transition:opacity 0.3s ease;
+        }
+        .stepper-item::after {
+            content:''; position:absolute; top:50%; left:36px; right:8px; height:2px;
+            background:linear-gradient(90deg,var(--brand-light),#e2e8f0);
+            transform:translateY(-50%); z-index:0; border-radius:2px;
+        }
+        .stepper-item:last-child::after { display:none; }
+        .stepper-item.active { opacity:1; }
+        .stepper-item.completed { opacity:0.75; }
+        .stepper-item.completed::after { background:var(--brand-light) !important; }
+        .step-number {
+            width:32px; height:32px; border-radius:50%;
+            display:grid; place-items:center; font-weight:800; font-size:0.8rem;
+            background:#f1f5f9; color:#94a3b8; z-index:1; flex-shrink:0;
+            border:2px solid #e2e8f0; transition:all 0.3s ease;
+        }
+        .stepper-item.active .step-number {
+            background:var(--brand); color:#fff; border-color:var(--brand);
+            box-shadow:0 4px 14px rgba(15,118,110,0.3);
+        }
+        .stepper-item.completed .step-number {
+            background:var(--brand-light); color:#fff; border-color:var(--brand-light);
+        }
+        .stepper-item strong { font-size:0.82rem; color:#0f172a; display:block; line-height:1.2; }
+        .stepper-item small { font-size:0.7rem; color:#94a3b8; display:block; line-height:1.2; }
+
+        /* ── Plan Selection Cards ── */
+        .system-selection { margin-bottom:1.5rem; }
+        .system-selection h3 {
+            font-size:0.82rem; font-weight:800; text-transform:uppercase;
+            letter-spacing:0.8px; color:#475569; margin-bottom:1rem;
+        }
+        .checkbox-group { display:flex; flex-direction:column; gap:12px; }
+        .checkbox-card {
+            display:block; padding:1.2rem 1.3rem; border-radius:18px;
+            border:2px solid rgba(15,118,110,0.14); background:rgba(255,255,255,0.55);
+            backdrop-filter:blur(8px); cursor:pointer;
+            transition:all 0.25s var(--ease-out); position:relative;
+        }
+        .checkbox-card:hover {
+            border-color:rgba(15,118,110,0.3); background:rgba(255,255,255,0.75);
+            transform:translateY(-1px); box-shadow:0 8px 24px rgba(15,118,110,0.08);
+        }
+        .checkbox-card.selected {
+            border-color:var(--brand) !important; background:rgba(15,118,110,0.04);
+            box-shadow:0 0 0 5px rgba(15,118,110,0.08);
+        }
+        .checkbox-card input[type="radio"] { display:none; }
+        .checkbox-card__row {
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .checkbox-card__row-left {
+            display:flex; align-items:center; gap:10px; font-weight:700;
+            font-size:1rem; color:#0f172a;
+        }
+        .checkbox-card__row-left::before {
+            content:''; width:20px; height:20px; border-radius:50%;
+            border:2px solid #cbd5e1; flex-shrink:0;
+            transition:all 0.25s ease;
+        }
+        .checkbox-card.selected .checkbox-card__row-left::before {
+            border-color:var(--brand); background:var(--brand);
+            box-shadow:inset 0 0 0 4px #fff;
+        }
+        .checkbox-price {
+            font-weight:800; font-size:1.05rem; color:var(--brand);
+            white-space:nowrap;
+        }
+        .checkbox-desc {
+            font-size:0.82rem; color:#64748b; margin-top:6px; line-height:1.4;
+        }
+
+        /* ── Feature Chips ── */
+        .plan-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+        .plan-chip {
+            display:inline-block; padding:4px 10px; border-radius:20px;
+            font-size:0.7rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:0.4px;
+            background:rgba(15,118,110,0.07); color:var(--brand);
+            border:1px solid rgba(15,118,110,0.12);
+        }
+
+        /* ── Duration & Payment Section ── */
+        .form-control {
+            width:100%; height:50px; padding:0 16px; border-radius:14px;
+            border:1.5px solid rgba(15,118,110,0.16); background:rgba(255,255,255,0.6);
+            font-weight:600; font-size:0.95rem; color:#0f172a;
+            transition:all 0.25s ease; outline:none;
+        }
+        .form-control:focus {
+            border-color:var(--brand); background:#fff;
+            box-shadow:0 0 0 4px rgba(15,118,110,0.1);
+        }
+        .notice-card {
+            display:flex; align-items:center; gap:8px; padding:12px 16px;
+            border-radius:14px; margin-bottom:1rem;
+            background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2);
+            font-size:0.85rem; color:#92400e; font-weight:600;
+        }
+        .notice-card i { font-size:1.2rem; }
+        .price-summary {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:14px 18px; border-radius:14px;
+            background:rgba(15,118,110,0.05); border:1px solid rgba(15,118,110,0.1);
+            font-size:0.95rem;
+        }
+        .price-highlight {
+            font-size:1.4rem; font-weight:800; color:var(--brand);
+        }
+
+        /* ── Payment Method Card ── */
+        .method-card .method-card__content { display:flex; flex-direction:column; }
+        .method-card .method-card__content span {
+            font-weight:700; font-size:0.95rem; color:#0f172a;
+        }
+
+        /* ── CTA Buttons ── */
+        .payment-cta { margin-top:1.5rem; text-align:center; }
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center; gap:8px;
+            font-weight:800; border-radius:16px; padding:0.85rem 2rem;
+            font-size:0.95rem; transition:all 0.3s var(--ease-out);
+            cursor:pointer; border:none; text-decoration:none; letter-spacing:0.3px;
+        }
+        .btn.full-width { width:100%; }
+        .btn-primary {
+            background:linear-gradient(135deg,var(--brand),var(--brand-strong),#2563eb);
+            background-size:200% auto; color:#fff;
+            box-shadow:0 10px 24px rgba(15,118,110,0.28);
+        }
+        .btn-primary:hover {
+            background-position:right center; transform:translateY(-2px);
+            box-shadow:0 14px 32px rgba(15,118,110,0.38);
+        }
+        .btn-outline {
+            background:transparent; border:2px solid rgba(15,118,110,0.2);
+            color:var(--brand); font-weight:700;
+        }
+        .btn-outline:hover { background:rgba(15,118,110,0.05); border-color:var(--brand); }
+        .payment-cta__note {
+            font-size:0.75rem; color:#94a3b8; margin-top:10px;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+
+        /* ── Alerts ── */
+        .alert {
+            padding:14px 18px; border-radius:16px; font-size:0.85rem; font-weight:600;
+            margin-bottom:20px; display:flex; align-items:center; gap:8px;
+            border:1px solid transparent;
+        }
+        .alert-error {
+            background:rgba(244,63,94,0.08); color:#e11d48;
+            border-color:rgba(244,63,94,0.2);
+        }
+
+        /* ── Footer ── */
+        .auth-footer {
+            margin-top:26px; border-top:1.5px solid rgba(15,118,110,0.08);
+            padding-top:20px; font-size:0.9rem; font-weight:600; color:#64748b; text-align:center;
+        }
+        .link-strong { color:var(--brand); font-weight:800; text-decoration:none; }
+        .link-strong:hover { color:var(--brand-strong); text-decoration:underline; }
+
+        /* ── Modal Refinements ── */
+        .modal.active { display:flex !important; }
+        .modal {
+            display:none; position:fixed; inset:0; background:rgba(15,23,42,0.45);
+            backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center;
+        }
+        .modal-content {
+            background:#fff; border-radius:24px; padding:2rem; max-width:440px; width:92%;
+            box-shadow:0 30px 60px rgba(15,23,42,0.2); position:relative;
+        }
+        .modal-content--sm { max-width:380px; text-align:center; }
+        .modal-content--center { text-align:center; }
+        .modal-close {
+            position:absolute; top:16px; right:16px; background:none; border:none;
+            font-size:1.5rem; color:#94a3b8; cursor:pointer; transition:color 0.2s;
+        }
+        .modal-close:hover { color:#0f172a; }
+        .modal-header { margin-bottom:1.2rem; }
+        .modal-header h3 { font-size:1.15rem; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:10px; margin:0; }
+        .modal-badge {
+            width:38px; height:38px; border-radius:12px; display:grid; place-items:center;
+            background:linear-gradient(135deg,var(--brand),var(--brand-strong));
+            color:#fff; font-size:1.1rem; box-shadow:0 6px 16px rgba(15,118,110,0.25);
+        }
+        .modal-header--brand h3 { color:#0f172a; }
+        .modal-header--telegram h3 { color:#0088cc; }
+        .modal-body { margin-bottom:1rem; }
+        .payment-amount {
+            font-size:2.2rem; font-weight:800; color:var(--brand);
+            text-align:center; margin-bottom:4px;
+        }
+        .payment-instruction {
+            font-size:0.82rem; color:#64748b; text-align:center; margin-bottom:1.2rem;
+        }
+        .qr-code-container--center { text-align:center; }
+        .qr-code-container--center img { max-width:220px; border-radius:12px; }
+        .modal-footer {
+            display:flex; gap:10px; margin-top:1.2rem; justify-content:flex-end;
+        }
+        .modal-icon--success {
+            width:64px; height:64px; border-radius:50%; margin:0 auto 1rem;
+            background:rgba(16,185,129,0.1); display:grid; place-items:center;
+            font-size:2rem; color:#10b981;
+        }
+        .waiting-status { text-align:center; }
+        .waiting-title { font-size:1.1rem; font-weight:800; color:#0f172a; margin:1rem 0 0.5rem; }
+        .waiting-desc { font-size:0.85rem; color:#64748b; line-height:1.5; margin-bottom:1rem; }
+        .telegram-badge {
+            display:inline-flex; align-items:center; gap:6px; padding:8px 16px;
+            border-radius:20px; background:rgba(0,136,204,0.08); color:#0088cc;
+            font-weight:700; font-size:0.85rem;
+        }
+        .countdown-container {
+            position:relative; width:120px; height:120px; margin:0 auto;
+        }
+        .countdown-svg { width:120px; height:120px; transform:rotate(-90deg); }
+        .countdown-circle-bg { fill:none; stroke:#f1f5f9; stroke-width:6; }
+        .countdown-circle-progress {
+            fill:none; stroke:var(--brand); stroke-width:6; stroke-linecap:round;
+            stroke-dasharray:351.85; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear;
+        }
+        .countdown-text {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            font-size:1.5rem; font-weight:800; color:#0f172a;
+        }
+        .status-inline {
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            font-size:0.85rem; color:#64748b; margin-top:1rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width:640px) {
+            .auth-card { padding:2rem 1.3rem !important; border-radius:22px !important; }
+            .auth-header h3 { font-size:1.4rem; }
+            .stepper-item strong { font-size:0.72rem; }
+            .stepper-item small { font-size:0.65rem; display:none; }
+            .checkbox-card { padding:1rem; }
+            .checkbox-price { font-size:0.9rem; }
+        }
+    </style>
 </head>
 <body class="auth-page">
+
+    <!-- Animated Blurred Blobs -->
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
@@ -47,14 +356,14 @@
                     <span>Mekong CyberUnit</span>
                 </a>
                 <h3>Create Account</h3>
-                <p>Complete payment via Bakong to setup your workspace</p>
+                <p>Choose a plan and start your journey with Mekong CyberUnit</p>
             </div>
 
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-error">
-                <i class="ph-bold ph-warning-circle" style="vertical-align: text-bottom;"></i>
-                <?php echo htmlspecialchars($_GET['error']); ?>
+                <i class="ph-bold ph-warning-circle" style="font-size:18px;"></i>
+                <span><?php echo htmlspecialchars($_GET['error']); ?></span>
             </div>
         <?php endif; ?>
 
@@ -64,44 +373,46 @@
                     <div class="step-number">1</div>
                     <div>
                         <strong>Choose Plan</strong>
-                        <small>Pick the stack that fits your team</small>
+                        <small>Pick your stack</small>
                     </div>
                 </div>
                 <div class="stepper-item" data-step="2">
                     <div class="step-number">2</div>
                     <div>
-                        <strong>Duration & Payment</strong>
-                        <small>Lock months and method</small>
+                        <strong>Payment</strong>
+                        <small>Secure via Bakong</small>
                     </div>
                 </div>
                 <div class="stepper-item" data-step="3">
                     <div class="step-number">3</div>
                     <div>
-                        <strong>Scan & Launch</strong>
-                        <small>Pay via Bakong, auto setup</small>
+                        <strong>Launch</strong>
+                        <small>Scan & go live</small>
                     </div>
                 </div>
             </div>
             <!-- Plan Selection (Visible First) -->
             <div class="system-selection" id="plan_section">
-                <h3>1. Select Plan to Pay</h3>
+                <h3>Select a Plan</h3>
                 <div class="checkbox-group">
                     <?php
                     $db = Database::getInstance();
                     $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
                     foreach ($plans as $plan):
                         $planCode = strtolower(str_replace(' ', '_', $plan['name']));
+                        $planPrice = (float)$plan['price'];
+                        $isFree = ($planPrice === 0.00);
                         // Fetch features for this plan
                         $features = $db->fetchAll("SELECT feature_key FROM system_modules WHERE system_id = ?", [$plan['id']]);
                         $featureList = array_column($features, 'feature_key');
                     ?>
-                    <label class="checkbox-card checkbox-card--stack" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $plan['price']; ?>, '<?php echo $planCode; ?>')">
+                    <label class="checkbox-card checkbox-card--stack<?php echo $isFree ? ' free-trial-card' : ''; ?>" onclick="selectPlan(<?php echo $plan['id']; ?>, <?php echo $planPrice; ?>, '<?php echo $planCode; ?>')" style="<?php echo $isFree ? 'border-color:rgba(5,150,105,0.35); background:rgba(5,150,105,0.025);' : ''; ?>">
                         <div class="checkbox-card__row">
                             <div class="checkbox-card__row-left">
-                                <input type="radio" name="plan_select" value="<?php echo $plan['id']; ?>" class="plan-radio" data-plan-code="<?php echo $planCode; ?>" data-plan-price="<?php echo number_format($plan['price'], 2, '.', ''); ?>">
-                                <span><?php echo htmlspecialchars($plan['name']); ?></span>
+                                <input type="radio" name="plan_select" value="<?php echo $plan['id']; ?>" class="plan-radio" data-plan-code="<?php echo $planCode; ?>" data-plan-price="<?php echo number_format($planPrice, 2, '.', ''); ?>">
+                                <span><?php echo htmlspecialchars($plan['name']); ?><?php echo $isFree ? '&nbsp;<span style="font-size:0.68rem;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-weight:700;">FREE</span>' : ''; ?></span>
                             </div>
-                            <div class="checkbox-price">$<?php echo number_format($plan['price'], 2); ?>/mo</div>
+                            <div class="checkbox-price"><?php echo $isFree ? '<span style="color:#059669;">Free</span>' : '$' . number_format($planPrice, 2) . '/mo'; ?></div>
                         </div>
                         
                         <div class="checkbox-desc"><?php echo htmlspecialchars($plan['description']); ?></div>
@@ -109,10 +420,7 @@
                         <?php if (!empty($featureList)): ?>
                         <div class="plan-chip-row">
                             <?php foreach ($featureList as $feat): ?>
-                                <span class="plan-chip">
-
-                                    <?php echo str_replace('_', ' ', $feat); ?>
-                                </span>
+                                <span class="plan-chip"><?php echo str_replace('_', ' ', $feat); ?></span>
                             <?php endforeach; ?>
                         </div>
                         <?php endif; ?>
@@ -123,7 +431,7 @@
 
             <!-- Subscription Duration Selection -->
             <div class="system-selection" id="duration_section" style="display: none;">
-                <h3>2. Select Duration</h3>
+                <h3>Subscription Duration</h3>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <select id="duration_select" class="form-control" onchange="updateTotalPrice()">
 
@@ -137,7 +445,7 @@
                     <strong>Special Offer!</strong> Get <span id="bonus_months">0</span> months free for 1-year subscription.
                 </div>
                 <div class="price-summary">
-                    <span style="font-weight: 500;">Total Amount:</span>
+                    <span style="font-weight: 600;">Total Amount:</span>
                     <span id="total_price_display" class="price-highlight">$0.00</span>
 
                 </div>
@@ -146,39 +454,38 @@
             <!-- Payment Method Selection -->
             <div class="system-selection" id="payment_method_section" style="display: none;">
 
-                <h3>3. Select Payment Method</h3>
+                <h3>Payment Method</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-card method-card" onclick="selectPaymentMethod('bakong')">
                         <input type="radio" name="payment_method" value="bakong" class="method-radio" checked>
-                        <div class="method-card__content">
-                            <span>Bakong QR</span>
-                            <div class="checkbox-desc">Scan with Bakong or any Banking App</div>
-
+                        <div class="checkbox-card__row">
+                            <div class="checkbox-card__row-left">
+                                <span>Bakong KHQR</span>
+                            </div>
+                            <div class="checkbox-price" style="color:#0F766E;">Instant</div>
                         </div>
-                        <div class="checkbox-price">Dynamic</div>
+                        <div class="checkbox-desc">Scan with Bakong or any Cambodian banking app</div>
                     </label>
                 </div>
             </div>
 
-            <!-- Pay CTA moved here -->
+            <!-- Pay CTA -->
             <div class="payment-cta" id="payment_cta" style="display:none;">
                 <button type="button" class="btn btn-primary full-width" onclick="showModal()">
                     <i class="ph-bold ph-qr-code"></i> <span id="pay_btn_text">Proceed to Payment</span>
                 </button>
                 <p class="payment-cta__note">
                     <i class="ph-bold ph-shield-check"></i> Secure payment powered by Bakong KHQR
-
                 </p>
             </div>
 
             <!-- Free Trial CTA -->
             <div class="payment-cta" id="trial_cta" style="display:none;">
-                <button type="button" class="btn btn-primary full-width" onclick="startFreeTrial()" style="background: #059669; border-color: #059669;">
+                <button type="button" class="btn btn-primary full-width" onclick="startFreeTrial()" style="background:linear-gradient(135deg,#059669,#047857,#10b981); background-size:200% auto;">
                     <i class="ph-bold ph-gift"></i> Start 7-Day Free Trial
                 </button>
                 <p class="payment-cta__note">
-                    <i class="ph-bold ph-info"></i> No credit card required. Full access for 7 days.
-
+                    <i class="ph-bold ph-info"></i> No credit card required — full access for 7 days
                 </p>
             </div>
         </form>
@@ -354,13 +661,12 @@
 
         // Plan Selection
         window.selectPlan = function(planId, price, planCode) {
-            const cards = document.querySelectorAll('.plan-radio');
-            cards.forEach(input => input.closest('.checkbox-card').style.borderColor = 'var(--border-color)');
+            document.querySelectorAll('.checkbox-card').forEach(card => card.classList.remove('selected'));
             
             const input = document.querySelector(`input[name="plan_select"][value="${planId}"]`);
             if (input) {
                 input.checked = true;
-                input.closest('.checkbox-card').style.borderColor = '#E31E26';
+                input.closest('.checkbox-card').classList.add('selected');
             }
 
             selectedPrice = price;
@@ -375,13 +681,13 @@
                 durationSection.style.display = 'none';
                 paymentMethodSection.style.display = 'none';
                 paymentCta.style.display = 'none';
-                trialCta.style.display = 'flex';
+                trialCta.style.display = 'block';
                 updateStepper(2);
             } else {
                 // Paid plan: show duration and payment method
                 durationSection.style.display = 'block';
                 paymentMethodSection.style.display = 'block';
-                paymentCta.style.display = 'flex';
+                paymentCta.style.display = 'block';
                 trialCta.style.display = 'none';
                 updateStepper(2);
                 updateTotalPrice();
@@ -419,13 +725,12 @@
 
         // Payment Method Selection
         window.selectPaymentMethod = function(method) {
-            const methodCards = document.querySelectorAll('.method-radio');
-            methodCards.forEach(input => input.closest('.checkbox-card').style.borderColor = 'var(--border-color)');
+            document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
             
             const input = document.querySelector(`input[name="payment_method"][value="${method}"]`);
             if (input) {
                 input.checked = true;
-                input.closest('.checkbox-card').style.borderColor = '#E31E26';
+                input.closest('.checkbox-card').classList.add('selected');
             }
 
             selectedMethod = method;
