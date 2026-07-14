@@ -324,134 +324,94 @@ $structuredData = [
     </section>
 
     <!-- Pricing -->
-    <section id="pricing" class="pricing-section py-5">
+    <section id="pricing" class="py-5">
         <div class="container py-4">
-            <div class="text-center mb-4">
+            <div class="text-center mb-5">
                 <div class="section-kicker"><i class="ph-bold ph-credit-card"></i> Transparent Pricing</div>
-                <h2 class="fw-bold">Plans that grow with your business</h2>
-                <p class="text-muted mx-auto" style="max-width:600px">Every plan includes unlimited transactions, free updates & Telegram support. No hidden fees.</p>
-                
-                <!-- Monthly / Annual Toggle -->
-                <div class="pricing-toggle" id="pricingToggle">
-                    <button class="active" onclick="switchPricing('monthly', this)">Monthly</button>
-                    <button onclick="switchPricing('annual', this)">Annual <span class="save-badge">Save up to 25%</span></button>
-                </div>
+                <h2 class="fw-bold">One subscription. All features. No surprises.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
             </div>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 align-items-stretch" id="pricingGrid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-start">
 
                 <?php
                 try {
                 $db = Database::getInstance();
                 $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
                 if (empty($plans)) {
-                    echo '<div class="col-12 text-center py-4" style="background:rgba(99,102,241,0.08);border-radius:1rem;border:1px dashed rgba(99,102,241,0.25);">
-                            <i class="ph-bold ph-warning-circle" style="font-size:2rem;color:var(--mc-primary);display:block;margin-bottom:0.5rem;"></i>
-                            No active pricing plans found. Configure them in the <a href="admin/plans.php" style="font-weight:700;color:var(--mc-primary);">Admin Panel</a>.
+                    echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 1rem; border: 1px dashed rgba(99, 102, 241, 0.3); color: #cbd5e1;">
+                            <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--accent);"></i>
+                            No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700; color: var(--primary);">Admin Panel</a>.
+
                           </div>';
                 } else {
                 foreach ($plans as $index => $plan):
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
-                    $price = (float)$plan['price'];
-                    $isFree = ($price === 0.00);
-                    $isPopular = ($price > 0 && $price <= 30 && $index > 0);
+                    $isPopular = ($index === 1); // Mark second plan as popular for UI
                     
-                    // Annual pricing (12 months)
-                    $annualPrice = $price * 12;
-                    $annualBonus = 0;
-                    if ($price >= 99) $annualBonus = 3;
-                    elseif ($price >= 30) $annualBonus = 1;
-                    $annualEffectiveMonths = 12 + $annualBonus;
-                    $annualMonthly = $annualPrice / $annualEffectiveMonths;
-                    
-                    // Features
+                    // Fetch linked features for this plan
                     $features = $db->fetchAll("SELECT sm.module_name, sm.feature_key FROM system_modules sm WHERE sm.system_id = ?", [$plan['id']]);
+
+                    // Feature labels
                     $featureLabels = [
-                        'pos_core'=>'POS Terminal & Dashboard','pos_orders'=>'Order History','pos_inventory'=>'Product & Inventory',
-                        'pos_customers'=>'Customer Management','pos_reports'=>'Sales Reports','pos_holds'=>'Hold Orders',
-                        'pos_digital_menu'=>'Digital Menu (QR)','pos_settings'=>'POS Settings','pos_sessions'=>'Cash Control',
-                        'pos_cashiers'=>'Cashier Management','inventory_stock_in'=>'Stock-In','hr_staff'=>'Staff Management',
+                        'pos_core'           => 'POS Terminal & Dashboard',
+                        'pos_orders'         => 'Order History',
+                        'pos_inventory'      => 'Product & Inventory',
+                        'pos_customers'      => 'Customer Management',
+                        'pos_reports'        => 'Sales Reports & Analytics',
+                        'pos_holds'          => 'Hold Orders',
+                        'pos_digital_menu'   => 'Digital Menu (QR)',
+                        'pos_settings'       => 'POS Settings',
+                        'pos_sessions'       => 'Cash Control Sessions',
+                        'pos_cashiers'       => 'Cashier Management',
+                        'inventory_stock_in' => 'Stock-In Management',
+                        'hr_staff'           => 'Staff Management',
                     ];
                     $storeLimit = (int)($plan['store_limit'] ?? 1);
                     $cashierLimit = (int)($plan['cashier_limit'] ?? 1);
-                    
-                    $cardClass = '';
-                    if ($isFree) $cardClass = 'trial-card';
-                    elseif ($isPopular) $cardClass = 'popular';
                 ?>
                 <div class="col">
-                <div class="pricing-card <?php echo $cardClass; ?>">
+                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?>">
                     <?php if ($isPopular): ?>
                     <div class="pricing-badge">Popular</div>
-                    <?php elseif ($isFree): ?>
-                    <div class="pricing-badge" style="background:linear-gradient(135deg,#059669,#047857);">Free</div>
                     <?php endif; ?>
-                    
-                    <div class="pricing-plan-name"><?php echo htmlspecialchars($plan['name']); ?></div>
-                    <div class="pricing-plan-desc"><?php echo htmlspecialchars($plan['description']); ?></div>
-                    
-                    <!-- Monthly Price -->
-                    <div class="pricing-price-row monthly-price">
-                        <?php if ($isFree): ?>
-                            <span class="price-amount" style="color:#059669;">Free</span>
-                        <?php else: ?>
-                            <span class="price-amount">$<?php echo number_format($price, 0); ?></span>
-                            <span class="price-period">/mo</span>
-                        <?php endif; ?>
+                    <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($plan['name']); ?></h4>
+                    <p class="text-muted small mb-3"><?php echo htmlspecialchars($plan['description']); ?></p>
+                    <div class="d-flex align-items-baseline gap-1 mb-3 pb-3 border-bottom">
+                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
+                        <span class="text-muted">/month</span>
                     </div>
-                    
-                    <!-- Annual Price (hidden by default) -->
-                    <?php if (!$isFree): ?>
-                    <div class="pricing-price-row annual-price" style="display:none;">
-                        <span class="price-amount">$<?php echo number_format($annualMonthly, 0); ?></span>
-                        <span class="price-period">/mo</span>
-                    </div>
-                    <div class="annual-save annual-price" style="display:none;">
-                        <i class="ph-bold ph-arrow-down"></i> $<?php echo number_format($price, 0); ?>/mo when billed annually
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($annualBonus > 0): ?>
-                    <div class="annual-bonus annual-price" style="display:none;">
-                        <i class="ph-bold ph-gift"></i>
-                        <span><strong><?php echo $annualBonus; ?> month<?php echo $annualBonus>1?'s':''; ?> free</strong> with annual plan</span>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <hr class="pricing-divider">
-                    
-                    <ul class="feature-list mb-3">
+                    <ul class="feature-list mb-4">
                         <?php foreach ($features as $f): ?>
-                            <?php $lk = $f['module_name'].'_'.$f['feature_key']; ?>
-                            <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($featureLabels[$lk] ?? ucfirst($f['feature_key'])); ?></li>
+                            <?php $labelKey = $f['module_name'] . '_' . $f['feature_key']; ?>
+                            <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($featureLabels[$labelKey] ?? ucfirst($f['feature_key'])); ?></li>
                         <?php endforeach; ?>
                         <?php if ($storeLimit > 0): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit>1?'s':''; ?></li>
+                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit > 1 ? 's' : ''; ?></li>
                         <?php else: ?>
                             <li><i class="ph-bold ph-check-circle"></i> Unlimited Stores</li>
                         <?php endif; ?>
                         <?php if ($cashierLimit > 0): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit>1?'s':''; ?></li>
+                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit > 1 ? 's' : ''; ?></li>
                         <?php else: ?>
                             <li><i class="ph-bold ph-check-circle"></i> Unlimited Cashiers</li>
                         <?php endif; ?>
-                        <?php if ($price >= 30): ?>
+                        <?php if ($plan['price'] >= 30): ?>
                             <li><i class="ph-bold ph-check-circle"></i> Cloud Storage</li>
                         <?php endif; ?>
-                        <?php if ($price >= 50): ?>
+                        <?php if ($plan['price'] >= 50): ?>
                             <li><i class="ph-bold ph-check-circle"></i> 24/7 Priority Support</li>
                         <?php endif; ?>
                     </ul>
-                    
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo ($isPopular||$isFree) ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">
-                        <?php echo $isFree ? 'Start Free Trial' : 'Get Started'; ?>
-                    </a>
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">Choose <?php echo htmlspecialchars($plan['name']); ?></a>
                 </div>
                 </div>
                 <?php endforeach; ?>
                 <?php } 
                 } catch (Exception $e) {
-                    echo '<div class="col-12 text-center py-3" style="color:#ef4444;border:1px solid #fecaca;border-radius:0.5rem;background:rgba(239,68,68,0.05);">
-                            <strong>Error:</strong> '.htmlspecialchars($e->getMessage()).'</div>';
+                    echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
+                            <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
+                           </div>';
+
                 }
                 ?>
             </div>
@@ -614,25 +574,6 @@ $structuredData = [
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/loader.js"></script>
     <script>
-        // ═══════════════════════════════════════════
-        // PRICING TOGGLE — Monthly / Annual
-        // ═══════════════════════════════════════════
-        window.switchPricing = function(mode, btn) {
-            document.querySelectorAll('#pricingToggle button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const monthlyEls = document.querySelectorAll('.monthly-price');
-            const annualEls = document.querySelectorAll('.annual-price');
-            
-            if (mode === 'annual') {
-                monthlyEls.forEach(el => el.style.display = 'none');
-                annualEls.forEach(el => el.style.display = '');
-            } else {
-                monthlyEls.forEach(el => el.style.display = '');
-                annualEls.forEach(el => el.style.display = 'none');
-            }
-        };
-
         // Bootstrap modal helpers
         function openAuthModal() {
             const m = new bootstrap.Modal(document.getElementById('authModal'));

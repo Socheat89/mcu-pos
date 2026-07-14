@@ -704,11 +704,12 @@
             selectedDuration = parseInt(durationSelect.value);
             totalPrice = selectedPrice * selectedDuration;
             
-            // Bonus Logic (based on price tiers)
+            // Bonus Logic
             let bonus = 0;
             if (selectedDuration === 12) {
-                if (selectedPrice >= 99) bonus = 3;
-                else if (selectedPrice >= 30) bonus = 1;
+                if (selectedPlan === 'starter') bonus = 1;
+                else if (selectedPlan === 'professional') bonus = 2;
+                else if (selectedPlan === 'enterprise') bonus = 3;
             }
             
             if (bonus > 0) {
