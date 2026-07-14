@@ -76,7 +76,11 @@ foreach ($systems as $system) {
 $planMeta = [];
 foreach ($systems as $i => $system) {
     $meta = ['badge' => '', 'accent' => '#06b6d4', 'btn' => 'btn-outline'];
-    if ($i === 1 && count($systems) >= 3) {
+    $price = (float)$system['price'];
+    if ($price === 0.00) {
+        // Free Trial
+        $meta = ['badge' => 'Free Trial', 'accent' => '#059669', 'btn' => 'btn-primary'];
+    } elseif ($i === 1 && count($systems) >= 3) {
         $meta = ['badge' => 'Popular', 'accent' => '#8b5cf6', 'btn' => 'btn-primary'];
     }
     $planMeta[$system['id']] = $meta;
@@ -160,19 +164,26 @@ foreach ($systems as $i => $system) {
                     $meta = $planMeta[$system['id']];
                     $features = $planFeatures[$system['id']] ?? [];
                     $name = htmlspecialchars($system['name']);
-                    $price = number_format($system['price'], 0);
+                    $sysPrice = (float)$system['price'];
+                    $price = number_format($sysPrice, 0);
                     $desc = htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.');
                     $sid = $system['id'];
+                    $isFreeTrial = ($sysPrice === 0.00);
                 ?>
                 <div class="system-card <?php echo $meta['badge'] ? 'popular-card' : ''; ?>" style="<?php echo $meta['badge'] ? '' : 'border-top: 3px solid ' . $meta['accent']; ?>">
                     <?php if ($meta['badge']): ?>
-                        <div class="plan-badge"><?php echo $meta['badge']; ?></div>
+                        <div class="plan-badge" style="<?php echo $isFreeTrial ? 'background: #d1fae5; color: #065f46;' : ''; ?>"><?php echo $meta['badge']; ?></div>
                     <?php endif; ?>
                     <h3 class="system-title"><?php echo $name; ?></h3>
                     <p class="system-desc"><?php echo $desc; ?></p>
                     <div class="price-tag">
-                        <span class="price-amount">$<?php echo $price; ?></span>
-                        <span class="price-period">/month</span>
+                        <?php if ($isFreeTrial): ?>
+                            <span class="price-amount" style="font-size: 2.5rem;">Free</span>
+                            <span class="price-period">for 7 days</span>
+                        <?php else: ?>
+                            <span class="price-amount">$<?php echo $price; ?></span>
+                            <span class="price-period">/month</span>
+                        <?php endif; ?>
                     </div>
                     <ul class="plan-list">
                         <?php foreach ($features as $feat): ?>
@@ -182,8 +193,8 @@ foreach ($systems as $i => $system) {
                             <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Basic POS Access</li>
                         <?php endif; ?>
                     </ul>
-                    <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo $meta['btn']; ?> full-width">
-                        Choose <?php echo $name; ?>
+                    <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo $meta['btn']; ?> full-width" <?php echo $isFreeTrial ? 'style="background: #059669; border-color: #059669;"' : ''; ?>>
+                        <?php echo $isFreeTrial ? 'Start Free Trial' : ('Choose ' . $name); ?>
                     </a>
                 </div>
                 <?php endforeach; ?>

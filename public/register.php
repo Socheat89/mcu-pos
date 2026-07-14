@@ -170,6 +170,17 @@
 
                 </p>
             </div>
+
+            <!-- Free Trial CTA -->
+            <div class="payment-cta" id="trial_cta" style="display:none;">
+                <button type="button" class="btn btn-primary full-width" onclick="startFreeTrial()" style="background: #059669; border-color: #059669;">
+                    <i class="ph-bold ph-gift"></i> Start 7-Day Free Trial
+                </button>
+                <p class="payment-cta__note">
+                    <i class="ph-bold ph-info"></i> No credit card required. Full access for 7 days.
+
+                </p>
+            </div>
         </form>
         
         <div class="auth-footer">
@@ -299,9 +310,7 @@
         const paymentModal = document.getElementById('paymentModal');
         const planSection = document.getElementById('plan_section');
         const hiddenSystems = document.getElementById('hidden_systems'); // Note: This element might be dynamically created if missing in HTML, but here we assume it exists if used. Wait, it's missing in HTML above. I should remove it or check unlockForm. Ah, unlockForm uses populateHiddenSystems but where is hidden_systems div? It's not in the form HTML above. I must assume it's missing or I should add it. I will add it to the form.
-        const paymentMethodSection = document.getElementById('payment_method_section');
         const payBtnText = document.getElementById('pay_btn_text');
-        const paymentCta = document.getElementById('payment_cta');
         const stepperItems = document.querySelectorAll('.stepper-item');
         
         // Detect localhost / local dev mode
@@ -310,6 +319,8 @@
             || window.location.port !== '';
         
         let selectedPlan = null;
+        let selectedPlanId = null;
+        let selectedPlanCode = null;
         let selectedPrice = 0;
         let selectedDuration = 1;
         let totalPrice = 0;
@@ -321,6 +332,9 @@
         const bonusNotice = document.getElementById('bonus_notice');
         const bonusMonths = document.getElementById('bonus_months');
         const totalPriceDisplay = document.getElementById('total_price_display');
+        const paymentCta = document.getElementById('payment_cta');
+        const trialCta = document.getElementById('trial_cta');
+        const paymentMethodSection = document.getElementById('payment_method_section');
         let currentMd5 = null;
         const basePublicUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
@@ -350,15 +364,34 @@
             }
 
             selectedPrice = price;
+            selectedPlanId = planId;
             selectedPlan = planCode;
+            selectedPlanCode = planCode;
             
-            // Show duration and payment method
-            durationSection.style.display = 'block';
-            paymentMethodSection.style.display = 'block';
-            paymentCta.style.display = 'flex';
-            updateStepper(2);
+            const isFree = (parseFloat(price) === 0);
             
-            updateTotalPrice();
+            if (isFree) {
+                // Free trial: hide payment sections, show trial CTA
+                durationSection.style.display = 'none';
+                paymentMethodSection.style.display = 'none';
+                paymentCta.style.display = 'none';
+                trialCta.style.display = 'flex';
+                updateStepper(2);
+            } else {
+                // Paid plan: show duration and payment method
+                durationSection.style.display = 'block';
+                paymentMethodSection.style.display = 'block';
+                paymentCta.style.display = 'flex';
+                trialCta.style.display = 'none';
+                updateStepper(2);
+                updateTotalPrice();
+            }
+        };
+
+        // Start Free Trial - redirect to setup
+        window.startFreeTrial = function() {
+            if (!selectedPlanCode) return;
+            window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true`;
         };
 
         window.updateTotalPrice = function() {
@@ -630,7 +663,7 @@
 
             const planParam = urlParams.get('plan');
             if (planParam) {
-                const normalized = planParam.toLowerCase();
+                const normalized = planParam.toLowerCase().replace(/[\s-]+/g, '_');
                 const targetRadio = document.querySelector(`.plan-radio[data-plan-code="${normalized}"]`);
                 if (targetRadio) {
                     const planId = parseInt(targetRadio.value, 10);
@@ -638,7 +671,11 @@
                     const planCode = targetRadio.dataset.planCode;
                     selectPlan(planId, planPrice, planCode);
                     setTimeout(() => {
-                        durationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        if (parseFloat(planPrice) === 0) {
+                            trialCta.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } else {
+                            durationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
                     }, 300);
                 }
             }

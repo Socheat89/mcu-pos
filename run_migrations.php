@@ -291,6 +291,48 @@ try {
         echo "'pos_sessions.store_id' added.<br>";
     }
 
+    // 21. Add 'is_trial' column to tenant_systems
+    echo "Checking 'tenant_systems.is_trial'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM tenant_systems LIKE 'is_trial'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE tenant_systems ADD COLUMN is_trial TINYINT(1) DEFAULT 0 COMMENT '1=trial, 0=paid' AFTER status");
+        echo "'tenant_systems.is_trial' added.<br>";
+    }
+
+    // 22. Seed Free Trial plan
+    echo "Seeding Free Trial plan...<br>";
+    $existing = $db->fetchOne("SELECT id FROM systems WHERE name = 'Free Trial'");
+    if (!$existing) {
+        $trialId = $db->insert('systems', [
+            'name'           => 'Free Trial',
+            'description'    => '7-day free trial with basic POS features. No credit card required.',
+            'price'          => 0.00,
+            'status'         => 'active',
+            'store_limit'    => 1,
+            'cashier_limit'  => 1,
+        ]);
+        echo "→ Free Trial plan created (ID: {$trialId}).<br>";
+
+        // Seed basic POS features for trial
+        $trialFeatures = [
+            ['pos', 'core'],
+            ['pos', 'orders'],
+            ['pos', 'inventory'],
+            ['pos', 'customers'],
+            ['pos', 'settings'],
+        ];
+        foreach ($trialFeatures as $feat) {
+            $db->insert('system_modules', [
+                'system_id'   => $trialId,
+                'module_name' => $feat[0],
+                'feature_key' => $feat[1],
+            ]);
+        }
+        echo "→ Free Trial features seeded.<br>";
+    } else {
+        echo "→ Free Trial plan already exists.<br>";
+    }
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
