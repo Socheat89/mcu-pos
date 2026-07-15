@@ -521,8 +521,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <div id="creationModal" class="modal">
         <div class="modal-content modal-content--sm modal-content--center">
 
-            <div id="creationSpinner" style="margin-bottom: 2rem;">
-                <i class="ph-bold ph-spinner ph-spin" style="font-size: 4rem; color: var(--primary);"></i>
+            <div id="creationSpinner" style="margin-bottom: 2rem; display: flex; justify-content: center;">
+                <div class="loader-spinner"></div>
             </div>
             <div id="creationSuccess" style="display: none; margin-bottom: 2rem;">
                 <i class="ph-bold ph-check-circle" style="font-size: 4rem; color: #10b981;"></i>
