@@ -66,7 +66,7 @@ $structuredData = [
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css?v=5.0">
+    <link rel="stylesheet" href="css/landing.css?v=5.1">
 
     
     <!-- Favicon -->

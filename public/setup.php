@@ -38,7 +38,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
 
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css?v=5.0">
+    <link rel="stylesheet" href="css/landing.css?v=5.1">
     <style>
         :root {
             --brand: #308AC6;
@@ -256,6 +256,12 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             grid-template-columns: 1fr 1fr;
             gap: 1.2rem;
         }
+        .form-row-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            width: 100%;
+        }
         .form-group {
             display: flex;
             flex-direction: column;
@@ -348,7 +354,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
         }
 
         @media (max-width: 600px) {
-            .form-grid {
+            .form-grid, .form-row-split {
                 grid-template-columns: 1fr;
             }
             .form-group {
@@ -486,19 +492,23 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                     </div>
                 </div>
             
-                <div class="form-group">
-                    <label for="admin_password">Password</label>
-                    <div style="position: relative;">
-                        <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                        <input type="password" id="admin_password" name="admin_password" required minlength="8" placeholder="••••••••" style="padding-left: 2.75rem;">
-                    </div>
-                </div>
+                <div class="form-group full-width">
+                    <div class="form-row-split">
+                        <div class="form-group">
+                            <label for="admin_password">Password</label>
+                            <div style="position: relative;">
+                                <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                                <input type="password" id="admin_password" name="admin_password" required minlength="8" placeholder="••••••••" style="padding-left: 2.75rem;">
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <div style="position: relative;">
-                        <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm secure password" style="padding-left: 2.75rem;">
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <div style="position: relative;">
+                                <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                                <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm secure password" style="padding-left: 2.75rem;">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
