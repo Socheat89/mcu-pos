@@ -29,6 +29,7 @@ import {
   ChevronRight,
   Languages,
   LogOut,
+  Menu,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -464,6 +465,10 @@ export default function App() {
   const [currentLang, setCurrentLang] = useState(window.CURRENT_LANG || 'km');
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef(null);
+  
+  // Action Menu state
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const actionMenuRef = useRef(null);
 
   // Translation helper
   const t = (key, fallback) => {
@@ -475,6 +480,9 @@ export default function App() {
     function handleClickOutside(event) {
       if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
         setLangMenuOpen(false);
+      }
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target)) {
+        setActionMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -901,61 +909,91 @@ export default function App() {
 
           {/* Right: Controls */}
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {/* Exit/Dashboard Button */}
-            <a
-              href={window.DASHBOARD_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/dashboard`}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
-                darkMode
-                  ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-cyan border-brand-cyan/20 hover:border-brand-cyan/40 hover:shadow-glow-cyan/5'
-                  : 'bg-white hover:bg-gray-50 text-brand-cyan border-gray-200 hover:border-brand-cyan/30'
-              }`}
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>{t('exit', 'Dashboard')}</span>
-            </a>
+            {/* Action Menu Dropdown */}
+            <div className="relative" ref={actionMenuRef}>
+              <button
+                onClick={() => setActionMenuOpen(!actionMenuOpen)}
+                className={`h-8 px-3 rounded-lg flex items-center gap-1.5 transition-all text-[11px] font-extrabold shadow-sm border ${
+                  darkMode 
+                    ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt border-brand-cyan/20 text-brand-cyan hover:border-brand-cyan/40' 
+                    : 'bg-white hover:bg-gray-50 border-gray-200 text-brand-cyan hover:border-brand-cyan/30'
+                }`}
+              >
+                <Menu className="h-3.5 w-3.5" />
+                <span>{currentLang === 'km' ? 'ម៉ឺនុយ' : currentLang === 'zh' ? '菜单' : 'Menu'}</span>
+                {pendingOrders.length > 0 && (
+                  <span className="bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5">
+                    {pendingOrders.length}
+                  </span>
+                )}
+                <ChevronDown className="h-3 w-3 text-brand-cyan" />
+              </button>
 
-            {/* Close Session Button */}
-            <a
-              href={window.CLOSE_SESSION_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/sessions/close`}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-extrabold transition-all border shadow-sm ${
-                darkMode
-                  ? 'bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger border-brand-danger/20 hover:border-brand-danger/40'
-                  : 'bg-red-50 hover:bg-red-100 text-brand-danger border-red-200 hover:border-brand-danger/40'
-              }`}
-              title={currentLang === 'km' ? 'បិទវគ្គលក់' : currentLang === 'zh' ? '关闭班次' : 'Close Session'}
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{currentLang === 'km' ? 'បិទវគ្គ' : currentLang === 'zh' ? '关闭班次' : 'Close Session'}</span>
-            </a>
+              {actionMenuOpen && (
+                <div className={`absolute right-0 mt-1.5 w-48 rounded-xl shadow-glass-lg border backdrop-blur-xl p-1 z-50 animate-scale-in ${
+                  darkMode ? 'bg-brand-surfDark/95 border-white/5 text-brand-textDark' : 'bg-white/95 border-gray-100 text-brand-textLight'
+                }`}>
+                  {/* Dashboard */}
+                  <a
+                    href={window.DASHBOARD_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/dashboard`}
+                    className="flex items-center gap-2 w-full rounded-lg px-2.5 py-2 text-[11px] font-bold transition-all border border-transparent hover:bg-brand-cyan/10 text-brand-cyan"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span>{t('exit', 'Dashboard')}</span>
+                  </a>
 
-            {/* Analytics toggle */}
-            <button
-              onClick={() => setAnalyticsViewOpen(!analyticsViewOpen)}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all duration-300 ${
-                analyticsViewOpen
-                  ? 'bg-brand-cyan text-white shadow-sm'
-                  : `${darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'}`
-              }`}
-            >
-              <BarChart2 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{analyticsViewOpen ? t('sell', 'លក់ទំនិញ') : t('reports', 'របាយការណ៍')}</span>
-            </button>
+                  {/* Analytics view / Reports toggle */}
+                  <button
+                    onClick={() => {
+                      setAnalyticsViewOpen(!analyticsViewOpen);
+                      setActionMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-2 w-full text-left rounded-lg px-2.5 py-2 text-[11px] font-bold transition-all border border-transparent ${
+                      analyticsViewOpen 
+                        ? 'bg-brand-cyan/20 text-brand-cyan' 
+                        : darkMode ? 'hover:bg-brand-cyan/10 text-brand-textDark' : 'hover:bg-brand-cyan/10 text-brand-textLight'
+                    }`}
+                  >
+                    <BarChart2 className="h-3.5 w-3.5 text-brand-cyan" />
+                    <span>{analyticsViewOpen ? t('sell', 'លក់ទំនិញ') : t('reports', 'របាយការណ៍')}</span>
+                  </button>
 
-            {/* Pending orders */}
-            <button
-              onClick={() => setPendingOrdersOpen(true)}
-              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-all ${
-                darkMode ? 'bg-brand-surfDark hover:bg-brand-surfDarkAlt text-brand-textDark border border-white/5' : 'bg-white hover:bg-gray-50 text-brand-textLight border border-gray-200'
-              }`}
-            >
-              <Clock className="h-3.5 w-3.5 text-brand-violet" />
-              <span className="hidden sm:inline">{t('pending', 'រង់ចាំ')}</span>
-              {pendingOrders.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5 badge-pulse">
-                  {pendingOrders.length}
-                </span>
+                  {/* Pending Orders */}
+                  <button
+                    onClick={() => {
+                      setPendingOrdersOpen(true);
+                      setActionMenuOpen(false);
+                    }}
+                    className={`flex items-center justify-between w-full text-left rounded-lg px-2.5 py-2 text-[11px] font-bold transition-all border border-transparent ${
+                      darkMode ? 'hover:bg-brand-cyan/10 text-brand-textDark' : 'hover:bg-brand-cyan/10 text-brand-textLight'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
+                      <span>{t('pending', 'រង់ចាំ')}</span>
+                    </span>
+                    {pendingOrders.length > 0 && (
+                      <span className="bg-brand-danger text-white rounded-full text-[9px] font-bold px-1.5 py-0.5">
+                        {pendingOrders.length}
+                      </span>
+                    )}
+                  </button>
+
+                  <div className={`my-1 border-t ${darkMode ? 'border-white/5' : 'border-gray-100'}`} />
+
+                  {/* Close Session */}
+                  <a
+                    href={window.CLOSE_SESSION_URL || `${window.BASE_PATH || ''}/${window.SUBDOMAIN || ''}/pos/sessions/close`}
+                    className={`flex items-center gap-2 w-full rounded-lg px-2.5 py-2 text-[11px] font-bold transition-all border border-transparent text-brand-danger ${
+                      darkMode ? 'hover:bg-brand-danger/10' : 'hover:bg-red-50'
+                    }`}
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span>{currentLang === 'km' ? 'បិទវគ្គ' : currentLang === 'zh' ? '关闭班次' : 'Close Session'}</span>
+                  </a>
+                </div>
               )}
-            </button>
+            </div>
 
             {/* Language Switcher Dropdown */}
             <div className="relative" ref={langMenuRef}>
@@ -1169,7 +1207,7 @@ export default function App() {
                     <p className="text-xs text-brand-muted/60 mt-1">{t('no_products_subtitle', 'No products match your search')}</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                  <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
                     {getFilteredProducts().map((prod, idx) => {
                       const isOutOfStock = prod.stock <= 0;
                       const isLowStock = prod.stock > 0 && prod.stock <= 5;
@@ -1230,7 +1268,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
+            <aside className={`lg:h-auto lg:w-[450px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Odoo POS Order Tabs */}
