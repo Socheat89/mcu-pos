@@ -15,12 +15,12 @@ export default {
           warning: '#ec9a29',
           danger: '#e05038',
           bgLight: '#f3f4f6',
-          bgDark: '#ffffff',
+          bgDark: '#080a10', // Dark background
           surfLight: '#FFFFFF',
-          surfDark: '#ffffff',
-          surfDarkAlt: '#f3f4f6',
+          surfDark: '#0e1322', // Dark card surface
+          surfDarkAlt: '#161b2e', // Dark elevated surface
           textLight: '#1f2937',
-          textDark: '#1f2937',
+          textDark: '#f8fafc', // Light text for dark background
           muted: '#4b5563',
         }
       },
