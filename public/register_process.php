@@ -4,11 +4,9 @@ require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Settings.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
-$urlPrefix = mc_base_path();
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: register.php');
+    header('Location: ' . mc_url('public/register.php'));
     exit;
 }
 
@@ -69,13 +67,18 @@ if (!empty($selectedSystems)) {
     }
 }
 
+// For free plans: any payment_status is accepted (trial or paid)
+// For paid plans: only 'paid' is accepted — prevents trial bypass on paid plans
 if (!$isFreeTrial && $paymentStatus !== 'paid') {
     $errors[] = 'Payment is required to create an account';
 }
 
 if (!empty($errors)) {
     $errorMsg = implode(', ', $errors);
-    header("Location: $urlPrefix/public/register.php?error=" . urlencode($errorMsg));
+    // Redirect back to setup.php preserving plan and trial/paid params
+    $planParam = $_POST['plan_code'] ?? $_POST['systems'][0] ?? '';
+    $trialParam = ($paymentStatus === 'trial') ? '&trial=true' : '&paid=true';
+    header("Location: " . mc_url("public/setup.php?plan=" . urlencode($planParam) . $trialParam . "&error=" . urlencode($errorMsg)));
     exit;
 }
 
@@ -84,14 +87,18 @@ try {
     // Check if subdomain is unique
     $existingTenant = $db->fetchOne("SELECT id FROM tenants WHERE subdomain = ?", [$subdomain]);
     if ($existingTenant) {
-        header("Location: register.php?error=" . urlencode('Subdomain already taken'));
+        $planParam = $_POST['plan_code'] ?? $_POST['systems'][0] ?? '';
+        $trialParam = ($paymentStatus === 'trial') ? '&trial=true' : '&paid=true';
+        header("Location: " . mc_url("public/setup.php?plan=" . urlencode($planParam) . $trialParam . "&error=" . urlencode('Subdomain already taken')));
         exit;
     }
 
     // Check if email is unique across tenants
     $existingUser = $db->fetchOne("SELECT id FROM users WHERE email = ?", [$adminEmail]);
     if ($existingUser) {
-        header("Location: register.php?error=" . urlencode('Email already registered'));
+        $planParam = $_POST['plan_code'] ?? $_POST['systems'][0] ?? '';
+        $trialParam = ($paymentStatus === 'trial') ? '&trial=true' : '&paid=true';
+        header("Location: " . mc_url("public/setup.php?plan=" . urlencode($planParam) . $trialParam . "&error=" . urlencode('Email already registered')));
         exit;
     }
 
@@ -143,7 +150,7 @@ try {
     $db->getConnection()->commit();
 
     // Success - redirect to success page with details
-    header("Location: $urlPrefix/public/success.php?subdomain=" . urlencode($subdomain) . "&name=" . urlencode($businessName));
+    header("Location: " . mc_url("public/success.php?subdomain=" . urlencode($subdomain) . "&name=" . urlencode($businessName)));
 
 } catch (Exception $e) {
     // Rollback on error
@@ -152,6 +159,8 @@ try {
     }
 
     error_log('Registration error: ' . $e->getMessage());
-    header("Location: $urlPrefix/public/register.php?error=" . urlencode('Registration failed. Please try again.'));
+    $planParam = $_POST['plan_code'] ?? $_POST['systems'][0] ?? '';
+    $trialParam = ($paymentStatus === 'trial') ? '&trial=true' : '&paid=true';
+    header("Location: " . mc_url("public/setup.php?plan=" . urlencode($planParam) . $trialParam . "&error=" . urlencode('Registration failed. Please try again.')));
 }
 ?>

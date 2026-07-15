@@ -431,6 +431,13 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             </div>
         </div>
 
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-error" style="padding:14px 18px; border-radius:16px; font-size:0.85rem; font-weight:600; margin-bottom:20px; display:flex; align-items:center; gap:8px; background:rgba(244,63,94,0.08); color:#e11d48; border:1px solid rgba(244,63,94,0.2);">
+                <i class="ph-bold ph-warning-circle" style="font-size:18px;"></i>
+                <span><?php echo htmlspecialchars($_GET['error']); ?></span>
+            </div>
+        <?php endif; ?>
+
         <form method="POST" action="<?php echo mc_url('public/register_process.php'); ?>" id="setupForm">
             <div class="stepper">
                 <div class="stepper-item completed">
@@ -514,6 +521,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 
                 <input type="hidden" name="payment_status" value="<?php echo $isTrial ? 'trial' : 'paid'; ?>">
                 <input type="hidden" name="payment_ref" value="<?php echo htmlspecialchars($ref); ?>">
+                <input type="hidden" name="plan_code" value="<?php echo htmlspecialchars($plan); ?>">
                 <div id="hidden_systems">
                     <?php
                         // Pass the actual plan ID from DB
