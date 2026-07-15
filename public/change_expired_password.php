@@ -77,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=2.3">
-    <link rel="icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_asset('images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="auth-page">
@@ -86,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="auth-card auth-card--compact">
             <div class="auth-header">
                 <div class="auth-logo">
-                    <div class="logo-icon" style="background: rgba(239, 68, 68, 0.1); color: #f87171;">
-                        <i class="ph-bold ph-keyholder"></i>
+                    <div class="logo-icon">
+                        <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
                     </div>
                     <span>Mekong CyberUnit</span>
                 </div>

@@ -161,6 +161,179 @@ try {
         echo "'password_changed_at' column added.<br>";
     }
 
+    // 9. Multi-Store: Create 'stores' table
+    echo "Checking 'stores' table...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'stores'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE stores (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            code VARCHAR(50) DEFAULT NULL,
+            address TEXT DEFAULT NULL,
+            phone VARCHAR(50) DEFAULT NULL,
+            email VARCHAR(255) DEFAULT NULL,
+            is_default TINYINT(1) DEFAULT 0,
+            is_active TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            INDEX idx_tenant_id (tenant_id),
+            INDEX idx_is_default (tenant_id, is_default)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        echo "'stores' table created.<br>";
+    }
+
+    // 10. Add store_id to products
+    echo "Checking 'products.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM products LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE products ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'products.store_id' added.<br>";
+    }
+
+    // 11. Add store_id to orders
+    echo "Checking 'orders.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM orders LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE orders ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'orders.store_id' added.<br>";
+    }
+
+    // 12. Add store_id to customers
+    echo "Checking 'customers.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM customers LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE customers ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'customers.store_id' added.<br>";
+    }
+
+    // 13. Add store_id to categories
+    echo "Checking 'categories.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM categories LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE categories ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'categories.store_id' added.<br>";
+    }
+
+    // 14. Add store_id to stock_logs
+    echo "Checking 'stock_logs.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM stock_logs LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE stock_logs ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'stock_logs.store_id' added.<br>";
+    }
+
+    // 15. Add current_store_id to users
+    echo "Checking 'users.current_store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM users LIKE 'current_store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE users ADD COLUMN current_store_id INT DEFAULT NULL AFTER role_id");
+        echo "'users.current_store_id' added.<br>";
+    }
+
+    // 16. Seed default stores for existing tenants
+    echo "Seeding default stores for existing tenants...<br>";
+    $tenants = $db->fetchAll("SELECT id, name FROM tenants WHERE status = 'active'");
+    foreach ($tenants as $tenant) {
+        $existing = $db->fetchOne("SELECT COUNT(*) as cnt FROM stores WHERE tenant_id = ?", [$tenant['id']]);
+        if ($existing['cnt'] == 0) {
+            $db->insert('stores', [
+                'tenant_id'  => $tenant['id'],
+                'name'       => $tenant['name'] . ' Main',
+                'code'       => 'MAIN',
+                'is_default' => 1,
+                'is_active'  => 1,
+            ]);
+            echo "→ Default store created for: {$tenant['name']}<br>";
+        }
+    }
+
+    // 17. Add 'store_limit' to systems (plans)
+    echo "Checking 'systems.store_limit'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM systems LIKE 'store_limit'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE systems ADD COLUMN store_limit INT DEFAULT 1 COMMENT 'Max stores allowed (0=unlimited)' AFTER price");
+        echo "'systems.store_limit' added.<br>";
+    }
+
+    // 18. Add 'cashier_limit' to systems (plans)
+    echo "Checking 'systems.cashier_limit'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM systems LIKE 'cashier_limit'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE systems ADD COLUMN cashier_limit INT DEFAULT 1 COMMENT 'Max cashiers allowed (0=unlimited)' AFTER store_limit");
+        echo "'systems.cashier_limit' added.<br>";
+    }
+
+    // 19. Set default limits for existing plans
+    echo "Setting default plan limits...<br>";
+    $systems = $db->fetchAll("SELECT id, name, price FROM systems");
+    foreach ($systems as $s) {
+        $price = (float)$s['price'];
+        if ($price <= 5) {
+            // $5 plan → 1 store, 1 cashier
+            $db->query("UPDATE systems SET store_limit = 1, cashier_limit = 1 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        } elseif ($price <= 50) {
+            // $30 plan → 5 stores, 5 cashiers
+            $db->query("UPDATE systems SET store_limit = 5, cashier_limit = 5 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        } else {
+            // $99.99+ → unlimited
+            $db->query("UPDATE systems SET store_limit = 0, cashier_limit = 0 WHERE id = ? AND store_limit IS NULL", [$s['id']]);
+        }
+    }
+    echo "Plan limits updated.<br>";
+
+    // 20. Add store_id to pos_sessions
+    echo "Checking 'pos_sessions.store_id'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM pos_sessions LIKE 'store_id'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE pos_sessions ADD COLUMN store_id INT DEFAULT NULL AFTER tenant_id, ADD INDEX idx_store_id (store_id)");
+        echo "'pos_sessions.store_id' added.<br>";
+    }
+
+    // 21. Add 'is_trial' column to tenant_systems
+    echo "Checking 'tenant_systems.is_trial'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM tenant_systems LIKE 'is_trial'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE tenant_systems ADD COLUMN is_trial TINYINT(1) DEFAULT 0 COMMENT '1=trial, 0=paid' AFTER status");
+        echo "'tenant_systems.is_trial' added.<br>";
+    }
+
+    // 22. Seed Free Trial plan
+    echo "Seeding Free Trial plan...<br>";
+    $existing = $db->fetchOne("SELECT id FROM systems WHERE name = 'Free Trial'");
+    if (!$existing) {
+        $trialId = $db->insert('systems', [
+            'name'           => 'Free Trial',
+            'description'    => '7-day free trial with basic POS features. No credit card required.',
+            'price'          => 0.00,
+            'status'         => 'active',
+            'store_limit'    => 1,
+            'cashier_limit'  => 1,
+        ]);
+        echo "→ Free Trial plan created (ID: {$trialId}).<br>";
+
+        // Seed basic POS features for trial
+        $trialFeatures = [
+            ['pos', 'core'],
+            ['pos', 'orders'],
+            ['pos', 'inventory'],
+            ['pos', 'customers'],
+            ['pos', 'settings'],
+        ];
+        foreach ($trialFeatures as $feat) {
+            $db->insert('system_modules', [
+                'system_id'   => $trialId,
+                'module_name' => $feat[0],
+                'feature_key' => $feat[1],
+            ]);
+        }
+        echo "→ Free Trial features seeded.<br>";
+    } else {
+        echo "→ Free Trial plan already exists.<br>";
+    }
+
+
     echo "Migrations completed successfully!";
 } catch (Exception $e) {
     echo "Migration failed: " . $e->getMessage();

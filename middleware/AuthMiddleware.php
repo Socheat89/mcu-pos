@@ -30,6 +30,7 @@ class AuthMiddleware {
             }
         }
 
+
         // Subscription Check (Skip for Super Admin)
         if ($_SESSION['role_level'] < 3) {
             require_once __DIR__ . '/../core/classes/Database.php';

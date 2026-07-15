@@ -37,6 +37,7 @@ $dashboardUrl = $posBase . '/dashboard';
         window.SUBDOMAIN = "<?php echo $subdomain; ?>";
         window.DASHBOARD_URL = "<?php echo htmlspecialchars($dashboardUrl); ?>";
         window.PRODUCTS = <?php echo json_encode(array_map(function($p) {
+
             $image = !empty($p['image'])
                 ? mc_url('uploads/products/' . $p['image'])
                 : mc_url('public/images/no-image.svg');
@@ -86,6 +87,7 @@ $dashboardUrl = $posBase . '/dashboard';
         window.CLOSE_SESSION_URL = "<?php echo $posBase . '/sessions/close'; ?>";
 
         window.RESUME = <?php
+
             $resumePayload = null;
             if (isset($resumeOrder) && $resumeOrder) {
                 $resumePayload = [
@@ -106,5 +108,6 @@ $dashboardUrl = $posBase . '/dashboard';
 <body class="bg-slate-50 text-slate-900 antialiased">
     <div id="root"></div>
     <script type="module" src="<?php echo mc_base_path(); ?>/public/dist/assets/index.js?v=<?php echo time(); ?>"></script>
+
 </body>
 </html>

@@ -340,6 +340,21 @@ function generateKHQRString(data) {
   return str;
 }
 
+// ─── Coffee Icon Placeholder (when no product image) ───────────
+function CoffeeIcon({ name }) {
+  const colors = ['#E76F51', '#F4A261', '#2A9D8F', '#264653', '#8AB17D', '#B5838D'];
+  const idx = (name || '').length % colors.length;
+  const initial = (name || '?')[0].toUpperCase();
+  return (
+    <div
+      className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-black"
+      style={{ background: colors[idx] }}
+    >
+      {initial}
+    </div>
+  );
+}
+
 // ─── Main App Component ────────────────────────────────────────
 export default function App() {
   // Load initial data from window
@@ -397,7 +412,8 @@ export default function App() {
   const [pendingOrdersOpen, setPendingOrdersOpen] = useState(false);
   const [analyticsViewOpen, setAnalyticsViewOpen] = useState(false);
   const [toast, setToast] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null); // { message, onConfirm }
+  const [confirmModal, setConfirmModal] = useState(null);
+  const [mobileTab, setMobileTab] = useState('products'); // 'products' | 'cart' // { message, onConfirm }
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
@@ -1107,7 +1123,7 @@ export default function App() {
           /* ═══ POS Terminal View ═══ */
           <>
             {/* ─── Left: Products ─── */}
-            <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <main className={`lg:flex-1 min-h-0 flex flex-col overflow-hidden ${mobileTab !== 'products' ? 'hidden lg:flex' : 'flex-1'}`}>
               {/* Search + Categories bar */}
               <div className={`flex-shrink-0 px-3 py-3 sm:px-5 space-y-3 border-b ${darkMode ? 'border-white/5' : 'border-gray-200'}`}>
                 {/* Search input */}
@@ -1135,43 +1151,12 @@ export default function App() {
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat === 'All' ? '' : cat)}
-                        className={`px-3.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-300 ${
-                          isActive
-                            ? 'pill-active'
-                            : `${darkMode ? 'bg-brand-surfDark border border-white/5 text-slate-400 hover:text-brand-cyan hover:border-brand-cyan/20' : 'bg-white border border-gray-200 text-gray-500 hover:text-brand-cyan hover:border-brand-cyan/30'}`
-                        }`}
+                        className={`pos-category-pill ${isActive ? 'active' : ''}`}
                       >
                         {cat === 'All' ? t('all', 'ទាំងអស់') : cat}
                       </button>
                     );
                   })}
-                </div>
-
-                <div className="hidden grid-cols-3 gap-2 sm:grid">
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Package className="h-3.5 w-3.5 text-brand-cyan" />
-                      <span>{t('products_label', 'Products')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{visibleProductCount}</div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <AlertTriangle className="h-3.5 w-3.5 text-brand-warning" />
-                      <span>{t('stock_alerts', 'Stock alerts')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">
-                      {lowStockCount}
-                      <span className="ml-1 text-[10px] font-bold text-brand-muted">/ {outOfStockCount} {t('out', 'out')}</span>
-                    </div>
-                  </div>
-                  <div className={`rounded-lg border px-3 py-2 ${darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'}`}>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-muted">
-                      <Clock className="h-3.5 w-3.5 text-brand-violet" />
-                      <span>{t('pending', 'Pending')}</span>
-                    </div>
-                    <div className="mt-1 text-sm font-black">{pendingOrders.length}</div>
-                  </div>
                 </div>
               </div>
 
@@ -1194,63 +1179,47 @@ export default function App() {
                         <div
                           key={prod.id}
                           onClick={() => addToCart(prod)}
-                          className={`glass-card rounded-2xl overflow-hidden cursor-pointer animate-slide-up group transition-all duration-300 ${
-                            isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''
-                          } ${inCartItem ? 'ring-2 ring-brand-cyan shadow-glow-cyan' : ''}`}
+                          className={`pos-product-card overflow-hidden cursor-pointer animate-slide-up group ${ 
+                            isOutOfStock ? 'opacity-50 pointer-events-none' : ''
+                          } ${inCartItem ? 'ring-2 ring-[#E76F51] ring-offset-2' : ''}`}
                           style={{ animationDelay: `${idx * 20}ms`, animationFillMode: 'both' }}
                         >
                           {/* Image area */}
-                          <div className={`aspect-[4/3] relative overflow-hidden flex items-center justify-center ${
-                            darkMode ? 'bg-brand-bgDark/40' : 'bg-slate-50'
-                          }`}>
+                          <div className="pos-product-img">
                             {prod.image ? (
-                              <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                              <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             ) : (
-                              <Package className={`h-9 w-9 transition-transform duration-500 group-hover:scale-110 ${darkMode ? 'text-slate-700' : 'text-slate-300'}`} />
-                            )}
-
-                            {/* Stock badge with pulsing dot */}
-                            <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
-                              isOutOfStock ? 'stock-out bg-brand-danger/10 text-brand-danger' : 
-                              isLowStock ? 'stock-low bg-brand-warning/10 text-brand-warning' : 
-                              'stock-ok bg-brand-success/10 text-brand-success'
-                            }`}>
-                              <span className={`h-1.5 w-1.5 rounded-full ${
-                                isOutOfStock ? 'bg-brand-danger' : 
-                                isLowStock ? 'bg-brand-warning animate-pulse' : 
-                                'bg-brand-success'
-                              }`}></span>
-                              {isOutOfStock ? t('out_of_stock', 'អស់') : isLowStock ? `${prod.stock}` : `${prod.stock}`}
-                            </span>
-
-                            {/* In-cart quantity overlay */}
-                            {inCartItem && (
-                              <div className="product-overlay" style={{ opacity: 1 }}>
-                                <span className="bg-brand-cyan text-white rounded-full px-3 py-1 text-xs font-black shadow-sm">
-                                  ×{inCartItem.quantity}
-                                </span>
+                              <div className="w-full h-full flex items-center justify-center bg-[#FFF8F0]">
+                                <CoffeeIcon name={prod.name} />
                               </div>
                             )}
 
-                            {/* Hover overlay */}
-                            {!inCartItem && !isOutOfStock && (
-                              <div className="product-overlay bg-black/5 dark:bg-black/20">
-                                <div className="h-8 w-8 rounded-full bg-brand-cyan flex items-center justify-center shadow-sm transform scale-90 group-hover:scale-100 transition-transform duration-200">
-                                  <Plus className="h-4.5 w-4.5 text-white" />
-                                </div>
+                            {/* Price badge - floating */}
+                            <span className="pos-price-badge">
+                              ${prod.price.toFixed(2)}
+                            </span>
+
+                            {/* Stock dot */}
+                            <span className={`pos-stock-dot ${isOutOfStock ? 'bg-red-500' : isLowStock ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                              title={`${prod.stock} in stock`}>
+                            </span>
+
+                            {/* In-cart quantity badge */}
+                            {inCartItem && (
+                              <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                <span className="bg-[#E76F51] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-lg">
+                                  {inCartItem.quantity}
+                                </span>
                               </div>
                             )}
                           </div>
 
                           {/* Info */}
-                          <div className="p-3.5 space-y-1.5">
-                            <h4 className="text-xs font-bold truncate leading-tight text-slate-800 dark:text-slate-200 group-hover:text-brand-cyan transition-colors">{prod.name}</h4>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-black text-brand-cyan">${prod.price.toFixed(2)}</span>
-                              <span className="text-[9px] font-bold text-brand-muted truncate max-w-[70px] uppercase bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
-                                {prod.sku || prod.category}
-                              </span>
-                            </div>
+                          <div className="pos-product-info">
+                            <h4 className="pos-product-name">{prod.name}</h4>
+                            {prod.sku && (
+                              <span className="pos-product-sku">{prod.sku}</span>
+                            )}
                           </div>
                         </div>
                       );
@@ -1261,7 +1230,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`h-[44vh] w-full flex-shrink-0 flex flex-col border-t lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 ${
+            <aside className={`lg:h-auto lg:w-[360px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Odoo POS Order Tabs */}
@@ -1333,36 +1302,27 @@ export default function App() {
                     <div
                       key={item.product.id}
                       onClick={() => handleSelectCartItem(item.product.id)}
-                      className={`cart-item flex flex-col gap-1 p-2 rounded cursor-pointer transition-all border ${
+                      className={`pos-cart-item cursor-pointer transition-all ${
                         item.product.id === activeProductId
-                          ? 'bg-brand-cyan/5 border-brand-cyan ring-1 ring-brand-cyan shadow-sm'
-                          : 'border-transparent hover:bg-gray-50/50'
+                          ? 'bg-[#FFF8F0] border-l-2 border-l-[#E76F51]'
+                          : ''
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="font-bold text-[11px] truncate text-slate-800">{item.product.name}</div>
-                        <div className="font-black text-[11px] text-brand-cyan">${getItemTotal(item).toFixed(2)}</div>
-                      </div>
-                      
-                      <div className="flex flex-col gap-0.5 text-[9px] text-brand-muted font-semibold pl-2 border-l border-brand-cyan/30">
-                        <div>
-                          {item.quantity} {item.quantity === 1 ? 'Unit' : 'Units'} at{' '}
-                          {item.customPrice !== undefined ? (
-                            <span>
-                              <span className="line-through text-gray-400 mr-1">${item.product.price.toFixed(2)}</span>
-                              <span className="text-brand-cyan font-bold">${item.customPrice.toFixed(2)}</span>
-                            </span>
-                          ) : (
-                            `$${item.product.price.toFixed(2)}`
-                          )}{' '}
-                          / Unit
-                        </div>
-                        {item.discount > 0 && (
-                          <div className="text-brand-danger font-bold">
-                            With a {item.discount}% discount
-                          </div>
+                      <div className="pos-cart-item-img">
+                        {item.product.image ? (
+                          <img src={item.product.image} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <CoffeeIcon name={item.product.name} />
                         )}
                       </div>
+                      <div className="pos-cart-item-info">
+                        <div className="pos-cart-item-name">{item.product.name}</div>
+                        <div className="pos-cart-item-price">
+                          {item.quantity}× ${item.product.price.toFixed(2)}
+                          {item.discount > 0 && <span className="text-[#E76F51] ml-1">(-{item.discount}%)</span>}
+                        </div>
+                      </div>
+                      <div className="font-black text-sm text-[#E76F51]">${getItemTotal(item).toFixed(2)}</div>
                     </div>
                   ))
                 )}
@@ -1437,11 +1397,11 @@ export default function App() {
                           }}
                           className={`h-9 rounded text-center text-xs font-black transition-all border ${
                             isSelectedMode
-                              ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
+                              ? 'bg-[#E76F51] border-[#E76F51] text-white shadow-sm'
                               : btn.isMode
                               ? 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
                               : btn.val === 'backspace'
-                              ? 'bg-gray-100 border-gray-200 text-brand-danger hover:bg-red-50'
+                              ? 'bg-gray-100 border-gray-200 text-[#E76F51] hover:bg-red-50'
                               : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-100'
                           }`}
                         >
@@ -1470,7 +1430,7 @@ export default function App() {
                           setPaymentModalOpen(true);
                         }
                       }}
-                      className="flex-1 bg-brand-success text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed rounded flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
+                      className="flex-1 bg-[#E76F51] text-white hover:bg-[#e05a3a] disabled:opacity-40 disabled:cursor-not-allowed rounded flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
                     >
                       <Zap className="h-4 w-4" />
                       <span className="text-[10px] font-black tracking-wider uppercase">
@@ -1494,6 +1454,38 @@ export default function App() {
                 </div>
               </div>
             </aside>
+
+            {/* 📱 Mobile Bottom Tab Bar */}
+            <div className="lg:hidden flex-shrink-0 flex border-t border-gray-200 bg-white">
+              <button
+                onClick={() => setMobileTab('products')}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all ${
+                  mobileTab === 'products' ? 'text-[#E76F51] bg-[#FFF8F0]' : 'text-gray-400'
+                }`}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="text-[10px] font-bold">{t('products_label', 'Products')}</span>
+              </button>
+
+              <button
+                onClick={() => setMobileTab('cart')}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all relative ${
+                  mobileTab === 'cart' ? 'text-[#E76F51] bg-[#FFF8F0]' : 'text-gray-400'
+                }`}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                </svg>
+                <span className="text-[10px] font-bold">{t('cart', 'Cart')} ({cartItemCount})</span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-0.5 right-1/4 bg-[#E76F51] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -1697,9 +1689,9 @@ export default function App() {
                           { val: 20.00, label: '$20' },
                           { val: 50.00, label: '$50' },
                           { val: 100.00, label: '$100' },
-                          { val: 2.50, label: '10K ៛' },
-                          { val: 5.00, label: '20K ៛' },
-                          { val: 12.50, label: '50K ៛' }
+                          { val: 2.50, label: '10K' },
+                          { val: 5.00, label: '20K' },
+                          { val: 12.50, label: '50K' }
                         ].map(bill => (
                           <button
                             key={bill.label}

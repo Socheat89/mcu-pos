@@ -1,15 +1,23 @@
 <?php
 // public/setup.php
 require_once __DIR__ . '/../core/helpers/url.php';
+require_once __DIR__ . '/../core/classes/Database.php';
 
 $plan = $_GET['plan'] ?? 'starter';
 $ref = $_GET['ref'] ?? '';
 $paid = $_GET['paid'] ?? 'false';
+$trial = $_GET['trial'] ?? 'false';
 
-if ($paid !== 'true') {
+if ($paid !== 'true' && $trial !== 'true') {
     header('Location: ' . mc_url('public/register.php?error=' . urlencode('Payment verification required to access setup.')));
     exit;
 }
+
+// Fetch plan ID from DB by plan name/code
+$db = Database::getInstance();
+$planSystem = $db->fetchOne("SELECT id, name, price FROM systems WHERE (name = ? OR REPLACE(LOWER(name), ' ', '_') = ?) AND status = 'active'", [$plan, $plan]);
+$planId = $planSystem ? $planSystem['id'] : 1;
+$isTrial = ($trial === 'true');
 
 $displayHost = $_SERVER['HTTP_HOST'] ?? 'mekongcyberunit.app';
 $displayHost = preg_replace('/^www\./', '', $displayHost);
@@ -27,13 +35,14 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
-    <link rel="shortcut icon" href="<?php echo mc_url('public/images/logo.png'); ?>" type="image/png">
+    <link rel="icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
+    <link rel="shortcut icon" href="<?php echo mc_url('public/images/my-logo.jpg'); ?>" type="image/jpeg">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -41,10 +50,11 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     
 </head>
 <body class="auth-page">
+
     <div class="page-loader" id="pageLoader">
         <div class="loader-card">
             <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
+                <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
             </div>
             <p class="loader-title">Mekong CyberUnit</p>
             <p class="loader-caption">Provisioning workspace</p>
@@ -57,18 +67,25 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             <div class="auth-header">
                 <a href="/" class="auth-logo">
                     <div class="logo-icon">
-                        <i class="ph-bold ph-cube"></i>
+                        <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
                     </div>
                     <span>Mekong CyberUnit</span>
                 </a>
+                <?php if ($isTrial): ?>
+                <div class="badge-success" style="background: #dbeafe; color: #1e40af; border-color: #bfdbfe;">
+                    <i class="ph-bold ph-gift"></i> 7-Day Free Trial
+                </div>
+                <?php else: ?>
                 <div class="badge-success">
                     <i class="ph-bold ph-check-circle"></i> Payment Confirmed
                 </div>
+                <?php endif; ?>
                 <h2>Business Information</h2>
                 <p>Complete your setup to activate your <span class="link-strong" style="text-transform: capitalize;">
                     <?php echo htmlspecialchars($plan); ?>
                 </span> workspace</p>
             </div>
+
 
         <div class="system-preview">
             <div class="system-icon-mini">
@@ -154,17 +171,12 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                     <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your secure password">
                 </div>
                 
-                <input type="hidden" name="payment_status" value="paid">
+                <input type="hidden" name="payment_status" value="<?php echo $isTrial ? 'trial' : 'paid'; ?>">
                 <input type="hidden" name="payment_ref" value="<?php echo htmlspecialchars($ref); ?>">
                 <div id="hidden_systems">
                     <?php
-                        // Pre-populate systems based on plan
-                        $systems = [1];
-                        if ($plan === 'professional') $systems = [1, 2];
-                        if ($plan === 'enterprise') $systems = [1, 2, 3];
-                        foreach($systems as $id) {
-                            echo '<input type="hidden" name="systems[]" value="'.$id.'">';
-                        }
+                        // Pass the actual plan ID from DB
+                        echo '<input type="hidden" name="systems[]" value="' . $planId . '">';
                     ?>
                 </div>
             </div>
@@ -179,6 +191,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <!-- Creation Loading Modal -->
     <div id="creationModal" class="modal">
         <div class="modal-content modal-content--sm modal-content--center">
+
             <div id="creationSpinner" style="margin-bottom: 2rem;">
                 <i class="ph-bold ph-spinner ph-spin" style="font-size: 4rem; color: var(--primary);"></i>
             </div>

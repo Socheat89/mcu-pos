@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo __('inventory'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+
      <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +20,7 @@
         .upload-zone:hover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
         .upload-zone.dragover { border-color: var(--pos-primary); background: var(--pos-primary-light); }
         .preview-img { max-width: 100%; max-height: 280px; border-radius: var(--pos-radius-lg); margin-top: 20px; box-shadow: var(--pos-shadow-lg); border: 4px solid var(--pos-border); }
+
     </style>
 </head>
 <body class="pos-app">
@@ -27,6 +29,7 @@
     <div class="fade-in">
         <div style="text-align: center; margin-bottom: 40px;">
             <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; background: var(--pos-primary-light); padding: 8px 16px; border-radius: var(--pos-radius); color: var(--pos-primary); border: 1px solid rgba(var(--pos-primary-rgb), 0.2); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+
                 <i class="fas fa-box-open"></i> <?php echo __('inventory_control'); ?>
             </div>
             <h1 style="font-size: 36px; font-weight: 900; color: var(--pos-text); margin: 0;"><?php echo isset($product) ? __('record_refinement') : __('new_product_entry'); ?></h1>
@@ -105,6 +108,7 @@
                             <input type="file" id="image-input" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
                             <div id="upload-placeholder" style="<?php echo (isset($product) && $product['image']) ? 'display:none;' : ''; ?>">
                                 <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; box-shadow: var(--pos-shadow-sm);">
+
                                     <i class="fas fa-file-export" style="font-size: 24px; color: var(--pos-primary);"></i>
                                 </div>
                                 <div style="font-weight: 800; color: var(--pos-text); font-size: 15px;"><?php echo __('click_select_drag_msg'); ?></div>

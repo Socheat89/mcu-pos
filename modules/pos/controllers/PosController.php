@@ -32,6 +32,7 @@ class PosController {
             exit;
         }
 
+
         $products = Product::getAll();
         $customers = $this->getCustomers();
         $pendingMenuOrders = Order::getPending($tenantId);

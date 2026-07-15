@@ -2,6 +2,7 @@
 $tenant = class_exists('Tenant') ? (Tenant::getCurrent() ?? []) : [];
 $tenantName = is_array($tenant) && !empty($tenant['name']) ? $tenant['name'] : 'Tenant';
 $tenantSlug  = is_array($tenant) && !empty($tenant['subdomain']) ? $tenant['subdomain'] : '';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +10,7 @@ $tenantSlug  = is_array($tenant) && !empty($tenant['subdomain']) ? $tenant['subd
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo __('qr_menu'); ?> - <?php echo htmlspecialchars($tenantName); ?></title>
+
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,6 +199,7 @@ $tenantSlug  = is_array($tenant) && !empty($tenant['subdomain']) ? $tenant['subd
             .table-qr-card { border: 1px solid #ccc; break-inside: avoid; }
             .tab-bar, .table-controls, .menu-hero, .pos-sidebar, .pos-topbar,
             .info-banner, .btn-sm-icon { display: none !important; }
+
         }
     </style>
 </head>
@@ -259,6 +262,7 @@ $tenantSlug  = is_array($tenant) && !empty($tenant['subdomain']) ? $tenant['subd
                             <i class="fas fa-external-link-alt"></i> <?php echo __('open_menu_new_tab'); ?>
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -418,6 +422,7 @@ $tenantSlug  = is_array($tenant) && !empty($tenant['subdomain']) ? $tenant['subd
 
         // Init
         renderTableQRs();
+
     </script>
 
     <?php include __DIR__ . '/partials/footer.php'; ?>

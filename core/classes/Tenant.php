@@ -152,6 +152,53 @@ class Tenant {
         return $level;
     }
 
+    /**
+     * Get maximum number of stores allowed by the tenant's active plan
+     * Returns 0 for unlimited
+     */
+    public static function getStoreLimit() {
+        if (!self::$currentTenant) return 1;
+
+        self::checkExpirations();
+
+        $db = Database::getInstance();
+        $result = $db->fetchOne(
+            "SELECT MAX(s.store_limit) as max_limit FROM tenant_systems ts 
+             JOIN systems s ON ts.system_id = s.id 
+             WHERE ts.tenant_id = ? AND ts.status = 'active' 
+             AND (ts.expires_at IS NULL OR ts.expires_at > NOW())",
+            [self::getId()]
+        );
+
+        $limit = $result['max_limit'] ?? null;
+        // NULL means no plan has this column set yet, default to 1
+        if ($limit === null) return 1;
+        return (int)$limit;
+    }
+
+    /**
+     * Get maximum number of cashiers allowed by the tenant's active plan
+     * Returns 0 for unlimited
+     */
+    public static function getCashierLimit() {
+        if (!self::$currentTenant) return 1;
+
+        self::checkExpirations();
+
+        $db = Database::getInstance();
+        $result = $db->fetchOne(
+            "SELECT MAX(s.cashier_limit) as max_limit FROM tenant_systems ts 
+             JOIN systems s ON ts.system_id = s.id 
+             WHERE ts.tenant_id = ? AND ts.status = 'active' 
+             AND (ts.expires_at IS NULL OR ts.expires_at > NOW())",
+            [self::getId()]
+        );
+
+        $limit = $result['max_limit'] ?? null;
+        if ($limit === null) return 1;
+        return (int)$limit;
+    }
+
     private static function checkExpirations() {
         if (!self::$currentTenant) return;
         

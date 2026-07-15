@@ -19,6 +19,7 @@ class SettingsController {
             die('No permission');
         }
 
+
         if (class_exists('Tenant') && Tenant::getPosLevel() < 1) {
              die('POS access required.');
         }
@@ -68,6 +69,7 @@ class SettingsController {
         if (!Auth::isTenantAdmin()) {
             die('No permission');
         }
+
 
         if (class_exists('Tenant') && Tenant::getPosLevel() < 1) {
              die('POS access required.');

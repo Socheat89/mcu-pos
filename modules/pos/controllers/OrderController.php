@@ -107,6 +107,7 @@ class OrderController {
         // Update order status to completed and set session_id
         $result = $db->update('orders', ['status' => 'completed', 'session_id' => $activeSession['id']], 'id = ? AND tenant_id = ? AND status = ?', [$id, $tenantId, 'pending']);
 
+
         if ($result) {
             $prefix = mc_base_path();
             header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/orders");
@@ -125,6 +126,7 @@ class OrderController {
         if (!$activeSession) {
             die('Order creation failed: No active POS session. Please open a session first.');
         }
+
 
         // Start transaction
         $db->getConnection()->beginTransaction();
@@ -191,6 +193,7 @@ class OrderController {
                     }
 
                     $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
@@ -221,6 +224,7 @@ class OrderController {
                     'total' => $total,
                     'status' => $status,
                     'session_id' => $activeSession['id']
+
                 ], 'id = ? AND tenant_id = ?', [$resumeOrderId, $tenantId]);
 
                 // Keep payments clean
@@ -254,6 +258,7 @@ class OrderController {
                 'total' => 0, // Calculate later
                 'status' => $status,
                 'session_id' => $activeSession['id']
+
             ];
 
             $orderId = $db->insert('orders', $orderData);
@@ -278,6 +283,7 @@ class OrderController {
                     }
                 }
                 $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [

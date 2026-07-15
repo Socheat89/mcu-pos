@@ -12,6 +12,7 @@ return [
     'reports' => '报告',
     'menu' => '数字化菜单',
     'cashiers' => '收银员',
+
     'language' => '语言',
     'english' => '英语',
     'khmer' => '高棉语',
@@ -34,6 +35,7 @@ return [
     'description' => '描述',
     'category' => '类别',
     'inventory' => '库存',
+
     'stock' => '库存',
     'low_stock' => '低库存',
     'out_of_stock' => '缺货',
@@ -140,6 +142,7 @@ return [
     'live_preview' => '实时预览',
     'on_hold' => '挂单',
     'inventory' => '库存',
+
     'analytics' => '分析',
     'digital_menu' => '数字菜单',
     'cyber_unit_pos' => 'Cyber Unit POS',
@@ -163,6 +166,7 @@ return [
     'start_adding_products' => '从添加您的第一个产品开始。',
     'in_stock_msg' => ':count 正在库存',
     'confirm_delete_product' => '您确定要删除此产品吗？',
+
     'transaction_history' => '交易历史',
     'orders_management_msg' => '查看并管理所有订单记录、付款和发票。',
     'open_terminal' => '打开终端',
@@ -374,4 +378,46 @@ return [
     'qr_table'             => '桌',
     'qr_scan_hint'         => '请用手机摄像头扫描此二维码以查看菜单。',
     'qr_table_auto_detected' => '桌号已通过 QR 码自动检测',
+
+    // Multi-Store
+    'manage_stores'           => '管理门店',
+    'manage_stores_desc'      => '管理您的门店分支和位置。',
+    'add_store'               => '添加门店',
+    'add_new_store'           => '添加新门店',
+    'edit_store'              => '编辑门店',
+    'store_name'              => '门店名称',
+    'store_code'              => '门店代码',
+    'store_name_required'     => '门店名称为必填项。',
+    'store_name_placeholder'  => '例如：总店，堆谷分店',
+    'store_address_placeholder' => '门店地址...',
+    'save_store'              => '保存门店',
+    'default_store'           => '默认',
+    'current_store'           => '当前门店',
+    'switch_to'               => '切换',
+    'set_as_default_store'    => '设为默认门店',
+    'confirm_delete_store'    => '确定要删除此门店吗？此操作无法撤销。',
+    'invalid_store'           => '无效的门店。',
+    'no_permission'           => '您没有执行此操作的权限。',
+    'stores_used'             => '已使用门店。',
+    'store_limit_reached'     => '门店数量已达上限！请升级计划以添加更多门店。',
+    'cashier_limit_reached'   => '收银员数量已达上限！请升级计划以添加更多收银员。',
+    'assign_store'            => '分配门店',
+    'all_stores'              => '所有门店',
+    'filter_by_store'         => '按门店筛选',
+    'sales_by_store'          => '各门店销售',
+    'products_sold_by_store'  => '各门店售出产品',
+    'select_store'            => '选择门店',
+    'store'                   => '门店',
+    'edit_cashier'            => '编辑收银员',
+
+    // Landing Page
+    'sign_in'                 => '登录',
+    'get_started'             => '开始使用',
+    'why_mcu'                 => '为什么选MCU',
+    'features'                => '功能',
+    'how_it_works'            => '如何使用',
+    'pricing'                 => '价格',
+    'faq'                     => '常见问题',
+    'contact'                 => '联系我们',
+
 ];

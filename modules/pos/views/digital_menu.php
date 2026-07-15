@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../core/helpers/url.php';
 $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table'])) : '';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -609,6 +610,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             to   { opacity: 0; }
         }
 
+
     </style>
 </head>
 <body>
@@ -625,6 +627,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             <?php echo __('qr_table'); ?> <?php echo $prefilledTable; ?>
         </div>
     <?php endif; ?>
+
 </header>
 
 <div class="container">
@@ -702,6 +705,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
     </div>
 </div>
 
+
 <div class="cart-floating-btn" id="cartBtn" onclick="toggleCart()">
     <i class="fas fa-shopping-basket"></i>
     <div class="cart-badge" id="cartCount">0</div>
@@ -737,6 +741,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                 <?php else: ?>
                     <input type="text" id="tableNumber" class="form-control" placeholder="<?php echo __('table_number_placeholder'); ?>">
                 <?php endif; ?>
+
             </div>
             <div class="form-group">
                 <label><?php echo __('your_name_optional'); ?></label>
@@ -882,6 +887,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                 '<?php echo __('enter_table_msg'); ?>',
                 '<?php echo __('ok'); ?>'
             );
+
             return;
         }
 
@@ -929,6 +935,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                 '<?php echo __('something_wrong_msg'); ?>',
                 '<?php echo __('ok'); ?>'
             );
+
         } finally {
             btn.disabled = false;
             btn.innerText = '<?php echo __('place_order_now'); ?>';
@@ -988,6 +995,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             }
         }, 270);
     }
+
 
 </script>
 

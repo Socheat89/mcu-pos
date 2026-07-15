@@ -60,6 +60,7 @@ foreach ($labels as $ym) {
             overflow: hidden;
             border: 1px solid var(--pos-border);
             box-shadow: var(--pos-shadow-lg), var(--pos-shadow-glow);
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -107,6 +108,7 @@ foreach ($labels as $ym) {
         .subscription-empty-hint { font-size: 12px; color: var(--pos-text-muted); font-weight: 600; }
         .subscription-cta { padding: 10px 24px; font-size: 13px; font-weight: 700; border-radius: 999px; }
         .subscription-manage-btn { width: 100%; justify-content: center; border-radius: 14px; font-weight: 700; padding: 12px 24px; }
+
     </style>
 </head>
 <body class="pos-app">
@@ -140,6 +142,7 @@ foreach ($labels as $ym) {
                         </a>
                     <?php endif; ?>
                     <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline" style="padding: 10px 24px; font-weight: 700; font-size: 13px; border-radius: var(--pos-radius); background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: white; text-decoration: none;">
+
                         <i class="fas fa-chart-pie"></i> <?php echo __('analytical_overview'); ?>
                     </a>
                 </div>
@@ -167,6 +170,7 @@ foreach ($labels as $ym) {
                 <span class="k"><?php echo __('low_stock'); ?></span>
                 <p class="v"><?php echo (int)($stats['low_stock_count'] ?? 0); ?></p>
                 <div class="chip" style="background: #fef2f2; color: var(--pos-danger);"><i class="fas fa-bolt"></i></div>
+
             </div>
         </div>
 
@@ -185,6 +189,7 @@ foreach ($labels as $ym) {
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <h3 class="pos-card-title"><?php echo __('latest_transactions'); ?></h3>
                         <a href="<?php echo htmlspecialchars($posUrl('orders')); ?>" class="btn btn-outline" style="padding: 8px 16px; font-size: 12px; border-radius: var(--pos-radius);"><?php echo __('review_ledger'); ?></a>
+
                     </div>
                     <div class="pos-table-container shadow-none" style="border: none;">
                         <table class="pos-table">
@@ -207,6 +212,7 @@ foreach ($labels as $ym) {
                                         <td style="font-weight: 700;">#<?php echo (int)$o['id']; ?></td>
                                         <td style="font-weight: 600; color: var(--pos-text);"><?php echo htmlspecialchars($o['customer_name'] ?? __('walk_in_client')); ?></td>
                                         <td style="font-weight: 800; color: var(--pos-primary);"><?php echo htmlspecialchars($fmtMoney($o['total'] ?? 0)); ?></td>
+
                                         <td><span class="badge <?php echo $badg; ?>"><?php echo __($o['status'] ?? 'pending'); ?></span></td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -221,6 +227,7 @@ foreach ($labels as $ym) {
             <div style="display: grid; gap: 24px; align-content: start;">
                 <!-- Subscription Intelligence -->
                 <div class="pos-card pad subscription-card" style="border-radius: var(--pos-radius-lg); padding: 24px;">
+
                     <div class="subscription-header">
                         <div>
                             <h3 class="pos-card-title" style="margin-bottom: 4px;"><?php echo __('subscription_overview'); ?></h3>
@@ -239,6 +246,7 @@ foreach ($labels as $ym) {
                             <p style="font-weight: 800; color: var(--pos-text);"><?php echo __('no_subscriptions'); ?></p>
                             <p class="subscription-empty-hint"><?php echo __('subscription_empty_hint'); ?></p>
                             <a href="<?php echo htmlspecialchars($subscriptionPricingUrl); ?>" class="btn btn-primary subscription-cta" style="border-radius: var(--pos-radius);">
+
                                 <i class="fas fa-rocket"></i> <?php echo __('subscribe_now'); ?>
                             </a>
                         </div>
@@ -270,6 +278,7 @@ foreach ($labels as $ym) {
                                 $isExpired = !empty($plan['is_expired']);
                             ?>
                                 <div class="subscription-plan" style="border-radius: var(--pos-radius); padding: 14px;">
+
                                     <div class="plan-row">
                                         <div>
                                             <p class="plan-name"><?php echo htmlspecialchars($plan['system_name'] ?? $plan['name'] ?? ''); ?></p>
@@ -283,6 +292,7 @@ foreach ($labels as $ym) {
                                             <strong><?php echo htmlspecialchars($expiresLabel); ?></strong>
                                         </div>
                                         <div class="stat" style="border-radius: 6px; padding: 10px;">
+
                                             <span><?php echo __('days_remaining'); ?></span>
                                             <?php if ($daysRemaining === null): ?>
                                                 <strong>—</strong>
@@ -297,6 +307,7 @@ foreach ($labels as $ym) {
                             <?php endforeach; ?>
                         </div>
                         <a href="<?php echo htmlspecialchars($subscriptionManageUrl); ?>" class="btn btn-outline subscription-manage-btn" style="border-radius: var(--pos-radius);">
+
                             <i class="fas fa-credit-card"></i> <?php echo __('manage_subscription'); ?>
                         </a>
                     <?php endif; ?>
@@ -314,6 +325,7 @@ foreach ($labels as $ym) {
                                 <div>
                                     <p style="font-weight: 800; color: var(--pos-success); margin: 0; font-size: 13px;"><?php echo __('operational_health_optimal'); ?></p>
                                     <p style="font-size: 11px; color: var(--pos-text-muted); margin: 4px 0 0; font-weight: 500;"><?php echo __('inventory_stabilized'); ?></p>
+
                                 </div>
                             </div>
                         <?php else: ?>
@@ -327,6 +339,7 @@ foreach ($labels as $ym) {
                                         <p style="font-size: 11px; color: var(--pos-danger); margin: 4px 0 0; font-weight: 600;"><?php echo __('inventory_deficit'); ?>: <?php echo (int)$p['stock_quantity']; ?> <?php echo __('units_remaining'); ?></p>
                                     </div>
                                     <a href="<?php echo htmlspecialchars($posUrl('products/' . $p['id'] . '/edit')); ?>" class="pos-icon-btn" style="width: 30px; height: 30px; border-radius: 6px;"><i class="fas fa-arrow-right" style="font-size: 12px;"></i></a>
+
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -354,6 +367,7 @@ foreach ($labels as $ym) {
                                         <p style="font-size: 11px; color: var(--pos-text-muted); font-weight: 700; text-transform: uppercase; margin-top: 2px;"><?php echo (int)$tp['qty']; ?> <?php echo __('acquisitions_recorded'); ?></p>
                                     </div>
                                     <div style="font-weight: 800; color: var(--pos-primary); font-size: 14px; font-family: 'Inter', sans-serif;">$<?php echo number_format($tp['qty'] * 24.5, 2); ?></div>
+
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -413,6 +427,7 @@ foreach ($labels as $ym) {
                             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
                             gradient.addColorStop(0, 'rgba(113, 75, 103, 0.12)');
                             gradient.addColorStop(1, 'rgba(113, 75, 103, 0)');
+
                             return gradient;
                         }
                     }]
@@ -448,6 +463,7 @@ foreach ($labels as $ym) {
                                 callback: function(value) { return '$' + value; }
                             },
                             border: { display: false }
+
                         }
                     }
                 }

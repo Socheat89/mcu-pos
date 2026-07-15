@@ -24,7 +24,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div class="pos-title">
                 <h1><?php echo __('session_list'); ?></h1>
-                <p><?php echo __('sessions'); ?> - Odoo POS style cash control and sales tracking</p>
+                <p><?php echo __('sessions'); ?> — <?php echo __('cash_control'); ?> & sales tracking</p>
             </div>
             
             <div style="display: flex; gap: 12px;">
@@ -44,9 +44,26 @@
         </div>
 
         <?php if (isset($_SESSION['success_msg'])): ?>
-            <div style="padding: 16px; border-radius: var(--pos-radius); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #86efac; font-weight: 700; margin-bottom: 24px;">
+            <div style="padding: 16px; border-radius: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #86efac; font-weight: 700; margin-bottom: 24px;">
                 <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($_SESSION['success_msg']); unset($_SESSION['success_msg']); ?>
             </div>
+        <?php endif; ?>
+
+        <!-- 🔽 Store Filter -->
+        <?php if (!empty($allStores) && count($allStores) > 1): ?>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:8px 16px;background:var(--pos-card);border:1px solid var(--pos-border);border-radius:14px;">
+            <i class="fas fa-store-alt" style="color:var(--pos-primary);"></i>
+            <span style="font-weight:700;font-size:13px;color:var(--pos-text-muted);"><?php echo __('filter_by_store'); ?>:</span>
+            <select onchange="filterStore(this.value)" style="padding:10px 14px;border-radius:10px;border:1px solid var(--pos-border);background:#fff;font-weight:700;font-size:13px;color:var(--pos-text);outline:none;cursor:pointer;">
+                <option value="0" <?php echo ($storeId ?? 0) == 0 ? 'selected' : ''; ?>><?php echo __('all_stores'); ?></option>
+                <?php foreach ($allStores as $st): ?>
+                    <option value="<?php echo $st['id']; ?>" <?php echo ($storeId ?? 0) == $st['id'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <script>function filterStore(id){window.location.href='?store_id='+id;}</script>
+        </div>
         <?php endif; ?>
 
         <div class="search-container">
@@ -58,7 +75,8 @@
             <table class="pos-table" id="sessionsTable">
                 <thead>
                     <tr>
-                        <th style="width: 100px;">ID</th>
+                        <th style="width: 80px;">ID</th>
+                        <th><?php echo __('store'); ?></th>
                         <th><?php echo __('opened_by'); ?></th>
                         <th><?php echo __('opened_at'); ?></th>
                         <th><?php echo __('closed_at'); ?></th>
@@ -72,7 +90,7 @@
                 <tbody>
                     <?php if (empty($sessions)): ?>
                         <tr>
-                            <td colspan="9" style="padding: 100px; text-align: center;">
+                            <td colspan="10" style="padding: 100px; text-align: center;">
                                 <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
                                     <i class="fas fa-history" style="font-size: 32px; color: var(--pos-text-dim);"></i>
                                 </div>
@@ -87,6 +105,16 @@
                         ?>
                             <tr class="session-row">
                                 <td style="font-weight: 800; color: var(--pos-primary);">#<?php echo $s['id']; ?></td>
+                                <td>
+                                    <span style="font-size:12px;font-weight:700;color:var(--pos-text);">
+                                        <?php if (!empty($s['store_name'])): ?>
+                                            <span style="color:var(--pos-primary);"><?php echo htmlspecialchars($s['store_code'] ? '[' . $s['store_code'] . '] ' : ''); ?></span>
+                                            <?php echo htmlspecialchars($s['store_name']); ?>
+                                        <?php else: ?>
+                                            <span style="color:var(--pos-text-muted);">—</span>
+                                        <?php endif; ?>
+                                    </span>
+                                </td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <div class="avatar-box">

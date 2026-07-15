@@ -1,9 +1,19 @@
 <?php 
 require_once __DIR__ . '/../core/classes/Database.php'; 
 require_once __DIR__ . '/../core/helpers/url.php';
+require_once __DIR__ . '/../core/classes/Language.php';
+
+// Detect current language
+$currentLang = Language::getLanguage();
+
+// Annual promo definition per price
+$annualPromos = [
+    30.00 => ['free_months' => 1, 'label_en' => 'Buy 1 Year, Get 1 Month FREE', 'label_km' => 'ទិញ ១ ឆ្នាំ ទទួលបាន ១ ខែ ដោយឥតគិតថ្លៃ'],
+    99.99 => ['free_months' => 3, 'label_en' => 'Buy 1 Year, Get 3 Months FREE', 'label_km' => 'ទិញ ១ ឆ្នាំ ទទួលបាន ៣ ខែ ដោយឥតគិតថ្លៃ'],
+];
 
 $canonicalUrl = rtrim(mc_url('', true), '/') . '/';
-$ogImage = mc_url('public/images/logo.png', true);
+$ogImage = mc_url('public/images/my-logo.jpg', true);
 $structuredData = [
     '@context' => 'https://schema.org',
     '@type' => 'SoftwareApplication',
@@ -57,17 +67,21 @@ $structuredData = [
     <meta name="twitter:description" content="POS Khmer system that manages orders, inventory, subscriptions, and HR in one dashboard.">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES); ?>">
     
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css?v=2.2">
+    <link rel="stylesheet" href="css/landing.css?v=4.1">
+
     
     <!-- Favicon -->
-    <link rel="icon" href="images/logo.png" type="image/png">
-    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="icon" href="images/my-logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="images/my-logo.jpg" type="image/jpeg">
     
     <script type="application/ld+json">
 <?php echo json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
@@ -75,349 +89,177 @@ $structuredData = [
     
     
     
-    <!-- Payment Success Modal -->
-    <div id="successModal" class="modal">
-        <div class="modal-content modal-content--sm modal-content--center">
-            <div class="modal-icon modal-icon--success">
-                <i class="ph-bold ph-check"></i>
-            </div>
-            <h3>Payment Successful!</h3>
-            <p>Thank you for your payment. Your workspace setup is being initialized.</p>
-            <div class="status-inline">
-                <i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...
+    <!-- Payment Success Modal (Bootstrap) -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center p-4">
+                <div class="mx-auto mb-3 d-grid place-items-center rounded-circle text-white" style="width:64px;height:64px;font-size:1.8rem;background:linear-gradient(135deg,#10B981,#059669)"><i class="ph-bold ph-check"></i></div>
+                <h4>Payment Successful!</h4>
+                <p class="text-muted">Your workspace setup is being initialized.</p>
+                <div class="text-muted"><i class="ph-bold ph-spinner ph-spin"></i> Redirecting to setup...</div>
             </div>
         </div>
     </div>
 
-    <!-- Waiting for Approval Modal -->
-    <div id="waitingModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header modal-header--telegram">
-                <h3>
-                    <i class="ph-bold ph-telegram-logo"></i> Awaiting Approval
-                </h3>
-                <button type="button" class="modal-close" onclick="closeWaitingModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="waiting-status">
-                    <div class="countdown-container">
-                        <svg class="countdown-svg">
-                            <circle class="countdown-circle-bg" cx="60" cy="60" r="56"></circle>
-                            <circle id="countdown-progress" class="countdown-circle-progress" cx="60" cy="60" r="56"></circle>
+    <!-- Waiting Modal (Bootstrap) -->
+    <div class="modal fade" id="waitingModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background:linear-gradient(135deg,#0088cc,#006699)">
+                    <h5 class="modal-title"><i class="ph-bold ph-telegram-logo"></i> Awaiting Approval</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeWaitingModal()"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="position-relative d-inline-block mb-3" style="width:120px;height:120px">
+                        <svg width="120" height="120" style="transform:rotate(-90deg)">
+                            <circle cx="60" cy="60" r="56" fill="none" stroke="#F1F5F9" stroke-width="6"/>
+                            <circle id="countdown-progress" cx="60" cy="60" r="56" fill="none" stroke="var(--mc-primary)" stroke-width="6" stroke-linecap="round" stroke-dasharray="351.85" stroke-dashoffset="0"/>
                         </svg>
-                        <div id="countdown-text" class="countdown-text">120</div>
+                        <div id="countdown-text" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center fw-bold" style="font-size:1.6rem">120</div>
                     </div>
-                    
-                    <div class="waiting-title">Admin Notification Sent</div>
-                    <div class="waiting-desc">
-                        We've notified our team to verify your payment. 
-                        This usually takes less than 2 minutes. 
-                        <br><strong>Please stay on this page.</strong>
-                    </div>
-                    
-                    <div class="telegram-badge">
-                        <i class="ph-bold ph-spinner ph-spin"></i>
-                        <span id="waitingBadgeText">Waiting for manual approval...</span>
-                    </div>
+                    <h6>Admin Notification Sent</h6>
+                    <p class="text-muted small">We've notified our team. This usually takes under 2 minutes.<br><strong>Please stay on this page.</strong></p>
+                    <span class="badge rounded-pill px-3 py-2" style="background:rgba(0,136,204,0.1);color:#0088cc"><i class="ph-bold ph-spinner ph-spin"></i> <span id="waitingBadgeText">Waiting for manual approval...</span></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sign In Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content modal-content--sm">
-            <div class="modal-header">
-                <h3>
-                    <i class="ph-bold ph-user-circle"></i> Welcome Back
-                </h3>
-                <button type="button" class="modal-close" onclick="closeAuthModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="authError" class="auth-error"></div>
-                <form id="authForm" onsubmit="handleAuthSubmit(event)">
-                    <div class="auth-form-group">
-                        <label for="modal-username">Username</label>
-                        <input type="text" id="modal-username" name="username" placeholder="Enter your username" required>
-                    </div>
-                    
-                    <div class="auth-form-group">
-                        <div style="display: flex; justify-content: space-between;">
-                            <label for="modal-password">Password</label>
-                            <a href="forgot_password.php" class="link-strong" style="font-size: 0.8rem;">Forgot?</a>
+    <!-- Sign In Modal (Bootstrap) -->
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="ph-bold ph-user-circle"></i> Welcome Back</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="authError" class="alert alert-danger d-none py-2"></div>
+                    <form id="authForm" action="login_process.php" method="POST">
+                        <div class="mb-3">
+                            <label for="modal-username" class="form-label">Username</label>
+                            <input type="text" id="modal-username" name="username" class="form-control" placeholder="Enter your username" required>
                         </div>
-                        <input type="password" id="modal-password" name="password" placeholder="Enter your password" required>
-                    </div>
-                    
-                    <button type="submit" id="signInBtn" class="btn btn-primary full-width">
-                        Sign In <i class="ph-bold ph-sign-in"></i>
-                    </button>
-                    
-                    <div class="auth-divider">or</div>
-                    
-                    <p>
-                        New here? <a href="register.php" class="link-strong">Create an account</a>
-                    </p>
-                </form>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <label for="modal-password" class="form-label">Password</label>
+                                <a href="forgot_password.php" class="small fw-semibold" style="color:var(--mc-primary)">Forgot?</a>
+                            </div>
+                            <input type="password" id="modal-password" name="password" class="form-control" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" id="signInBtn" class="btn btn-primary w-100">Sign In <i class="ph-bold ph-sign-in"></i></button>
+                        <div class="text-center my-3 text-muted small">or</div>
+                        <p class="text-center mb-0 small">New here? <a href="register.php" class="fw-semibold" style="color:var(--mc-primary)">Create an account</a></p>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="js/khqr-1.0.2.min.js"></script>
-    <!-- Icons (Phosphor Icons for a premium look) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="landing-page">
+
     <div class="page-loader" id="pageLoader">
-        <div class="loader-card">
-            <div class="loader-logo">
-                <i class="ph-bold ph-cube"></i>
-            </div>
-            <p class="loader-title">Mekong CyberUnit</p>
-            <p class="loader-caption">Preparing POS workspace</p>
-            <div class="loader-spinner"></div>
-            <div class="loader-progress"><span></span></div>
+        <div class="text-center">
+            <div class="loader-spinner mx-auto mb-3"></div>
+            <p class="fw-bold mb-1">Mekong CyberUnit</p>
+            <p class="text-muted small text-uppercase">Preparing POS workspace</p>
         </div>
     </div>
     
-    <!-- Header -->
-    <header class="main-header">
-        <div class="container nav-container">
-            <a href="#" class="logo">
-                <div class="logo-icon">
-                    <i class="ph-bold ph-cube"></i>
-                </div>
-                <span>Mekong CyberUnit</span>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <span class="navbar-brand-icon"><img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"></span>
+                Mekong CyberUnit
             </a>
-            
-            <nav class="nav-links">
-                <a href="#about" class="nav-item">About Me</a>
-                <a href="#features" class="nav-item">Features</a>
-                <a href="#pricing" class="nav-item">Pricing</a>
-                <a href="#faq" class="nav-item">FAQ</a>
-                <a href="#contact" class="nav-item">Contact</a>
-            </nav>
-            
-            <div class="flex items-center gap-4 nav-actions">
-                <a href="login.php" onclick="openAuthModal()" class="nav-item">Sign In</a>
-                <a href="register.php" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Get Started</a>
-            </div>
-
-            <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNavDrawer">
-                <i class="ph-bold ph-list"></i>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="ph-bold ph-list fs-5"></i>
             </button>
-        </div>
-    </header>
-
-    <div class="mobile-drawer" id="mobileNavDrawer" role="navigation">
-        <nav>
-            <a href="#about" class="nav-item" onclick="closeMobileDrawer()">About Me</a>
-            <a href="#features" class="nav-item" onclick="closeMobileDrawer()">Features</a>
-            <a href="#pricing" class="nav-item" onclick="closeMobileDrawer()">Pricing</a>
-            <a href="#faq" class="nav-item" onclick="closeMobileDrawer()">FAQ</a>
-            <a href="#contact" class="nav-item" onclick="closeMobileDrawer()">Contact</a>
-        </nav>
-        <div class="mobile-cta">
-            <a href="login.php" class="btn btn-outline" onclick="closeMobileDrawer(); openAuthModal();">Sign In</a>
-            <a href="register.php" class="btn btn-primary" onclick="closeMobileDrawer()">Get Started</a>
-        </div>
-    </div>
-
-    <!-- Hero Section -->
-    <section class="hero" id="top">
-        <div class="container hero-grid">
-            <div class="hero-copy">
-                <div class="hero-pill">
-                    <i class="ph-fill ph-sparkle"></i>
-                    Khmer-first cloud POS
-                </div>
-                <h1>Run sales, inventory, and subscriptions in one Mekong workspace.</h1>
-                <p>
-                    Mekong CyberUnit keeps Khmer and English teams in sync with POS, inventory, HR, and billing
-                    across every branch. One dashboard, one subscription, zero chaos.
-                </p>
-                <div class="btn-group hero-actions">
-                    <a href="register.php" class="btn btn-primary">
-                        Start Free Trial <i class="ph-bold ph-arrow-right"></i>
-                    </a>
-                    <a href="#pricing" class="btn btn-outline">See Pricing</a>
-                </div>
-                <div class="hero-metrics">
-                    <div class="metric-card">
-                        <strong>120+</strong>
-                        <span>SMEs onboarded</span>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item"><a class="nav-link" href="#about">Why MCU</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Language Switcher -->
+                    <div class="lang-switcher">
+                        <button class="lang-btn" type="button">
+                            <i class="ph-bold ph-translate"></i>
+                            <?php
+                            $langLabels = ['en' => '🇺🇸 EN', 'km' => '🇰🇭 ខ្មែរ', 'zh' => '🇨🇳 中文'];
+                            echo $langLabels[$currentLang] ?? '🌐 EN';
+                            ?>
+                            <i class="ph-bold ph-caret-down" style="font-size:0.65rem;"></i>
+                        </button>
+                        <div class="lang-dropdown">
+                            <a href="set_lang.php?lang=en" class="lang-option <?php echo $currentLang === 'en' ? 'active' : ''; ?>">
+                                <span class="lang-flag">🇺🇸</span> English
+                            </a>
+                            <a href="set_lang.php?lang=km" class="lang-option <?php echo $currentLang === 'km' ? 'active' : ''; ?>">
+                                <span class="lang-flag">🇰🇭</span> ខ្មែរ
+                            </a>
+                            <a href="set_lang.php?lang=zh" class="lang-option <?php echo $currentLang === 'zh' ? 'active' : ''; ?>">
+                                <span class="lang-flag">🇨🇳</span> 中文
+                            </a>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <strong>3</strong>
-                        <span>Languages shipped</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>24 hr</strong>
-                        <span>Average rollout</span>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="hero-card">
-                    <div class="hero-card__title">Live sales pulse</div>
-                    <div class="hero-card__item">
-                        <span>Morning rush</span>
-                        <strong>$1,240</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Low stock alerts</span>
-                        <strong>8 items</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Open tabs</span>
-                        <strong>12 orders</strong>
-                    </div>
-                </div>
-                <div class="hero-card hero-card--accent">
-                    <div class="hero-card__title">Why teams switch</div>
-                    <div class="hero-card__item">
-                        <span>KHQR + cash</span>
-                        <strong>2 taps</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Multi-outlet view</span>
-                        <strong>Unified</strong>
-                    </div>
-                    <div class="hero-card__item">
-                        <span>Offline friendly</span>
-                        <strong>Always on</strong>
-                    </div>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link">Sign In</a>
+                    <a href="register.php" class="btn btn-primary btn-sm">Get Started</a>
                 </div>
             </div>
         </div>
-    </section>
+    </nav>
 
-    <!-- Features Section -->
-    <section id="features" class="features-section">
+    <!-- Hero -->
+    <section class="hero-section" id="top">
         <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">
-                    <i class="ph-bold ph-sparkle"></i> Platform Highlights
-                </div>
-                <h2>Packed with Enterprise-grade Features</h2>
-                <p>Everything you need to scale your retail, cafe, or restaurant business in Cambodia.</p>
-            </div>
-            
-            <div class="features-grid">
-                <!-- Feature 1 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-arrows-clockwise"></i>
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="hero-pill"><i class="ph-fill ph-sparkle"></i> Trusted by 120+ Cambodian Businesses</div>
+                    <h1 class="hero-title">The POS system that speaks Khmer, thinks local, and scales with you.</h1>
+                    <p class="text-secondary fs-5 mb-4">Ditch the spreadsheets. One dashboard for sales, inventory, staff, and billing — with built-in Bakong KHQR and offline mode.</p>
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a href="register.php" class="btn btn-primary btn-lg">Start Free Trial <i class="ph-bold ph-arrow-right"></i></a>
+                        <a href="#features" class="btn btn-outline-primary btn-lg">Explore Features</a>
                     </div>
-                    <h3>Real-time Cloud Sync / ការសមកាលកម្មពេលវេលាជាក់ស្តែង</h3>
-                    <p>Transactions and stock updates sync instantly across all devices. Never worry about losing data even if your connection drops.</p>
-                </div>
-                <!-- Feature 2 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-translate"></i>
-                    </div>
-                    <h3>Bilingual Khmer & English / គាំទ្រពីរភាសា ខ្មែរ និង អង់គ្លេស</h3>
-                    <p>Designed with Khmer-first usability. Seamlessly toggle languages to support local cashiers and international managers.</p>
-                </div>
-                <!-- Feature 3 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-qr-code"></i>
-                    </div>
-                    <h3>Bakong KHQR Payments / ការទូទាត់តាម KHQR បាគង</h3>
-                    <p>Generate dynamic KHQR codes for instant customer scanning. Automatically verifies payments with real-time notifications.</p>
-                </div>
-                <!-- Feature 4 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-package"></i>
-                    </div>
-                    <h3>Smart Inventory Control / ការគ្រប់គ្រងសារពើភ័ណ្ឌឆ្លាតវៃ</h3>
-                    <p>Track raw ingredients and products. Receive automated low-stock warnings and manage purchase orders easily.</p>
-                </div>
-                <!-- Feature 5 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-chart-line-up"></i>
-                    </div>
-                    <h3>Sales & Analytics / របាយការណ៍លក់លម្អិត</h3>
-                    <p>Access deep sales performance charts, top-selling items, and profit margin analysis anywhere, anytime.</p>
-                </div>
-                <!-- Feature 6 -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="ph-bold ph-storefront"></i>
-                    </div>
-                    <h3>Multi-outlet Management / គ្រប់គ្រងសាខាច្រើន</h3>
-                    <p>Manage multiple branch locations, centralize warehouse stock, and compare store performances from a single dashboard.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Me Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-intro">
-                    <span class="about-pill">
-                        <i class="ph-bold ph-user-focus"></i>
-                        Meet the Builder
-                    </span>
-                    <h2>Human-centered Khmer POS systems for Cambodian operators</h2>
-                    <p>
-                        I design Mekong CyberUnit the way I run my own businesses: fast iterations, transparent pricing,
-                        and obsessive care for local workflows. Every release blends field interviews with rapid prototyping,
-                        so features feel like a teammate instead of another SaaS chore—and keeps us ranking whenever teams search for POS Khmer or modern POS systems in the Mekong.
-                    </p>
-                    <ul class="about-list">
-                        <li>
-                            <i class="ph-bold ph-lightning"></i>
-                            Built the first unified POS, HR, and inventory stack tailored for Khmer + English crews.
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-flask"></i>
-                            Ship weekly experiments so the Khmer POS experience stays fast across menus, tax rules, and subscription rails.
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-handshake"></i>
-                            Partner with cafés, clinics, and franchise brands to co-create playbooks that scale and boost search visibility for Cambodian POS system keywords.
-                        </li>
-                    </ul>
-                    <div class="signature">
-                        <strong>— The Mekong CyberUnit maker</strong>
-                        <span>Product, engineering, and customer success in one desk.</span>
+                    <div class="hero-metrics d-flex gap-3">
+                        <div class="metric-item text-center"><strong class="d-block">120+</strong><small class="text-muted text-uppercase">Merchants</small></div>
+                        <div class="metric-item text-center"><strong class="d-block">99.9%</strong><small class="text-muted text-uppercase">Uptime</small></div>
+                        <div class="metric-item text-center"><strong class="d-block">3 min</strong><small class="text-muted text-uppercase">To First Sale</small></div>
                     </div>
                 </div>
-                <div class="about-profile">
-                    <div class="profile-meta">
-                        <span>Independent Founder</span>
-                        <span>Est. 2020</span>
-                    </div>
-                    <h3 class="profile-name">Your operator-in-residence</h3>
-                    <div class="profile-role">Builder · Systems Thinker · Customer Partner</div>
-                    <p class="profile-bio">
-                        I grew up between restaurant back offices and dusty warehouses, so I obsess over practical UX:
-                        offline-friendly flows, bilingual interfaces, and automations your team trusts after one shift.
-                        If something feels clunky, ping me—I'm the one answering support chats too.
-                    </p>
-                    <div class="profile-stats">
-                        <div class="stat-card">
-                            <span class="stat-value">120+</span>
-                            <span class="stat-label">SMEs onboarded</span>
+                <div class="col-lg-6">
+                    <div class="dashboard-mockup">
+                        <div class="dashboard-header">
+                            <span class="dashboard-dot red"></span><span class="dashboard-dot yellow"></span><span class="dashboard-dot green"></span>
+                            <span class="dashboard-title">Live Dashboard — Phnom Penh Branch</span>
                         </div>
-                        <div class="stat-card">
-                            <span class="stat-value">9.4/10</span>
-                            <span class="stat-label">Support CSAT</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-value">3</span>
-                            <span class="stat-label">Languages shipped</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-value">24 hr</span>
-                            <span class="stat-label">Average rollout</span>
+                        <div class="dashboard-body">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6"><div class="dashboard-stat"><span class="label">Today's Sales</span><span class="value up">៛ 4,250,000</span></div></div>
+                                <div class="col-6"><div class="dashboard-stat"><span class="label">Orders</span><span class="value">47</span></div></div>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6"><div class="dashboard-stat"><span class="label">KHQR Payments</span><span class="value accent">32 txns</span></div></div>
+                                <div class="col-6"><div class="dashboard-stat"><span class="label">Low Stock Alerts</span><span class="value warn">3 items</span></div></div>
+                            </div>
+                            <div class="dashboard-bars">
+                                <div class="dashboard-bar" style="height:60%"><span>Mon</span></div>
+                                <div class="dashboard-bar" style="height:80%"><span>Tue</span></div>
+                                <div class="dashboard-bar peak" style="height:100%"><span>Wed</span></div>
+                                <div class="dashboard-bar" style="height:70%"><span>Thu</span></div>
+                                <div class="dashboard-bar" style="height:90%"><span>Fri</span></div>
+                                <div class="dashboard-bar" style="height:50%"><span>Sat</span></div>
+                                <div class="dashboard-bar" style="height:40%"><span>Sun</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -425,16 +267,104 @@ $structuredData = [
         </div>
     </section>
 
-    <!-- Cloud POS Pricing Section -->
-    <section class="pricing-section" id="pricing">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">Cloud POS Plans</div>
-                <h2>Simple, Transparent Pricing</h2>
-                <p>Choose the right plan for your business needs.</p>
+    <!-- Features -->
+    <section id="features" class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-sparkle"></i> Why Teams Love MCU</div>
+                <h2 class="fw-bold">Everything your business needs. Nothing you don't.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">Purpose-built for Cambodian retailers, cafés, and restaurants — from single counters to multi-branch chains.</p>
             </div>
-            
-            <div class="systems-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-cash-register"></i></div><h5>Lightning-Fast POS</h5><p class="text-muted small mb-0">Process sales in under 2 seconds. Hold orders, split bills, apply discounts, and print Khmer/English receipts.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-qr-code"></i></div><h5>Bakong KHQR Built-In</h5><p class="text-muted small mb-0">Generate dynamic QR codes. Auto-verify payments in real-time. No more manual bank slip checks.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-package"></i></div><h5>Smart Inventory</h5><p class="text-muted small mb-0">Track stock across branches in real-time. Low-stock alerts and purchase order management.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-wifi-slash"></i></div><h5>Offline-First Mode</h5><p class="text-muted small mb-0">Internet down? Keep selling. Auto-sync when you reconnect. Zero data loss.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-chart-bar"></i></div><h5>Live Analytics</h5><p class="text-muted small mb-0">Sales dashboards, top-product rankings, profit margin reports — accessible from any device.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-buildings"></i></div><h5>Multi-Branch Control</h5><p class="text-muted small mb-0">Unlimited outlets, single login. Compare performance, transfer stock, centralize reporting.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-translate"></i></div><h5>Khmer & English UI</h5><p class="text-muted small mb-0">Toggle between ខ្មែរ and English instantly. Every label supports both languages.</p></div></div>
+                <div class="col"><div class="feature-card"><div class="feature-icon"><i class="ph-bold ph-users-three"></i></div><h5>Staff & Cashier Mgmt</h5><p class="text-muted small mb-0">Track shifts, permissions, cash control sessions, and payroll reports — all integrated.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why MCU -->
+    <section id="about" class="py-5 bg-light bg-opacity-50">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-shield-check"></i> Why Mekong CyberUnit</div>
+                <h2 class="fw-bold">Built in Cambodia, for Cambodian businesses.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">We're not a generic POS translated into Khmer. We live and work here, building features that match how local shops operate.</p>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-bank"></i></div><h5>Bakong-First Payments</h5><p class="text-muted small mb-0">Deep KHQR integration. Customers pay with any banking app. No extra hardware, no manual reconciliation.</p></div></div>
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-clock-countdown"></i></div><h5>10-Minute Setup</h5><p class="text-muted small mb-0">Create account, add products via CSV or manually, and start selling — all before your first customer arrives.</p></div></div>
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-cloud-arrow-down"></i></div><h5>Works Offline, Syncs Online</h5><p class="text-muted small mb-0">Internet unpredictable? MCU stores transactions locally and syncs when you're back. Zero lost sales.</p></div></div>
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-headset"></i></div><h5>Khmer-Speaking Support</h5><p class="text-muted small mb-0">Stuck on a Saturday evening? Our Telegram support responds in Khmer within minutes. Real humans, no bots.</p></div></div>
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-shield"></i></div><h5>Enterprise Security</h5><p class="text-muted small mb-0">Encrypted data, role-based access, session timeouts, and audit logs keep your business safe.</p></div></div>
+                <div class="col"><div class="why-card"><div class="why-icon"><i class="ph-bold ph-rocket-launch"></i></div><h5>Weekly Improvements</h5><p class="text-muted small mb-0">Updates every week based on merchant feedback. Your feature request could be live by next Monday.</p></div></div>
+            </div>
+            <div class="trust-strip d-flex align-items-center justify-content-center gap-3 gap-md-5 py-4 px-3 flex-wrap">
+                <div class="text-center"><strong class="d-block fs-4" style="color:var(--mc-primary-dark)">120+</strong><small class="text-muted text-uppercase">Active Merchants</small></div>
+                <div class="trust-divider d-none d-md-block"></div>
+                <div class="text-center"><strong class="d-block fs-4" style="color:var(--mc-primary-dark)">3</strong><small class="text-muted text-uppercase">Languages (EN/KM/ZH)</small></div>
+                <div class="trust-divider d-none d-md-block"></div>
+                <div class="text-center"><strong class="d-block fs-4" style="color:var(--mc-primary-dark)">24/7</strong><small class="text-muted text-uppercase">Telegram Support</small></div>
+                <div class="trust-divider d-none d-md-block"></div>
+                <div class="text-center"><strong class="d-block fs-4" style="color:var(--mc-primary-dark)">2020</strong><small class="text-muted text-uppercase">Established Since</small></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-path"></i> Get Started in Minutes</div>
+                <h2 class="fw-bold">From sign-up to first sale in 3 simple steps.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">No technical skills needed. No hardware to install. Just a browser and a dream.</p>
+            </div>
+            <div class="row align-items-start justify-content-center g-3">
+                <div class="col-md-3 text-center">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-icon"><i class="ph-bold ph-user-plus"></i></div>
+                        <h5>Create Your Account</h5>
+                        <p class="text-muted small">Sign up in 60 seconds. Choose your plan and workspace name. No credit card needed for trial.</p>
+                    </div>
+                </div>
+                <div class="col-auto d-none d-md-flex align-items-center pt-5 text-muted fs-4"><i class="ph-bold ph-arrow-right"></i></div>
+                <div class="col-md-3 text-center">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-icon"><i class="ph-bold ph-file-csv"></i></div>
+                        <h5>Add Your Products</h5>
+                        <p class="text-muted small">Import via CSV or add one by one. Set prices in USD or KHR, upload images, organize by category.</p>
+                    </div>
+                </div>
+                <div class="col-auto d-none d-md-flex align-items-center pt-5 text-muted fs-4"><i class="ph-bold ph-arrow-right"></i></div>
+                <div class="col-md-3 text-center">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-icon"><i class="ph-bold ph-cash-register"></i></div>
+                        <h5>Start Selling</h5>
+                        <p class="text-muted small">Open your POS on any device. Accept cash or KHQR, print receipts, and watch your dashboard come alive.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-credit-card"></i> Transparent Pricing</div>
+                <h2 class="fw-bold">One subscription. All features. No surprises.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-start">
+
                 <?php
                 try {
                 $db = Database::getInstance();
@@ -443,52 +373,108 @@ $structuredData = [
                     echo '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 1rem; border: 1px dashed rgba(99, 102, 241, 0.3); color: #cbd5e1;">
                             <i class="ph-bold ph-warning-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: var(--accent);"></i>
                             No active pricing plans found. Please configure them in the <a href="' . (strpos($_SERVER['REQUEST_URI'], '/public/') !== false ? '../admin/plans.php' : 'admin/plans.php') . '" style="text-decoration: underline; font-weight: 700; color: var(--primary);">Admin Panel</a>.
+
                           </div>';
                 } else {
                 foreach ($plans as $index => $plan):
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
                     $isPopular = ($index === 1); // Mark second plan as popular for UI
+                    $planPrice = (float)$plan['price'];
                     
-                    // Fetch linked modules for this plan
-                    $modules = $db->fetchAll("SELECT module_name FROM system_modules WHERE system_id = ?", [$plan['id']]);
+                    // Determine annual promo for this plan
+                    $promo = null;
+                    foreach ($annualPromos as $promoPrice => $promoDef) {
+                        if (abs($planPrice - $promoPrice) < 0.01) {
+                            $promo = $promoDef;
+                            break;
+                        }
+                    }
+                    $promoLabel = $promo ? (($currentLang === 'km') ? $promo['label_km'] : $promo['label_en']) : '';
+                    
+                    // Fetch linked features for this plan
+                    $features = $db->fetchAll("SELECT sm.module_name, sm.feature_key FROM system_modules sm WHERE sm.system_id = ?", [$plan['id']]);
+
+                    // Feature labels
+                    $featureLabels = [
+                        'pos_core'           => 'POS Terminal & Dashboard',
+                        'pos_orders'         => 'Order History',
+                        'pos_inventory'      => 'Product & Inventory',
+                        'pos_customers'      => 'Customer Management',
+                        'pos_reports'        => 'Sales Reports & Analytics',
+                        'pos_holds'          => 'Hold Orders',
+                        'pos_digital_menu'   => 'Digital Menu (QR)',
+                        'pos_settings'       => 'POS Settings',
+                        'pos_sessions'       => 'Cash Control Sessions',
+                        'pos_cashiers'       => 'Cashier Management',
+                        'inventory_stock_in' => 'Stock-In Management',
+                        'hr_staff'           => 'Staff Management',
+                    ];
+                    $storeLimit = (int)($plan['store_limit'] ?? 1);
+                    $cashierLimit = (int)($plan['cashier_limit'] ?? 1);
                 ?>
-                <div class="system-card <?php echo $isPopular ? 'popular-card' : ''; ?>">
+                <div class="col">
+                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?>">
                     <?php if ($isPopular): ?>
-                    <div class="plan-badge">Popular</div>
+                    <div class="pricing-badge">Popular</div>
                     <?php endif; ?>
-                    
-                    <h3 class="system-title"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                    <p class="system-desc"><?php echo htmlspecialchars($plan['description']); ?></p>
-                    
-                    <div class="price-tag">
-                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
-                        <span class="price-period">/month</span>
+
+                    <?php if ($promo): ?>
+                    <div class="annual-badge" style="margin-top: <?php echo $isPopular ? '1.5rem' : '0'; ?>;">
+                        <i class="ph-bold ph-gift"></i>
+                        <?php echo ($currentLang === 'km') ? 'ប្រូម៉ូ ប្រចាំឆ្នាំ' : 'Annual Promo'; ?>
                     </div>
-                    
-                    <ul class="plan-list">
-                        <?php if (empty($modules)): ?>
-                            <li>
-                                <i class="ph-bold ph-info"></i> Basic Platform Access
-                            </li>
+                    <?php endif; ?>
+
+                    <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($plan['name']); ?></h4>
+                    <p class="text-muted small mb-2"><?php echo htmlspecialchars($plan['description']); ?></p>
+
+                    <?php if ($promo): ?>
+                    <div class="promo-callout">
+                        <i class="ph-bold ph-tag"></i>
+                        <span><?php echo htmlspecialchars($promoLabel); ?></span>
+                    </div>
+                    <?php endif; ?>
+
+                    <div class="d-flex align-items-baseline gap-1 mb-3 pb-3 border-bottom">
+                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
+                        <span class="text-muted">/month</span>
+                    </div>
+                    <ul class="feature-list mb-4">
+                        <?php foreach ($features as $f): ?>
+                            <?php $labelKey = $f['module_name'] . '_' . $f['feature_key']; ?>
+                            <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($featureLabels[$labelKey] ?? ucfirst($f['feature_key'])); ?></li>
+                        <?php endforeach; ?>
+                        <?php if ($storeLimit > 0): ?>
+                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit > 1 ? 's' : ''; ?></li>
                         <?php else: ?>
-                            <?php foreach ($modules as $mod): ?>
-                            <li>
-                                <i class="ph-bold ph-check-circle"></i>
-                                <span><?php echo htmlspecialchars($mod['module_name']); ?> Module</span>
-                            </li>
-                            <?php endforeach; ?>
+                            <li><i class="ph-bold ph-check-circle"></i> Unlimited Stores</li>
                         <?php endif; ?>
-                        <li>
-                            <i class="ph-bold ph-check-circle"></i> Cloud Storage
-                        </li>
-                        <li>
-                            <i class="ph-bold ph-check-circle"></i> 24/7 Priority Support
-                        </li>
+                        <?php if ($cashierLimit > 0): ?>
+                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit > 1 ? 's' : ''; ?></li>
+                        <?php else: ?>
+                            <li><i class="ph-bold ph-check-circle"></i> Unlimited Cashiers</li>
+                        <?php endif; ?>
+                        <?php if ($plan['price'] >= 30): ?>
+                            <li><i class="ph-bold ph-check-circle"></i> Cloud Storage</li>
+                        <?php endif; ?>
+                        <?php if ($plan['price'] >= 50): ?>
+                            <li><i class="ph-bold ph-check-circle"></i> 24/7 Priority Support</li>
+                        <?php endif; ?>
+                        <?php if ($promo): ?>
+                            <li style="color:#d97706; font-weight:700;">
+                                <i class="ph-bold ph-star" style="color:#F59E0B;"></i>
+                                <?php
+                                if ($currentLang === 'km') {
+                                    echo '១ ឆ្នាំ = ' . (12 + $promo['free_months']) . ' ខែ (' . $promo['free_months'] . ' ខែ ឥតគិតថ្លៃ)';
+                                } else {
+                                    echo '1 Year = ' . (12 + $promo['free_months']) . ' Months (' . $promo['free_months'] . ' FREE)';
+                                }
+                                ?>
+                            </li>
+                        <?php endif; ?>
                     </ul>
-                    
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline'; ?> full-width">
-                        Choose <?php echo htmlspecialchars($plan['name']); ?>
-                    </a>
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">Choose <?php echo htmlspecialchars($plan['name']); ?></a>
+                </div>
                 </div>
                 <?php endforeach; ?>
                 <?php } 
@@ -496,389 +482,202 @@ $structuredData = [
                     echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
                             <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
                            </div>';
+
                 }
                 ?>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials-section">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">
-                    <i class="ph-bold ph-chats"></i> Customer Reviews
-                </div>
-                <h2>Loved by Operators Across Cambodia</h2>
-                <p>See how local cafes, retail stores, and pharmacies scale their businesses with Mekong CyberUnit.</p>
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-5 bg-light bg-opacity-50">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-chats-circle"></i> Merchant Stories</div>
+                <h2 class="fw-bold">Trusted by businesses across Cambodia</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">From street-side coffee carts to multi-branch pharmacies — hear why they chose MCU.</p>
             </div>
-            
-            <div class="testimonials-grid">
-                <!-- Testimonial 1 -->
-                <div class="testimonial-card">
-                    <p class="testimonial-quote">
-                        "Mekong CyberUnit changed the way we handle morning rushes. Toggling between Khmer and English works perfectly for our baristas, and the KHQR Bakong integration means we don't have to check manual bank slips anymore."
-                    </p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">☕</div>
-                        <div class="testimonial-info">
-                            <h4>Sokha Pich / ពេជ្រ សុខា</h4>
-                            <p>Owner, Brown & Bloom Cafe (Phnom Penh)</p>
-                        </div>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col"><div class="testimonial-card"><div class="testimonial-stars mb-2">★★★★★</div><p class="fst-italic text-secondary">"We switched from paper ledgers to MCU. The KHQR integration saves us 30 minutes of reconciliation daily. Our baristas picked it up in one shift."</p><div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);font-size:1.2rem">☕</div><div><strong class="d-block small">Sokha Pich</strong><small class="text-muted">Brown & Bloom Cafe, Phnom Penh</small></div></div></div></div>
+                <div class="col"><div class="testimonial-card"><div class="testimonial-stars mb-2">★★★★★</div><p class="fst-italic text-secondary">"Managing 3 outlets from my phone is a game-changer. Inventory alerts tell me what to restock before I run out. Offline mode saved us during rainy season outages."</p><div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);font-size:1.2rem">🛍️</div><div><strong class="d-block small">Piseth Vong</strong><small class="text-muted">Kravan Retail, Siem Reap</small></div></div></div></div>
+                <div class="col"><div class="testimonial-card"><div class="testimonial-stars mb-2">★★★★★</div><p class="fst-italic text-secondary">"We manage 4,000+ drug SKUs across two locations. MCU's cloud sync is instant, and bilingual UI means our Khmer staff and I can both use it comfortably."</p><div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);font-size:1.2rem">💊</div><div><strong class="d-block small">Dr. Chantrea Keo</strong><small class="text-muted">Angkor Pharmacy, Battambang</small></div></div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ (Bootstrap Accordion) -->
+    <section id="faq" class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-question"></i> Quick Answers</div>
+                <h2 class="fw-bold">Frequently asked questions</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">Everything you need to know before getting started with MCU.</p>
+            </div>
+            <div class="accordion mx-auto" id="faqAccordion" style="max-width:860px">
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">How long does the initial setup take? / តើការតំឡើងដំបូងចំណាយពេលប៉ុន្មាន?</button></h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Setting up your workspace is instant! After registration, configure your menu items, import products via CSV, and start selling in under 10 minutes.</div></div>
+                </div>
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">What hardware is compatible? / តើឧបករណ៍ណាខ្លះដែលអាចប្រើប្រាស់បាន?</button></h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">MCU is cloud-based and runs on any modern browser. Compatible with iPad, Android tablets, Windows PCs, and macOS. Connects to standard Bluetooth/USB receipt printers and cash drawers.</div></div>
+                </div>
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Does it support offline sales? / តើវាគាំទ្រការលក់ក្រៅប្រព័ន្ធ (Offline) ដែរឬទេ?</button></h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Yes! Offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.</div></div>
+                </div>
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">How does the Bakong KHQR integration work? / តើការទូទាត់តាម KHQR បាគងដំណើរការដូចម្តេច?</button></h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-5 bg-light bg-opacity-50">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <div class="section-kicker"><i class="ph-bold ph-envelope"></i> Get In Touch</div>
+                <h2 class="fw-bold">We're here to help</h2>
+                <p class="text-muted mx-auto" style="max-width:640px">Questions about features, pricing, or custom integrations? Reach out anytime.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="p-4 bg-white rounded-4 border h-100">
+                        <h5 class="fw-bold mb-3">Contact Information</h5>
+                        <div class="d-flex gap-3 mb-3 p-2 rounded-3"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);color:var(--mc-primary)"><i class="ph-bold ph-envelope-simple"></i></div><div><strong class="d-block small">Email Support</strong><small class="text-muted">support@mekongcyberunit.app</small></div></div>
+                        <div class="d-flex gap-3 mb-3 p-2 rounded-3"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);color:var(--mc-primary)"><i class="ph-bold ph-telegram-logo"></i></div><div><strong class="d-block small">Telegram</strong><small class="text-muted"><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" style="color:var(--mc-primary);font-weight:600">@SOCHEAT_DOEM</a></small></div></div>
+                        <div class="d-flex gap-3 p-2 rounded-3"><div class="rounded-3 d-grid place-items-center flex-shrink-0" style="width:40px;height:40px;background:rgba(13,148,136,0.1);color:var(--mc-primary)"><i class="ph-bold ph-map-pin"></i></div><div><strong class="d-block small">Headquarters</strong><small class="text-muted">Sensok District, Phnom Penh, Cambodia</small></div></div>
                     </div>
                 </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="testimonial-card">
-                    <p class="testimonial-quote">
-                        "Managing three outlets from my phone is a breeze. The smart inventory alerts help us restock before running out. The offline mode saved us multiple times during internet outages."
-                    </p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">🛍️</div>
-                        <div class="testimonial-info">
-                            <h4>Piseth Vong / វង្ស ពិសិដ្ឋ</h4>
-                            <p>Founder, Kravan Retail Shop (Siem Reap)</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="testimonial-card">
-                    <p class="testimonial-quote">
-                        "We were searching for a POS Khmer solution that can manage thousands of item SKUs. The cloud sync is instantaneous, and the automated reports give us exact daily margin insights."
-                    </p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">💊</div>
-                        <div class="testimonial-info">
-                            <h4>Chantrea Keo / កែវ ចាន់ទ្រា</h4>
-                            <p>General Manager, Angkor Pharmacy (Battambang)</p>
-                        </div>
+                <div class="col-lg-7">
+                    <div class="p-4 bg-white rounded-4 border">
+                        <form action="#" method="POST" onsubmit="event.preventDefault();alert('Thank you! We will get back to you shortly.');this.reset();">
+                            <div class="row g-3">
+                                <div class="col-md-6"><label class="form-label small fw-semibold">First Name</label><input type="text" class="form-control" placeholder="John" required></div>
+                                <div class="col-md-6"><label class="form-label small fw-semibold">Last Name</label><input type="text" class="form-control" placeholder="Doe" required></div>
+                                <div class="col-12"><label class="form-label small fw-semibold">Email Address</label><input type="email" class="form-control" placeholder="john@example.com" required></div>
+                                <div class="col-12"><label class="form-label small fw-semibold">Message</label><textarea class="form-control" rows="4" placeholder="How can we help your business?" required></textarea></div>
+                                <div class="col-12"><button type="submit" class="btn btn-primary w-100">Send Message <i class="ph-bold ph-paper-plane-right"></i></button></div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section id="faq" class="faq-section">
+    <!-- CTA -->
+    <section class="py-5">
         <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">
-                    <i class="ph-bold ph-question"></i> Frequently Asked Questions
-                </div>
-                <h2>Got Questions? We Have Answers</h2>
-                <p>Everything you need to know about setting up and using Mekong CyberUnit POS.</p>
-            </div>
-            
-            <div class="faq-container">
-                <!-- FAQ 1 -->
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How long does the initial setup take? / តើការតំឡើងដំបូងចំណាយពេលប៉ុន្មាន?</span>
-                        <i class="ph-bold ph-caret-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-inner">
-                            Setting up your workspace is instant! After registration, you can configure your menu items, import products via CSV, and start selling in under 10 minutes.
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- FAQ 2 -->
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What hardware is compatible? / តើឧបករណ៍ណាខ្លះដែលអាចប្រើប្រាស់បាន?</span>
-                        <i class="ph-bold ph-caret-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-inner">
-                            Mekong CyberUnit POS is cloud-based and runs on any modern browser. It is compatible with iPad, Android tablets, Windows PCs, and macOS. It also connects to standard Bluetooth/USB receipt printers and cash drawers.
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- FAQ 3 -->
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Does it support offline sales? / តើវាគាំទ្រការលក់ក្រៅប្រព័ន្ធ (Offline) ដែរឬទេ?</span>
-                        <i class="ph-bold ph-caret-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-inner">
-                            Yes! Our offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- FAQ 4 -->
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How does the Bakong KHQR integration work? / តើការទូទាត់តាម KHQR បាគងដំណើរការដូចម្តេច?</span>
-                        <i class="ph-bold ph-caret-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-inner">
-                            Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact-section">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-kicker">
-                    <i class="ph-bold ph-envelope"></i> Contact Us
-                </div>
-                <h2>Get in Touch with Our Team</h2>
-                <p>Have questions about pricing, features, or custom integrations? We're here to help.</p>
-            </div>
-            
-            <div class="contact-grid">
-                <!-- Contact Info Card -->
-                <div class="contact-info-card">
-                    <h3>Contact Information</h3>
-                    <p>Reach out to us directly or visit our office. We usually respond within a few hours.</p>
-                    
-                    <ul class="contact-method-list">
-                        <!-- Email -->
-                        <li class="contact-method-item">
-                            <div class="contact-method-icon">
-                                <i class="ph-bold ph-envelope-simple"></i>
-                            </div>
-                            <div class="contact-method-text">
-                                <h4>Email Support</h4>
-                                <p>support@mekongcyberunit.app</p>
-                            </div>
-                        </li>
-                        
-                        <!-- Telegram -->
-                        <li class="contact-method-item">
-                            <div class="contact-method-icon">
-                                <i class="ph-bold ph-telegram-logo"></i>
-                            </div>
-                            <div class="contact-method-text">
-                                <h4>Telegram Channels</h4>
-                                <p><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="contact-link">@SOCHEAT_DOEM</a></p>
-                            </div>
-                        </li>
-                        
-                        <!-- Office Location -->
-                        <li class="contact-method-item">
-                            <div class="contact-method-icon">
-                                <i class="ph-bold ph-map-pin"></i>
-                            </div>
-                            <div class="contact-method-text">
-                                <h4>Phnom Penh Headquarters</h4>
-                                <p>Sensok District, Phnom Penh, Cambodia</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Contact Form Card -->
-                <div class="contact-form-card">
-                    <form class="contact-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Thank you for contacting us! We will get back to you shortly.'); this.reset();">
-                        <div class="contact-form-group">
-                            <label for="contact-firstname">First Name</label>
-                            <input type="text" id="contact-firstname" name="firstname" placeholder="John" required>
-                        </div>
-                        
-                        <div class="contact-form-group">
-                            <label for="contact-lastname">Last Name</label>
-                            <input type="text" id="contact-lastname" name="lastname" placeholder="Doe" required>
-                        </div>
-                        
-                        <div class="contact-form-group full-width">
-                            <label for="contact-email">Email Address</label>
-                            <input type="email" id="contact-email" name="email" placeholder="john.doe@example.com" required>
-                        </div>
-                        
-                        <div class="contact-form-group full-width">
-                            <label for="contact-message">Message</label>
-                            <textarea id="contact-message" name="message" rows="5" placeholder="How can we help your business?" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary full-width">
-                            Send Message <i class="ph-bold ph-paper-plane-right"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features / CTA -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-box">
-                <h2>Ready to transform your business?</h2>
-                <p>Join hundreds of businesses using Mekong CyberUnit to streamline operations.</p>
-                <div class="btn-group">
-                     <a href="register.php" class="btn btn-primary">
-                        Create Free Account
-                    </a>
-                    <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn btn-ghost">
-                        Contact Sales
-                    </a>
+            <div class="cta-box text-center text-white position-relative">
+                <h2 class="fw-bold position-relative z-1">Ready to upgrade your shop?</h2>
+                <p class="position-relative z-1 text-white-50 mb-4">Join 120+ Cambodian businesses already running on Mekong CyberUnit. Free trial, no credit card, cancel anytime.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-3 position-relative z-1">
+                    <a href="register.php" class="btn btn-light btn-lg px-4 fw-semibold" style="color:var(--mc-primary-dark)">Start Your Free Trial <i class="ph-bold ph-arrow-right"></i></a>
+                    <a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener" class="btn btn-outline-light btn-lg px-4"><i class="ph-bold ph-telegram-logo"></i> Chat on Telegram</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
+    <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="logo">
-                        <div class="logo-icon">
-                            <i class="ph-bold ph-cube"></i>
-                        </div>
-                        <span>Mekong CyberUnit</span>
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="navbar-brand-icon"><img src="images/my-logo.jpg" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"></span>
+                        <span class="fw-bold text-white">Mekong CyberUnit</span>
                     </div>
-                    <p>Empowering businesses with enterprise-grade tools at a fraction of the cost.</p>
+                    <p class="small">Empowering Cambodian businesses with enterprise-grade POS tools at a fraction of the cost.</p>
                 </div>
-                
-                <div class="footer-col">
-                    <h4>Product</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">POS</a></li>
-                        <li><a href="#">Inventory</a></li>
-                        <li><a href="#">HR Management</a></li>
-                        <li><a href="#">Pricing</a></li>
-                    </ul>
+                <div class="col-md-2 col-6">
+                    <h5>Product</h5>
+                    <ul class="list-unstyled small"><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#how-it-works">How It Works</a></li><li><a href="register.php">Sign Up</a></li></ul>
                 </div>
-                
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
+                <div class="col-md-2 col-6">
+                    <h5>Support</h5>
+                    <ul class="list-unstyled small"><li><a href="#faq">FAQ</a></li><li><a href="#contact">Contact</a></li><li><a href="https://t.me/SOCHEAT_DOEM" target="_blank" rel="noopener">Telegram</a></li><li><a href="mailto:support@mekongcyberunit.app">Email Us</a></li></ul>
                 </div>
-                
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Security</a></li>
-                    </ul>
+                <div class="col-md-3 col-6">
+                    <h5>Company</h5>
+                    <ul class="list-unstyled small"><li><a href="#about">About</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li></ul>
                 </div>
             </div>
-            
-            <div class="copyright">
+            <div class="footer-bottom text-center">
                 &copy; 2026 Mekong CyberUnit. All rights reserved.
             </div>
         </div>
     </footer>
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header modal-header--brand">
-                <h3>
-                    <div class="modal-badge">
-                        <i class="ph-bold ph-qr-code"></i>
+    <!-- Payment Modal (Bootstrap) -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background:linear-gradient(135deg,var(--mc-primary),var(--mc-primary-dark))">
+                    <h5 class="modal-title"><span class="badge bg-white bg-opacity-25 me-2 rounded-2"><i class="ph-bold ph-qr-code"></i></span> Scan to Pay (Bakong)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="fs-2 fw-bold mb-1" id="modalAmount">$0.00</div>
+                    <p class="text-muted small mb-3">Scan with Bakong or any Banking App</p>
+                    <div class="d-flex justify-content-center mb-3" style="min-height:200px">
+                        <div id="qrPlaceholder" class="d-none"><i class="ph-bold ph-spinner ph-spin fs-1 text-muted"></i></div>
+                        <img id="qrImage" src="" alt="KHQR Payment" class="d-none rounded-3 shadow-sm" style="max-width:220px">
                     </div>
-                    Scan to Pay (Bakong)
-                </h3>
-                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="payment-amount" id="modalAmount">$0.00</div>
-                <div class="payment-instruction">Scan with Bakong or any Banking App</div>
-                
-                <div class="qr-code-container qr-code-container--center">
-                    <div id="qrPlaceholder" style="display: none;">
-                         <i class="ph-bold ph-spinner ph-spin"></i>
+                    <div id="staticNotice" class="alert alert-success d-none py-2 small"><i class="ph-bold ph-seal-check"></i> Please click 'I Have Paid' after scanning.</div>
+                    <div id="pollingNotice" class="alert alert-warning py-2 small text-start">
+                        <i class="ph-bold ph-spinner ph-spin"></i> កំពុងរង់ចាំការទូទាត់... (Waiting for payment)
+                        <div id="apiStatus" class="small text-muted mt-1 font-monospace">Status: INITIALIZING...</div>
+                        <button type="button" id="manualCheckBtn" onclick="if(window.currentMd5) checkStatusManual(window.currentMd5)" class="btn btn-sm btn-warning mt-2 d-none"><i class="ph-bold ph-arrows-clockwise"></i> ពិនិត្យឡើងវិញ (Check Now)</button>
                     </div>
-                    <img id="qrImage" src="" alt="KHQR Payment" style="display: none;">
+                    <p class="text-muted small mt-2">Payment for <span id="planName" class="fw-semibold">Plan</span></p>
                 </div>
-                
-                <div id="staticNotice" style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 0.5rem; text-align: left; display: none;">
-                    <p style="font-size: 0.85rem; color: #065f46; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="ph-bold ph-seal-check"></i>
-                        Please click 'I Have Paid' after scanning.
-                    </p>
+                <div class="modal-footer">
+                    <button type="button" id="confirmBtn" class="btn btn-primary d-none" onclick="confirmStaticPayment()"><i class="ph-bold ph-check-circle"></i> I Have Paid</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
-
-                <div id="pollingNotice" style="margin-top: 1rem; padding: 1rem; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 0.5rem; text-align: left;">
-                    <p style="font-size: 0.85rem; color: #92400e; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="ph-bold ph-spinner ph-spin"></i>
-                        កំពុងរង់ចាំការទូទាត់... (Waiting for payment)
-                    </p>
-                    <div id="apiStatus" style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">Status: INITIALIZING...</div>
-                    <button type="button" id="manualCheckBtn" onclick="if(window.currentMd5) checkStatusManual(window.currentMd5)" style="margin-top: 8px; font-size: 0.75rem; background: #92400e; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; display: none;">
-                        <i class="ph-bold ph-arrows-clockwise"></i> ពិនិត្យឡើងវិញ (Check Now)
-                    </button>
-                </div>
-                
-                <p class="payment-meta">
-                    Payment for <span id="planName">Plan</span>
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="confirmBtn" class="btn btn-primary" style="flex: 2; display: none;" onclick="confirmStaticPayment()">
-                    <i class="ph-bold ph-check-circle"></i> I Have Paid
-                </button>
-                <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/loader.js"></script>
     <script>
-        const mobileToggle = document.getElementById('mobileNavToggle');
-        const mobileDrawer = document.getElementById('mobileNavDrawer');
-
-        function closeMobileDrawer() {
-            if (mobileDrawer) {
-                mobileDrawer.classList.remove('active');
-            }
-            document.body.classList.remove('mobile-nav-open');
-            if (mobileToggle) {
-                mobileToggle.setAttribute('aria-expanded', 'false');
+        // Bootstrap modal helpers
+        function openAuthModal() {
+            const m = new bootstrap.Modal(document.getElementById('authModal'));
+            m.show();
+        }
+        function closeAuthModal() {
+            const m = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+            if (m) m.hide();
+        }
+        function closeWaitingModal() {
+            if (confirm("Are you sure you want to cancel? Your payment notification has already been sent.")) {
+                const m = bootstrap.Modal.getInstance(document.getElementById('waitingModal'));
+                if (m) m.hide();
+                if (pollingInterval) clearInterval(pollingInterval);
+                if (countdownInterval) clearInterval(countdownInterval);
             }
         }
-
-        function toggleMobileDrawer() {
-            if (!mobileDrawer || !mobileToggle) return;
-            const willOpen = !mobileDrawer.classList.contains('active');
-            mobileDrawer.classList.toggle('active', willOpen);
-            document.body.classList.toggle('mobile-nav-open', willOpen);
-            mobileToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        }
-
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', toggleMobileDrawer);
-        }
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                closeMobileDrawer();
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                closeMobileDrawer();
-            }
-        });
-
-        window.closeMobileDrawer = closeMobileDrawer;
 
         let currentPlan = '';
         let currentAmount = 0;
         let pollingInterval = null;
-        const modal = document.getElementById('paymentModal');
-        const qrImage = document.getElementById('qrImage');
-        const qrPlaceholder = document.getElementById('qrPlaceholder');
+        const paymentModalEl = document.getElementById('paymentModal');
+        let paymentModal = null;
+
+        function getPaymentModal() {
+            if (!paymentModal) paymentModal = new bootstrap.Modal(paymentModalEl);
+            return paymentModal;
+        }
+
+        function closeModal() {
+            getPaymentModal().hide();
+            if (pollingInterval) clearInterval(pollingInterval);
+        }
 
         // Helper to handle relative paths
         // Use origin-relative paths for API calls to avoid subfolder issues on mekongcyberunit.app
@@ -895,14 +694,16 @@ $structuredData = [
             const confirmBtn = document.getElementById('confirmBtn');
             const staticNotice = document.getElementById('staticNotice');
             const pollingNotice = document.getElementById('pollingNotice');
+            const qrImage = document.getElementById('qrImage');
+            const qrPlaceholder = document.getElementById('qrPlaceholder');
             
             qrImage.style.display = 'none';
-            qrPlaceholder.style.display = 'block';
-            confirmBtn.style.display = 'none';
-            staticNotice.style.display = 'none';
-            pollingNotice.innerHTML = '<p style="font-size: 0.85rem; color: #92400e; margin: 0; display: flex; align-items: center; gap: 0.5rem;"><i class="ph-bold ph-spinner ph-spin"></i> កំពុងភ្ជាប់ទៅកាន់ប្រព័ន្ធទូទាត់... (Connecting...)</p>';
+            qrPlaceholder.classList.remove('d-none');
+            confirmBtn.classList.add('d-none');
+            staticNotice.classList.add('d-none');
+            pollingNotice.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> កំពុងភ្ជាប់ទៅកាន់ប្រព័ន្ធទូទាត់... (Connecting...)';
             
-            modal.classList.add('active');
+            getPaymentModal().show();
 
             try {
                 const response = await fetch(`${projectPath}api/bakong_qr.php?plan=${plan}&method=bakong&t=${Date.now()}`);
@@ -959,7 +760,7 @@ $structuredData = [
                 if (result.success) {
                     // Switch to waiting modal
                     closeModal();
-                    document.getElementById('waitingModal').classList.add('active');
+                    (new bootstrap.Modal(document.getElementById('waitingModal'))).show();
                     
                     startCountdown(120);
                     startApprovalPolling(result.ref);
@@ -1057,7 +858,7 @@ $structuredData = [
                      clearInterval(pollingInterval);
                      setTimeout(() => {
                          closeModal();
-                         document.getElementById('successModal').classList.add('active');
+                         (new bootstrap.Modal(document.getElementById('successModal'))).show();
                          setTimeout(() => {
                             window.location.href = `setup.php?plan=${currentPlan}&paid=true&md5=${md5}`;
                          }, 1000);
@@ -1103,7 +904,7 @@ $structuredData = [
 
                         setTimeout(() => {
                             closeModal();
-                            document.getElementById('successModal').classList.add('active');
+                            (new bootstrap.Modal(document.getElementById('successModal'))).show();
                             setTimeout(() => {
                                 const setupPath = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'setup.php';
                                 window.location.href = `${setupPath}?plan=${currentPlan}&paid=true&md5=${md5}`;
@@ -1125,24 +926,7 @@ $structuredData = [
             }, 2000); // Check every 2 seconds
         }
 
-        function closeModal() {
-            modal.classList.remove('active');
-            if (pollingInterval) {
-                clearInterval(pollingInterval);
-                pollingInterval = null;
-            }
-        }
-
-        // Auth Modal Functions
-        function openAuthModal() {
-            document.getElementById('authModal').classList.add('active');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-            document.getElementById('authError').style.display = 'none';
-        }
-
+        // Auth form handler
         async function handleAuthSubmit(event) {
             event.preventDefault();
             const form = event.target;
@@ -1151,7 +935,7 @@ $structuredData = [
             
             btn.disabled = true;
             btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Signing In...';
-            errorDiv.style.display = 'none';
+            errorDiv.classList.add('d-none');
             
             const formData = new FormData(form);
             formData.append('ajax', '1');
@@ -1173,7 +957,7 @@ $structuredData = [
                     }, 500);
                 } else {
                     errorDiv.textContent = result.error || 'Login failed';
-                    errorDiv.style.display = 'block';
+                    errorDiv.classList.remove('d-none');
                     btn.disabled = false;
                     btn.innerHTML = 'Sign In <i class="ph-bold ph-sign-in" style="margin-left: 8px;"></i>';
                 }
@@ -1188,37 +972,98 @@ $structuredData = [
 
         window.closeWaitingModal = function() {
             if(confirm("Are you sure you want to cancel the waiting process? Your payment notification has already been sent.")) {
-                document.getElementById('waitingModal').classList.remove('active');
+                const m = bootstrap.Modal.getInstance(document.getElementById('waitingModal'));
+                if (m) m.hide();
                 if (pollingInterval) clearInterval(pollingInterval);
                 if (countdownInterval) clearInterval(countdownInterval);
             }
         };
 
-        // FAQ Accordion Toggle
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', () => {
-                const item = question.parentElement;
-                
-                // Toggle current item
-                item.classList.toggle('active');
-                
-                // Close other items
-                document.querySelectorAll('.faq-item').forEach(otherItem => {
-                    if (otherItem !== item) {
-                        otherItem.classList.remove('active');
+        // ═══════════════════════════════════════════════════════
+        // SCROLL ANIMATIONS — Intersection Observer
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, idx) => {
+                    if (entry.isIntersecting) {
+                        // Staggered delay based on index within parent
+                        const siblings = entry.target.parentElement ? 
+                            Array.from(entry.target.parentElement.children).filter(c => c.classList.contains('animate-on-scroll')) : [];
+                        const delay = siblings.indexOf(entry.target) * 80;
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, Math.min(delay, 400));
+                        observer.unobserve(entry.target);
                     }
                 });
-            });
-        });
+            }, observerOptions);
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-            if (event.target == document.getElementById('authModal')) {
-                closeAuthModal();
-            }
-        }
+            // Observe all elements with animate-on-scroll class
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Also observe existing sections for staggered entrance
+            const sectionSelectors = [
+                '.feature-card', '.testimonial-card', '.system-card',
+                '.faq-item', '.metric-card', '.stat-card'
+            ];
+            
+            sectionSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach((el, idx) => {
+                    el.classList.add('animate-on-scroll');
+                    el.style.transitionDelay = (idx % 6) * 60 + 'ms';
+                    observer.observe(el);
+                });
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // HEADER SCROLL SHADOW
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const header = document.querySelector('.main-header');
+            if (!header) return;
+            
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                if (currentScroll > 10) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                lastScroll = currentScroll;
+            }, { passive: true });
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // ACTIVE NAV LINK HIGHLIGHT ON SCROLL
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-links .nav-item, .mobile-drawer .nav-item');
+            if (!sections.length || !navLinks.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                        });
+                    }
+                });
+            }, { threshold: 0.3, rootMargin: '-80px 0px -20% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+        })();
     </script>
 </body>
 </html>
+

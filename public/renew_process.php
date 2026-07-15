@@ -47,18 +47,19 @@ try {
     $newExpiry = date('Y-m-d H:i:s', strtotime("+$months months", $baseDate));
 
     if ($existing) {
-        // Update existing
+        // Update existing (clear trial flag on paid renewal)
         $db->update('tenant_systems', 
-            ['expires_at' => $newExpiry, 'status' => 'active', 'subscribed_at' => date('Y-m-d H:i:s')], 
+            ['expires_at' => $newExpiry, 'status' => 'active', 'is_trial' => 0, 'subscribed_at' => date('Y-m-d H:i:s')], 
             'tenant_id = ? AND system_id = ?', 
             [$tenantId, $planId]
         );
     } else {
-        // First time subscripting to this plan (or switching)
+        // First time subscribing to this plan (or switching)
         $db->insert('tenant_systems', [
             'tenant_id' => $tenantId,
             'system_id' => $planId,
             'status' => 'active',
+            'is_trial' => 0,
             'expires_at' => $newExpiry
         ]);
     }

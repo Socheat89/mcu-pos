@@ -7,6 +7,7 @@ class Database
 
     private function __construct()
     {
+
         $config = require __DIR__ . '/../../config/database.php';
         $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}";
         $this->pdo = new PDO($dsn, $config['username'], $config['password']);
@@ -20,6 +21,7 @@ class Database
 
     public static function getInstance()
     {
+
         if (self::$instance === null) {
             self::$instance = new self();
         }
@@ -33,6 +35,7 @@ class Database
 
     public function query($sql, $params = [])
     {
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
@@ -50,6 +53,7 @@ class Database
 
     public function insert($table, $data)
     {
+
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
@@ -59,6 +63,7 @@ class Database
 
     public function update($table, $data, $where, $whereParams = [])
     {
+
         $set = [];
         foreach ($data as $key => $value) {
             $set[] = "{$key} = :{$key}";
@@ -69,11 +74,13 @@ class Database
         $namedWhereParams = [];
         $paramIndex = 0;
         $namedWhere = preg_replace_callback('/\?/', function ($match) use ($whereParams, &$paramIndex, &$namedWhereParams) {
+
             $paramName = ":where{$paramIndex}";
             $namedWhereParams[$paramName] = $whereParams[$paramIndex];
             $paramIndex++;
             return $paramName;
         }, $where);
+
 
         $sql = "UPDATE {$table} SET {$setStr} WHERE {$namedWhere}";
         $params = array_merge($data, $namedWhereParams);
@@ -82,6 +89,7 @@ class Database
 
     public function delete($table, $where, $params = [])
     {
+
         $sql = "DELETE FROM {$table} WHERE {$where}";
         return $this->query($sql, $params)->rowCount();
     }

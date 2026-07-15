@@ -86,6 +86,7 @@ CREATE TABLE password_resets (
     INDEX idx_password_reset_expires (expires_at)
 );
 
+
 -- Settings Table for tenant-specific configurations
 CREATE TABLE settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -255,3 +256,4 @@ SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'staff' AND p.modul
 -- receipt_footer_text: Thank you for your business!
 -- receipt_font_size: 12
 -- receipt_paper_width: 400
+

@@ -25,8 +25,6 @@ RewriteRule ^$ public/ [L]
 RewriteCond %{REQUEST_URI} !^/public/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{DOCUMENT_ROOT}/mcu-pos/public/$1 -f [OR]
-RewriteCond %{DOCUMENT_ROOT}/Mekong_CyberUnit/public/$1 -f [OR]
 RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
 RewriteRule ^(.*)$ public/$1 [L]
 

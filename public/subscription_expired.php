@@ -15,6 +15,7 @@
     <main class="auth-shell">
     <div class="status-card">
         <div class="status-icon error">
+
             <i class="ph-bold ph-clock-countdown"></i>
         </div>
         <h2>Subscription Expired</h2>
@@ -25,5 +26,6 @@
         </div>
     </div>
     </main>
+
 </body>
 </html>

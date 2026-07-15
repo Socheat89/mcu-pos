@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../core/helpers/url.php';
 $urlPrefix = mc_base_path();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +24,7 @@ $urlPrefix = mc_base_path();
         .search-container input:focus { border-color: var(--pos-primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.15); }
         
         .product-img { width: 44px; height: 44px; border-radius: var(--pos-radius); background: #ffffff; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--pos-border); }
+
     </style>
 </head>
 <body class="pos-app">
@@ -37,6 +39,7 @@ $urlPrefix = mc_base_path();
             <a href="<?php echo htmlspecialchars($posUrl('products/create')); ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> <?php echo __('add'); ?>
             </a>
+
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -48,16 +51,19 @@ $urlPrefix = mc_base_path();
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_categories'); ?></span>
                 <p class="v">12</p>
+
                 <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-tags"></i></div>
             </div>
         </div>
 
         <div class="search-container">
+
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="<?php echo __('search_product_placeholder'); ?>" onkeyup="searchProducts()">
         </div>
 
         <div class="pos-table-container">
+
             <table class="pos-table" id="productsTable">
                 <thead>
                     <tr>
@@ -77,6 +83,7 @@ $urlPrefix = mc_base_path();
                                 </div>
                                 <h3 style="color: var(--pos-text); font-weight: 800; margin: 0;"><?php echo __('no_products_found'); ?></h3>
                                 <p style="color: var(--pos-text-muted); margin-top: 8px;"><?php echo __('start_adding_products'); ?></p>
+
                             </td>
                         </tr>
                     <?php else: ?>
@@ -99,6 +106,7 @@ $urlPrefix = mc_base_path();
                                 <td>
                                     <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($p['name']); ?></div>
                                     <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">SKU: <?php echo htmlspecialchars($p['sku'] ?: 'N/A'); ?></div>
+
                                 </td>
                                 <td>
                                     <span class="badge <?php echo $badge; ?>">
@@ -135,6 +143,7 @@ $urlPrefix = mc_base_path();
                 row.style.display = text.includes(filter) ? '' : 'none';
             });
         }
+
     </script>
     
     <?php include __DIR__ . '/partials/footer.php'; ?>

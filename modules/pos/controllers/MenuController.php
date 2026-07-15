@@ -41,6 +41,7 @@ class MenuController {
         AuthMiddleware::handle();
 
         if (!Auth::isTenantAdmin()) {
+
             die('No permission');
         }
 

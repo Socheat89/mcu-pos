@@ -50,6 +50,10 @@ if (!function_exists('mc_base_path')) {
 
 if (!function_exists('mc_url')) {
     function mc_url(string $path = '', bool $absolute = false): string {
+        // If the path contains a full URL, extract and return it directly
+        if (preg_match('#https?://.+$#i', $path, $matches)) {
+            return $matches[0];
+        }
         $base = mc_base_path();
         $normalizedPath = $path === '' ? '' : '/' . ltrim($path, '/');
         $relative = $base === '' ? $normalizedPath : rtrim($base, '/') . $normalizedPath;

@@ -19,6 +19,12 @@ foreach ($helperCandidates as $helperPath) {
 if (!function_exists('mc_base_path')) {
     throw new RuntimeException('Unable to load core/helpers/url.php');
 }
+
+// Load Store class for store switcher
+$storeClassPath = dirname(__DIR__, 4) . '/core/classes/Store.php';
+if (is_file($storeClassPath) && !class_exists('Store')) {
+    require_once $storeClassPath;
+}
 $basePath = mc_base_path();
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
 
@@ -68,12 +74,14 @@ $navLabel = function (string $key): string {
         'pos'          => __('pos'),
         'sessions'     => __('sessions'),
         'holds'        => __('on_hold'),
+        'orders'       => __('orders'),
         'products'     => __('inventory'),
         'customers'    => __('customers'),
         'reports'      => __('analytics'),
         'settings'     => __('settings'),
         'cashiers'     => __('cashiers'),
         'digital_menu' => __('qr_menu'),
+        'stores'       => __('manage_stores'),
     ];
 
     return $labels[$key] ?? __($key);
@@ -94,27 +102,6 @@ $navLabel = function (string $key): string {
                     <span class="pos-brand__sub"><?php echo __('cyber_unit_pos'); ?></span>
                 </div>
             </a>
-
-            <?php $sidebarUser = Auth::user(); ?>
-            <div class="pos-sidebar__summary">
-                <div class="pos-sidebar__summary-top">
-                    <div class="pos-sidebar__summary-title"><?php echo htmlspecialchars($tenantName); ?></div>
-                    <div class="pos-sidebar__summary-badge">
-                        <i class="fas fa-signal"></i>
-                        Live
-                    </div>
-                </div>
-                <div class="pos-sidebar__summary-grid">
-                    <div class="pos-sidebar__summary-card">
-                        <span class="k"><?php echo __('mode'); ?></span>
-                        <span class="v"><?php echo __('terminal'); ?></span>
-                    </div>
-                    <div class="pos-sidebar__summary-card">
-                        <span class="k"><?php echo __('role'); ?></span>
-                        <span class="v"><?php echo htmlspecialchars($sidebarUser['role_name'] ?? 'POS'); ?></span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <nav class="pos-side-nav">
@@ -141,6 +128,12 @@ $navLabel = function (string $key): string {
             <?php if ($hasFeature('pos', 'holds')): ?>
             <a class="pos-side-link <?php echo $activeClass('holds'); ?>" href="<?php echo htmlspecialchars($posUrl('holds')); ?>">
                 <i class="fas fa-clock-rotate-left"></i><span><?php echo $navLabel('holds'); ?></span>
+            </a>
+            <?php endif; ?>
+
+            <?php if ($hasFeature('pos', 'orders')): ?>
+            <a class="pos-side-link <?php echo $activeClass('orders'); ?>" href="<?php echo htmlspecialchars($posUrl('orders')); ?>">
+                <i class="fas fa-list-ul"></i><span><?php echo $navLabel('orders'); ?></span>
             </a>
             <?php endif; ?>
 
@@ -184,6 +177,12 @@ $navLabel = function (string $key): string {
                 <?php if ($isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('digital_menu'); ?>" href="<?php echo htmlspecialchars($posUrl('menu/admin')); ?>">
                     <i class="fas fa-qrcode"></i><span><?php echo $navLabel('digital_menu'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('stores'); ?>" href="<?php echo htmlspecialchars($posUrl('stores')); ?>">
+                    <i class="fas fa-store-alt"></i><span><?php echo $navLabel('stores'); ?></span>
                 </a>
                 <?php endif; ?>
             <?php endif; ?>
@@ -359,8 +358,6 @@ $navLabel = function (string $key): string {
         if (window.innerWidth >= 980) {
             // Desktop: toggle collapse
             shell.classList.toggle('pos-shell--collapsed');
-            // Persist preference
-            localStorage.setItem('pos_sidebar_collapsed', shell.classList.contains('pos-shell--collapsed'));
         } else {
             // Mobile: toggle drawer
             setOpen(!shell.classList.contains('pos-shell--open'));
@@ -368,13 +365,6 @@ $navLabel = function (string $key): string {
     }
 
     window.__posToggleSidebar = toggle;
-
-    // Restore state on load
-    if (window.innerWidth >= 980) {
-        var collapsed = localStorage.getItem('pos_sidebar_collapsed') === 'true';
-        var shell = document.getElementById('posShell');
-        if (shell && collapsed) shell.classList.add('pos-shell--collapsed');
-    }
 
     var overlay = document.getElementById('posOverlay');
     if (overlay) {
@@ -546,4 +536,93 @@ $navLabel = function (string $key): string {
         var s = document.getElementById('posLangSwitcher');
         if (s && !s.contains(e.target)) s.classList.remove('active');
     });
+</script>
+
+<!-- 📱 Mobile Touch Enhancements -->
+<script>
+(function() {
+    // Remove 300ms tap delay on all interactive elements
+    var style = document.createElement('style');
+    style.textContent = 'a, button, input, select, textarea, .btn, .pos-side-link, .pill-btn, .pos-tab-link { touch-action: manipulation; }';
+    document.head.appendChild(style);
+
+    // Swipe right to open sidebar on mobile
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        var diff = e.changedTouches[0].clientX - touchStartX;
+        // Swipe right > 80px from left edge → open sidebar
+        if (diff > 80 && touchStartX < 30 && window.innerWidth < 980) {
+            var shell = document.getElementById('posShell');
+            if (shell && !shell.classList.contains('pos-shell--open')) {
+                shell.classList.add('pos-shell--open');
+                var overlay = document.getElementById('posOverlay');
+                if (overlay) overlay.setAttribute('aria-hidden', 'false');
+            }
+        }
+        // Swipe left > 80px → close sidebar
+        if (diff < -80 && window.innerWidth < 980) {
+            var shell = document.getElementById('posShell');
+            if (shell && shell.classList.contains('pos-shell--open')) {
+                shell.classList.remove('pos-shell--open');
+                var overlay = document.getElementById('posOverlay');
+                if (overlay) overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
+    });
+
+    // Add scroll hint on tables
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inject PWA meta tags for installable webapp
+        var head = document.head;
+
+        // Apple mobile webapp
+        if (!document.querySelector('meta[name="apple-mobile-web-app-capable"]')) {
+            var appleCapable = document.createElement('meta');
+            appleCapable.name = 'apple-mobile-web-app-capable';
+            appleCapable.content = 'yes';
+            head.appendChild(appleCapable);
+        }
+        if (!document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')) {
+            var appleStatus = document.createElement('meta');
+            appleStatus.name = 'apple-mobile-web-app-status-bar-style';
+            appleStatus.content = 'black-translucent';
+            head.appendChild(appleStatus);
+        }
+        if (!document.querySelector('link[rel="manifest"]')) {
+            var manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = '/public/manifest.json';
+            head.appendChild(manifestLink);
+        }
+        if (!document.querySelector('meta[name="theme-color"]')) {
+            var themeColor = document.createElement('meta');
+            themeColor.name = 'theme-color';
+            themeColor.content = '#06b6d4';
+            head.appendChild(themeColor);
+        }
+
+        var tables = document.querySelectorAll('.pos-table-container, .pos-table');
+        tables.forEach(function(t) {
+            if (t.scrollWidth > t.clientWidth) {
+                t.style.setProperty('--table-scroll-hint', '"← swipe →"');
+                t.setAttribute('data-scrollable', 'true');
+            }
+        });
+
+        // Prevent pinch-zoom on mobile
+        var vp = document.querySelector('meta[name="viewport"]');
+        if (vp) {
+            vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/public/service-worker.js');
+        }
+    });
+})();
 </script>

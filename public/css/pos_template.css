@@ -60,6 +60,7 @@
 }
 
 html, body {
+
     height: 100%;
 }
 
@@ -73,6 +74,7 @@ body.pos-app {
 }
 
 /* Remove decorative backgrounds */
+
 body {
     background-image: none !important;
 }
@@ -92,6 +94,7 @@ body {
 }
 
 /* ── Layout Shell ────────────────────────────────────────────────────────── */
+
 .pos-shell {
     min-height: 100vh;
     display: grid;
@@ -100,12 +103,14 @@ body {
 }
 
 /* Overlay for mobile sidebar */
+
 .pos-overlay {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(5, 8, 22, 0.75);
     backdrop-filter: blur(8px);
+
     z-index: 1000;
 }
 
@@ -114,6 +119,7 @@ body {
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
+
 .pos-sidebar {
     position: sticky;
     top: 0;
@@ -145,6 +151,7 @@ body {
 /* Brand */
 .pos-sidebar__brand {
     padding: 4px 4px 16px;
+
 }
 
 .pos-brand {
@@ -165,6 +172,7 @@ body {
 .pos-brand:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(129, 140, 248, 0.15);
+
 }
 
 .pos-brand::after {
@@ -172,6 +180,7 @@ body {
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 50%);
+
     pointer-events: none;
 }
 
@@ -184,6 +193,7 @@ body {
     place-items: center;
     box-shadow: 0 8px 24px rgba(129, 140, 248, 0.3);
     flex-shrink: 0;
+
     position: relative;
     z-index: 1;
 }
@@ -227,6 +237,7 @@ body {
     border-radius: var(--pos-radius);
     border: 1px solid var(--pos-border);
     background: rgba(255, 255, 255, 0.02);
+
 }
 
 .pos-sidebar__summary-top {
@@ -234,6 +245,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+
     margin-bottom: 12px;
 }
 
@@ -244,6 +256,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
 }
 
 .pos-sidebar__summary-badge {
@@ -253,18 +266,21 @@ body {
     padding: 4px 10px;
     border-radius: 9999px;
     background: rgba(52, 211, 153, 0.12);
+
     color: #86efac;
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     flex-shrink: 0;
+
 }
 
 .pos-sidebar__summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+
 }
 
 .pos-sidebar__summary-card {
@@ -272,6 +288,7 @@ body {
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--pos-border);
+
 }
 
 .pos-sidebar__summary-card .k {
@@ -281,6 +298,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: rgba(255, 255, 255, 0.4);
+
     margin-bottom: 4px;
 }
 
@@ -381,6 +399,7 @@ body {
 /* Collapsed Sidebar (Desktop) */
 .pos-shell--collapsed {
     grid-template-columns: 80px 1fr;
+
 }
 
 .pos-shell--collapsed .pos-brand__text,
@@ -393,11 +412,13 @@ body {
 
 .pos-shell--collapsed .pos-sidebar {
     padding: 12px 8px;
+
 }
 
 .pos-shell--collapsed .pos-brand {
     justify-content: center;
     padding: 10px;
+
 }
 
 .pos-shell--collapsed .pos-side-link {
@@ -407,6 +428,7 @@ body {
 
 .pos-shell--collapsed .pos-side-link i {
     font-size: 18px;
+
     margin: 0;
 }
 
@@ -468,6 +490,7 @@ body {
     color: var(--pos-primary);
     border-color: rgba(6, 182, 212, 0.2);
     transform: translateY(-1px);
+
 }
 
 .pos-status-indicator {
@@ -478,6 +501,7 @@ body {
     border-radius: 9999px;
     background: rgba(14, 19, 34, 0.6);
     border: 1px solid var(--pos-border);
+
 }
 
 .pos-status-dot {
@@ -499,6 +523,7 @@ body {
     font-size: 13px;
     color: var(--pos-text);
     text-transform: capitalize;
+
 }
 
 .pos-header-right {
@@ -506,6 +531,7 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
+
 }
 
 .pos-clock-widget {
@@ -533,12 +559,14 @@ body {
     color: var(--pos-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
 }
 
 .pos-header-divider {
     width: 1px;
     height: 28px;
     background: var(--pos-border);
+
 }
 
 .pos-user-profile {
@@ -556,6 +584,7 @@ body {
 .pos-user-profile:hover {
     background: rgba(6, 182, 212, 0.06);
     border-color: rgba(6, 182, 212, 0.15);
+
     transform: translateY(-1px);
 }
 
@@ -567,6 +596,7 @@ body {
     display: block;
     font-weight: 700;
     font-size: 13px;
+
     color: var(--pos-text);
 }
 
@@ -583,6 +613,7 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
+
     background: var(--pos-gradient-primary);
     color: #fff;
     display: grid;
@@ -650,12 +681,14 @@ body {
     border: 1px solid var(--pos-border);
     border-radius: var(--pos-radius);
     transition: all 0.3s ease;
+
     overflow: hidden;
 }
 
 .pos-card:hover {
     border-color: rgba(15, 118, 110, 0.2);
     box-shadow: var(--pos-shadow-md);
+
 }
 
 .pos-card.pad {
@@ -731,6 +764,7 @@ body {
     font-family: 'Space Grotesk', sans-serif;
     position: relative;
     z-index: 1;
+
 }
 
 .pos-stat .chip {
@@ -749,6 +783,7 @@ body {
 /* ── Tables ──────────────────────────────────────────────────────────────── */
 .pos-table-container {
     background: var(--pos-card);
+
     border-radius: var(--pos-radius);
     border: 1px solid var(--pos-border);
     overflow: hidden;
@@ -763,11 +798,13 @@ body {
 .pos-table th {
     background: rgba(255, 255, 255, 0.02);
     padding: 14px 20px;
+
     text-align: left;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+
     color: var(--pos-text-muted);
     border-bottom: 1px solid var(--pos-border);
 }
@@ -775,6 +812,7 @@ body {
 .pos-table td {
     padding: 14px 20px;
     font-size: 13px;
+
     font-weight: 600;
     color: var(--pos-text);
     border-bottom: 1px solid var(--pos-border);
@@ -790,6 +828,7 @@ body {
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -806,6 +845,7 @@ body {
     outline: none;
     font-family: inherit;
     white-space: nowrap;
+
 }
 
 .btn-primary {
@@ -823,6 +863,7 @@ body {
     background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
     opacity: 0;
     transition: opacity 0.25s ease;
+
 }
 
 .btn-primary:hover {
@@ -836,6 +877,7 @@ body {
 
 .btn-outline {
     background: transparent;
+
     color: var(--pos-text);
     border: 1.5px solid var(--pos-border);
 }
@@ -850,6 +892,7 @@ body {
     background: rgba(248, 113, 113, 0.1);
     color: var(--pos-danger);
     border: 1px solid rgba(248, 113, 113, 0.15);
+
 }
 
 .btn-danger:hover {
@@ -876,11 +919,13 @@ body {
     border-radius: 10px;
     border: 1px solid var(--pos-border);
     background: rgba(14, 19, 34, 0.6);
+
     display: grid;
     place-items: center;
     cursor: pointer;
     color: var(--pos-text-muted);
     transition: all 0.25s ease;
+
 }
 
 .pos-icon-btn:hover {
@@ -1016,6 +1061,7 @@ body {
 @keyframes posModalIn {
     from { opacity: 0; transform: translateY(12px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
+
 }
 
 .pos-modal-overlay {
@@ -1023,6 +1069,7 @@ body {
     inset: 0;
     background: rgba(5, 8, 22, 0.7);
     backdrop-filter: blur(8px);
+
     display: none;
     place-items: center;
     justify-content: center;
@@ -1048,6 +1095,7 @@ body {
 
 .pos-modal__header {
     padding: 20px 28px;
+
     border-bottom: 1px solid var(--pos-border);
     display: flex;
     align-items: center;
@@ -1064,6 +1112,7 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 12px;
+
     background: var(--pos-primary-light);
     color: var(--pos-primary);
     display: grid;
@@ -1074,6 +1123,7 @@ body {
 .pos-modal__title h3 {
     font-size: 17px;
     font-weight: 700;
+
     margin: 0;
     color: var(--pos-text);
 }
@@ -1081,6 +1131,7 @@ body {
 .pos-modal__title p {
     margin: 3px 0 0;
     font-size: 12px;
+
     color: var(--pos-text-muted);
 }
 
@@ -1090,6 +1141,7 @@ body {
     border-radius: 10px;
     border: 1px solid var(--pos-border);
     background: rgba(255, 255, 255, 0.03);
+
     color: var(--pos-text-muted);
     cursor: pointer;
     display: grid;
@@ -1099,6 +1151,7 @@ body {
 
 .pos-modal__close:hover {
     background: rgba(255, 255, 255, 0.08);
+
     color: var(--pos-text);
 }
 
@@ -1284,6 +1337,7 @@ body {
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
+
 @media (max-width: 980px) {
     .pos-shell {
         grid-template-columns: 1fr;
@@ -1297,6 +1351,7 @@ body {
         width: 280px;
         transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: 20px 0 60px rgba(0, 0, 0, 0.5);
+
     }
 
     .pos-shell--open .pos-sidebar {
@@ -1304,6 +1359,7 @@ body {
         width: min(86vw, 320px);
         border-top-right-radius: var(--pos-radius-xl);
         border-bottom-right-radius: var(--pos-radius-xl);
+
     }
 
     .pos-sidebar-toggle {
@@ -1344,6 +1400,7 @@ body {
 
 /* ── Print ───────────────────────────────────────────────────────────────── */
 @media print {
+
     .pos-sidebar,
     .pos-topbar,
     .pos-overlay,
@@ -1351,6 +1408,7 @@ body {
     .pos-pill,
     .pos-footer,
     .pos-toast-host {
+
         display: none !important;
     }
 
@@ -1708,6 +1766,342 @@ textarea:focus {
         white-space: nowrap;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   📱 MOBILE-FIRST RESPONSIVE ENHANCEMENTS
+   Touch-friendly, readable, easy to tap on phones (320px – 768px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Phone (≤480px) ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    /* Typography */
+    h1, .pos-title h1 { font-size: 22px !important; }
+    h2 { font-size: 18px !important; }
+    h3, .pos-card-title { font-size: 15px !important; }
+    p, .pos-title p { font-size: 13px !important; }
+
+    /* Page padding */
+    .pos-page {
+        padding: 14px 10px 20px !important;
+    }
+
+    /* ── Tables: horizontal scroll ── */
+    .pos-table-container,
+    .pos-panel,
+    div[style*="overflow-x:auto"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -10px;
+        padding: 0 10px;
+        width: calc(100% + 20px);
+    }
+
+    .pos-table {
+        min-width: 600px;
+        font-size: 12px;
+    }
+
+    .pos-table th,
+    .pos-table td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+    }
+
+    /* ── Cards full width ── */
+    .report-card,
+    .store-sales-card,
+    .pos-card {
+        padding: 16px !important;
+    }
+
+    /* ── Grids: always single column ── */
+    .pos-grid.cols-2,
+    .pos-grid.cols-3,
+    .pos-grid.cols-4,
+    [style*="grid-template-columns: repeat(auto-fit"],
+    [style*="grid-template-columns: repeat(auto-fill"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* ── Stat cards ── */
+    .pos-stat .v { font-size: 22px !important; }
+    .pos-stat .k { font-size: 10px !important; }
+    .pos-stat { padding: 14px !important; }
+
+    /* ── Store filter bar ── */
+    .store-filter-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+    .store-filter-bar select {
+        width: 100% !important;
+    }
+
+    /* ── Header actions stack ── */
+    .fade-in > div[style*="display: flex"],
+    .fade-in > div[style*="display:flex"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .fade-in > div[style*="display: flex"] > .btn,
+    .fade-in > div[style*="display:flex"] > .btn,
+    .fade-in > div[style*="display: flex"] > a.btn,
+    .fade-in > div[style*="display:flex"] > a.btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* ── Buttons: touch-friendly ── */
+    .btn {
+        min-height: 44px;
+        padding: 12px 18px !important;
+        font-size: 13px !important;
+    }
+
+    .btn-sm, .pill-btn {
+        min-height: 38px;
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+    }
+
+    /* ── Form controls ── */
+    .pos-form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    select,
+    textarea {
+        font-size: 16px !important;  /* Prevents iOS zoom on focus */
+        padding: 14px 14px !important;
+        min-height: 48px;
+    }
+
+    .pos-form-label { font-size: 12px !important; }
+
+    /* ── Modals ── */
+    .pos-modal,
+    .csh-modal,
+    .modal {
+        width: 94% !important;
+        max-width: 94vw !important;
+        padding: 20px 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .csh-modal-backdrop {
+        padding: 10px !important;
+    }
+
+    /* ── Modal buttons full-width ── */
+    .pos-modal .pos-form-group + div[style*="display:flex"],
+    .csh-modal div[style*="display:flex"][style*="gap"] {
+        flex-direction: column !important;
+    }
+
+    .pos-modal .btn,
+    .csh-modal .btn {
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    /* ── Cashier list ── */
+    .csh-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .csh-row {
+        flex-wrap: wrap !important;
+        padding: 14px !important;
+        gap: 10px !important;
+    }
+
+    .csh-actions {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    .csh-form {
+        position: static !important;
+    }
+
+    /* ── Hold cards ── */
+    .hold-card {
+        flex-direction: column !important;
+        gap: 14px !important;
+        padding: 16px !important;
+    }
+
+    .hold-card > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* ── Session open form ── */
+    .form-card {
+        padding: 20px 16px !important;
+    }
+
+    /* ── Products page import panel ── */
+    .import-panel__header {
+        padding: 14px 16px !important;
+    }
+    .import-panel__body {
+        padding: 0 16px 16px !important;
+    }
+    .import-tabs {
+        flex-wrap: wrap !important;
+    }
+    .import-upload-zone {
+        padding: 20px 14px !important;
+    }
+
+    /* ── Tabs scroll ── */
+    .pos-tabs {
+        width: 100% !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Sidebar ── */
+    .pos-shell--open .pos-sidebar {
+        width: min(88vw, 300px) !important;
+    }
+}
+
+/* ── Tablet (481px – 768px) ─────────────────────────────────────────────── */
+@media (min-width: 481px) and (max-width: 768px) {
+    .pos-page {
+        padding: 18px 16px 24px !important;
+    }
+
+    .pos-grid.cols-3,
+    .pos-grid.cols-4 {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 14px !important;
+    }
+
+    .csh-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .csh-form {
+        position: static !important;
+    }
+
+    .fade-in > div[style*="display: flex"] {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+
+    .btn {
+        min-height: 44px;
+        padding: 12px 18px !important;
+    }
+
+    .pos-table {
+        min-width: 500px;
+    }
+}
+
+/* ── Medium (769px – 1024px) ────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .pos-grid.cols-4 {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .pos-grid.cols-3 {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .csh-layout {
+        grid-template-columns: 340px 1fr !important;
+        gap: 20px !important;
+    }
+}
+
+/* 📱 Mobile Sidebar Drawer — bigger, clearer */
+@media (max-width: 980px) {
+  .pos-sidebar {
+    padding: 12px !important;
+  }
+  .pos-brand {
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+  .pos-brand__logo {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .pos-brand__title {
+    font-size: 18px !important;
+  }
+  .pos-side-link {
+    padding: 14px 16px !important;
+    font-size: 15px !important;
+    gap: 14px !important;
+    margin-bottom: 2px;
+    min-height: 50px;
+  }
+  .pos-side-link i {
+    font-size: 18px !important;
+    width: 24px !important;
+  }
+  .pos-nav-header {
+    font-size: 11px !important;
+    margin: 24px 16px 10px !important;
+  }
+  .pos-sidebar__footer .pos-side-link {
+    font-size: 15px !important;
+    padding: 14px 16px !important;
+  }
+  
+  /* Sidebar drawer: wider */
+  .pos-shell--open .pos-sidebar {
+    width: min(88vw, 320px) !important;
+  }
+  .pos-sidebar-toggle {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* 📊 Dashboard Mobile Fixes */
+@media (max-width: 768px) {
+  .dashboard-hero {
+    padding: 24px 18px !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    border-radius: 20px !important;
+  }
+  .dashboard-hero h1 {
+    font-size: 24px !important;
+  }
+  .dashboard-hero p {
+    font-size: 13px !important;
+  }
+  .dashboard-hero .hero-right .big-number {
+    font-size: 36px !important;
+  }
+  
+  .notification-card {
+    flex-direction: column !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   END MOBILE ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ============================================================================
    POS Clean UI - Odoo POS Style
@@ -2100,3 +2494,4 @@ textarea:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+

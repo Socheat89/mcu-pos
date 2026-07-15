@@ -22,6 +22,7 @@ class DashboardController {
         // Get active session
         $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
 
+
         // Get stats
         $stats = [];
 

@@ -57,7 +57,19 @@ if (empty($selectedSystems)) {
     $errors[] = 'Please select at least one system';
 }
 
-if ($paymentStatus !== 'paid') {
+// Initialize DB early for plan validation
+$db = Database::getInstance();
+
+// Check if selected plan is a free trial (price = 0)
+$isFreeTrial = false;
+if (!empty($selectedSystems)) {
+    $planCheck = $db->fetchOne("SELECT price FROM systems WHERE id = ? AND status = 'active'", [$selectedSystems[0]]);
+    if ($planCheck && (float)$planCheck['price'] === 0.00) {
+        $isFreeTrial = true;
+    }
+}
+
+if (!$isFreeTrial && $paymentStatus !== 'paid') {
     $errors[] = 'Payment is required to create an account';
 }
 
@@ -68,7 +80,6 @@ if (!empty($errors)) {
 }
 
 try {
-    $db = Database::getInstance();
 
     // Check if subdomain is unique
     $existingTenant = $db->fetchOne("SELECT id FROM tenants WHERE subdomain = ?", [$subdomain]);
@@ -115,12 +126,15 @@ try {
     ]);
 
     // Subscribe to selected systems
-    $expiryDate = date('Y-m-d H:i:s', strtotime('+30 days'));
+    // Free trial: 7 days expiry; Paid: 30 days expiry
+    $expiryDays = $isFreeTrial ? 7 : 30;
+    $expiryDate = date('Y-m-d H:i:s', strtotime("+{$expiryDays} days"));
     foreach ($selectedSystems as $systemId) {
         $db->insert('tenant_systems', [
-            'tenant_id' => $tenantId,
-            'system_id' => $systemId,
-            'status' => 'active',
+            'tenant_id'  => $tenantId,
+            'system_id'  => $systemId,
+            'status'     => 'active',
+            'is_trial'   => $isFreeTrial ? 1 : 0,
             'expires_at' => $expiryDate
         ]);
     }

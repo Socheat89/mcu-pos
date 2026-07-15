@@ -27,6 +27,7 @@ $success = $_GET['success'] ?? '';
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+
     <style>
         :root {
             --primary: #2563eb;
@@ -46,6 +47,7 @@ $success = $_GET['success'] ?? '';
 
         body {
             background: #0f172a; /* Sleek dark background */
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -119,6 +121,7 @@ $success = $_GET['success'] ?? '';
         .login-card:hover {
             border-color: rgba(255, 255, 255, 0.15) !important;
             box-shadow: 0 35px 100px rgba(0, 0, 0, 0.45) !important;
+
         }
 
         .header {
@@ -164,6 +167,7 @@ $success = $_GET['success'] ?? '';
             letter-spacing: 0.8px;
             color: #94a3b8;
         }
+
         
         .input-wrapper {
             position: relative;
@@ -180,6 +184,7 @@ $success = $_GET['success'] ?? '';
             transition: color 0.25s ease;
             pointer-events: none;
             z-index: 10;
+
         }
 
         .input-wrapper input {
@@ -271,6 +276,7 @@ $success = $_GET['success'] ?? '';
             background: rgba(16, 185, 129, 0.1);
             color: #34d399;
             border-color: rgba(16, 185, 129, 0.2);
+
         }
 
         .footer-note {
@@ -312,6 +318,7 @@ $success = $_GET['success'] ?? '';
         <div class="blob blob-3"></div>
     </div>
 
+
     <div class="login-card">
         <div class="header">
             <div class="logo-box">
@@ -325,6 +332,7 @@ $success = $_GET['success'] ?? '';
             <div class="alert">
                 <i class="ph-bold ph-warning-circle" style="font-size: 18px;"></i>
                 <span><?php echo htmlspecialchars($error); ?></span>
+
             </div>
         <?php endif; ?>
 
@@ -332,6 +340,7 @@ $success = $_GET['success'] ?? '';
             <div class="alert alert-success">
                 <i class="ph-bold ph-check-circle" style="font-size: 18px;"></i>
                 <span><?php echo htmlspecialchars($success); ?></span>
+
             </div>
         <?php endif; ?>
 
@@ -341,6 +350,7 @@ $success = $_GET['success'] ?? '';
                 <div class="input-wrapper">
                     <i class="ph ph-user prefix-icon"></i>
                     <input type="text" name="username" required placeholder="Enter master username" autocomplete="username">
+
                 </div>
             </div>
 
@@ -362,6 +372,7 @@ $success = $_GET['success'] ?? '';
                 <i class="ph ph-shield-warning" style="font-size: 20px;"></i>
                 <span>Authorize Access</span>
             </button>
+
         </form>
 
         <div class="footer-note">
@@ -382,5 +393,6 @@ $success = $_GET['success'] ?? '';
             }
         }
     </script>
+
 </body>
 </html>

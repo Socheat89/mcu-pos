@@ -71,3 +71,4 @@ class Product {
 
 Product::init();
 ?>
+

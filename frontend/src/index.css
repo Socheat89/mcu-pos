@@ -600,3 +600,465 @@ select:focus,
   color: #e05038 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ☕ CAFÉ-STYLE POS DESIGN — Clean, warm, image-first product cards
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Product Card ──────────────────────────────────────────── */
+.pos-product-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.pos-product-card:active {
+  transform: scale(0.97);
+}
+
+.pos-product-img {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  background: #FFF8F0;
+}
+
+/* Price badge - floating bottom-left */
+.pos-price-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+/* Stock dot - top-right */
+.pos-stock-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+/* Product info below image */
+.pos-product-info {
+  padding: 10px 12px 12px;
+}
+
+.pos-product-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pos-product-sku {
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Category Pills ───────────────────────────────────────── */
+.pos-category-pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.25s;
+  border: 1.5px solid #eee;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+}
+
+.pos-category-pill.active {
+  background: #E76F51;
+  color: #fff;
+  border-color: #E76F51;
+}
+
+/* ── Cart Item ────────────────────────────────────────────── */
+.pos-cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 56px;
+}
+
+.pos-cart-item:last-child {
+  border-bottom: none;
+}
+
+.pos-cart-item-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #FFF8F0;
+}
+
+.pos-cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pos-cart-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-cart-item-price {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.pos-cart-qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  color: #E76F51;
+  transition: all 0.15s;
+}
+
+.pos-cart-qty-btn:active {
+  background: #E76F51;
+  color: #fff;
+  border-color: #E76F51;
+}
+
+/* ── Checkout / Payment Summary ───────────────────────────── */
+.pos-checkout-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.pos-checkout-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 2px solid #eee;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* ── Warm Accent Colors ───────────────────────────────────── */
+:root {
+  --cafe-primary: #E76F51;
+  --cafe-warm: #F4A261;
+  --cafe-light: #FFF8F0;
+  --cafe-text: #1a1a2e;
+  --cafe-muted: #999;
+}
+
+/* ── Mobile Bottom Tab Bar ───────────────────────────────── */
+@media (max-width: 1023px) {
+  .lg\:hidden.flex-shrink-0.flex.border-t {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+  }
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   📱 MOBILE TOUCH OPTIMIZATION — Big tap targets, thumb-friendly layout
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* ── Prevent iOS zoom on inputs ── */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* ── Keypad buttons: minimum 44px tap target ── */
+  .grid-cols-4.gap-1 button,
+  div[class*="grid-cols-4"] button {
+    min-height: 48px !important;
+    height: auto !important;
+    font-size: 15px !important;
+    border-radius: 10px !important;
+  }
+
+  /* ── Payment button: bigger & full-height ── */
+  aside .w-\[96px\] {
+    width: 112px !important;
+  }
+
+  /* ── Clear cart & Payment buttons ── */
+  aside .h-8 {
+    min-height: 48px !important;
+    height: auto !important;
+  }
+
+  /* ── Mode buttons (Qty/Disc/Price) more visible ── */
+  .grid-cols-4.gap-1 button.bg-gray-100 {
+    font-size: 11px !important;
+    min-height: 44px !important;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Payment text bigger ── */
+  aside button .text-\[10px\] {
+    font-size: 12px !important;
+  }
+
+  /* ── Product cards: bigger tap area ── */
+  .glass-card {
+    min-height: 148px;
+  }
+
+  .glass-card .aspect-\[4\/3\] {
+    aspect-ratio: 1/1 !important;
+  }
+
+  /* ── Product name & price bigger ── */
+  .glass-card h4 {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+  }
+
+  .glass-card .text-sm.font-black {
+    font-size: 16px !important;
+  }
+
+  /* ── Stock badge bigger ── */
+  .glass-card .text-\[9px\] {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* ── In-cart quantity badge bigger ── */
+  .product-overlay .rounded-full {
+    padding: 6px 14px !important;
+    font-size: 14px !important;
+  }
+
+  /* ── Hover overlay Plus button bigger ── */
+  .product-overlay .h-8.w-8 {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* ── Category/header chips bigger ── */
+  header button,
+  header a {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* ── Search input bigger ── */
+  input[placeholder*="Search"],
+  input[placeholder*="ស្វែង"],
+  input[placeholder*="搜索"] {
+    min-height: 48px !important;
+    font-size: 16px !important;
+    padding: 12px 16px !important;
+  }
+
+  /* ── Cart item rows: bigger tap zone ── */
+  aside .flex.items-center.gap-2 {
+    min-height: 44px;
+    padding: 8px 0;
+  }
+
+  /* ── Cart quantity buttons + / - bigger ── */
+  aside button svg.lucide,
+  aside button .lucide {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* ── Remove hover scale on mobile (annoying) ── */
+  .glass-card:hover {
+    transform: none !important;
+  }
+
+  /* ── Prevent accidental double-tap zoom ── */
+  button, a, .glass-card {
+    touch-action: manipulation;
+  }
+
+  /* ── Pending orders drawer full-width ── */
+  .max-w-sm {
+    max-width: 92vw !important;
+  }
+
+  /* ── Modal payment wider ── */
+  .modal-backdrop > div[class*="max-w"] {
+    max-width: 94vw !important;
+    width: 94vw !important;
+  }
+
+  /* ── Scrollable areas smoother ── */
+  .overflow-y-auto, .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Medium phones / tablet portrait ── */
+@media (max-width: 768px) {
+  /* 🔥 CAFÉ CART — Big, readable, tappable */
+  .pos-cart-item {
+    min-height: 64px !important;
+    padding: 14px 12px !important;
+    gap: 14px !important;
+  }
+
+  .pos-cart-item-img {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+  }
+
+  .pos-cart-item-name {
+    font-size: 15px !important;
+  }
+
+  .pos-cart-item-price {
+    font-size: 13px !important;
+  }
+
+  /* Cart total/price in cart item */
+  .pos-cart-item > div:last-child {
+    font-size: 16px !important;
+  }
+
+  /* Order tabs — bigger */
+  aside [class*="items-center"][class*="gap-1"] {
+    padding: 8px 10px !important;
+  }
+
+  aside button .text-\[11px\] {
+    font-size: 14px !important;
+  }
+
+  /* Customer selector — bigger */
+  aside select,
+  aside .relative select {
+    font-size: 14px !important;
+    padding: 12px 32px 12px 32px !important;
+    min-height: 48px !important;
+  }
+
+  /* Cart subtotal/total section — bigger */
+  aside .text-\[11px\].font-medium {
+    font-size: 14px !important;
+  }
+
+  aside .text-xs.font-black {
+    font-size: 15px !important;
+  }
+
+  aside .text-sm.font-black {
+    font-size: 18px !important;
+  }
+
+  /* Cart empty state — bigger */
+  aside .h-8.w-8.mb-2 {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Product cards — even bigger on mobile */
+  .pos-product-card {
+    min-height: 180px !important;
+  }
+
+  .pos-product-name {
+    font-size: 14px !important;
+  }
+
+  .pos-product-sku {
+    font-size: 11px !important;
+  }
+
+  .pos-price-badge {
+    font-size: 16px !important;
+    padding: 6px 14px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+  }
+
+  /* Category pills — bigger */
+  .pos-category-pill {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    border-radius: 24px !important;
+  }
+
+  /* Cart footer area spacing */
+  aside .flex-shrink-0.px-3 {
+    padding: 12px 14px !important;
+  }
+
+  /* "Cart (2 items)" heading */
+  aside h3, aside .font-bold.text-\[11px\] {
+    font-size: 15px !important;
+  }
+}
+
+/* ── Very small phones (≤380px) ── */
+@media (max-width: 380px) {
+  .glass-card {
+    min-height: 130px;
+  }
+
+  .glass-card h4 {
+    font-size: 12px !important;
+  }
+
+  .glass-card .text-sm.font-black {
+    font-size: 14px !important;
+  }
+
+  .grid-cols-4.gap-1 button {
+    min-height: 42px !important;
+    font-size: 14px !important;
+  }
+
+  aside .w-\[96px\] {
+    width: 96px !important;
+  }
+}
+

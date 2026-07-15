@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo __('on_hold'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +18,7 @@
         .hold-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--pos-warning); opacity: 0.5; }
         .hold-card:hover { transform: translateY(-4px); border-color: var(--pos-primary); box-shadow: var(--pos-shadow-lg), var(--pos-shadow-glow); }
         .hold-meta-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: rgba(255, 255, 255, 0.03); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--pos-border); }
+
     </style>
 </head>
 <body class="pos-app">
@@ -29,6 +31,7 @@
                     <i class="fas fa-pause-circle"></i> <?php echo __('transaction_queue'); ?>
                 </div>
                 <h1><?php echo __('on_hold'); ?></h1>
+
                 <p><?php echo __('held_orders_msg'); ?></p>
             </div>
             <a href="<?php echo htmlspecialchars($posUrl('pos')); ?>" class="btn btn-primary" style="padding: 14px 28px;">
@@ -39,6 +42,7 @@
         <?php if (!count($heldOrders ?? [])): ?>
             <div class="pos-card" style="padding: 100px 40px; text-align: center; border: 2px dashed var(--pos-border); background: transparent;">
                 <div style="width: 100px; height: 100px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 24px; box-shadow: var(--pos-shadow-sm);">
+
                     <i class="fas fa-file-invoice" style="font-size: 40px; color: var(--pos-border);"></i>
                 </div>
                 <h3 style="font-weight: 900; color: var(--pos-text);"><?php echo __('no_orders_standby'); ?></h3>
@@ -56,6 +60,7 @@
                     <div class="hold-card">
                         <div style="display: flex; align-items: center; gap: 20px;">
                             <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--pos-warning); display: grid; place-items: center; font-size: 20px;">
+
                                 <i class="fas fa-clock-rotate-left"></i>
                             </div>
                             <div>
