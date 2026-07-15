@@ -24,11 +24,11 @@
     
     <style>
         :root {
-            --brand: #0F766E;
-            --brand-strong: #0D9488;
-            --brand-light: #14B8A6;
-            --surface: rgba(255,255,255,0.52);
-            --border: rgba(15,118,110,0.12);
+            --brand: #308AC6;
+            --brand-strong: #1F6896;
+            --brand-light: #52A2D4;
+            --surface: rgba(255, 255, 255, 0.52);
+            --border: rgba(48, 138, 198, 0.12);
             --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -38,9 +38,9 @@
             position:absolute; border-radius:50%; filter:blur(90px); opacity:0.55;
             animation:floatBlob 18s infinite ease-in-out;
         }
-        .blob-1 { width:500px; height:500px; background:rgba(13,148,136,0.18); top:-15%; left:-8%; animation-delay:0s; }
-        .blob-2 { width:420px; height:420px; background:rgba(245,158,11,0.13); bottom:-12%; right:-10%; animation-delay:-6s; }
-        .blob-3 { width:360px; height:360px; background:rgba(37,99,235,0.10); top:45%; left:55%; animation-delay:-12s; }
+        .blob-1 { width:500px; height:500px; background:rgba(48, 138, 198, 0.15); top:-15%; left:-8%; animation-delay:0s; }
+        .blob-2 { width:420px; height:420px; background:rgba(82, 162, 212, 0.12); bottom:-12%; right:-10%; animation-delay:-6s; }
+        .blob-3 { width:360px; height:360px; background:rgba(37, 99, 235, 0.08); top:45%; left:55%; animation-delay:-12s; }
         @keyframes floatBlob {
             0%,100% { transform:translate(0,0) scale(1); }
             33% { transform:translate(60px,-50px) scale(1.12); }
@@ -462,7 +462,7 @@
                             <div class="checkbox-card__row-left">
                                 <span>Bakong KHQR</span>
                             </div>
-                            <div class="checkbox-price" style="color:#0F766E;">Instant</div>
+                            <div class="checkbox-price" style="color:var(--brand);">Instant</div>
                         </div>
                         <div class="checkbox-desc">Scan with Bakong or any Cambodian banking app</div>
                     </label>

@@ -24,6 +24,14 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
+        :root {
+            --brand: #308AC6;
+            --brand-strong: #1F6896;
+            --brand-light: #52A2D4;
+            --primary: #308AC6;
+            --border: rgba(48, 138, 198, 0.12);
+        }
+
         body, h1, h2, h3, h4, h5, h6, p, span, a, label, input, button {
             font-family: 'Sora', 'Battambang', sans-serif !important;
         }

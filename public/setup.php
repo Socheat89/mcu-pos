@@ -44,6 +44,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             --brand: #308AC6;
             --brand-strong: #1F6896;
             --brand-light: #52A2D4;
+            --primary: #308AC6;
+            --mc-primary: #308AC6;
             --surface: rgba(255, 255, 255, 0.85);
             --border: rgba(48, 138, 198, 0.15);
             --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
