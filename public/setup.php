@@ -268,6 +268,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.2rem;
+            min-width: 0;
         }
         .form-row-split {
             display: grid;
@@ -282,7 +283,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             text-align: left;
         }
         .form-group.full-width {
-            grid-column: span 2;
+            grid-column: 1 / -1;
         }
         .form-group label {
             font-size: 0.75rem;
@@ -374,11 +375,18 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 flex-direction: column;
                 gap: 8px;
             }
-            .form-grid, .form-row-split {
+            .form-grid {
                 grid-template-columns: 1fr;
             }
-            .form-group {
-                grid-column: span 1 !important;
+            .form-grid > .form-group.full-width,
+            .form-grid > .form-section-header {
+                grid-column: 1 / -1 !important;
+            }
+            .form-row-split {
+                grid-template-columns: 1fr;
+            }
+            .form-row-split .form-group {
+                grid-column: auto !important;
             }
             .stepper {
                 flex-direction: column;
@@ -557,7 +565,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                     <span class="form-helper">This will be your unique portal address.</span>
                 </div>
 
-                <div style="grid-column: span 2; margin: 1rem 0 0.5rem;">
+                <div class="form-section-header" style="grid-column: 1 / -1; margin: 1rem 0 0.5rem;">
                     <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         <i class="ph-bold ph-identification-card" style="color: var(--primary);"></i> Admin Credentials
                     </h3>
