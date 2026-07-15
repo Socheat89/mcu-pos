@@ -133,9 +133,9 @@ $settings = Settings::getAll($tenantId);
     <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6a5cff;
-            --primary-dark: #5648d4;
-            --secondary: #8a3ffc;
+            --primary: #308AC6;
+            --primary-dark: #1F6896;
+            --secondary: #4FA5DB;
             --accent: #2dd4ff;
             --success: #10b981;
             --warning: #f59e0b;
@@ -144,7 +144,7 @@ $settings = Settings::getAll($tenantId);
             --card-bg: #ffffff;
             --text: #1e293b;
             --text-muted: #64748b;
-            --border: rgba(30, 41, 59, 0.08);
+            --border: rgba(48, 138, 198, 0.08);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
         }
@@ -158,8 +158,8 @@ $settings = Settings::getAll($tenantId);
         body {
             font-family: "Battambang", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
             background: 
-                radial-gradient(900px 600px at 15% -10%, rgba(106, 92, 255, 0.15), transparent 60%),
-                radial-gradient(900px 600px at 110% 10%, rgba(138, 63, 252, 0.12), transparent 60%),
+                radial-gradient(900px 600px at 15% -10%, rgba(48, 138, 198, 0.15), transparent 60%),
+                radial-gradient(900px 600px at 110% 10%, rgba(31, 104, 150, 0.12), transparent 60%),
                 var(--bg);
             color: var(--text);
             min-height: 100vh;
