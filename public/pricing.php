@@ -4,8 +4,9 @@ require_once __DIR__ . '/../core/helpers/url.php';
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Language.php';
 
-// Detect current language
-$currentLang = Language::getLanguage();
+// Detect current language (session already started by bootstrap_session.php)
+Language::init();
+$currentLang = Language::getCurrentLang();
 
 // Annual promo definition: plan price => [free_months, promo_text_en, promo_text_km]
 $annualPromos = [

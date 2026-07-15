@@ -3,8 +3,10 @@ require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 require_once __DIR__ . '/../core/classes/Language.php';
 
-// Detect current language
-$currentLang = Language::getLanguage();
+// Start session if not already started (needed for Language::init)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+Language::init();
+$currentLang = Language::getCurrentLang();
 
 // Annual promo definition per price
 $annualPromos = [
