@@ -399,11 +399,11 @@ body.landing-page {
 }
 .pricing-card.popular {
     border: 2px solid var(--mc-primary);
-    transform: translateY(-12px);
+    transform: translateY(-6px);
     background: linear-gradient(180deg, #fff, #F0FDFA);
     box-shadow: 0 12px 30px rgba(13, 148, 136, 0.12);
 }
-.pricing-card.popular:hover { transform: translateY(-16px); }
+.pricing-card.popular:hover { transform: translateY(-10px); }
 
 .pricing-badge {
     position: absolute;

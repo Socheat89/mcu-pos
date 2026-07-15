@@ -374,7 +374,7 @@ $structuredData = [
                     </div>
                 </div>
             </div>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-start">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 justify-content-center align-items-start">
 
                 <?php
                 try {
@@ -522,26 +522,26 @@ $structuredData = [
     <section id="faq" class="py-5">
         <div class="container py-4">
             <div class="text-center mb-5">
-                <div class="section-kicker"><i class="ph-bold ph-question"></i> Quick Answers</div>
-                <h2 class="fw-bold">Frequently asked questions</h2>
-                <p class="text-muted mx-auto" style="max-width:640px">Everything you need to know before getting started with MCU.</p>
+                <div class="section-kicker"><i class="ph-bold ph-question"></i> <span data-i18n="faq_kicker">Quick Answers</span></div>
+                <h2 class="fw-bold" data-i18n="faq_headline">Frequently asked questions</h2>
+                <p class="text-muted mx-auto" style="max-width:640px" data-i18n="faq_subtext">Everything you need to know before getting started with MCU.</p>
             </div>
             <div class="accordion mx-auto" id="faqAccordion" style="max-width:860px">
                 <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
-                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">How long does the initial setup take? / តើការតំឡើងដំបូងចំណាយពេលប៉ុន្មាន?</button></h2>
-                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Setting up your workspace is instant! After registration, configure your menu items, import products via CSV, and start selling in under 10 minutes.</div></div>
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" data-i18n="faq1_q">How long does the initial setup take?</button></h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted" data-i18n="faq1_a">Setting up your workspace is instant! After registration, configure your menu items, import products via CSV, and start selling in under 10 minutes.</div></div>
                 </div>
                 <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
-                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">What hardware is compatible? / តើឧបករណ៍ណាខ្លះដែលអាចប្រើប្រាស់បាន?</button></h2>
-                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">MCU is cloud-based and runs on any modern browser. Compatible with iPad, Android tablets, Windows PCs, and macOS. Connects to standard Bluetooth/USB receipt printers and cash drawers.</div></div>
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" data-i18n="faq2_q">What hardware is compatible?</button></h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted" data-i18n="faq2_a">MCU is cloud-based and runs on any modern browser. Compatible with iPad, Android tablets, Windows PCs, and macOS. Connects to standard Bluetooth/USB receipt printers and cash drawers.</div></div>
                 </div>
                 <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
-                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Does it support offline sales? / តើវាគាំទ្រការលក់ក្រៅប្រព័ន្ធ (Offline) ដែរឬទេ?</button></h2>
-                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Yes! Offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.</div></div>
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" data-i18n="faq3_q">Does it support offline sales?</button></h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted" data-i18n="faq3_a">Yes! Offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.</div></div>
                 </div>
                 <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
-                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">How does the Bakong KHQR integration work? / តើការទូទាត់តាម KHQR បាគងដំណើរការដូចម្តេច?</button></h2>
-                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted">Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.</div></div>
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" data-i18n="faq4_q">How does the Bakong KHQR integration work?</button></h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted" data-i18n="faq4_a">Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.</div></div>
                 </div>
             </div>
         </div>
@@ -1143,6 +1143,18 @@ $structuredData = [
                     priority_support: '24/7 Priority Support',
                     unlimited_stores: 'Unlimited Stores',
                     unlimited_cashiers: 'Unlimited Cashiers',
+                    // FAQ
+                    faq_kicker: 'Quick Answers',
+                    faq_headline: 'Frequently asked questions',
+                    faq_subtext: 'Everything you need to know before getting started with MCU.',
+                    faq1_q: 'How long does the initial setup take?',
+                    faq1_a: 'Setting up your workspace is instant! After registration, configure your menu items, import products via CSV, and start selling in under 10 minutes.',
+                    faq2_q: 'What hardware is compatible?',
+                    faq2_a: 'MCU is cloud-based and runs on any modern browser. Compatible with iPad, Android tablets, Windows PCs, and macOS. Connects to standard Bluetooth/USB receipt printers and cash drawers.',
+                    faq3_q: 'Does it support offline sales?',
+                    faq3_a: 'Yes! Offline mode allows you to continue taking orders and printing receipts. Once your internet connection is restored, all data automatically syncs back to the cloud.',
+                    faq4_q: 'How does the Bakong KHQR integration work?',
+                    faq4_a: 'Our platform generates dynamic KHQR codes including transaction amount and store metadata. Your customer scans it with any mobile banking app, and our system receives instant confirmation webhook to complete the order without manual verification.',
                 },
                 km: {
                     why_mcu: 'ហេតុអ្វី MCU', features: 'មុខងារ', how_it_works: 'របៀបប្រើប្រាស់',
@@ -1169,6 +1181,18 @@ $structuredData = [
                     priority_support: 'ការគាំទ្រអាទិភាព ២៤/៧',
                     unlimited_stores: 'ហាងគ្មានដំណើ',
                     unlimited_cashiers: 'អ្នកលក់គ្មានដំណើ',
+                    // FAQ
+                    faq_kicker: 'ចម្លើយរហ័ស',
+                    faq_headline: 'សំណួរដែលសួរញឹកញាប់',
+                    faq_subtext: 'អ្វីៗទាំងអស់ដែលអ្នកត្រូវដឹងមុននឹងចាប់ផ្តើមប្រើ MCU។',
+                    faq1_q: 'តើការតំឡើងដំបូងចំណាយពេលប៉ុន្មាន?',
+                    faq1_a: 'ការតំឡើង workspace គឺភ្លាមៗ! បន្ទាប់ពីការចុះឈ្មោះ ចាត់រៀបចំទំនិញ នាំចូលផលិតផលតាម CSV ហើយចាប់ផ្តើមលក់ក្នុងរយៈពេលតិចជាង ១០ នាទី។',
+                    faq2_q: 'តើឧបករណ៍ណាខ្លះដែលអាចប្រើប្រាស់បាន?',
+                    faq2_a: 'MCU ដំណើរការលើ browser ទំនើបណាមួយ។ ស្របតាម iPad, Android tablet, Windows PC, និង macOS។ ភ្ជាប់ជាមួយម៉ាស៊ីនបោះពុម្ព receipt និង cash drawer ស្តង់ដារ។',
+                    faq3_q: 'តើវាគាំទ្រការលក់ក្រៅប្រព័ន្ធ (Offline) ដែរឬទេ?',
+                    faq3_a: 'បាទ/ចាស! របៀប Offline អនុញ្ញាតឱ្យអ្នកបន្តទទួលការបញ្ជាទិញ និងបោះពុម្ព receipt។ នៅពេលអ៊ីនធឺណិតភ្ជាប់ឡើងវិញ ទិន្នន័យទាំងអស់នឹងធ្វើសមកាលកម្មដោយស្វ័យប្រវត្តិ។',
+                    faq4_q: 'តើការទូទាត់តាម KHQR បាគងដំណើរការដូចម្តេច?',
+                    faq4_a: 'វេទិការបស់យើងបង្កើត KHQR code ថាមវន្ត រួមមានចំនួនទឹកប្រាក់ និងព័ត៌មាន store។ អតិថិជនស្កែនតាម app ធនាគារ ហើយប្រព័ន្ធរបស់យើងទទួលការបញ្ជាក់ភ្លាមៗដោយមិនចាំបាច់ផ្ទៀងផ្ទាត់ដោយដៃ។',
                 },
                 zh: {
                     why_mcu: '为什么选MCU', features: '功能', how_it_works: '如何使用',
@@ -1195,6 +1219,18 @@ $structuredData = [
                     priority_support: '24/7优先支持',
                     unlimited_stores: '不限门店',
                     unlimited_cashiers: '不限收银员',
+                    // FAQ
+                    faq_kicker: '快速解答',
+                    faq_headline: '常见问题解答',
+                    faq_subtext: '开始使用 MCU 之前，您需要了解的一切。',
+                    faq1_q: '初始设置需要多长时间？',
+                    faq1_a: '设置工作区即时完成！注册后，配置菜单项目、通过CSV导入产品，不到10分钟即可开始销售。',
+                    faq2_q: '兼容哪些硬件？',
+                    faq2_a: 'MCU 基于云端，可在任何现代浏览器上运行。兼容 iPad、安卓平板、Windows PC 和 macOS。支持标准蓝牙/USB收据打印机和收银抽屉。',
+                    faq3_q: '支持离线销售吗？',
+                    faq3_a: '支持！离线模式允许您继续接单和打印收据。网络恢复后，所有数据将自动同步至云端。',
+                    faq4_q: 'Bakong KHQR 集成是如何工作的？',
+                    faq4_a: '我们的平台生成动态 KHQR 码，包含交易金额和门店信息。客户用任意手机银行App扫码，系统即时收到确认通知，无需人工核实。',
                 }
             };
 
