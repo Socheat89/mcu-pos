@@ -9,8 +9,8 @@ export default {
     extend: {
       colors: {
         brand: {
-          cyan: '#714B67', // Odoo brand Purple
-          violet: '#00A09D', // Odoo brand Teal
+          cyan: '#2F89C5', // Brand Blue (from logo)
+          violet: '#1E6899', // Dark Brand Blue
           success: '#2c8a3c',
           warning: '#ec9a29',
           danger: '#e05038',
@@ -31,8 +31,8 @@ export default {
       boxShadow: {
         'glass': '0 1px 3px rgba(0, 0, 0, 0.05)',
         'glass-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
-        'glow-cyan': '0 0 15px rgba(113, 75, 103, 0.2)',
-        'glow-violet': '0 0 15px rgba(0, 160, 157, 0.2)',
+        'glow-cyan': '0 0 15px rgba(47, 137, 197, 0.2)',
+        'glow-violet': '0 0 15px rgba(30, 104, 153, 0.2)',
         'card': '0 1px 3px rgba(0, 0, 0, 0.05)',
         'card-hover': '0 8px 24px rgba(0, 0, 0, 0.08)',
       },
