@@ -293,6 +293,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             color: #0f172a;
             transition: all 0.25s var(--ease-out);
             outline: none;
+            box-sizing: border-box;
         }
         .form-group input:focus, .form-group select:focus {
             border-color: var(--brand);
@@ -312,6 +313,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             border: none !important;
             border-radius: 12px !important;
             height: 48px !important;
+            padding: 0 1.6rem !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -484,7 +486,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="admin_email">Work Email</label>
+                    <label for="admin_email"><i class="ph-bold ph-envelope" style="color: var(--primary);"></i> Work Email</label>
                     <div style="position: relative;">
                         <i class="ph-bold ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                         <input type="email" id="admin_email" name="admin_email" required placeholder="admin@business.com" style="padding-left: 2.75rem;">
@@ -492,7 +494,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="admin_username">Username</label>
+                    <label for="admin_username"><i class="ph-bold ph-user" style="color: var(--primary);"></i> Username</label>
                     <div style="position: relative;">
                         <i class="ph-bold ph-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                         <input type="text" id="admin_username" name="admin_username" required placeholder="admin" style="padding-left: 2.75rem;">
@@ -502,7 +504,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 <div class="form-group full-width">
                     <div class="form-row-split">
                         <div class="form-group">
-                            <label for="admin_password">Password</label>
+                            <label for="admin_password"><i class="ph-bold ph-lock-key" style="color: var(--primary);"></i> Password</label>
                             <div style="position: relative;">
                                 <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                                 <input type="password" id="admin_password" name="admin_password" required minlength="8" placeholder="••••••••" style="padding-left: 2.75rem;">
@@ -510,7 +512,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                         </div>
 
                         <div class="form-group">
-                            <label for="confirm_password">Confirm Password</label>
+                            <label for="confirm_password"><i class="ph-bold ph-lock-key" style="color: var(--primary);"></i> Confirm Password</label>
                             <div style="position: relative;">
                                 <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                                 <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm secure password" style="padding-left: 2.75rem;">
@@ -518,16 +520,16 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                         </div>
                     </div>
                 </div>
-                
-                <input type="hidden" name="payment_status" value="<?php echo $isTrial ? 'trial' : 'paid'; ?>">
-                <input type="hidden" name="payment_ref" value="<?php echo htmlspecialchars($ref); ?>">
-                <input type="hidden" name="plan_code" value="<?php echo htmlspecialchars($plan); ?>">
-                <div id="hidden_systems">
-                    <?php
-                        // Pass the actual plan ID from DB
-                        echo '<input type="hidden" name="systems[]" value="' . $planId . '">';
-                    ?>
-                </div>
+            </div>
+            
+            <input type="hidden" name="payment_status" value="<?php echo $isTrial ? 'trial' : 'paid'; ?>">
+            <input type="hidden" name="payment_ref" value="<?php echo htmlspecialchars($ref); ?>">
+            <input type="hidden" name="plan_code" value="<?php echo htmlspecialchars($plan); ?>">
+            <div id="hidden_systems">
+                <?php
+                    // Pass the actual plan ID from DB
+                    echo '<input type="hidden" name="systems[]" value="' . $planId . '">';
+                ?>
             </div>
             
             <button type="submit" class="btn btn-primary full-width" style="margin-top: 1rem;">
