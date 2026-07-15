@@ -2,25 +2,6 @@
 require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 require_once __DIR__ . '/../core/classes/Database.php';
-require_once __DIR__ . '/../core/classes/Language.php';
-
-// Detect current language (session already started by bootstrap_session.php)
-Language::init();
-$currentLang = Language::getCurrentLang();
-
-// Annual promo definition: plan price => [free_months, promo_text_en, promo_text_km]
-$annualPromos = [
-    30.00 => [
-        'free_months' => 1,
-        'label_en'    => 'Buy 1 Year, Get 1 Month FREE',
-        'label_km'    => 'ទិញ ១ ឆ្នាំ ទទួលបាន ១ ខែ ដោយឥតគិតថ្លៃ',
-    ],
-    99.99 => [
-        'free_months' => 3,
-        'label_en'    => 'Buy 1 Year, Get 3 Months FREE',
-        'label_km'    => 'ទិញ ១ ឆ្នាំ ទទួលបាន ៣ ខែ ដោយឥតគិតថ្លៃ',
-    ],
-];
 
 // Load plans and their features from DB
 $db = Database::getInstance();
@@ -158,33 +139,13 @@ foreach ($systems as $i => $system) {
                 <a href="<?php echo mc_url('public/index.php#features'); ?>" class="nav-item">Features</a>
                 <a href="<?php echo mc_url('public/index.php#pricing'); ?>" class="nav-item">Pricing</a>
                 <a href="<?php echo mc_url('public/index.php#contact'); ?>" class="nav-item">Contact</a>
+
             </nav>
             
             <div class="flex items-center gap-4">
-                <!-- Language Switcher -->
-                <div class="lang-switcher">
-                    <button class="lang-btn" id="langBtn" type="button">
-                        <i class="ph-bold ph-translate"></i>
-                        <?php
-                        $langLabels = ['en' => '🇺🇸 EN', 'km' => '🇰🇭 ខ្មែរ', 'zh' => '🇨🇳 中文'];
-                        echo $langLabels[$currentLang] ?? '🌐 EN';
-                        ?>
-                        <i class="ph-bold ph-caret-down" style="font-size:0.65rem;"></i>
-                    </button>
-                    <div class="lang-dropdown" id="langDropdown">
-                        <a href="<?php echo mc_url('public/set_lang.php?lang=en'); ?>" class="lang-option <?php echo $currentLang === 'en' ? 'active' : ''; ?>">
-                            <span class="lang-flag">🇺🇸</span> English
-                        </a>
-                        <a href="<?php echo mc_url('public/set_lang.php?lang=km'); ?>" class="lang-option <?php echo $currentLang === 'km' ? 'active' : ''; ?>">
-                            <span class="lang-flag">🇰🇭</span> ខ្មែរ
-                        </a>
-                        <a href="<?php echo mc_url('public/set_lang.php?lang=zh'); ?>" class="lang-option <?php echo $currentLang === 'zh' ? 'active' : ''; ?>">
-                            <span class="lang-flag">🇨🇳</span> 中文
-                        </a>
-                    </div>
-                </div>
                 <a href="<?php echo mc_url('public/login.php'); ?>" class="nav-item">Sign In</a>
                 <a href="<?php echo mc_url('public/register.php'); ?>" class="btn btn-primary">Get Started</a>
+
             </div>
         </div>
     </header>
@@ -204,45 +165,17 @@ foreach ($systems as $i => $system) {
                     $features = $planFeatures[$system['id']] ?? [];
                     $name = htmlspecialchars($system['name']);
                     $sysPrice = (float)$system['price'];
-                    $price = number_format($sysPrice, 2);
+                    $price = number_format($sysPrice, 0);
                     $desc = htmlspecialchars($system['description'] ?: 'Perfect for growing businesses.');
                     $sid = $system['id'];
                     $isFreeTrial = ($sysPrice === 0.00);
-
-                    // Determine annual promo
-                    $promo = null;
-                    foreach ($annualPromos as $promoPrice => $promoDef) {
-                        if (abs($sysPrice - $promoPrice) < 0.01) {
-                            $promo = $promoDef;
-                            break;
-                        }
-                    }
-                    $promoLabel = '';
-                    if ($promo) {
-                        $promoLabel = ($currentLang === 'km') ? $promo['label_km'] : $promo['label_en'];
-                    }
                 ?>
                 <div class="system-card <?php echo $meta['badge'] ? 'popular-card' : ''; ?>" style="<?php echo $meta['badge'] ? '' : 'border-top: 3px solid ' . $meta['accent']; ?>">
                     <?php if ($meta['badge']): ?>
                         <div class="plan-badge" style="<?php echo $isFreeTrial ? 'background: #d1fae5; color: #065f46;' : ''; ?>"><?php echo $meta['badge']; ?></div>
                     <?php endif; ?>
-
-                    <?php if ($promo): ?>
-                        <div class="annual-badge"><i class="ph-bold ph-gift"></i>
-                            <?php echo ($currentLang === 'km') ? 'ប្រូម៉ូ ប្រចាំឆ្នាំ' : 'Annual Promo'; ?>
-                        </div>
-                    <?php endif; ?>
-
                     <h3 class="system-title"><?php echo $name; ?></h3>
                     <p class="system-desc"><?php echo $desc; ?></p>
-
-                    <?php if ($promo): ?>
-                    <div class="promo-callout">
-                        <i class="ph-bold ph-tag"></i>
-                        <span><?php echo htmlspecialchars($promoLabel); ?></span>
-                    </div>
-                    <?php endif; ?>
-
                     <div class="price-tag">
                         <?php if ($isFreeTrial): ?>
                             <span class="price-amount" style="font-size: 2.5rem;">Free</span>
@@ -258,18 +191,6 @@ foreach ($systems as $i => $system) {
                         <?php endforeach; ?>
                         <?php if (empty($features)): ?>
                             <li><i class="ph-bold ph-check-circle" style="color:#06b6d4;"></i> Basic POS Access</li>
-                        <?php endif; ?>
-                        <?php if ($promo): ?>
-                            <li style="color:#d97706; font-weight:700;">
-                                <i class="ph-bold ph-star" style="color:#F59E0B;"></i>
-                                <?php
-                                if ($currentLang === 'km') {
-                                    echo '១ ឆ្នាំ = ' . (12 + $promo['free_months']) . ' ខែ (' . $promo['free_months'] . ' ខែ ឥតគិតថ្លៃ)';
-                                } else {
-                                    echo '1 Year = ' . (12 + $promo['free_months']) . ' Months (' . $promo['free_months'] . ' FREE)';
-                                }
-                                ?>
-                            </li>
                         <?php endif; ?>
                     </ul>
                     <a href="<?php echo mc_url('public/register.php?plan=' . urlencode($system['name'])); ?>" class="btn <?php echo $meta['btn']; ?> full-width" <?php echo $isFreeTrial ? 'style="background: #059669; border-color: #059669;"' : ''; ?>>

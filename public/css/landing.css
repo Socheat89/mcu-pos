@@ -437,6 +437,34 @@ body.landing-page {
 }
 .feature-list li i { color: var(--mc-primary); }
 
+/* ── Annual Bonus Badge ── */
+.annual-bonus-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.8rem;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.6rem;
+    animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+}
+
+/* ── Billing toggle switch ── */
+#billingToggle {
+    accent-color: var(--mc-primary);
+}
+.annual-saving-note {
+    margin-top: 0.4rem;
+}
+
 /* ── Testimonials ── */
 .testimonial-card {
     border: 1px solid rgba(15, 23, 42, 0.06);
@@ -517,99 +545,6 @@ body.landing-page {
     color: rgba(255, 255, 255, 0.3);
     font-size: 0.85rem;
 }
-
-/* ── Annual Promo Badge ── */
-.annual-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.75rem;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #F59E0B, #D97706);
-    color: white;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
-    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
-    animation: pulse-glow 2.5s ease-in-out infinite;
-}
-.annual-badge i { font-size: 0.85rem; }
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3); }
-    50% { box-shadow: 0 3px 20px rgba(245, 158, 11, 0.55); }
-}
-
-.promo-callout {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 0.9rem;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.04));
-    border: 1px dashed rgba(245, 158, 11, 0.45);
-    border-radius: 0.6rem;
-    font-size: 0.82rem;
-    color: #92400e;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-.promo-callout i { color: #F59E0B; font-size: 1rem; }
-
-/* ── Language Switcher ── */
-.lang-switcher {
-    position: relative;
-}
-.lang-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 50px;
-    background: rgba(13, 148, 136, 0.06);
-    border: 1px solid rgba(13, 148, 136, 0.15);
-    color: var(--mc-primary-dark);
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-.lang-btn:hover {
-    background: rgba(13, 148, 136, 0.12);
-    border-color: var(--mc-primary);
-}
-.lang-btn i { font-size: 1rem; }
-.lang-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    background: white;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-    min-width: 150px;
-    z-index: 9999;
-    overflow: hidden;
-}
-.lang-switcher:hover .lang-dropdown,
-.lang-dropdown:hover { display: block; }
-.lang-option {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--mc-soft);
-    text-decoration: none;
-    transition: background 0.15s;
-}
-.lang-option:hover { background: #F0FDFA; color: var(--mc-primary-dark); }
-.lang-option.active { color: var(--mc-primary); background: rgba(13, 148, 136, 0.05); }
-.lang-flag { font-size: 1.1rem; }
 
 /* ── Scroll animations ── */
 .animate-on-scroll {

@@ -1,18 +1,6 @@
 <?php 
 require_once __DIR__ . '/../core/classes/Database.php'; 
 require_once __DIR__ . '/../core/helpers/url.php';
-require_once __DIR__ . '/../core/classes/Language.php';
-
-// Start session if not already started (needed for Language::init)
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-Language::init();
-$currentLang = Language::getCurrentLang();
-
-// Annual promo definition per price
-$annualPromos = [
-    30.00 => ['free_months' => 1, 'label_en' => 'Buy 1 Year, Get 1 Month FREE', 'label_km' => 'ទិញ ១ ឆ្នាំ ទទួលបាន ១ ខែ ដោយឥតគិតថ្លៃ'],
-    99.99 => ['free_months' => 3, 'label_en' => 'Buy 1 Year, Get 3 Months FREE', 'label_km' => 'ទិញ ១ ឆ្នាំ ទទួលបាន ៣ ខែ ដោយឥតគិតថ្លៃ'],
-];
 
 $canonicalUrl = rtrim(mc_url('', true), '/') . '/';
 $ogImage = mc_url('public/images/my-logo.jpg', true);
@@ -183,38 +171,38 @@ $structuredData = [
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
-                    <li class="nav-item"><a class="nav-link" href="#about">Why MCU</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about" data-i18n="why_mcu">Why MCU</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features" data-i18n="features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how-it-works" data-i18n="how_it_works">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing" data-i18n="pricing">Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq" data-i18n="faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact" data-i18n="contact">Contact</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
                     <!-- Language Switcher -->
-                    <div class="lang-switcher">
-                        <button class="lang-btn" type="button">
-                            <i class="ph-bold ph-translate"></i>
-                            <?php
-                            $langLabels = ['en' => '🇺🇸 EN', 'km' => '🇰🇭 ខ្មែរ', 'zh' => '🇨🇳 中文'];
-                            echo $langLabels[$currentLang] ?? '🌐 EN';
-                            ?>
-                            <i class="ph-bold ph-caret-down" style="font-size:0.65rem;"></i>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 px-2 py-1" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:0.75rem;border-radius:20px;">
+                            <i class="ph-bold ph-translate" style="font-size:0.9rem"></i>
+                            <span id="currentLangLabel">EN</span>
+                            <i class="ph-bold ph-caret-down" style="font-size:0.7rem"></i>
                         </button>
-                        <div class="lang-dropdown">
-                            <a href="set_lang.php?lang=en" class="lang-option <?php echo $currentLang === 'en' ? 'active' : ''; ?>">
-                                <span class="lang-flag">🇺🇸</span> English
-                            </a>
-                            <a href="set_lang.php?lang=km" class="lang-option <?php echo $currentLang === 'km' ? 'active' : ''; ?>">
-                                <span class="lang-flag">🇰🇭</span> ខ្មែរ
-                            </a>
-                            <a href="set_lang.php?lang=zh" class="lang-option <?php echo $currentLang === 'zh' ? 'active' : ''; ?>">
-                                <span class="lang-flag">🇨🇳</span> 中文
-                            </a>
-                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="langDropdown" style="min-width:140px;border-radius:12px;">
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 lang-option" href="#" data-lang="en">
+                                <span class="flag-icon">🇺🇸</span> <span>English</span>
+                                <i class="ph-bold ph-check ms-auto text-success lang-check" id="check-en"></i>
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 lang-option" href="#" data-lang="km">
+                                <span class="flag-icon">🇰🇭</span> <span>ខ្មែរ</span>
+                                <i class="ph-bold ph-check ms-auto text-success lang-check d-none" id="check-km"></i>
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 lang-option" href="#" data-lang="zh">
+                                <span class="flag-icon">🇨🇳</span> <span>中文</span>
+                                <i class="ph-bold ph-check ms-auto text-success lang-check d-none" id="check-zh"></i>
+                            </a></li>
+                        </ul>
                     </div>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link">Sign In</a>
-                    <a href="register.php" class="btn btn-primary btn-sm">Get Started</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link" data-i18n="sign_in">Sign In</a>
+                    <a href="register.php" class="btn btn-primary btn-sm" data-i18n="get_started">Get Started</a>
                 </div>
             </div>
         </div>
@@ -361,9 +349,30 @@ $structuredData = [
     <section id="pricing" class="py-5">
         <div class="container py-4">
             <div class="text-center mb-5">
-                <div class="section-kicker"><i class="ph-bold ph-credit-card"></i> Transparent Pricing</div>
-                <h2 class="fw-bold">One subscription. All features. No surprises.</h2>
-                <p class="text-muted mx-auto" style="max-width:640px">Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
+                <div class="section-kicker"><i class="ph-bold ph-credit-card"></i> <span data-i18n="transparent_pricing">Transparent Pricing</span></div>
+                <h2 class="fw-bold" data-i18n="pricing_headline">One subscription. All features. No surprises.</h2>
+                <p class="text-muted mx-auto" style="max-width:640px" data-i18n="pricing_subtext">Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.</p>
+                <!-- Annual Toggle -->
+                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                    <span class="fw-semibold" data-i18n="billing_monthly">Monthly</span>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="billingToggle" style="width:2.5rem;height:1.3rem;cursor:pointer">
+                        <label class="form-check-label" for="billingToggle"></label>
+                    </div>
+                    <span class="fw-semibold" data-i18n="billing_annual">Annual</span>
+                    <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#10B981,#059669);color:#fff;font-size:0.75rem;" data-i18n="save_label">Save up to 25%</span>
+                </div>
+                <!-- Annual Promo Info -->
+                <div id="annualPromoInfo" class="d-none mt-3">
+                    <div class="d-inline-flex flex-wrap justify-content-center gap-2">
+                        <span class="badge rounded-pill px-3 py-2" style="background:rgba(13,148,136,0.1);color:var(--mc-primary);border:1px solid rgba(13,148,136,0.3);font-size:0.8rem">
+                            <i class="ph-bold ph-gift"></i> <span data-i18n="inventory_annual_promo">Inventory System: Buy 1 Year → Get 1 Month Free</span>
+                        </span>
+                        <span class="badge rounded-pill px-3 py-2" style="background:rgba(99,102,241,0.1);color:#6366f1;border:1px solid rgba(99,102,241,0.3);font-size:0.8rem">
+                            <i class="ph-bold ph-gift"></i> <span data-i18n="premium_annual_promo">POS Premium: Buy 1 Year → Get 3 Months Free</span>
+                        </span>
+                    </div>
+                </div>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 align-items-start">
 
@@ -381,18 +390,16 @@ $structuredData = [
                 foreach ($plans as $index => $plan):
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
                     $isPopular = ($index === 1); // Mark second plan as popular for UI
-                    $planPrice = (float)$plan['price'];
-                    
-                    // Determine annual promo for this plan
-                    $promo = null;
-                    foreach ($annualPromos as $promoPrice => $promoDef) {
-                        if (abs($planPrice - $promoPrice) < 0.01) {
-                            $promo = $promoDef;
-                            break;
-                        }
-                    }
-                    $promoLabel = $promo ? (($currentLang === 'km') ? $promo['label_km'] : $promo['label_en']) : '';
-                    
+                    $planName  = $plan['name'];
+                    $isInventory = (stripos($planName, 'Inventory') !== false);
+                    $isPremium   = (stripos($planName, 'Premium') !== false);
+
+                    // Free-month bonus: Inventory=1, Premium=3
+                    $freeMonths   = $isInventory ? 1 : ($isPremium ? 3 : 0);
+                    $annualTotal  = $plan['price'] * 12;
+                    $annualCharge = $annualTotal - ($plan['price'] * $freeMonths);
+                    $annualPerMo  = round($annualCharge / 12, 2);
+
                     // Fetch linked features for this plan
                     $features = $db->fetchAll("SELECT sm.module_name, sm.feature_key FROM system_modules sm WHERE sm.system_id = ?", [$plan['id']]);
 
@@ -415,67 +422,71 @@ $structuredData = [
                     $cashierLimit = (int)($plan['cashier_limit'] ?? 1);
                 ?>
                 <div class="col">
-                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?>">
+                <div class="pricing-card <?php echo $isPopular ? 'popular' : ''; ?>" data-plan="<?php echo htmlspecialchars($planCode); ?>" data-monthly-price="<?php echo $plan['price']; ?>" data-annual-per-mo="<?php echo $annualPerMo; ?>" data-free-months="<?php echo $freeMonths; ?>">
                     <?php if ($isPopular): ?>
-                    <div class="pricing-badge">Popular</div>
+                    <div class="pricing-badge" data-i18n="popular">Popular</div>
                     <?php endif; ?>
-
-                    <?php if ($promo): ?>
-                    <div class="annual-badge" style="margin-top: <?php echo $isPopular ? '1.5rem' : '0'; ?>;">
+                    <?php if ($freeMonths > 0): ?>
+                    <div class="annual-bonus-badge d-none" id="annual-badge-<?php echo $planCode; ?>">
                         <i class="ph-bold ph-gift"></i>
-                        <?php echo ($currentLang === 'km') ? 'ប្រូម៉ូ ប្រចាំឆ្នាំ' : 'Annual Promo'; ?>
+                        <?php if ($isInventory): ?>
+                        <span data-i18n="free_1_month">1 Month FREE on Annual</span>
+                        <?php else: ?>
+                        <span data-i18n="free_3_months">3 Months FREE on Annual</span>
+                        <?php endif; ?>
                     </div>
                     <?php endif; ?>
-
                     <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($plan['name']); ?></h4>
-                    <p class="text-muted small mb-2"><?php echo htmlspecialchars($plan['description']); ?></p>
-
-                    <?php if ($promo): ?>
-                    <div class="promo-callout">
-                        <i class="ph-bold ph-tag"></i>
-                        <span><?php echo htmlspecialchars($promoLabel); ?></span>
+                    <p class="text-muted small mb-3"><?php echo htmlspecialchars($plan['description']); ?></p>
+                    <div class="d-flex align-items-baseline gap-1 mb-1 pb-0">
+                        <span class="price-amount" id="price-<?php echo $planCode; ?>">$<?php echo number_format($plan['price'], 2); ?></span>
+                        <span class="text-muted price-period"><span data-i18n="per_month">/month</span></span>
                     </div>
+                    <?php if ($freeMonths > 0): ?>
+                    <div class="annual-saving-note d-none mb-3 pb-3 border-bottom" id="saving-<?php echo $planCode; ?>">
+                        <small class="text-success fw-semibold"><i class="ph-bold ph-tag"></i>
+                        <?php if ($isInventory): ?>
+                        <span data-i18n="annual_note_inventory">$<?php echo number_format($annualCharge, 2); ?>/yr · 1 month free</span>
+                        <?php else: ?>
+                        <span data-i18n="annual_note_premium">$<?php echo number_format($annualCharge, 2); ?>/yr · 3 months free</span>
+                        <?php endif; ?>
+                        </small>
+                    </div>
+                    <div class="mb-3 pb-3 border-bottom d-block" id="monthly-border-<?php echo $planCode; ?>"></div>
+                    <?php else: ?>
+                    <div class="mb-3 pb-3 border-bottom"></div>
                     <?php endif; ?>
-
-                    <div class="d-flex align-items-baseline gap-1 mb-3 pb-3 border-bottom">
-                        <span class="price-amount">$<?php echo number_format($plan['price'], 2); ?></span>
-                        <span class="text-muted">/month</span>
-                    </div>
                     <ul class="feature-list mb-4">
                         <?php foreach ($features as $f): ?>
                             <?php $labelKey = $f['module_name'] . '_' . $f['feature_key']; ?>
                             <li><i class="ph-bold ph-check-circle"></i> <?php echo htmlspecialchars($featureLabels[$labelKey] ?? ucfirst($f['feature_key'])); ?></li>
                         <?php endforeach; ?>
+                        <?php if ($isInventory): ?>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_stock_alerts">Low-Stock Alerts</span></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_purchase_orders">Purchase Order Management</span></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_supplier_mgmt">Supplier Management</span></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_inventory_reports">Inventory Reports</span></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_barcode_scan">Barcode Scanner Support</span></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="feat_stock_transfer">Stock Transfer Between Stores</span></li>
+                        <?php endif; ?>
                         <?php if ($storeLimit > 0): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit > 1 ? 's' : ''; ?></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="up_to_stores">Up to <?php echo $storeLimit; ?> Store<?php echo $storeLimit > 1 ? 's' : ''; ?></span></li>
                         <?php else: ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Unlimited Stores</li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="unlimited_stores">Unlimited Stores</span></li>
                         <?php endif; ?>
                         <?php if ($cashierLimit > 0): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit > 1 ? 's' : ''; ?></li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="up_to_cashiers">Up to <?php echo $cashierLimit; ?> Cashier<?php echo $cashierLimit > 1 ? 's' : ''; ?></span></li>
                         <?php else: ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Unlimited Cashiers</li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="unlimited_cashiers">Unlimited Cashiers</span></li>
                         <?php endif; ?>
                         <?php if ($plan['price'] >= 30): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> Cloud Storage</li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="cloud_storage">Cloud Storage</span></li>
                         <?php endif; ?>
                         <?php if ($plan['price'] >= 50): ?>
-                            <li><i class="ph-bold ph-check-circle"></i> 24/7 Priority Support</li>
-                        <?php endif; ?>
-                        <?php if ($promo): ?>
-                            <li style="color:#d97706; font-weight:700;">
-                                <i class="ph-bold ph-star" style="color:#F59E0B;"></i>
-                                <?php
-                                if ($currentLang === 'km') {
-                                    echo '១ ឆ្នាំ = ' . (12 + $promo['free_months']) . ' ខែ (' . $promo['free_months'] . ' ខែ ឥតគិតថ្លៃ)';
-                                } else {
-                                    echo '1 Year = ' . (12 + $promo['free_months']) . ' Months (' . $promo['free_months'] . ' FREE)';
-                                }
-                                ?>
-                            </li>
+                            <li><i class="ph-bold ph-check-circle"></i> <span data-i18n="priority_support">24/7 Priority Support</span></li>
                         <?php endif; ?>
                     </ul>
-                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline-primary'; ?> w-100">Choose <?php echo htmlspecialchars($plan['name']); ?></a>
+                    <a href="register.php?plan=<?php echo $planCode; ?>" class="btn <?php echo $isPopular ? 'btn-primary' : 'btn-outline-primary'; ?> w-100"><span data-i18n="choose">Choose</span> <?php echo htmlspecialchars($plan['name']); ?></a>
                 </div>
                 </div>
                 <?php endforeach; ?>
@@ -1064,6 +1075,161 @@ $structuredData = [
             }, { threshold: 0.3, rootMargin: '-80px 0px -20% 0px' });
 
             sections.forEach(section => observer.observe(section));
+        })();
+        // ═══════════════════════════════════════════════════════
+        // ANNUAL BILLING TOGGLE
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const toggle = document.getElementById('billingToggle');
+            const promoInfo = document.getElementById('annualPromoInfo');
+            if (!toggle) return;
+
+            toggle.addEventListener('change', function() {
+                const isAnnual = this.checked;
+                promoInfo && promoInfo.classList.toggle('d-none', !isAnnual);
+
+                document.querySelectorAll('.pricing-card[data-plan]').forEach(card => {
+                    const planCode     = card.dataset.plan;
+                    const monthlyPrice = parseFloat(card.dataset.monthlyPrice);
+                    const annualPerMo  = parseFloat(card.dataset.annualPerMo);
+                    const freeMonths   = parseInt(card.dataset.freeMonths || '0');
+
+                    const priceEl   = document.getElementById('price-' + planCode);
+                    const savingEl  = document.getElementById('saving-' + planCode);
+                    const badgeEl   = document.getElementById('annual-badge-' + planCode);
+                    const borderEl  = document.getElementById('monthly-border-' + planCode);
+
+                    if (priceEl) {
+                        if (isAnnual && freeMonths > 0) {
+                            priceEl.textContent = '$' + annualPerMo.toFixed(2);
+                        } else {
+                            priceEl.textContent = '$' + monthlyPrice.toFixed(2);
+                        }
+                    }
+                    if (savingEl)  savingEl.classList.toggle('d-none', !isAnnual || freeMonths === 0);
+                    if (badgeEl)   badgeEl.classList.toggle('d-none', !isAnnual || freeMonths === 0);
+                    if (borderEl)  borderEl.classList.toggle('d-none', isAnnual && freeMonths > 0);
+                });
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // LANGUAGE SWITCHER (i18n)
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            const translations = {
+                en: {
+                    why_mcu: 'Why MCU', features: 'Features', how_it_works: 'How It Works',
+                    pricing: 'Pricing', faq: 'FAQ', contact: 'Contact',
+                    sign_in: 'Sign In', get_started: 'Get Started',
+                    transparent_pricing: 'Transparent Pricing',
+                    pricing_headline: 'One subscription. All features. No surprises.',
+                    pricing_subtext: 'Every plan includes unlimited transactions, free updates, and Telegram support. No hidden fees, no per-transaction charges.',
+                    billing_monthly: 'Monthly', billing_annual: 'Annual',
+                    save_label: 'Save up to 25%',
+                    inventory_annual_promo: 'Inventory System: Buy 1 Year → Get 1 Month Free',
+                    premium_annual_promo: 'POS Premium: Buy 1 Year → Get 3 Months Free',
+                    free_1_month: '1 Month FREE on Annual',
+                    free_3_months: '3 Months FREE on Annual',
+                    per_month: '/month',
+                    popular: 'Popular', choose: 'Choose',
+                    feat_stock_alerts: 'Low-Stock Alerts',
+                    feat_purchase_orders: 'Purchase Order Management',
+                    feat_supplier_mgmt: 'Supplier Management',
+                    feat_inventory_reports: 'Inventory Reports',
+                    feat_barcode_scan: 'Barcode Scanner Support',
+                    feat_stock_transfer: 'Stock Transfer Between Stores',
+                    cloud_storage: 'Cloud Storage',
+                    priority_support: '24/7 Priority Support',
+                    unlimited_stores: 'Unlimited Stores',
+                    unlimited_cashiers: 'Unlimited Cashiers',
+                },
+                km: {
+                    why_mcu: 'ហេតុអ្វី MCU', features: 'មុខងារ', how_it_works: 'របៀបប្រើប្រាស់',
+                    pricing: 'តម្លៃ', faq: 'សំណួរញឹកញាប់', contact: 'ទំនាក់ទំនង',
+                    sign_in: 'ចូលគណនី', get_started: 'ចាប់ផ្តើម',
+                    transparent_pricing: 'តម្លៃប្រកបដោយតម្លាភាព',
+                    pricing_headline: 'ជាវមួយ។ មុខងារទាំងអស់។ គ្មានការភ្ញាក់ផ្អើល។',
+                    pricing_subtext: 'គ្រប់ package រួមមានប្រតិបត្តិការគ្មានដំណើ ការធ្វើបច្ចុប្បន្នភាព និងការគាំទ្រតេឡេក្រាម។ គ្មានថ្លៃបន្ថែម។',
+                    billing_monthly: 'ប្រចាំខែ', billing_annual: 'ប្រចាំឆ្នាំ',
+                    save_label: 'សន្សំបាន 25%',
+                    inventory_annual_promo: 'Inventory System: ទិញ ១ ឆ្នាំ → ទទួល ១ ខែ ឥតគិតថ្លៃ',
+                    premium_annual_promo: 'POS Premium: ទិញ ១ ឆ្នាំ → ទទួល ៣ ខែ ឥតគិតថ្លៃ',
+                    free_1_month: '១ ខែ ឥតគិតថ្លៃ (ការជាវប្រចាំឆ្នាំ)',
+                    free_3_months: '៣ ខែ ឥតគិតថ្លៃ (ការជាវប្រចាំឆ្នាំ)',
+                    per_month: '/ខែ',
+                    popular: 'ពេញនិយម', choose: 'ជ្រើសរើស',
+                    feat_stock_alerts: 'ការជូនដំណឹងស្តុកទាប',
+                    feat_purchase_orders: 'ការគ្រប់គ្រងការបញ្ជាទិញ',
+                    feat_supplier_mgmt: 'ការគ្រប់គ្រងអ្នកផ្គត់ផ្គង់',
+                    feat_inventory_reports: 'របាយការណ៍ស្តុក',
+                    feat_barcode_scan: 'ការស្គែនបាខូដ',
+                    feat_stock_transfer: 'ការផ្ទេរស្តុករវាងហាង',
+                    cloud_storage: 'ទំហំផ្ទុកពពក',
+                    priority_support: 'ការគាំទ្រអាទិភាព ២៤/៧',
+                    unlimited_stores: 'ហាងគ្មានដំណើ',
+                    unlimited_cashiers: 'អ្នកលក់គ្មានដំណើ',
+                },
+                zh: {
+                    why_mcu: '为什么选MCU', features: '功能', how_it_works: '如何使用',
+                    pricing: '价格', faq: '常见问题', contact: '联系我们',
+                    sign_in: '登录', get_started: '开始使用',
+                    transparent_pricing: '透明定价',
+                    pricing_headline: '一次订阅。所有功能。无惊喜。',
+                    pricing_subtext: '每个计划包括无限交易、免费更新和Telegram支持。无隐藏费用，无每笔交易费用。',
+                    billing_monthly: '按月', billing_annual: '按年',
+                    save_label: '最多节省25%',
+                    inventory_annual_promo: '库存系统：购买1年 → 免费获得1个月',
+                    premium_annual_promo: 'POS Premium：购买1年 → 免费获得3个月',
+                    free_1_month: '年付免费1个月',
+                    free_3_months: '年付免费3个月',
+                    per_month: '/月',
+                    popular: '热门', choose: '选择',
+                    feat_stock_alerts: '低库存警报',
+                    feat_purchase_orders: '采购订单管理',
+                    feat_supplier_mgmt: '供应商管理',
+                    feat_inventory_reports: '库存报告',
+                    feat_barcode_scan: '条码扫描支持',
+                    feat_stock_transfer: '门店间库存调拨',
+                    cloud_storage: '云存储',
+                    priority_support: '24/7优先支持',
+                    unlimited_stores: '不限门店',
+                    unlimited_cashiers: '不限收银员',
+                }
+            };
+
+            const langLabels = { en: 'EN', km: 'ខ្មែរ', zh: '中文' };
+
+            function applyLang(lang) {
+                const t = translations[lang] || translations.en;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (t[key]) el.textContent = t[key];
+                });
+                // Update current lang label
+                const lbl = document.getElementById('currentLangLabel');
+                if (lbl) lbl.textContent = langLabels[lang] || 'EN';
+                // Update checkmarks
+                ['en','km','zh'].forEach(l => {
+                    const chk = document.getElementById('check-' + l);
+                    if (chk) chk.classList.toggle('d-none', l !== lang);
+                });
+                // Persist
+                localStorage.setItem('mcuLang', lang);
+                document.documentElement.lang = lang;
+            }
+
+            // Apply saved language on load
+            const saved = localStorage.getItem('mcuLang') || 'en';
+            applyLang(saved);
+
+            // Handle language option clicks
+            document.querySelectorAll('.lang-option').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    applyLang(this.dataset.lang);
+                });
+            });
         })();
     </script>
 </body>

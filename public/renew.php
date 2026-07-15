@@ -31,14 +31,6 @@ $currentPlan = $db->fetchOne("
 );
 
 $plans = $db->fetchAll("SELECT * FROM systems WHERE status = 'active' ORDER BY price ASC");
-
-// Annual promo definition: plan price => free months
-$annualPromos = [
-    30.00 => 1,   // Buy 12 months, get 1 free (pay for 11)
-    99.99 => 3,   // Buy 12 months, get 3 free (pay for 9)
-];
-// Build JSON for JS
-$annualPromosJson = json_encode($annualPromos);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,29 +99,13 @@ $annualPromosJson = json_encode($annualPromos);
                 <select id="duration" class="form-control" onchange="updateTotal()">
 
                     <?php for($i=1; $i<=12; $i++): ?>
-                        <?php
-                        // Check if any plan has annual promo for 12 months
-                        $annualNote = '';
-                        // We can't know selected plan at render, so show generic note on 12
-                        if ($i === 12) {
-                            $annualNote = ' — Annual Promo applies!';
-                        }
-                        ?>
-                        <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?><?php echo $annualNote; ?></option>
+                        <option value="<?php echo $i; ?>"><?php echo $i; ?> Month<?php echo $i>1?'s':''; ?></option>
                     <?php endfor; ?>
                 </select>
-
-                <!-- Annual promo info box (shown dynamically by JS) -->
-                <div id="annualPromoBox" style="display:none; margin-top:0.75rem; padding:0.65rem 0.9rem; background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.04)); border:1px dashed rgba(245,158,11,0.5); border-radius:0.6rem; font-size:0.83rem; color:#92400e; font-weight:600;">
-                    <i class="ph-bold ph-gift" style="color:#F59E0B;"></i>
-                    <span id="annualPromoText"></span>
-                </div>
-
                 <div class="price-summary" style="margin-top: 1rem;">
                     <span>Total Payment:</span>
                     <span id="totalDisplay" class="price-highlight">$0.00</span>
                 </div>
-                <div id="savingsNote" style="display:none; text-align:right; font-size:0.78rem; color:#059669; font-weight:700; margin-top:0.3rem;"></div>
             </div>
 
             <button type="button" class="btn btn-primary full-width" style="margin-top: 2rem;" onclick="startRenewal()">
@@ -168,16 +144,6 @@ $annualPromosJson = json_encode($annualPromos);
         let currentMd5 = null;
         let pollingInterval = null;
 
-        // Annual promo map from PHP: { price: freeMonths }
-        const annualPromos = <?php echo $annualPromosJson; ?>;
-
-        function getFreeMonths(price) {
-            for (const [promoPrice, freeMonths] of Object.entries(annualPromos)) {
-                if (Math.abs(price - parseFloat(promoPrice)) < 0.01) return freeMonths;
-            }
-            return 0;
-        }
-
         function selectPlan(id, price, name) {
             selectedPlanId = id;
             selectedPrice = price;
@@ -191,41 +157,13 @@ $annualPromosJson = json_encode($annualPromos);
 
         function updateTotal() {
             const months = parseInt(document.getElementById('duration').value);
-            const freeMonths = getFreeMonths(selectedPrice);
-            const promoBox = document.getElementById('annualPromoBox');
-            const promoText = document.getElementById('annualPromoText');
-            const savingsNote = document.getElementById('savingsNote');
-
-            let billableMonths = months;
-            let savings = 0;
-
-            if (months === 12 && freeMonths > 0) {
-                billableMonths = 12 - freeMonths;
-                savings = selectedPrice * freeMonths;
-                promoText.textContent = `Annual Deal: Pay for ${billableMonths} months, enjoy ${12} months! (Save $${savings.toFixed(2)})`;
-                promoBox.style.display = 'flex';
-                promoBox.style.gap = '0.5rem';
-                promoBox.style.alignItems = 'center';
-                savingsNote.textContent = `You save $${savings.toFixed(2)}!`;
-                savingsNote.style.display = 'block';
-            } else {
-                promoBox.style.display = 'none';
-                savingsNote.style.display = 'none';
-            }
-
-            const total = selectedPrice * billableMonths;
+            const total = selectedPrice * months;
             document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
         }
 
         async function startRenewal() {
             const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', ''));
             if (total <= 0) { alert("Please select a plan first."); return; }
-
-            // Store the actual subscription months (always 12 for annual, even if payment is discounted)
-            const selectedMonths = parseInt(document.getElementById('duration').value);
-            const freeMonths = getFreeMonths(selectedPrice);
-            // actualMonths = what the tenant gets (full 12 even if paying for fewer)
-            window._actualSubscriptionMonths = selectedMonths; // always what was selected
 
             document.getElementById('modalAmount').textContent = '$' + total.toFixed(2);
             document.getElementById('paymentModal').classList.add('active');
@@ -282,8 +220,7 @@ $annualPromosJson = json_encode($annualPromos);
                     const statusUpper = (data.status || '').toUpperCase();
                     if (data.success && (statusUpper === 'SUCCESS' || statusUpper === 'APPROVED')) {
                         clearInterval(pollingInterval);
-                        const subMonths = window._actualSubscriptionMonths || document.getElementById('duration').value;
-                        window.location.href = `renew_process.php?ref=${currentMd5}&months=${subMonths}&plan_id=${selectedPlanId}`;
+                        window.location.href = `renew_process.php?ref=${currentMd5}&months=${document.getElementById('duration').value}&plan_id=${selectedPlanId}`;
                     }
                 } catch (e) {}
             }, 3000);
