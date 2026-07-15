@@ -363,6 +363,10 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
         }
 
         @media (max-width: 600px) {
+            .auth-header-top {
+                flex-direction: column;
+                gap: 8px;
+            }
             .form-grid, .form-row-split {
                 grid-template-columns: 1fr;
             }
@@ -375,6 +379,28 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             }
             .auth-card {
                 padding: 1.8rem 1.2rem !important;
+            }
+            .auth-header h2 {
+                font-size: 1.25rem;
+            }
+            .auth-header p {
+                font-size: 0.8rem;
+            }
+            .auth-logo span {
+                font-size: 1rem;
+            }
+            .badge-success {
+                font-size: 0.68rem;
+                padding: 0.3rem 0.7rem;
+            }
+            .system-preview {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .btn-primary {
+                height: 44px !important;
+                font-size: 0.88rem !important;
             }
         }
     </style>

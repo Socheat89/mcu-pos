@@ -319,10 +319,18 @@
         @media (max-width:640px) {
             .auth-card { padding:2rem 1.3rem !important; border-radius:22px !important; }
             .auth-header h3 { font-size:1.4rem; }
+            .stepper { flex-direction: column; gap: 6px; }
             .stepper-item strong { font-size:0.72rem; }
             .stepper-item small { font-size:0.65rem; display:none; }
+            .stepper-item::after { display: none; }
             .checkbox-card { padding:1rem; }
             .checkbox-price { font-size:0.9rem; }
+            .checkbox-card__row { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .form-control { height: 44px; font-size: 0.88rem; }
+            .btn { padding: 0.75rem 1.5rem; font-size: 0.88rem; }
+            .modal-content { padding: 1.5rem; border-radius: 18px; max-width: 92%; }
+            .payment-amount { font-size: 1.8rem; }
+            .plan-chip { font-size: 0.65rem; padding: 3px 8px; }
         }
     </style>
 </head>

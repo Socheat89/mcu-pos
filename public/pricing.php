@@ -109,6 +109,182 @@ foreach ($systems as $i => $system) {
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
+    <style>
+        :root {
+            --brand: #308AC6;
+            --brand-strong: #1F6896;
+            --brand-light: #52A2D4;
+            --mc-primary: #308AC6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body.landing-page {
+            font-family: 'Sora', 'Battambang', sans-serif;
+            margin: 0;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #0f172a;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ── Header / Nav ── */
+        .main-header {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 100;
+            padding: 0.75rem 0;
+        }
+        .nav-container {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1.5rem; flex-wrap: wrap;
+        }
+        .logo {
+            display: inline-flex; align-items: center; gap: 10px;
+            text-decoration: none; flex-shrink: 0;
+        }
+        .logo-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            overflow: hidden; display: grid; place-items: center;
+            box-shadow: 0 4px 12px rgba(48,138,198,0.12);
+        }
+        .logo span {
+            font-family: 'Unbounded', sans-serif; font-weight: 700;
+            font-size: 1rem; color: #0f172a; letter-spacing: -0.03em;
+        }
+        .nav-links { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+        .nav-item {
+            font-weight: 600; font-size: 0.88rem; color: #475569;
+            text-decoration: none; padding: 0.5rem 1rem; border-radius: 50px;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .nav-item:hover { color: #0f172a; background: #f1f5f9; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-4 { gap: 1rem; }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; font-weight: 700; border-radius: 50px;
+            padding: 0.7rem 1.6rem; font-size: 0.9rem;
+            transition: all 0.25s ease; cursor: pointer; border: none;
+            text-decoration: none; white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+            color: #fff; box-shadow: 0 4px 16px rgba(48,138,198,0.25);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(48,138,198,0.35); }
+        .btn-outline {
+            background: transparent; border: 2px solid rgba(48,138,198,0.2);
+            color: var(--brand);
+        }
+        .btn-outline:hover { background: rgba(48,138,198,0.05); border-color: var(--brand); }
+        .full-width { width: 100%; }
+
+        /* ── Pricing Section ── */
+        .pricing-section { padding: 5rem 0; }
+        .section-header { text-align: center; margin-bottom: 3.5rem; }
+        .section-kicker {
+            display: inline-block; padding: 0.3rem 1rem;
+            background: rgba(48,138,198,0.08); color: var(--brand);
+            border-radius: 50px; font-weight: 700; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;
+        }
+        .section-header h1 {
+            font-family: 'Unbounded', sans-serif; font-size: 2.2rem;
+            font-weight: 700; margin: 0.5rem 0; letter-spacing: -0.03em;
+        }
+        .section-header p { color: #64748b; font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+        /* ── Pricing Grid ── */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            align-items: start;
+        }
+        .system-card {
+            background: #fff; border-radius: 20px; padding: 2rem 1.8rem;
+            border: 1px solid #e2e8f0; position: relative;
+            transition: all 0.3s ease; display: flex; flex-direction: column;
+        }
+        .system-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+        .popular-card {
+            border: 2px solid #8b5cf6;
+            box-shadow: 0 8px 30px rgba(139,92,246,0.12);
+        }
+        .plan-badge {
+            position: absolute; top: -12px; right: 20px;
+            padding: 0.25rem 0.9rem; border-radius: 50px;
+            font-weight: 700; font-size: 0.72rem; letter-spacing: 0.02em;
+            background: #ede9fe; color: #7c3aed;
+        }
+        .system-title {
+            font-family: 'Unbounded', sans-serif; font-size: 1.2rem;
+            font-weight: 700; margin: 0 0 0.5rem;
+        }
+        .system-desc { color: #64748b; font-size: 0.88rem; margin-bottom: 1.2rem; line-height: 1.5; }
+        .price-tag { margin-bottom: 1.5rem; }
+        .price-amount { font-family: 'Unbounded', sans-serif; font-size: 2.5rem; font-weight: 800; color: #0f172a; }
+        .price-period { color: #64748b; font-size: 0.9rem; font-weight: 500; margin-left: 2px; }
+        .plan-list {
+            list-style: none; padding: 0; margin: 0 0 1.8rem;
+            flex: 1; display: flex; flex-direction: column; gap: 0.6rem;
+        }
+        .plan-list li {
+            display: flex; align-items: center; gap: 0.6rem;
+            font-size: 0.88rem; color: #334155;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center; padding: 3rem 1.5rem;
+            border-top: 1px solid #e2e8f0; background: #fff;
+        }
+        .footer-brand {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-bottom: 0.8rem;
+        }
+        .footer-brand span {
+            font-family: 'Unbounded', sans-serif; font-weight: 700;
+            font-size: 0.95rem; color: #0f172a;
+        }
+        .copyright { font-size: 0.82rem; color: #94a3b8; margin: 0; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .nav-container { justify-content: center; text-align: center; }
+            .nav-links { justify-content: center; }
+            .pricing-section { padding: 3rem 0; }
+            .section-header h1 { font-size: 1.6rem; }
+            .systems-grid {
+                grid-template-columns: 1fr;
+                max-width: 420px; margin: 0 auto;
+            }
+            .system-card { padding: 1.5rem 1.3rem; }
+            .price-amount { font-size: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-header { padding: 0.5rem 0; }
+            .logo span { font-size: 0.85rem; }
+            .logo-icon { width: 34px; height: 34px; }
+            .nav-item { font-size: 0.78rem; padding: 0.4rem 0.7rem; }
+            .btn { padding: 0.6rem 1.2rem; font-size: 0.82rem; }
+            .section-header h1 { font-size: 1.4rem; }
+            .section-header p { font-size: 0.85rem; }
+            .system-card { padding: 1.3rem 1rem; border-radius: 16px; }
+            .plan-list li { font-size: 0.82rem; }
+            footer { padding: 2rem 1rem; }
+        }
+    </style>
     
 </head>
 <body class="landing-page">

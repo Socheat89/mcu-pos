@@ -269,6 +269,57 @@
             font-weight: 600;
             color: #64748b;
         }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .auth-card {
+                padding: 2rem 1.3rem !important;
+                border-radius: 22px !important;
+            }
+            .auth-header h2 {
+                font-size: 1.4rem;
+            }
+            .auth-header p {
+                font-size: 0.85rem;
+            }
+            .input-wrapper input {
+                height: 48px;
+                padding: 10px 42px 10px 44px !important;
+                font-size: 0.9rem !important;
+                border-radius: 14px !important;
+            }
+            .input-wrapper i.prefix-icon {
+                left: 14px;
+                font-size: 18px;
+            }
+            .btn-toggle-password {
+                right: 14px;
+                font-size: 18px;
+            }
+            .btn-submit {
+                height: 48px;
+                font-size: 0.9rem !important;
+                border-radius: 14px !important;
+                margin-top: 20px;
+            }
+            .form-group {
+                margin-bottom: 16px !important;
+            }
+            .alert {
+                padding: 12px 14px !important;
+                font-size: 0.8rem !important;
+            }
+            .auth-footer {
+                font-size: 0.82rem;
+                margin-top: 20px;
+                padding-top: 16px;
+            }
+            .auth-label-row {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 4px;
+            }
+        }
     </style>
 </head>
 <body class="auth-page">
