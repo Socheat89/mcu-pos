@@ -389,10 +389,10 @@ $structuredData = [
                 } else {
                 foreach ($plans as $index => $plan):
                     $planCode = strtolower(str_replace(' ', '_', $plan['name']));
-                    $isPopular = ($index === 1); // Mark second plan as popular for UI
+                    $isPopular = (floatval($plan['price']) == 30.00); // Mark the 30.00 plan (POS Standard/Inventory) as popular for UI
                     $planName  = $plan['name'];
-                    $isInventory = (stripos($planName, 'Inventory') !== false);
-                    $isPremium   = (stripos($planName, 'Premium') !== false);
+                    $isInventory = (stripos($planName, 'Inventory') !== false || floatval($plan['price']) == 30.00);
+                    $isPremium   = (stripos($planName, 'Premium') !== false || floatval($plan['price']) == 99.99 || floatval($plan['price']) == 100.00);
 
                     // Free-month bonus: Inventory=1, Premium=3
                     $freeMonths   = $isInventory ? 1 : ($isPremium ? 3 : 0);
