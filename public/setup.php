@@ -422,7 +422,14 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 font-size: 0.85rem;
             }
             .form-group .workspace-url-prefix {
-                font-size: 0.7rem;
+                font-size: 0.65rem;
+                max-width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .url-input-container {
+                padding: 0 0.6rem !important;
+                gap: 0.3rem !important;
             }
         }
 
@@ -558,7 +565,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
 
                 <div class="form-group full-width">
                     <label for="subdomain"><i class="ph-bold ph-globe" style="color: var(--primary);"></i> Workspace URL</label>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0 1rem; max-width: 100%; overflow: hidden;">
+                    <div class="url-input-container" style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0 1rem; max-width: 100%; overflow: hidden;">
                         <span class="workspace-url-prefix" style="color: #64748b; font-weight: 600; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0;"><?php echo htmlspecialchars($workspaceBasePreview); ?></span>
                         <input type="text" id="subdomain" name="subdomain" required pattern="[a-zA-Z0-9]+" title="Only letters and numbers allowed" placeholder="your-business" style="border: none; background: transparent; padding: 0.875rem 0; outline: none; box-shadow: none; min-width: 0; flex: 1;">
                     </div>
