@@ -18,7 +18,7 @@ unset($_SESSION['password_reset_success'], $_SESSION['password_reset_debug_link'
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=2.3">
+    <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=5.0">
     <link rel="icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
     <link rel="shortcut icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>

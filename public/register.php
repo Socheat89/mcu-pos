@@ -13,7 +13,7 @@
 
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/landing.css?v=5.0">
     
     <!-- Favicon -->
     <link rel="icon" href="images/my-logo.jpg" type="image/jpeg">
