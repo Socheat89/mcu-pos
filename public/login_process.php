@@ -1,15 +1,6 @@
 <?php
 // public/login_process.php
-<<<<<<< HEAD
 require_once __DIR__ . '/../core/bootstrap_session.php';
-=======
-// Extend Session to 1 Year (no auto-logout) before starting session
-$sessionLifetime = 31536000; // 365 days
-ini_set('session.cookie_lifetime', $sessionLifetime);
-ini_set('session.gc_maxlifetime', $sessionLifetime);
-
-session_start();
->>>>>>> 4f70196d56a2322fe59205c2c0a31f2a9b6ba3b8
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Auth.php';
 require_once __DIR__ . '/../core/helpers/url.php';

@@ -5,23 +5,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 try {
-<<<<<<< HEAD
-=======
-    // Harden Session Security & Extend Session Lifetime to 1 Year (no auto-logout)
-    $sessionLifetime = 31536000; // 365 days
-    ini_set('session.cookie_lifetime', $sessionLifetime);
-    ini_set('session.gc_maxlifetime', $sessionLifetime);
-    ini_set('session.cookie_httponly', 1);
-    ini_set('session.use_only_cookies', 1);
-    ini_set('session.cookie_samesite', 'Lax');
-    ini_set('session.use_strict_mode', 1);
-
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    date_default_timezone_set('Asia/Phnom_Penh');
-
->>>>>>> 4f70196d56a2322fe59205c2c0a31f2a9b6ba3b8
     $baseDir = dirname(__FILE__);
     require_once $baseDir . '/core/bootstrap_session.php';
     date_default_timezone_set('Asia/Phnom_Penh');
