@@ -413,6 +413,9 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 height: 44px;
                 font-size: 0.85rem;
             }
+            .form-group .workspace-url-prefix {
+                font-size: 0.7rem;
+            }
         }
 
         @media (max-width: 380px) {
@@ -548,7 +551,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 <div class="form-group full-width">
                     <label for="subdomain"><i class="ph-bold ph-globe" style="color: var(--primary);"></i> Workspace URL</label>
                     <div style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0 1rem; max-width: 100%; overflow: hidden;">
-                        <span style="color: #64748b; font-weight: 600; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0;"><?php echo htmlspecialchars($workspaceBasePreview); ?></span>
+                        <span class="workspace-url-prefix" style="color: #64748b; font-weight: 600; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0;"><?php echo htmlspecialchars($workspaceBasePreview); ?></span>
                         <input type="text" id="subdomain" name="subdomain" required pattern="[a-zA-Z0-9]+" title="Only letters and numbers allowed" placeholder="your-business" style="border: none; background: transparent; padding: 0.875rem 0; outline: none; box-shadow: none; min-width: 0; flex: 1;">
                     </div>
                     <span class="form-helper">This will be your unique portal address.</span>
@@ -561,7 +564,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="admin_email"><i class="ph-bold ph-envelope" style="color: var(--primary);"></i> Work Email</label>
+                    <label for="admin_email">Work Email</label>
                     <div style="position: relative;">
                         <i class="ph-bold ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                         <input type="email" id="admin_email" name="admin_email" required placeholder="admin@business.com" style="padding-left: 2.75rem;">
@@ -569,7 +572,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="admin_username"><i class="ph-bold ph-user" style="color: var(--primary);"></i> Username</label>
+                    <label for="admin_username">Username</label>
                     <div style="position: relative;">
                         <i class="ph-bold ph-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                         <input type="text" id="admin_username" name="admin_username" required placeholder="admin" style="padding-left: 2.75rem;">
@@ -579,7 +582,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 <div class="form-group full-width">
                     <div class="form-row-split">
                         <div class="form-group">
-                            <label for="admin_password"><i class="ph-bold ph-lock-key" style="color: var(--primary);"></i> Password</label>
+                            <label for="admin_password">Password</label>
                             <div style="position: relative;">
                                 <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                                 <input type="password" id="admin_password" name="admin_password" required minlength="8" placeholder="••••••••" style="padding-left: 2.75rem;">
@@ -587,7 +590,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                         </div>
 
                         <div class="form-group">
-                            <label for="confirm_password"><i class="ph-bold ph-lock-key" style="color: var(--primary);"></i> Confirm Password</label>
+                            <label for="confirm_password">Confirm Password</label>
                             <div style="position: relative;">
                                 <i class="ph-bold ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
                                 <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm secure password" style="padding-left: 2.75rem;">
