@@ -1291,7 +1291,7 @@ export default function App() {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold cursor-pointer transition-all border ${
                         isActive
                           ? 'bg-brand-cyan border-brand-cyan text-white shadow-sm'
-                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-100'
+                          : 'bg-white dark:bg-brand-bgDark border-gray-200 dark:border-white/5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-brand-surfDarkAlt'
                       }`}
                     >
                       <span>{order.name}</span>
@@ -1308,7 +1308,7 @@ export default function App() {
                 })}
                 <button
                   onClick={addNewOrder}
-                  className="px-2.5 py-1.5 rounded bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 flex items-center justify-center transition-all cursor-pointer shadow-sm text-[11px] font-bold"
+                  className="px-2.5 py-1.5 rounded bg-white dark:bg-brand-bgDark hover:bg-gray-100 dark:hover:bg-brand-surfDarkAlt border border-gray-200 dark:border-white/5 text-gray-600 dark:text-gray-300 flex items-center justify-center transition-all cursor-pointer shadow-sm text-[11px] font-bold"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
@@ -1320,15 +1320,15 @@ export default function App() {
                   <div className="h-6 w-6 rounded bg-brand-cyan flex items-center justify-center">
                     <Receipt className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <h3 className="text-xs font-bold tracking-tight text-slate-800">{t('cart', 'កន្ត្រក')}</h3>
+                  <h3 className="text-xs font-bold tracking-tight text-slate-800 dark:text-gray-200">{t('cart', 'កន្ត្រក')}</h3>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-brand-cyan">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 dark:bg-brand-surfDarkAlt text-brand-cyan">
                   {cartItemCount} {t('items', 'items')}
                 </span>
               </div>
 
               {/* Cart Items */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-1 bg-white">
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 space-y-1 bg-white dark:bg-brand-surfDark">
                 {cart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center py-10">
                     <ShoppingBag className="h-8 w-8 mb-2 text-gray-300" />
@@ -1367,13 +1367,13 @@ export default function App() {
               </div>
 
               {/* Cart Footer */}
-              <div className="flex-shrink-0 px-3 pb-3 pt-2 bg-gray-50 border-t border-gray-200 flex flex-col gap-2">
+              <div className="flex-shrink-0 px-3 pb-3 pt-2 bg-gray-50 dark:bg-brand-surfDark border-t border-gray-200 dark:border-white/5 flex flex-col gap-2">
                 {/* Odoo style Customer Select Button */}
                 <div className="relative">
                   {selectedCustomerId ? (
                     <button
                       onClick={() => setSelectedCustomerId('')}
-                      className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-white hover:bg-gray-100 border border-brand-cyan rounded text-[11px] font-bold text-brand-cyan transition-all shadow-sm"
+                      className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-white dark:bg-brand-bgDark hover:bg-gray-100 dark:hover:bg-brand-surfDarkAlt border border-brand-cyan rounded text-[11px] font-bold text-brand-cyan transition-all shadow-sm"
                     >
                       <span className="flex items-center gap-2 truncate">
                         <UserCircle className="h-4 w-4 text-brand-cyan flex-shrink-0" />
@@ -1387,14 +1387,14 @@ export default function App() {
                       <select
                         value={selectedCustomerId}
                         onChange={(e) => setSelectedCustomerId(e.target.value)}
-                        className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-bold rounded border border-gray-200 bg-white text-gray-600 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
+                        className="w-full appearance-none py-1.5 pl-8 pr-8 text-[11px] font-bold rounded border border-gray-200 dark:border-white/5 bg-white dark:bg-brand-bgDark text-gray-600 dark:text-gray-200 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
                       >
                         <option value="">{t('customer', 'អតិថិជន')} : {t('walk_in', 'Walk-in')}</option>
                         {customers.map(c => (
                           <option key={c.id} value={c.id}>{c.name} {c.phone && `(${c.phone})`}</option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
                     </div>
                   )}
                 </div>
@@ -1437,10 +1437,10 @@ export default function App() {
                             isSelectedMode
                               ? 'bg-[#E76F51] border-[#E76F51] text-white shadow-sm'
                               : btn.isMode
-                              ? 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
+                              ? 'bg-gray-100 dark:bg-brand-surfDarkAlt border-gray-200 dark:border-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-brand-bgDark'
                               : btn.val === 'backspace'
-                              ? 'bg-gray-100 border-gray-200 text-[#E76F51] hover:bg-red-50'
-                              : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-100'
+                              ? 'bg-gray-100 dark:bg-brand-surfDarkAlt border-gray-200 dark:border-white/5 text-[#E76F51] hover:bg-red-50 dark:hover:bg-red-950/20'
+                              : 'bg-white dark:bg-brand-bgDark border-gray-200 dark:border-white/5 text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-brand-surfDarkAlt'
                           }`}
                         >
                           {btn.label}
@@ -1480,12 +1480,12 @@ export default function App() {
                 </div>
 
                 {/* Receipt Totals summary */}
-                <div className="p-2.5 rounded bg-white border border-gray-200 space-y-1 text-[11px] font-medium text-brand-muted">
+                <div className="p-2.5 rounded bg-white dark:bg-brand-bgDark border border-gray-200 dark:border-white/5 space-y-1 text-[11px] font-medium text-brand-muted dark:text-gray-400">
                   <div className="flex justify-between items-center">
                     <span>{t('subtotal', 'Subtotal')}</span>
                     <span>${getSubtotal().toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-black text-slate-800 border-t border-gray-100 pt-1.5 mt-1">
+                  <div className="flex justify-between items-center text-xs font-black text-slate-800 dark:text-gray-200 border-t border-gray-100 dark:border-white/5 pt-1.5 mt-1">
                     <span>{t('total', 'Total')}</span>
                     <span className="text-sm font-black text-brand-cyan">${getGrandTotal().toFixed(2)}</span>
                   </div>
