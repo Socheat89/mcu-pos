@@ -113,13 +113,19 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             text-align: center;
             margin-bottom: 1.8rem;
         }
+        .auth-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
         .auth-logo {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
             text-decoration: none;
-            margin-bottom: 1rem;
         }
         .logo-icon {
             width: 44px;
@@ -157,7 +163,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            padding: 0.3rem 0.8rem;
+            padding: 0.35rem 0.9rem;
             border-radius: 50px;
             background: #e0f2fe;
             color: #0369a1;
@@ -165,7 +171,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             font-size: 0.72rem;
             font-weight: 700;
             letter-spacing: 0.02em;
-            margin-top: 0.2rem;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .system-preview {
@@ -401,21 +408,23 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
     <main class="auth-shell">
         <div class="auth-card">
             <div class="auth-header">
-                <a href="/" class="auth-logo">
-                    <div class="logo-icon">
-                        <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
+                <div class="auth-header-top">
+                    <a href="/" class="auth-logo">
+                        <div class="logo-icon">
+                            <img src="<?php echo mc_url('public/images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
+                        </div>
+                        <span>Mekong CyberUnit</span>
+                    </a>
+                    <?php if ($isTrial): ?>
+                    <div class="badge-success" style="background: #dbeafe; color: #1e40af; border-color: #bfdbfe;">
+                        <i class="ph-bold ph-gift"></i> 7-Day Free Trial
                     </div>
-                    <span>Mekong CyberUnit</span>
-                </a>
-                <?php if ($isTrial): ?>
-                <div class="badge-success" style="background: #dbeafe; color: #1e40af; border-color: #bfdbfe;">
-                    <i class="ph-bold ph-gift"></i> 7-Day Free Trial
+                    <?php else: ?>
+                    <div class="badge-success">
+                        <i class="ph-bold ph-check-circle"></i> Payment Confirmed
+                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php else: ?>
-                <div class="badge-success">
-                    <i class="ph-bold ph-check-circle"></i> Payment Confirmed
-                </div>
-                <?php endif; ?>
                 <h2>Business Information</h2>
                 <p>Complete your setup to activate your <span class="link-strong" style="text-transform: capitalize;">
                     <?php echo htmlspecialchars($plan); ?>
