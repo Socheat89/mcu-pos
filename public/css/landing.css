@@ -4,16 +4,16 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-    --mc-primary: #2F89C5;
-    --mc-primary-dark: #1E6899;
-    --mc-primary-light: #4FA5DB;
+    --mc-primary: #308AC6;
+    --mc-primary-dark: #1F6896;
+    --mc-primary-light: #52A2D4;
     --mc-accent: #F59E0B;
     --mc-accent-dark: #D97706;
     --mc-dark: #0F172A;
     --mc-soft: #334155;
     --mc-muted: #64748B;
     --mc-bg: #F8FAFC;
-    --mc-glow: 0 0 30px rgba(47, 137, 197, 0.2);
+    --mc-glow: 0 0 30px rgba(48, 138, 198, 0.2);
     --mc-radius-lg: 1rem;
     --mc-radius-xl: 1.5rem;
 }
@@ -21,7 +21,7 @@
 /* ── Bootstrap overrides ── */
 :root {
     --bs-primary: var(--mc-primary);
-    --bs-primary-rgb: 47, 137, 197;
+    --bs-primary-rgb: 48, 138, 198;
     --bs-link-color: var(--mc-primary);
     --bs-link-hover-color: var(--mc-primary-dark);
     --bs-body-font-family: 'Sora', 'Battambang', system-ui, -apple-system, sans-serif;
