@@ -184,47 +184,74 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
         .system-preview {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.85rem 1.2rem;
-            border-radius: 14px;
-            background: rgba(48, 138, 198, 0.06);
-            border: 1px solid rgba(48, 138, 198, 0.15);
+            gap: 14px;
+            padding: 1rem 1.3rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(48, 138, 198, 0.05), rgba(48, 138, 198, 0.02));
+            border: 1.5px solid rgba(48, 138, 198, 0.12);
             margin-bottom: 1.5rem;
             text-align: left;
+            transition: all 0.25s ease;
+        }
+        .system-preview:hover {
+            border-color: rgba(48, 138, 198, 0.25);
+            box-shadow: 0 4px 16px rgba(48, 138, 198, 0.06);
         }
         .system-icon-mini {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--brand);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-strong));
             color: #fff;
             display: grid;
             place-items: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(48, 138, 198, 0.2);
         }
 
         /* ── Stepper ── */
         .stepper {
             display: flex;
-            gap: 10px;
+            gap: 0;
             margin-bottom: 2rem;
             border-bottom: 1px solid #e2e8f0;
             padding-bottom: 1.2rem;
+            position: relative;
         }
         .stepper-item {
             flex: 1;
             display: flex;
             align-items: center;
             gap: 10px;
-            opacity: 0.45;
+            opacity: 0.4;
             transition: all 0.3s ease;
             text-align: left;
+            position: relative;
+        }
+        .stepper-item::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 38px;
+            right: 8px;
+            height: 2px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            z-index: 0;
+            transition: background 0.3s ease;
+        }
+        .stepper-item:last-child::after {
+            display: none;
         }
         .stepper-item.active {
             opacity: 1;
         }
         .stepper-item.completed {
-            opacity: 0.8;
+            opacity: 0.75;
+        }
+        .stepper-item.completed::after {
+            background: var(--brand-light);
         }
         .step-number {
             width: 28px;
@@ -236,19 +263,27 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             font-size: 0.75rem;
             background: #f1f5f9;
             color: #94a3b8;
-            border: 1.5px solid #cbd5e1;
+            border: 2px solid #e2e8f0;
             flex-shrink: 0;
+            z-index: 1;
+            transition: all 0.3s ease;
         }
         .stepper-item.active .step-number {
             background: var(--brand);
             color: #fff;
             border-color: var(--brand);
-            box-shadow: 0 4px 10px rgba(48, 138, 198, 0.25);
+            box-shadow: 0 4px 12px rgba(48, 138, 198, 0.3);
         }
         .stepper-item.completed .step-number {
             background: var(--brand-strong);
             color: #fff;
             border-color: var(--brand-strong);
+            font-size: 0;
+        }
+        .stepper-item.completed .step-number::before {
+            content: '✓';
+            font-size: 0.85rem;
+            font-weight: 700;
         }
         .stepper-item strong {
             font-size: 0.78rem;
@@ -391,6 +426,9 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             .stepper {
                 flex-direction: column;
                 gap: 12px;
+            }
+            .stepper-item::after {
+                display: none;
             }
             .auth-card {
                 padding: 1.8rem 1.2rem !important;
