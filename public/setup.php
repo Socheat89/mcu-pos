@@ -61,6 +61,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             padding: 2.5rem 1rem;
             position: relative;
             font-family: 'Sora', 'Battambang', sans-serif;
+            overflow-x: hidden;
+            max-width: 100vw;
         }
 
         /* Ambient animated blobs */
@@ -70,6 +72,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
+            max-width: 100vw;
         }
         .blob {
             position: absolute;
@@ -90,6 +93,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             z-index: 10;
             width: 100%;
             max-width: 650px;
+            min-width: 0;
             margin: 0 auto;
         }
 
@@ -103,6 +107,8 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             border-radius: 24px !important;
             padding: 2.5rem 2.2rem !important;
             transition: all 0.3s ease;
+            overflow: hidden;
+            max-width: 100%;
         }
         .auth-card:hover {
             box-shadow: 0 25px 60px rgba(48, 138, 198, 0.12), 0 8px 25px rgba(0, 0, 0, 0.03) !important;
@@ -290,6 +296,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
         }
         .form-group input, .form-group select {
             width: 100%;
+            max-width: 100%;
             height: 46px;
             padding: 0 16px;
             border-radius: 12px;
@@ -402,6 +409,39 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 height: 44px !important;
                 font-size: 0.88rem !important;
             }
+            .form-group input, .form-group select {
+                height: 44px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body.auth-page {
+                padding: 1rem 0.5rem;
+            }
+            .auth-card {
+                padding: 1.4rem 0.9rem !important;
+                border-radius: 18px !important;
+            }
+            .auth-header h2 {
+                font-size: 1.1rem;
+            }
+            .auth-header-top {
+                gap: 6px;
+            }
+            .auth-logo span {
+                font-size: 0.88rem;
+            }
+            .badge-success {
+                font-size: 0.62rem;
+                padding: 0.2rem 0.5rem;
+            }
+            .form-group label {
+                font-size: 0.68rem;
+            }
+            .stepper-item strong {
+                font-size: 0.65rem;
+            }
         }
     </style>
     
@@ -453,7 +493,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
                 </div>
                 <h2>Business Information</h2>
                 <p>Complete your setup to activate your <span class="link-strong" style="text-transform: capitalize;">
-                    <?php echo htmlspecialchars($plan); ?>
+                    <?php echo htmlspecialchars(str_replace('_', ' ', $plan)); ?>
                 </span> workspace</p>
             </div>
 
@@ -464,7 +504,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             </div>
             <div>
                 <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Plan Selected</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Cloud POS <?php echo ucfirst($plan); ?> - <?php echo $ref ? 'Ref: ' . htmlspecialchars($ref) : 'Paid'; ?></div>
+                <div style="font-size: 0.75rem; color: #64748b;">Cloud POS <?php echo ucfirst(str_replace('_', ' ', $plan)); ?> &mdash; <?php echo $ref ? 'Ref: ' . htmlspecialchars($ref) : ($isTrial ? 'Free Trial' : 'Paid'); ?></div>
             </div>
         </div>
 
@@ -507,9 +547,9 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
 
                 <div class="form-group full-width">
                     <label for="subdomain"><i class="ph-bold ph-globe" style="color: var(--primary);"></i> Workspace URL</label>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0 1rem;">
-                        <span style="color: #64748b; font-weight: 600; font-size: 0.85rem; white-space: nowrap;"><?php echo htmlspecialchars($workspaceBasePreview); ?></span>
-                        <input type="text" id="subdomain" name="subdomain" required pattern="[a-zA-Z0-9]+" title="Only letters and numbers allowed" placeholder="your-business" style="border: none; background: transparent; padding: 0.875rem 0; outline: none; box-shadow: none;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0 1rem; max-width: 100%; overflow: hidden;">
+                        <span style="color: #64748b; font-weight: 600; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0;"><?php echo htmlspecialchars($workspaceBasePreview); ?></span>
+                        <input type="text" id="subdomain" name="subdomain" required pattern="[a-zA-Z0-9]+" title="Only letters and numbers allowed" placeholder="your-business" style="border: none; background: transparent; padding: 0.875rem 0; outline: none; box-shadow: none; min-width: 0; flex: 1;">
                     </div>
                     <span class="form-helper">This will be your unique portal address.</span>
                 </div>
