@@ -77,3 +77,7 @@ CREATE TABLE IF NOT EXISTS telegram_pending_links (
     INDEX idx_setup_code (setup_code),
     INDEX idx_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Ensure new columns exist on tenant_telegram_config (safe to re-run)
+ALTER TABLE tenant_telegram_config ADD COLUMN chat_title VARCHAR(255) NULL COMMENT 'Group name (auto-detected)' AFTER chat_id;
+ALTER TABLE tenant_telegram_config ADD COLUMN setup_code VARCHAR(10) NULL COMMENT '6-char setup code for easy pairing' AFTER chat_title;

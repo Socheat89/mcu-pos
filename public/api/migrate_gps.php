@@ -39,12 +39,18 @@ try {
 
         try {
             $db->query($stmt);
-            preg_match('/CREATE TABLE.*?`?(\w+)`?/i', $stmt, $m);
-            echo '<span class="ok">✅ Created:</span> ' . ($m[1] ?? 'table') . "\n";
+            if (stripos($stmt, 'CREATE TABLE') !== false) {
+                preg_match('/CREATE TABLE.*?`?(\w+)`?/i', $stmt, $m);
+                echo '<span class="ok">✅ Created:</span> ' . ($m[1] ?? 'table') . "\n";
+            } else {
+                preg_match('/ALTER TABLE\s+`?(\w+)`?\s+ADD COLUMN\s+`?(\w+)`?/i', $stmt, $m);
+                echo '<span class="ok">✅ Added column:</span> ' . ($m[2] ?? 'column') . ' → ' . ($m[1] ?? 'table') . "\n";
+            }
         } catch (Exception $e) {
             $msg = $e->getMessage();
-            if (stripos($msg, 'already exists') !== false || stripos($msg, 'Duplicate') !== false) {
-                echo '<span class="skip">⏭️  Skip:</span> ' . (isset($m[1]) ? $m[1] : 'table') . " (already exists)\n";
+            if (stripos($msg, 'already exists') !== false || stripos($msg, 'Duplicate') !== false || stripos($msg, 'duplicate') !== false) {
+                preg_match('/ADD COLUMN\s+`?(\w+)`?/i', $stmt, $m);
+                echo '<span class="skip">⏭️  Skip:</span> ' . ($m[1] ?? 'column') . " (already exists)\n";
             } else {
                 echo '<span class="err">❌ Error:</span> ' . htmlspecialchars($msg) . "\n";
             }
