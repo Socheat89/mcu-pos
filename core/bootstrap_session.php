@@ -91,7 +91,9 @@ function _remember_me_restore(string $sealedCookie): void {
             // Re-issue encrypted cookie (new seal, same plaintext token)
             $newSealed = $crypt->seal($plainToken);
             $isHttps   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+                || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
+                || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
             setcookie('remember_me', $newSealed, [
                 'expires'  => strtotime('+90 days'),
                 'path'     => '/',

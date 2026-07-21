@@ -117,14 +117,16 @@ function _issue_remember_me_token(int $userId, $db): void {
         $hash   = hash('sha256', $token);
         $expiry = date('Y-m-d H:i:s', strtotime('+90 days'));
 
-        // Clean old tokens for this user (keep at most 4 previous devices)
-        $db->execute(
-            "DELETE FROM remember_tokens WHERE user_id = ?
-             AND id NOT IN (
-                 SELECT id FROM (SELECT id FROM remember_tokens WHERE user_id = ? ORDER BY expires_at DESC LIMIT 4) t
-             )",
-            [$userId, $userId]
-        );
+        // Clean expired tokens and limit total active devices per user to 5
+        $db->execute("DELETE FROM remember_tokens WHERE expires_at < NOW()");
+        $userTokens = $db->fetchAll("SELECT id FROM remember_tokens WHERE user_id = ? ORDER BY id DESC", [$userId]);
+        if (count($userTokens) >= 5) {
+            $oldIds = array_column(array_slice($userTokens, 4), 'id');
+            if (!empty($oldIds)) {
+                $inClause = implode(',', array_map('intval', $oldIds));
+                $db->execute("DELETE FROM remember_tokens WHERE id IN ($inClause)");
+            }
+        }
 
         // Insert new token (only the SHA-256 hash is stored — never the plaintext)
         $db->execute(
@@ -137,7 +139,9 @@ function _issue_remember_me_token(int $userId, $db): void {
         $sealed = $crypt->seal($token); // AES-256-GCM + HMAC-SHA256
 
         $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
+            || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
 
         setcookie('remember_me', $sealed, [
             'expires'  => strtotime('+90 days'),
