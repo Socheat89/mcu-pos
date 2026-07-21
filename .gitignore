@@ -8,5 +8,3 @@
 Thumbs.db
 /vendor
 /sessions
-# App secrets — never commit
-/config/app.php
