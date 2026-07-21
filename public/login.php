@@ -22,12 +22,12 @@ if (Auth::check()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login - Mekong CyberUnit POS</title>
+    <title>Login - Mekong CyberUnit</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;600;700;800&family=Battambang:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
     <link rel="icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
@@ -38,14 +38,13 @@ if (Auth::check()) {
 
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: rgba(17, 24, 39, 0.75);
-            --brand-cyan: #06b6d4;
-            --brand-teal: #0d9488;
-            --brand-gradient: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0f766e 100%);
-            --border-glow: rgba(6, 182, 212, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
         }
 
         * {
@@ -55,16 +54,11 @@ if (Auth::check()) {
         }
 
         body, input, button {
-            font-family: 'Sora', 'Battambang', sans-serif;
+            font-family: 'Sora', 'Battambang', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body.auth-page {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(13, 148, 136, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.9) 0%, #090d16 100%);
-            background-attachment: fixed;
+            background-color: var(--bg);
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
@@ -72,82 +66,46 @@ if (Auth::check()) {
             justify-content: center;
             padding: 1.25rem;
             color: var(--text-main);
-            overflow-x: hidden;
-            position: relative;
         }
 
-        /* Ambient Glow Orbs */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
-        }
-        .orb-1 {
-            width: 350px;
-            height: 350px;
-            background: #06b6d4;
-            top: -100px;
-            left: -100px;
-        }
-        .orb-2 {
-            width: 400px;
-            height: 400px;
-            background: #0d9488;
-            bottom: -150px;
-            right: -150px;
-        }
-
-        /* Container Shell */
         .auth-shell {
             width: 100%;
-            max-width: 440px;
-            position: relative;
-            z-index: 10;
+            max-width: 410px;
             margin: 0 auto;
         }
 
-        /* Glassmorphism Card */
         .auth-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glow);
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.6),
-                0 0 30px rgba(6, 182, 212, 0.1),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border-radius: 20px;
             padding: 2.25rem 2rem;
             width: 100%;
         }
 
-        /* Brand Logo Block */
+        /* Header */
         .brand-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
         }
 
         .auth-logo {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             text-decoration: none;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .logo-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 14px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
-            border: 1.5px solid rgba(6, 182, 212, 0.4);
+            border: 1px solid #cbd5e1;
             flex-shrink: 0;
-            background: #0f172a;
+            background: #ffffff;
         }
 
         .logo-icon img {
@@ -157,23 +115,18 @@ if (Auth::check()) {
         }
 
         .brand-title {
-            font-family: 'Space Grotesk', 'Sora', sans-serif;
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #0f172a;
             letter-spacing: -0.02em;
         }
 
-        .brand-title span {
-            color: var(--brand-cyan);
-        }
-
         .welcome-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.35rem;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
         }
 
         .welcome-subtitle {
@@ -182,7 +135,7 @@ if (Auth::check()) {
             font-weight: 500;
         }
 
-        /* Form Inputs */
+        /* Form Controls */
         .form-group {
             margin-bottom: 1.25rem;
         }
@@ -191,27 +144,23 @@ if (Auth::check()) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .form-label {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #cbd5e1;
+            color: #334155;
         }
 
         .forgot-link {
             font-size: 0.8rem;
             font-weight: 600;
-            color: var(--brand-cyan);
+            color: var(--primary);
             text-decoration: none;
-            transition: color 0.2s;
         }
 
         .forgot-link:hover {
-            color: #38bdf8;
             text-decoration: underline;
         }
 
@@ -224,124 +173,108 @@ if (Auth::check()) {
 
         .input-icon {
             position: absolute;
-            left: 16px;
-            font-size: 20px;
-            color: #64748b;
-            transition: color 0.2s;
+            left: 14px;
+            font-size: 18px;
+            color: #94a3b8;
             pointer-events: none;
             z-index: 2;
         }
 
         .form-input {
             width: 100%;
-            height: 50px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1.5px solid rgba(51, 65, 85, 0.7);
-            border-radius: 14px;
-            padding: 0 44px 0 48px;
-            color: #ffffff;
-            font-size: 0.95rem;
+            height: 46px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 0 40px 0 42px;
+            color: #0f172a;
+            font-size: 0.92rem;
             font-weight: 600;
             outline: none;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
         .form-input::placeholder {
-            color: #475569;
+            color: #94a3b8;
             font-weight: 400;
         }
 
         .form-input:focus {
-            border-color: var(--brand-cyan);
-            background: rgba(15, 23, 42, 0.95);
-            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.18);
-        }
-
-        .form-input:focus ~ .input-icon {
-            color: var(--brand-cyan);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
         .password-toggle-btn {
             position: absolute;
-            right: 14px;
+            right: 12px;
             background: none;
             border: none;
-            color: #64748b;
-            font-size: 20px;
+            color: #94a3b8;
+            font-size: 18px;
             cursor: pointer;
             padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: color 0.2s;
             z-index: 2;
         }
 
         .password-toggle-btn:hover {
-            color: var(--brand-cyan);
+            color: var(--primary);
         }
 
-        /* Primary Submit Button */
+        /* Submit Button */
         .btn-submit {
             width: 100%;
-            height: 52px;
-            background: var(--brand-gradient);
+            height: 48px;
+            background: var(--primary);
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             color: #ffffff;
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: 0.02em;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4);
-            transition: all 0.25s ease;
-            margin-top: 1.75rem;
+            gap: 8px;
+            transition: background 0.15s ease;
+            margin-top: 1.5rem;
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.55);
-            filter: brightness(1.08);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
+            background: var(--primary-hover);
         }
 
         /* Alert Boxes */
         .alert {
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            line-height: 1.4;
+            gap: 8px;
         }
 
         .alert-error {
-            background: rgba(225, 29, 72, 0.15);
-            border: 1px solid rgba(225, 29, 72, 0.3);
-            color: #fecdd3;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
         }
 
         .alert-success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #a7f3d0;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
         }
 
         /* Footer */
         .auth-footer {
-            margin-top: 1.75rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
             text-align: center;
             font-size: 0.85rem;
             color: var(--text-muted);
@@ -349,7 +282,7 @@ if (Auth::check()) {
         }
 
         .auth-footer a {
-            color: var(--brand-cyan);
+            color: var(--primary);
             font-weight: 700;
             text-decoration: none;
             margin-left: 4px;
@@ -365,19 +298,12 @@ if (Auth::check()) {
             }
             .auth-card {
                 padding: 1.75rem 1.25rem;
-                border-radius: 20px;
-            }
-            .welcome-title {
-                font-size: 1.3rem;
+                border-radius: 16px;
             }
         }
     </style>
 </head>
 <body class="auth-page">
-
-    <!-- Ambient Glow Orbs -->
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
 
     <main class="auth-shell">
         <div class="auth-card">
@@ -387,16 +313,16 @@ if (Auth::check()) {
                     <div class="logo-icon">
                         <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU Logo">
                     </div>
-                    <div class="brand-title">Mekong <span>CyberUnit</span></div>
+                    <div class="brand-title">Mekong CyberUnit</div>
                 </a>
                 <h1 class="welcome-title">Welcome Back</h1>
-                <p class="welcome-subtitle">Sign in to your Mekong POS account</p>
+                <p class="welcome-subtitle">Sign in to your account</p>
             </div>
 
             <!-- Error Notification -->
             <?php if (isset($_GET['error'])): ?>
                 <div class="alert alert-error">
-                    <i class="ph-bold ph-warning-circle" style="font-size: 20px; flex-shrink: 0; color: #f43f5e;"></i>
+                    <i class="ph-bold ph-warning-circle" style="font-size: 18px; flex-shrink: 0;"></i>
                     <span><?php echo htmlspecialchars($_GET['error']); ?></span>
                 </div>
             <?php endif; ?>
@@ -404,7 +330,7 @@ if (Auth::check()) {
             <!-- Success Notification -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success">
-                    <i class="ph-bold ph-check-circle" style="font-size: 20px; flex-shrink: 0; color: #10b981;"></i>
+                    <i class="ph-bold ph-check-circle" style="font-size: 18px; flex-shrink: 0;"></i>
                     <span><?php echo htmlspecialchars($_GET['success']); ?></span>
                 </div>
             <?php endif; ?>
@@ -414,7 +340,7 @@ if (Auth::check()) {
                 <!-- Username Input -->
                 <div class="form-group">
                     <div class="form-label-row">
-                        <label for="username" class="form-label">Username / ឈ្មោះប្រកាស</label>
+                        <label for="username" class="form-label">Username</label>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph-bold ph-user input-icon"></i>
@@ -426,8 +352,8 @@ if (Auth::check()) {
                 <!-- Password Input -->
                 <div class="form-group">
                     <div class="form-label-row">
-                        <label for="password" class="form-label">Password / ពាក្យសម្ងាត់</label>
-                        <a href="<?php echo mc_url('forgot_password.php'); ?>" class="forgot-link">Forgot?</a>
+                        <label for="password" class="form-label">Password</label>
+                        <a href="<?php echo mc_url('forgot_password.php'); ?>" class="forgot-link">Forgot password?</a>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph-bold ph-lock-key input-icon"></i>
@@ -441,8 +367,8 @@ if (Auth::check()) {
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-submit">
-                    <i class="ph-bold ph-sign-in" style="font-size: 22px;"></i>
-                    <span>Sign In / ចូលប្រព័ន្ធ</span>
+                    <i class="ph-bold ph-sign-in" style="font-size: 20px;"></i>
+                    <span>Sign In</span>
                 </button>
             </form>
 
