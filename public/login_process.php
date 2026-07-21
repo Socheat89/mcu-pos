@@ -8,7 +8,6 @@ require_once __DIR__ . '/../core/helpers/url.php';
 // Dynamic URL Prefix
 $urlPrefix = mc_base_path();
 
-
 $isAjax = isset($_POST['ajax']);
 
 if ($isAjax) {
@@ -21,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         exit;
     }
     header("Location: $urlPrefix/login.php");
-
     exit;
 }
 
@@ -34,7 +32,6 @@ if (empty($username) || empty($password)) {
         exit;
     }
     header("Location: $urlPrefix/login.php?error=" . urlencode('Username and password are required'));
-
     exit;
 }
 
@@ -52,10 +49,14 @@ try {
 
     if ($user && password_verify($password, $user['password_hash'])) {
         session_regenerate_id(true);
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['tenant_id'] = $user['tenant_id'];
-        $_SESSION['tenant_subdomain'] = $user['subdomain'];
-        $_SESSION['role_level'] = $user['role_level'];
+        $_SESSION['user_id']           = $user['id'];
+        $_SESSION['tenant_id']         = $user['tenant_id'];
+        $_SESSION['tenant_subdomain']  = $user['subdomain'];
+        $_SESSION['role_level']        = $user['role_level'];
+
+        // ── Issue "Remember Me" persistent token ─────────────────────────────
+        // Always set — keeps PWA / mobile users logged in across app restarts
+        _issue_remember_me_token((int)$user['id'], $db);
 
         $redirect = '';
         // Redirect based on role
@@ -79,19 +80,55 @@ try {
             exit;
         }
         header("Location: $urlPrefix/login.php?error=" . urlencode('Invalid username or password'));
-
         exit;
     }
 } catch (Exception $e) {
     error_log("Login Error: " . $e->getMessage());
     if ($isAjax) {
-        // Don't expose technical details to user in production, but for now we can
-        // or just say "System error"
         echo json_encode(['success' => false, 'error' => 'System error: ' . $e->getMessage()]);
         exit;
     }
     header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred. Please try again.'));
-
     exit;
 }
-?>
+
+/**
+ * Create a secure remember_me token, store its hash in DB, set a 90-day cookie.
+ */
+function _issue_remember_me_token(int $userId, $db): void {
+    try {
+        $token  = bin2hex(random_bytes(32)); // 64-char hex token
+        $hash   = hash('sha256', $token);
+        $expiry = date('Y-m-d H:i:s', strtotime('+90 days'));
+
+        // Clean old tokens for this user (keep at most 5 devices)
+        $db->execute(
+            "DELETE FROM remember_tokens WHERE user_id = ?
+             AND id NOT IN (
+                 SELECT id FROM (SELECT id FROM remember_tokens WHERE user_id = ? ORDER BY expires_at DESC LIMIT 4) t
+             )",
+            [$userId, $userId]
+        );
+
+        // Insert new token
+        $db->execute(
+            "INSERT INTO remember_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)",
+            [$userId, $hash, $expiry]
+        );
+
+        // Set cookie
+        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+        setcookie('remember_me', $token, [
+            'expires'  => strtotime('+90 days'),
+            'path'     => '/',
+            'secure'   => $isHttps,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    } catch (Exception $e) {
+        error_log("Remember Me Error: " . $e->getMessage());
+    }
+}
+?>
