@@ -1199,7 +1199,7 @@ export default function App() {
               </div>
 
               {/* Product Grid */}
-              <div className="flex-1 overflow-y-auto p-3 pb-28 sm:p-5 lg:pb-5">
+              <div className="flex-1 overflow-y-auto p-3 pb-16 sm:p-5 lg:pb-5">
                 {getFilteredProducts().length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
                     <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
@@ -1502,41 +1502,6 @@ export default function App() {
 
             {/* 📱 Mobile Fixed Bottom Bar (Checkout Banner & Nav Tabs) */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col shadow-2xl">
-              {/* Quick Checkout Banner (Products view only) */}
-              {cartItemCount > 0 && mobileTab === 'products' && (
-                <div className={`px-4 py-2.5 border-t shadow-lg flex items-center justify-between gap-3 animate-slide-up ${
-                  darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-gray-200 text-slate-800'
-                }`}>
-                  <button
-                    onClick={() => setMobileTab('cart')}
-                    className="flex items-center gap-2 text-xs font-bold text-left min-w-0"
-                  >
-                    <span className="bg-[#E76F51] text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm">
-                      {cartItemCount}
-                    </span>
-                    <div className="truncate">
-                      <div className="text-xs font-extrabold leading-none">{t('cart', 'កន្ត្រក')} ({cartItemCount})</div>
-                      <div className="text-[11px] font-black text-brand-cyan mt-0.5">${getGrandTotal().toFixed(2)}</div>
-                    </div>
-                  </button>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        if (orderStatus === 'pending') {
-                          handleCheckoutSubmit();
-                        } else {
-                          setPaymentModalOpen(true);
-                        }
-                      }}
-                      className="px-4 py-2 bg-[#E76F51] hover:bg-[#e05a3a] text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-                    >
-                      <Zap className="h-4 w-4" />
-                      <span>{orderStatus === 'pending' ? 'Hold' : t('checkout', 'Checkout / គិតលុយ')}</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Bottom Nav Tabs */}
               <div className={`flex border-t ${
