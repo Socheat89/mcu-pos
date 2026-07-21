@@ -127,7 +127,7 @@ class SessionController {
                 $storeId = $defaultStore ? $defaultStore['id'] : null;
             }
 
-            $db->insert('pos_sessions', [
+            $sessionId = $db->insert('pos_sessions', [
                 'tenant_id'       => $tenantId,
                 'store_id'        => $storeId,
                 'user_id'         => $userId,
@@ -135,6 +135,24 @@ class SessionController {
                 'status'          => 'open',
                 'opened_at'       => date('Y-m-d H:i:s')
             ]);
+
+            // Auto-create GPS tracking session
+            try {
+                $db->insert('gps_tracking_sessions', [
+                    'tenant_id'      => $tenantId,
+                    'store_id'       => $storeId,
+                    'user_id'        => $userId,
+                    'pos_session_id' => $sessionId,
+                    'status'         => 'active',
+                    'device_info'    => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
+                    'started_at'     => date('Y-m-d H:i:s')
+                ]);
+            } catch (Exception $e) {
+                // Table might not exist yet, fail silently
+            }
+
+            // Send Telegram notification for session open
+            $this->sendTelegramSessionNotification($tenantId, $userId, 'open', $openingBalance);
 
             $_SESSION['success_msg'] = __('session_opened_success');
             $prefix = mc_base_path();
@@ -206,6 +224,21 @@ class SessionController {
                 'id = ? AND tenant_id = ?', 
                 [$activeSession['id'], $tenantId]
             );
+
+            // Stop GPS tracking session
+            try {
+                $db->update(
+                    'gps_tracking_sessions',
+                    ['status' => 'stopped', 'ended_at' => date('Y-m-d H:i:s')],
+                    'pos_session_id = ? AND tenant_id = ? AND status = ?',
+                    [$activeSession['id'], $tenantId, 'active']
+                );
+            } catch (Exception $e) {
+                // Table might not exist yet, fail silently
+            }
+
+            // Send Telegram notification with sales report
+            $this->sendTelegramSessionNotification($tenantId, Auth::user()['id'], 'close', null, $activeSession['id'], $totalSessionSales, $paymentSummary);
 
             $_SESSION['success_msg'] = __('session_closed_success');
             $prefix = mc_base_path();
@@ -296,6 +329,89 @@ class SessionController {
         );
 
         include __DIR__ . '/../views/session_detail.php';
+    }
+
+    /**
+     * Send Telegram notification for session open/close with optional sales report
+     */
+    private function sendTelegramSessionNotification($tenantId, $userId, $action, $openingBalance = null, $sessionId = null, $totalSales = null, $paymentSummary = null) {
+        try {
+            $db = Database::getInstance();
+
+            // Get tenant's Telegram config or fallback to system
+            $tgConfig = $db->fetchOne(
+                "SELECT * FROM tenant_telegram_config WHERE tenant_id = ? AND is_active = 1",
+                [$tenantId]
+            );
+
+            $botToken = $tgConfig['bot_token'] ?? null;
+            $chatId = $tgConfig['chat_id'] ?? null;
+
+            if (!$botToken || !$chatId) {
+                $sysConfig = require __DIR__ . '/../../../config/telegram.php';
+                $botToken = $sysConfig['bot_token'] ?? null;
+                $chatId = $sysConfig['chat_id'] ?? null;
+            }
+
+            if (!$botToken || !$chatId) return;
+
+            $user = $db->fetchOne("SELECT username, email FROM users WHERE id = ?", [$userId]);
+            $tenant = $db->fetchOne("SELECT name, subdomain FROM tenants WHERE id = ?", [$tenantId]);
+            $storeName = '';
+            if ($sessionId) {
+                $store = $db->fetchOne(
+                    "SELECT s.name FROM stores s JOIN pos_sessions ps ON ps.store_id = s.id WHERE ps.id = ?",
+                    [$sessionId]
+                );
+                $storeName = $store ? $store['name'] : '';
+            }
+
+            if ($action === 'open') {
+                $message = "🟢 <b>POS Session Opened</b>\n";
+                $message .= "🏪 " . ($tenant['name'] ?? 'Store') . "\n";
+                if ($storeName) $message .= "📍 " . $storeName . "\n";
+                $message .= "👤 " . ($user['username'] ?? 'N/A') . "\n";
+                $message .= "💰 Opening Balance: <b>$" . number_format((float)$openingBalance, 2) . "</b>\n";
+                $message .= "🕐 " . date('Y-m-d H:i:s');
+            } elseif ($action === 'close') {
+                $message = "🔴 <b>POS Session Closed</b>\n";
+                $message .= "🏪 " . ($tenant['name'] ?? 'Store') . "\n";
+                if ($storeName) $message .= "📍 " . $storeName . "\n";
+                $message .= "👤 " . ($user['username'] ?? 'N/A') . "\n";
+                $message .= "━━━━━━━━━━━━━━━━\n";
+                $message .= "📊 <b>Sales Report</b>\n";
+                $message .= "💰 Total Sales: <b>$" . number_format((float)$totalSales, 2) . "</b>\n";
+
+                if ($paymentSummary && is_array($paymentSummary)) {
+                    foreach ($paymentSummary as $method => $amount) {
+                        $icon = match(strtolower($method)) {
+                            'cash' => '💵', 'khqr' => '📱', 'card' => '💳',
+                            default => '💲'
+                        };
+                        $message .= $icon . " " . ucfirst($method) . ": $" . number_format((float)$amount, 2) . "\n";
+                    }
+                }
+                $message .= "🕐 " . date('Y-m-d H:i:s');
+            }
+
+            $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+            $data = [
+                'chat_id'    => $chatId,
+                'text'       => $message,
+                'parse_mode' => 'HTML'
+            ];
+            $ctx = stream_context_create([
+                'http' => [
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                    'ignore_errors' => true
+                ]
+            ]);
+            @file_get_contents($url, false, $ctx);
+        } catch (Exception $e) {
+            // Silent fail - don't break session flow
+        }
     }
 }
 ?>

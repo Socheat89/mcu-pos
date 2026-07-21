@@ -176,6 +176,11 @@ try {
                     require_once $baseDir . '/modules/pos/controllers/StoreController.php';
                     $controller = new StoreController();
 
+                } elseif ($sub === 'gps') {
+                    require_once $baseDir . '/modules/pos/controllers/GpsController.php';
+                    $controller = new GpsController();
+                    $action = 'dashboard';
+
                 } elseif ($sub === 'holds') {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();

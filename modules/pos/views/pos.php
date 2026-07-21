@@ -109,5 +109,7 @@ $dashboardUrl = $posBase . '/dashboard';
     <div id="root"></div>
     <script type="module" src="<?php echo mc_base_path(); ?>/public/dist/assets/index.js?v=<?php echo time(); ?>"></script>
 
+    <?php include __DIR__ . '/gps_tracker.php'; ?>
+
 </body>
 </html>

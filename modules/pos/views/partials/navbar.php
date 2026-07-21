@@ -82,6 +82,7 @@ $navLabel = function (string $key): string {
         'cashiers'     => __('cashiers'),
         'digital_menu' => __('qr_menu'),
         'stores'       => __('manage_stores'),
+        'gps'          => __('gps_tracking'),
     ];
 
     return $labels[$key] ?? __($key);
@@ -183,6 +184,12 @@ $navLabel = function (string $key): string {
                 <?php if ($isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('stores'); ?>" href="<?php echo htmlspecialchars($posUrl('stores')); ?>">
                     <i class="fas fa-store-alt"></i><span><?php echo $navLabel('stores'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('gps'); ?>" href="<?php echo htmlspecialchars($posUrl('gps')); ?>">
+                    <i class="fas fa-satellite"></i><span><?php echo $navLabel('gps'); ?></span>
                 </a>
                 <?php endif; ?>
             <?php endif; ?>
