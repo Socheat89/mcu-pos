@@ -23,7 +23,7 @@ $dashboardUrl = $posBase . '/dashboard';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title><?php echo __('pos'); ?> - <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
     <!-- React App Built Assets -->
     <link href="<?php echo mc_base_path(); ?>/public/dist/assets/index.css?v=<?php echo time(); ?>" rel="stylesheet">

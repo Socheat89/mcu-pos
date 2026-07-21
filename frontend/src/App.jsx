@@ -889,7 +889,7 @@ export default function App() {
 
       {/* ─── Header ─── */}
       <header className="flex-shrink-0">
-        <div className="glass px-4 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200">
+        <div className="glass px-3 py-2 sm:px-6 flex flex-nowrap items-center justify-between gap-2 border-b border-gray-200">
           {/* Left: Branding */}
           <div className="flex min-w-0 items-center gap-3">
             <div className="h-9 w-9 flex-shrink-0 rounded-md bg-brand-cyan flex items-center justify-center">
@@ -1199,7 +1199,7 @@ export default function App() {
               </div>
 
               {/* Product Grid */}
-              <div className="flex-1 overflow-y-auto p-3 sm:p-5">
+              <div className="flex-1 overflow-y-auto p-3 pb-28 sm:p-5 lg:pb-5">
                 {getFilteredProducts().length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
                     <Package className="h-16 w-16 text-brand-muted/30 mb-4" />
@@ -1268,7 +1268,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`lg:h-auto lg:w-[450px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
+            <aside className={`lg:h-auto lg:w-[450px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t pb-14 lg:pb-0 ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Odoo POS Order Tabs */}
@@ -1500,78 +1500,81 @@ export default function App() {
               </div>
             </aside>
 
-            {/* 📱 Mobile Sticky Quick Checkout Bar */}
-            {cartItemCount > 0 && mobileTab === 'products' && (
-              <div className={`lg:hidden flex-shrink-0 px-4 py-2.5 border-t shadow-lg flex items-center justify-between gap-3 animate-slide-up z-20 ${
-                darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-gray-200 text-slate-800'
+            {/* 📱 Mobile Fixed Bottom Bar (Checkout Banner & Nav Tabs) */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col shadow-2xl">
+              {/* Quick Checkout Banner */}
+              {cartItemCount > 0 && mobileTab === 'products' && (
+                <div className={`px-4 py-2.5 border-t shadow-lg flex items-center justify-between gap-3 animate-slide-up ${
+                  darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-gray-200 text-slate-800'
+                }`}>
+                  <button
+                    onClick={() => setMobileTab('cart')}
+                    className="flex items-center gap-2 text-xs font-bold text-left min-w-0"
+                  >
+                    <span className="bg-[#E76F51] text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm">
+                      {cartItemCount}
+                    </span>
+                    <div className="truncate">
+                      <div className="text-xs font-extrabold leading-none">{t('cart', 'កន្ត្រក')} ({cartItemCount})</div>
+                      <div className="text-[11px] font-black text-brand-cyan mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                    </div>
+                  </button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => {
+                        if (orderStatus === 'pending') {
+                          handleCheckoutSubmit();
+                        } else {
+                          setPaymentModalOpen(true);
+                        }
+                      }}
+                      className="px-4 py-2 bg-[#E76F51] hover:bg-[#e05a3a] text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <Zap className="h-4 w-4" />
+                      <span>{orderStatus === 'pending' ? 'Hold' : t('checkout', 'Checkout / គិតលុយ')}</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom Nav Tabs */}
+              <div className={`flex border-t ${
+                darkMode ? 'bg-brand-surfDark border-white/10' : 'bg-white border-gray-200'
               }`}>
                 <button
-                  onClick={() => setMobileTab('cart')}
-                  className="flex items-center gap-2 text-xs font-bold text-left min-w-0"
+                  onClick={() => setMobileTab('products')}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all ${
+                    mobileTab === 'products'
+                      ? 'text-[#E76F51] bg-[#FFF8F0] dark:bg-brand-cyan/10 font-bold'
+                      : darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  <span className="bg-[#E76F51] text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm">
-                    {cartItemCount}
-                  </span>
-                  <div className="truncate">
-                    <div className="text-xs font-extrabold leading-none">{t('cart', 'កន្ត្រក')} ({cartItemCount})</div>
-                    <div className="text-[11px] font-black text-brand-cyan mt-0.5">${getGrandTotal().toFixed(2)}</div>
-                  </div>
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <span className="text-[10px] font-bold">{t('products_label', 'Products')}</span>
                 </button>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => {
-                      if (orderStatus === 'pending') {
-                        handleCheckoutSubmit();
-                      } else {
-                        setPaymentModalOpen(true);
-                      }
-                    }}
-                    className="px-4 py-2 bg-[#E76F51] hover:bg-[#e05a3a] text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <Zap className="h-4 w-4" />
-                    <span>{orderStatus === 'pending' ? 'Hold' : t('checkout', 'Checkout / គិតលុយ')}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+
+                <button
+                  onClick={() => setMobileTab('cart')}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all relative ${
+                    mobileTab === 'cart'
+                      ? 'text-[#E76F51] bg-[#FFF8F0] dark:bg-brand-cyan/10 font-bold'
+                      : darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                  </svg>
+                  <span className="text-[10px] font-bold">{t('cart', 'Cart')} (${getGrandTotal().toFixed(2)})</span>
+                  {cartItemCount > 0 && (
+                    <span className="absolute top-1 right-1/4 bg-[#E76F51] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </button>
               </div>
-            )}
-
-            {/* 📱 Mobile Bottom Tab Bar */}
-            <div className={`lg:hidden flex-shrink-0 flex border-t z-20 ${
-              darkMode ? 'bg-brand-surfDark border-white/10' : 'bg-white border-gray-200'
-            }`}>
-              <button
-                onClick={() => setMobileTab('products')}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all ${
-                  mobileTab === 'products'
-                    ? 'text-[#E76F51] bg-[#FFF8F0] dark:bg-brand-cyan/10 font-bold'
-                    : darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span className="text-[10px] font-bold">{t('products_label', 'Products')}</span>
-              </button>
-
-              <button
-                onClick={() => setMobileTab('cart')}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-all relative ${
-                  mobileTab === 'cart'
-                    ? 'text-[#E76F51] bg-[#FFF8F0] dark:bg-brand-cyan/10 font-bold'
-                    : darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-                </svg>
-                <span className="text-[10px] font-bold">{t('cart', 'Cart')} (${getGrandTotal().toFixed(2)})</span>
-                {cartItemCount > 0 && (
-                  <span className="absolute top-1 right-1/4 bg-[#E76F51] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-                    {cartItemCount}
-                  </span>
-                )}
-              </button>
             </div>
           </>
         )}
