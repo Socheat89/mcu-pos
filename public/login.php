@@ -1,4 +1,21 @@
-<?php require_once __DIR__ . '/../core/helpers/url.php'; ?>
+<?php 
+require_once __DIR__ . '/../core/bootstrap_session.php';
+require_once __DIR__ . '/../core/classes/Database.php';
+require_once __DIR__ . '/../core/classes/Auth.php';
+require_once __DIR__ . '/../core/helpers/url.php';
+
+if (Auth::check()) {
+    $urlPrefix = mc_base_path();
+    $subdomain = $_SESSION['tenant_subdomain'] ?? '';
+    if (Auth::isSuperAdmin()) {
+        header("Location: $urlPrefix/admin/index.php");
+        exit;
+    } elseif (!empty($subdomain)) {
+        header("Location: $urlPrefix/$subdomain/pos/pos");
+        exit;
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">

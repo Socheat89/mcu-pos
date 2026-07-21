@@ -232,6 +232,17 @@ try {
 
     // 3. Root/Home Page
     if ($path === '/' || $path === '') {
+        if (Auth::check()) {
+            $urlPrefix = mc_base_path();
+            $subdomain = $_SESSION['tenant_subdomain'] ?? '';
+            if (Auth::isSuperAdmin()) {
+                header("Location: $urlPrefix/admin/index.php");
+                exit;
+            } elseif (!empty($subdomain)) {
+                header("Location: $urlPrefix/$subdomain/pos/pos");
+                exit;
+            }
+        }
         include $baseDir . '/public/index.php';
         exit;
     }

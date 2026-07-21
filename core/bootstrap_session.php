@@ -60,13 +60,15 @@ function _remember_me_restore(string $sealedCookie): void {
         $hash = hash('sha256', $plainToken);
 
         $row = $db->fetchOne(
-            "SELECT rt.user_id, u.tenant_id, u.status, r.level as role_level
+            "SELECT rt.user_id, u.tenant_id, t.subdomain as tenant_subdomain, u.status, r.level as role_level
                FROM remember_tokens rt
-               JOIN users u  ON u.id  = rt.user_id
-               JOIN roles r  ON r.id  = u.role_id
+               JOIN users u   ON u.id = rt.user_id
+               JOIN tenants t ON t.id = u.tenant_id
+               JOIN roles r   ON r.id = u.role_id
               WHERE rt.token_hash = ?
                 AND rt.expires_at > NOW()
                 AND u.status = 'active'
+                AND t.status = 'active'
               LIMIT 1",
             [$hash]
         );
@@ -74,9 +76,10 @@ function _remember_me_restore(string $sealedCookie): void {
         if ($row) {
             // ── Step 3: Restore session ───────────────────────────────────────
             session_regenerate_id(true);
-            $_SESSION['user_id']    = $row['user_id'];
-            $_SESSION['tenant_id']  = $row['tenant_id'];
-            $_SESSION['role_level'] = $row['role_level'];
+            $_SESSION['user_id']          = $row['user_id'];
+            $_SESSION['tenant_id']        = $row['tenant_id'];
+            $_SESSION['tenant_subdomain'] = $row['tenant_subdomain'];
+            $_SESSION['role_level']       = $row['role_level'];
 
             // Rolling expiry — extend token lifetime on each visit
             $newExpiry = date('Y-m-d H:i:s', strtotime('+90 days'));
