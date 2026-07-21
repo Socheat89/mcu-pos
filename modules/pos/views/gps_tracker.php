@@ -161,32 +161,42 @@
         if (!indicator) {
             indicator = document.createElement('div');
             indicator.id = 'gps-tracking-indicator';
-            indicator.innerHTML = '<i class="fas fa-satellite"></i> <span>GPS Tracking Active</span>';
+            indicator.title = 'GPS កំពុងដំណើរការ — ចុចដើម្បីលាក់';
+            
+            // Icon-only dot on all screens — small, top-right, unobtrusive
+            indicator.innerHTML = '<i class="fas fa-satellite"></i>';
             indicator.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px; z-index: 99999;
-                background: rgba(16, 185, 129, 0.95); color: white;
-                padding: 10px 18px; border-radius: 24px;
-                font-size: 13px; font-weight: 700;
-                display: flex; align-items: center; gap: 8px;
-                box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+                position: fixed; top: 12px; right: 60px; z-index: 9999;
+                width: 28px; height: 28px;
+                background: rgba(16, 185, 129, 0.9); color: white;
+                border-radius: 50%;
+                font-size: 12px; font-weight: 700;
+                display: grid; place-items: center;
+                box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
                 animation: gpsPulse 2s infinite;
                 cursor: pointer;
+                transition: all 0.3s;
             `;
-            indicator.title = 'GPS location tracking is active. Click to toggle info.';
-            indicator.onclick = function() {
-                alert('GPS Tracking Active\\nLocation is being sent every ' + (GPS_CONFIG.pollInterval/1000) + ' seconds.\\nTracking will stop when you close the POS session.');
+            indicator.onclick = function(e) {
+                e.stopPropagation();
+                this.style.display = 'none';
+                // Show again after 5 minutes
+                setTimeout(() => { if (isTracking) this.style.display = 'grid'; }, 300000);
             };
             document.body.appendChild(indicator);
 
-            // Add pulse animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes gpsPulse {
-                    0%, 100% { box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); }
-                    50% { box-shadow: 0 8px 35px rgba(16, 185, 129, 0.7); }
-                }
-            `;
-            document.head.appendChild(style);
+            // Pulse animation
+            if (!document.getElementById('gps-pulse-style')) {
+                const style = document.createElement('style');
+                style.id = 'gps-pulse-style';
+                style.textContent = `
+                    @keyframes gpsPulse {
+                        0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+                        50% { box-shadow: 0 0 22px rgba(16, 185, 129, 0.8); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         }
     }
 
