@@ -306,60 +306,115 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
             </div>
         </div>
 
-        <!-- Tab: Telegram Setup -->
+        <!-- Tab: Telegram Setup (Simple Wizard) -->
         <div id="tab-telegram-setup" class="tab-content">
+            <?php $isConnected = !empty($telegramConfig['chat_id']); ?>
+            
             <div class="telegram-setup-card">
-                <h3 style="font-weight: 800; font-size: 18px; margin: 0 0 8px 0;">
-                    <i class="fab fa-telegram-plane" style="color: #0088cc;"></i> <?php echo __('telegram_bot_setup'); ?>
+                <?php if ($isConnected): ?>
+                <!-- ── CONNECTED STATE ── -->
+                <div style="text-align:center;margin-bottom:24px;">
+                    <div style="width:72px;height:72px;background:rgba(16,185,129,0.15);border-radius:50%;display:inline-grid;place-items:center;margin-bottom:12px;">
+                        <i class="fas fa-check-circle" style="font-size:36px;color:#10b981;"></i>
+                    </div>
+                    <h3 style="font-weight:800;font-size:20px;margin:0;color:#e2e8f0;">✅ បានភ្ជាប់ហើយ / Connected!</h3>
+                    <p style="color:#94a3b8;font-size:14px;margin-top:6px;">
+                        📋 ក្រុម៖ <b style="color:#06b6d4;"><?php echo htmlspecialchars($telegramConfig['chat_title'] ?? 'Telegram Group'); ?></b>
+                    </p>
+                </div>
+                <?php else: ?>
+                <!-- ── SETUP WIZARD ── -->
+                <h3 style="font-weight:800;font-size:20px;margin:0 0 4px 0;text-align:center;">
+                    <i class="fab fa-telegram-plane" style="color:#0088cc;"></i> ភ្ជាប់ Telegram / Connect Telegram
                 </h3>
-                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 24px;">
-                    <?php echo __('telegram_bot_setup_desc'); ?>
+                <p style="color:#94a3b8;font-size:14px;margin-bottom:28px;text-align:center;">
+                    គ្រាន់តែ ៣ ជំហានងាយៗ មិនចាំបាច់ដឹង Chat ID ទេ!
                 </p>
 
-                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                    <h4 style="font-weight: 700; margin: 0 0 8px 0; font-size: 14px;">📋 <?php echo __('how_to_setup'); ?></h4>
-                    <ol style="color: #94a3b8; font-size: 13px; line-height: 2; padding-left: 20px; margin: 0;">
-                        <li><?php echo __('telegram_step1'); ?> <strong>@BotFather</strong> <?php echo __('telegram_step1b'); ?></li>
-                        <li><?php echo __('telegram_step2'); ?> <code style="background:rgba(0,136,204,0.2);padding:2px 8px;border-radius:4px;">8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY</code></li>
-                        <li><?php echo __('telegram_step3'); ?></li>
-                        <li><?php echo __('telegram_step4'); ?></li>
-                        <li><?php echo __('telegram_step5'); ?></li>
-                    </ol>
+                <!-- Step Cards -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+                    <!-- Step 1 -->
+                    <div style="background:rgba(0,136,204,0.08);border:1.5px solid rgba(0,136,204,0.2);border-radius:16px;padding:24px 16px;text-align:center;">
+                        <div style="width:48px;height:48px;background:#0088cc;border-radius:14px;display:inline-grid;place-items:center;font-size:22px;margin-bottom:12px;">1️⃣</div>
+                        <div style="font-weight:800;font-size:14px;color:#e2e8f0;margin-bottom:6px;">បន្ថែម Bot ចូលក្រុម</div>
+                        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Add bot to your Telegram group</div>
+                        <a href="https://t.me/<?php 
+                            // Get bot username
+                            $botUser = 'mcu_pos_bot';
+                            try {
+                                $botInfo = @file_get_contents("https://api.telegram.org/bot8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY/getMe");
+                                $botData = json_decode($botInfo, true);
+                                if ($botData && $botData['ok']) $botUser = $botData['result']['username'];
+                            } catch(Exception $e) {}
+                            echo $botUser;
+                        ?>?startgroup=true" target="_blank" 
+                           style="display:inline-block;background:#0088cc;color:white;padding:10px 16px;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none;transition:all 0.2s;">
+                            <i class="fab fa-telegram-plane"></i> បើក Telegram
+                        </a>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.2);border-radius:16px;padding:24px 16px;text-align:center;">
+                        <div style="width:48px;height:48px;background:#f59e0b;border-radius:14px;display:inline-grid;place-items:center;font-size:22px;margin-bottom:12px;">2️⃣</div>
+                        <div style="font-weight:800;font-size:14px;color:#e2e8f0;margin-bottom:6px;">ទទួលលេខកូដ</div>
+                        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Bot នឹងផ្ញើលេខកូដ ៦ ខ្ទង់ក្នុងក្រុម</div>
+                        <div style="background:rgba(245,158,11,0.15);border-radius:8px;padding:8px;font-size:11px;color:#fbbf24;">
+                            💡 វាយ <b>/code</b> ក្នុងក្រុមបើចង់បានលេខកូដថ្មី
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div style="background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.2);border-radius:16px;padding:24px 16px;text-align:center;">
+                        <div style="width:48px;height:48px;background:#10b981;border-radius:14px;display:inline-grid;place-items:center;font-size:22px;margin-bottom:12px;">3️⃣</div>
+                        <div style="font-weight:800;font-size:14px;color:#e2e8f0;margin-bottom:6px;">បញ្ចូលលេខកូដ</div>
+                        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px;">វាយលេខកូដ ៦ ខ្ទង់ខាងក្រោម → រួចរាល់!</div>
+                        <div style="background:rgba(16,185,129,0.15);border-radius:8px;padding:8px;font-size:11px;color:#6ee7b7;">
+                            ⚡ ចំណាយពេលតែ ១ នាទីប៉ុណ្ណោះ
+                        </div>
+                    </div>
                 </div>
 
-                <form id="telegramConfigForm">
-                    <div style="display: grid; gap: 16px; max-width: 600px;">
-                        <div>
-                            <label style="display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #cbd5e1;"><?php echo __('bot_token'); ?></label>
-                            <input type="text" name="bot_token" id="tgBotToken"
-                                   value="<?php echo htmlspecialchars($telegramConfig['bot_token'] ?? '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY'); ?>"
-                                   style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #374151;background:#1e293b;color:#e2e8f0;font-weight:600;font-size:13px;outline:none;"
-                                   placeholder="123456:ABC-DEF1234ghikl..." readonly>
-                            <small style="color:#64748b;font-size:11px;"><?php echo __('bot_token_hint'); ?></small>
-                        </div>
-                        <div>
-                            <label style="display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #cbd5e1;"><?php echo __('chat_id'); ?> (Group/Channel ID)</label>
-                            <input type="text" name="chat_id" id="tgChatId"
-                                   value="<?php echo htmlspecialchars($telegramConfig['chat_id'] ?? ''); ?>"
-                                   style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #374151;background:#1e293b;color:#e2e8f0;font-weight:600;font-size:13px;outline:none;"
-                                   placeholder="-1001234567890 or @yourgroup">
-                            <small style="color:#64748b;font-size:11px;"><?php echo __('chat_id_hint'); ?></small>
-                        </div>
+                <!-- Code Input Area -->
+                <div style="background:rgba(255,255,255,0.03);border:2px dashed rgba(0,136,204,0.3);border-radius:16px;padding:28px;text-align:center;">
+                    <label style="display:block;font-weight:800;font-size:15px;color:#e2e8f0;margin-bottom:4px;">
+                        🔑 បញ្ចូលលេខកូដ ៦ ខ្ទង់ / Enter 6-Digit Code
+                    </label>
+                    <p style="color:#64748b;font-size:12px;margin-bottom:16px;">លេខកូដដែល Bot បានផ្ញើក្នុងក្រុម Telegram របស់អ្នក</p>
+                    
+                    <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
+                        <input type="text" id="setupCodeInput" maxlength="6" 
+                               placeholder="_ _ _ _ _ _"
+                               style="width:200px;padding:16px;text-align:center;font-size:28px;font-weight:900;letter-spacing:8px;
+                                      border:2px solid #374151;border-radius:14px;background:#1e293b;color:#06b6d4;
+                                      text-transform:uppercase;outline:none;font-family:monospace;"
+                               oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()">
+                        <button type="button" class="btn-telegram" onclick="claimSetupCode()"
+                                style="padding:16px 32px;font-size:15px;border-radius:14px;">
+                            <i class="fas fa-link"></i> ភ្ជាប់ / Connect
+                        </button>
+                    </div>
+                    <div id="tgClaimMsg" style="font-size:13px;font-weight:600;margin-top:12px;min-height:20px;"></div>
+                </div>
+                <?php endif; ?>
 
-                        <div style="display: grid; gap: 10px; margin-top: 8px;">
-                            <label style="font-weight: 700; font-size: 13px; color: #cbd5e1;"><?php echo __('notification_settings'); ?></label>
+                <!-- Notification Settings -->
+                <form id="telegramConfigForm" style="margin-top:<?php echo $isConnected ? '0' : '28px'; ?>;">
+                    <div style="display:grid;gap:16px;max-width:600px;margin:0 auto;">
+                        <div style="display:grid;gap:10px;margin-top:8px;">
+                            <label style="font-weight:700;font-size:13px;color:#cbd5e1;">
+                                <i class="fas fa-bell" style="color:#f59e0b;"></i> ការជូនដំណឹង / Notifications
+                            </label>
                             <?php
                             $checkboxes = [
-                                'notify_session_open'  => __('notify_session_open'),
-                                'notify_session_close' => __('notify_session_close'),
-                                'notify_sales_report'  => __('notify_sales_report'),
-                                'notify_gps_start'     => __('notify_gps_start'),
-                                'notify_gps_stop'      => __('notify_gps_stop'),
+                                'notify_session_open'  => '🔔 ពេលបើកវគ្គលក់ / Session Open',
+                                'notify_session_close' => '📊 ពេលបិទវគ្គលក់ (ជាមួយរបាយការណ៍) / Session Close + Report',
+                                'notify_gps_start'     => '📍 ពេលចាប់ផ្តើមតាមដាន GPS / GPS Start',
+                                'notify_gps_stop'      => '🛑 ពេលបញ្ឈប់តាមដាន GPS / GPS Stop',
                             ];
                             foreach ($checkboxes as $key => $label):
                                 $checked = ($telegramConfig[$key] ?? 1) ? 'checked' : '';
                             ?>
-                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: #cbd5e1;">
+                            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#cbd5e1;padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px;">
                                 <input type="checkbox" name="<?php echo $key; ?>" <?php echo $checked; ?>
                                        style="width:18px;height:18px;accent-color:#0088cc;">
                                 <?php echo $label; ?>
@@ -367,15 +422,20 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
                             <?php endforeach; ?>
                         </div>
 
-                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
                             <button type="button" class="btn-telegram" onclick="saveTelegramConfig()">
-                                <i class="fas fa-save"></i> <?php echo __('save_settings'); ?>
+                                <i class="fas fa-save"></i> រក្សាទុក / Save
                             </button>
-                            <button type="button" class="btn" style="background: #374151; color: #cbd5e1; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;" onclick="testTelegram()">
-                                <i class="fas fa-paper-plane"></i> <?php echo __('test_telegram'); ?>
+                            <?php if ($isConnected): ?>
+                            <button type="button" class="btn" style="background:#374151;color:#cbd5e1;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer;" onclick="testTelegram()">
+                                <i class="fas fa-paper-plane"></i> សាកល្បងផ្ញើ / Test
                             </button>
+                            <button type="button" class="btn" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer;" onclick="disconnectTelegram()">
+                                <i class="fas fa-unlink"></i> ផ្តាច់ / Disconnect
+                            </button>
+                            <?php endif; ?>
                         </div>
-                        <div id="tgConfigMsg" style="font-size: 13px; font-weight: 600; margin-top: 8px;"></div>
+                        <div id="tgConfigMsg" style="font-size:13px;font-weight:600;margin-top:4px;min-height:20px;"></div>
                     </div>
                 </form>
             </div>
@@ -589,11 +649,67 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
 
     // ===== Telegram Config =====
 
+    // Claim setup code (the easy way — no Chat IDs!)
+    function claimSetupCode() {
+        const codeInput = document.getElementById('setupCodeInput');
+        const msgEl = document.getElementById('tgClaimMsg');
+        const code = codeInput.value.trim().toUpperCase();
+
+        if (code.length !== 6) {
+            msgEl.innerHTML = '<span style="color:#f59e0b;">⚠️ សូមបញ្ចូលលេខកូដ ៦ ខ្ទង់ / Enter 6-digit code</span>';
+            codeInput.focus();
+            return;
+        }
+
+        msgEl.innerHTML = '<span style="color:#f59e0b;">⏳ កំពុងភ្ជាប់... / Connecting...</span>';
+
+        fetch('<?php echo $urlPrefix; ?>/public/api/gps_claim_code.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ setup_code: code }),
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                msgEl.innerHTML = '<span style="color:#10b981;font-size:15px;">✅ ' + res.message + '</span>';
+                // Reload after 2 seconds to show connected state
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + (res.error || 'Error') + '</span>';
+            }
+        })
+        .catch(err => {
+            msgEl.innerHTML = '<span style="color:#ef4444;">❌ មានបញ្ហា / Error: ' + err.message + '</span>';
+        });
+    }
+
+    // Disconnect Telegram
+    function disconnectTelegram() {
+        if (!confirm('ផ្តាច់ Telegram? / Disconnect Telegram?\n\nYou can reconnect anytime by entering a new setup code.')) return;
+
+        const msgEl = document.getElementById('tgConfigMsg');
+        msgEl.innerHTML = '<span style="color:#f59e0b;">⏳ កំពុងផ្តាច់... / Disconnecting...</span>';
+
+        fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: '', chat_title: '', setup_code: '', is_active: 0 }),
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + (res.error || 'Error') + '</span>';
+            }
+        });
+    }
+
     function saveTelegramConfig() {
         const form = document.getElementById('telegramConfigForm');
         const data = {
-            bot_token: form.bot_token.value.trim(),
-            chat_id: form.chat_id.value.trim(),
             notify_session_open: form.notify_session_open?.checked ? 1 : 0,
             notify_session_close: form.notify_session_close?.checked ? 1 : 0,
             notify_sales_report: form.notify_sales_report?.checked ? 1 : 0,
@@ -612,7 +728,7 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
         .then(res => {
             const msgEl = document.getElementById('tgConfigMsg');
             if (res.success) {
-                msgEl.innerHTML = '<span style="color:#10b981;">✅ <?php echo __('settings_saved'); ?></span>';
+                msgEl.innerHTML = '<span style="color:#10b981;">✅ បានរក្សាទុក / Saved!</span>';
             } else {
                 msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + (res.error || 'Error') + '</span>';
             }
@@ -622,7 +738,7 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
 
     function testTelegram() {
         const msgEl = document.getElementById('tgConfigMsg');
-        msgEl.innerHTML = '<span style="color:#f59e0b;">⏳ <?php echo __('sending_test'); ?>...</span>';
+        msgEl.innerHTML = '<span style="color:#f59e0b;">⏳ កំពុងផ្ញើសារសាកល្បង...</span>';
 
         fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
             method: 'GET',
@@ -630,33 +746,29 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
         })
         .then(r => r.json())
         .then(res => {
-            if (!res.success || !res.config || !res.config.bot_token || !res.config.chat_id) {
-                msgEl.innerHTML = '<span style="color:#ef4444;">❌ <?php echo __('configure_telegram_first'); ?></span>';
+            if (!res.success || !res.config || !res.config.chat_id) {
+                msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនទាន់បានភ្ជាប់ Telegram ទេ។ សូមបញ្ចូលលេខកូដ ៦ ខ្ទង់សិន។</span>';
                 return;
             }
 
-            // Send test via the controller
-            const testMsg = "✅ <b>MCU POS - Test Message</b>\n🏪 Telegram setup successful!\n🕐 " + new Date().toLocaleString();
-            const url = `https://api.telegram.org/bot${res.config.bot_token}/sendMessage`;
-            const body = new URLSearchParams({
-                chat_id: res.config.chat_id,
-                text: testMsg,
-                parse_mode: 'HTML'
-            });
+            const botToken = res.config.bot_token || '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
+            const testMsg = "✅ <b>MCU POS — សាកល្បង / Test</b>\n🕐 " + new Date().toLocaleString();
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            const body = new URLSearchParams({ chat_id: res.config.chat_id, text: testMsg, parse_mode: 'HTML' });
 
             return fetch(url, { method: 'POST', body: body });
         })
         .then(r => r ? r.json() : null)
         .then(tgRes => {
             if (tgRes && tgRes.ok) {
-                msgEl.innerHTML = '<span style="color:#10b981;">✅ <?php echo __('test_sent_success'); ?></span>';
+                msgEl.innerHTML = '<span style="color:#10b981;">✅ បានផ្ញើសារសាកល្បង! សូមពិនិត្យមើលក្រុម Telegram របស់អ្នក។</span>';
             } else {
-                msgEl.innerHTML = '<span style="color:#ef4444;">❌ <?php echo __('test_failed'); ?>: ' + ((tgRes && tgRes.description) || 'Unknown error') + '</span>';
+                msgEl.innerHTML = '<span style="color:#ef4444;">❌ បរាជ័យ / Failed: ' + ((tgRes && tgRes.description) || 'Unknown') + '</span>';
             }
             setTimeout(() => msgEl.innerHTML = '', 8000);
         })
         .catch(err => {
-            msgEl.innerHTML = '<span style="color:#ef4444;">❌ <?php echo __('test_failed'); ?>: ' + err.message + '</span>';
+            msgEl.innerHTML = '<span style="color:#ef4444;">❌ បរាជ័យ / Failed: ' + err.message + '</span>';
             setTimeout(() => msgEl.innerHTML = '', 8000);
         });
     }

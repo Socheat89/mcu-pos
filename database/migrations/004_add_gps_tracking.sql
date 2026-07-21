@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS tenant_telegram_config (
     tenant_id INT NOT NULL,
     bot_token VARCHAR(255) NULL COMMENT 'Custom bot token (if user provides their own)',
     chat_id VARCHAR(100) NULL COMMENT 'Group or channel chat ID',
+    chat_title VARCHAR(255) NULL COMMENT 'Group name (auto-detected)',
+    setup_code VARCHAR(10) NULL COMMENT '6-char setup code for easy pairing',
     notify_session_open TINYINT(1) DEFAULT 1 COMMENT 'Notify when POS session opens',
     notify_session_close TINYINT(1) DEFAULT 1 COMMENT 'Notify when POS session closes',
     notify_sales_report TINYINT(1) DEFAULT 1 COMMENT 'Send daily sales report',
@@ -58,4 +60,20 @@ CREATE TABLE IF NOT EXISTS tenant_telegram_config (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
     UNIQUE KEY unique_tenant_telegram (tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Pending Telegram links (temporary pairing codes before tenant claims them)
+CREATE TABLE IF NOT EXISTS telegram_pending_links (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setup_code VARCHAR(10) NOT NULL UNIQUE COMMENT '6-char code user enters in POS',
+    chat_id VARCHAR(100) NOT NULL COMMENT 'Detected group chat ID',
+    chat_title VARCHAR(255) NULL COMMENT 'Group name',
+    chat_type VARCHAR(20) NULL COMMENT 'group / supergroup',
+    bot_token VARCHAR(255) NULL COMMENT 'Bot token used',
+    claimed_by_tenant_id INT NULL COMMENT 'NULL until claimed',
+    claimed_at DATETIME NULL,
+    expires_at DATETIME NOT NULL COMMENT 'Code expires after 24h',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_setup_code (setup_code),
+    INDEX idx_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -69,21 +69,32 @@ if ($method === 'GET') {
         [$tenantId]
     );
 
-    $data = [
-        'bot_token'            => $input['bot_token'] ?? null,
-        'chat_id'              => $input['chat_id'] ?? null,
-        'notify_session_open'  => isset($input['notify_session_open']) ? (int)$input['notify_session_open'] : 1,
-        'notify_session_close' => isset($input['notify_session_close']) ? (int)$input['notify_session_close'] : 1,
-        'notify_sales_report'  => isset($input['notify_sales_report']) ? (int)$input['notify_sales_report'] : 1,
-        'notify_gps_start'     => isset($input['notify_gps_start']) ? (int)$input['notify_gps_start'] : 1,
-        'notify_gps_stop'      => isset($input['notify_gps_stop']) ? (int)$input['notify_gps_stop'] : 1,
-        'is_active'            => isset($input['is_active']) ? (int)$input['is_active'] : 1,
-    ];
+    // Build data array — only include fields that are explicitly provided
+    $data = [];
+    $allowedFields = ['bot_token', 'chat_id', 'chat_title', 'setup_code',
+        'notify_session_open', 'notify_session_close', 'notify_sales_report',
+        'notify_gps_start', 'notify_gps_stop', 'is_active'];
+    
+    foreach ($allowedFields as $field) {
+        if (array_key_exists($field, $input)) {
+            $data[$field] = $input[$field];
+        }
+    }
+
+    if (empty($data)) {
+        echo json_encode(['success' => false, 'error' => 'No fields to update']);
+        exit;
+    }
 
     if ($existing) {
         $db->update('tenant_telegram_config', $data, 'id = ?', [$existing['id']]);
     } else {
         $data['tenant_id'] = $tenantId;
+        // Only set bot_token default if creating new and not provided
+        if (!isset($data['bot_token'])) {
+            $sysConfig = require $root . '/config/telegram.php';
+            $data['bot_token'] = $sysConfig['bot_token'] ?? '';
+        }
         $db->insert('tenant_telegram_config', $data);
     }
 
