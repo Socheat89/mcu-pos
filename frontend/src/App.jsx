@@ -1502,8 +1502,8 @@ export default function App() {
 
             {/* 📱 Mobile Fixed Bottom Bar (Checkout Banner & Nav Tabs) */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col shadow-2xl">
-              {/* Quick Checkout Banner */}
-              {cartItemCount > 0 && (
+              {/* Quick Checkout Banner (Products view only) */}
+              {cartItemCount > 0 && mobileTab === 'products' && (
                 <div className={`px-4 py-2.5 border-t shadow-lg flex items-center justify-between gap-3 animate-slide-up ${
                   darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-gray-200 text-slate-800'
                 }`}>
