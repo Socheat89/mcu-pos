@@ -82,13 +82,13 @@ try {
         header("Location: $urlPrefix/login.php?error=" . urlencode('Invalid username or password'));
         exit;
     }
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Login Error: " . $e->getMessage());
     if ($isAjax) {
         echo json_encode(['success' => false, 'error' => 'System error: ' . $e->getMessage()]);
         exit;
     }
-    header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred. Please try again.'));
+    header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred: ' . $e->getMessage()));
     exit;
 }
 
@@ -99,6 +99,19 @@ try {
 function _issue_remember_me_token(int $userId, $db): void {
     try {
         require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+
+        // Auto-create table if not exists
+        $db->execute("CREATE TABLE IF NOT EXISTS `remember_tokens` (
+            `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `user_id`    INT UNSIGNED NOT NULL,
+            `token_hash` VARCHAR(64)  NOT NULL,
+            `expires_at` DATETIME     NOT NULL,
+            `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uq_token` (`token_hash`),
+            KEY `idx_user` (`user_id`),
+            KEY `idx_expires` (`expires_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         $token  = bin2hex(random_bytes(32)); // 64-char hex — raw plaintext token
         $hash   = hash('sha256', $token);
@@ -133,7 +146,7 @@ function _issue_remember_me_token(int $userId, $db): void {
             'httponly' => true,   // JS cannot read this cookie
             'samesite' => 'Lax',
         ]);
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Remember Me Error: " . $e->getMessage());
     }
 }

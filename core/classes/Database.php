@@ -93,5 +93,10 @@ class Database
         $sql = "DELETE FROM {$table} WHERE {$where}";
         return $this->query($sql, $params)->rowCount();
     }
+
+    public function execute($sql, $params = [])
+    {
+        return $this->query($sql, $params);
+    }
 }
 ?>

@@ -100,7 +100,7 @@ function _remember_me_restore(string $sealedCookie): void {
             // DB token expired or revoked → clear cookie
             setcookie('remember_me', '', ['expires' => time() - 3600, 'path' => '/']);
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // Silently fail — never break the page load
     }
 }
