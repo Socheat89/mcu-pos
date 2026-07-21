@@ -908,7 +908,7 @@ export default function App() {
           </div>
 
           {/* Right: Controls */}
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-nowrap items-center justify-end gap-1 sm:gap-2 flex-shrink-0">
             {/* Action Menu Dropdown */}
             <div className="relative" ref={actionMenuRef}>
               <button
@@ -1268,7 +1268,7 @@ export default function App() {
             </main>
 
             {/* ─── Right: Cart Sidebar ─── */}
-            <aside className={`lg:h-auto lg:w-[450px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t pb-14 lg:pb-0 ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
+            <aside className={`lg:h-auto lg:w-[450px] lg:border-l lg:border-t-0 flex-shrink-0 flex flex-col border-t overflow-y-auto lg:overflow-visible pb-28 lg:pb-0 ${mobileTab !== 'cart' ? 'hidden lg:flex' : 'flex-1 lg:flex-initial'} ${
               darkMode ? 'bg-brand-surfDark border-white/5' : 'bg-white border-gray-200'
             }`}>
               {/* Odoo POS Order Tabs */}
@@ -1440,7 +1440,7 @@ export default function App() {
                               handleKeypadPress(btn.val);
                             }
                           }}
-                          className={`h-9 rounded text-center text-xs font-black transition-all border ${
+                          className={`h-8 sm:h-9 rounded text-center text-[11px] sm:text-xs font-black transition-all border ${
                             isSelectedMode
                               ? 'bg-[#E76F51] border-[#E76F51] text-white shadow-sm'
                               : btn.isMode
@@ -1503,7 +1503,7 @@ export default function App() {
             {/* 📱 Mobile Fixed Bottom Bar (Checkout Banner & Nav Tabs) */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col shadow-2xl">
               {/* Quick Checkout Banner */}
-              {cartItemCount > 0 && mobileTab === 'products' && (
+              {cartItemCount > 0 && (
                 <div className={`px-4 py-2.5 border-t shadow-lg flex items-center justify-between gap-3 animate-slide-up ${
                   darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-gray-200 text-slate-800'
                 }`}>
