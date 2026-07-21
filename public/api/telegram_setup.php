@@ -58,10 +58,10 @@ echo json_encode([
         'bot_username' => $botData['result']['username'] ?? 'unknown',
         'how_to_use' => [
             '1. Add @' . ($botData['result']['username'] ?? 'your_bot') . ' to your Telegram group as ADMIN',
-            '2. Send /chatid in the group to get the Chat ID',
+            '2. Bot will auto-send a 6-digit setup code in the group',
             '3. Go to MCU POS → GPS Tracking → Telegram Setup',
-            '4. Enter the Chat ID and save',
-            '5. You will start receiving GPS and sales notifications!',
+            '4. Enter the 6-digit code → Done! ✅',
+            '5. No Chat IDs or API calls needed!',
         ]
     ]
 ], JSON_PRETTY_PRINT);
