@@ -62,9 +62,11 @@ try {
         // Redirect based on role
         if ($user['role_level'] == 3) { // Super admin
             $redirect = "$urlPrefix/admin/index.php";
+        } elseif ($user['role_level'] == 1) { // Cashier
+            $redirect = "$urlPrefix/{$user['subdomain']}/pos/pos";
         } else {
-            // Redirect to tenant dashboard
-            $redirect = "$urlPrefix/{$user['subdomain']}/dashboard";
+            // Tenant Admin / Manager -> POS Terminal
+            $redirect = "$urlPrefix/{$user['subdomain']}/pos/pos";
         }
 
         if ($isAjax) {
