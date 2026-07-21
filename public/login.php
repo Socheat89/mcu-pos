@@ -18,426 +18,453 @@ if (Auth::check()) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Mekong CyberUnit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - Mekong CyberUnit POS</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Battambang:wght@300;400;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="<?php echo mc_asset('css/landing.css'); ?>?v=5.1">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;600;700;800&family=Battambang:wght@400;700;900&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
     <link rel="icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
     <link rel="shortcut icon" href="<?php echo mc_asset('images/my-logo.jpg'); ?>" type="image/jpeg">
 
-    
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            --brand: #308AC6;
-            --brand-strong: #1F6896;
-            --brand-light: #52A2D4;
-            --primary: #308AC6;
-            --border: rgba(48, 138, 198, 0.12);
+            --bg-dark: #090d16;
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --brand-cyan: #06b6d4;
+            --brand-teal: #0d9488;
+            --brand-gradient: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0f766e 100%);
+            --border-glow: rgba(6, 182, 212, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
 
-        body, h1, h2, h3, h4, h5, h6, p, span, a, label, input, button {
-            font-family: 'Sora', 'Battambang', sans-serif !important;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        /* ── Floating Blobs ── */
-        .blob-container {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            z-index: -2;
-            pointer-events: none;
-        }
-        .blob {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.16;
-            animation: float 22s infinite alternate ease-in-out;
-        }
-        .blob-1 {
-            background: var(--brand);
-            left: -150px;
-            top: -150px;
-            animation-delay: 0s;
-        }
-        .blob-2 {
-            background: #f4a261;
-            right: -150px;
-            bottom: -150px;
-            animation-duration: 26s;
-            animation-delay: -6s;
-        }
-        .blob-3 {
-            background: #2563eb;
-            left: 45%;
-            top: 40%;
-            width: 600px;
-            height: 600px;
-            animation-duration: 32s;
-            animation-delay: -12s;
-        }
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(80px, 60px) scale(1.15); }
-            100% { transform: translate(-40px, 90px) scale(0.9); }
+        body, input, button {
+            font-family: 'Sora', 'Battambang', sans-serif;
         }
 
-        /* ── Premium Glassmorphism Card ── */
         body.auth-page {
-            background: linear-gradient(180deg, #fefbf6 0%, #f6eee0 100%) !important;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(13, 148, 136, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.9) 0%, #090d16 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            color: var(--text-main);
+            overflow-x: hidden;
             position: relative;
         }
+
+        /* Ambient Glow Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        .orb-1 {
+            width: 350px;
+            height: 350px;
+            background: #06b6d4;
+            top: -100px;
+            left: -100px;
+        }
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: #0d9488;
+            bottom: -150px;
+            right: -150px;
+        }
+
+        /* Container Shell */
         .auth-shell {
+            width: 100%;
+            max-width: 440px;
             position: relative;
             z-index: 10;
-        }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.45) !important;
-            backdrop-filter: blur(24px) !important;
-            -webkit-backdrop-filter: blur(24px) !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-            box-shadow: 0 28px 75px rgba(15, 118, 110, 0.08), 0 10px 30px rgba(0,0,0,0.02) !important;
-            border-radius: 28px !important;
-            padding: 3.5rem 3rem !important;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .auth-card:hover {
-            box-shadow: 0 35px 85px rgba(15, 118, 110, 0.12), 0 15px 35px rgba(0,0,0,0.03) !important;
-        }
-        .auth-header h2 {
-            font-size: 1.85rem;
-            font-weight: 850;
-            color: #0f172a;
-            letter-spacing: -0.04em;
-            margin-top: 15px;
-            margin-bottom: 6px;
-        }
-        .auth-header p {
-            color: #64748b;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-        
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: transparent;
-            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.12);
-            transition: transform 0.4s var(--ease-out);
-            overflow: hidden;
-        }
-        .auth-logo:hover .logo-icon {
-            transform: scale(1.08);
-        }
-        .auth-logo span {
-            font-family: 'Unbounded', sans-serif !important;
-            font-weight: 800;
-            color: #0f172a;
-            font-size: 1.12rem;
-            letter-spacing: -0.03em;
+            margin: 0 auto;
         }
 
-        /* ── Input Wrapper & Style Refresh ── */
+        /* Glassmorphism Card */
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(6, 182, 212, 0.1),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.25rem 2rem;
+            width: 100%;
+        }
+
+        /* Brand Logo Block */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+            border: 1.5px solid rgba(6, 182, 212, 0.4);
+            flex-shrink: 0;
+            background: #0f172a;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-title span {
+            color: var(--brand-cyan);
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.35rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Form Inputs */
         .form-group {
-            margin-bottom: 22px !important;
+            margin-bottom: 1.25rem;
         }
-        .form-group label {
-            font-weight: 800 !important;
-            font-size: 0.76rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.8px !important;
-            color: #475569 !important;
-            margin-bottom: 8px !important;
+
+        .form-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
         }
+
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #cbd5e1;
+        }
+
+        .forgot-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--brand-cyan);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
         .input-wrapper {
             position: relative;
-            display: block;
             width: 100%;
-        }
-        .input-wrapper i.prefix-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #94a3b8;
-            transition: color 0.25s ease;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .input-wrapper input {
-            width: 100%;
-            height: 54px;
-            padding: 10px 48px 10px 50px !important;
-            border-radius: 16px !important;
-            border: 1.5px solid rgba(15, 118, 110, 0.16) !important;
-            background: rgba(255, 255, 255, 0.72) !important;
-            color: #0f172a !important;
-            font-weight: 600 !important;
-            font-size: 0.98rem !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            outline: none;
-        }
-        .input-wrapper input:focus {
-            border-color: var(--brand) !important;
-            background: #ffffff !important;
-            box-shadow: 0 0 0 4.5px rgba(15, 118, 110, 0.14) !important;
-        }
-        .input-wrapper input:focus ~ i.prefix-icon {
-            color: var(--brand);
+            display: flex;
+            align-items: center;
         }
 
-        /* Password toggle button */
-        .btn-toggle-password {
+        .input-icon {
             position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 16px;
+            font-size: 20px;
+            color: #64748b;
+            transition: color 0.2s;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1.5px solid rgba(51, 65, 85, 0.7);
+            border-radius: 14px;
+            padding: 0 44px 0 48px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input::placeholder {
+            color: #475569;
+            font-weight: 400;
+        }
+
+        .form-input:focus {
+            border-color: var(--brand-cyan);
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.18);
+        }
+
+        .form-input:focus ~ .input-icon {
+            color: var(--brand-cyan);
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
             background: none;
             border: none;
-            color: #94a3b8;
-            cursor: pointer;
+            color: #64748b;
             font-size: 20px;
-            padding: 0;
-            display: grid;
-            place-items: center;
-            transition: color 0.2s ease;
-            z-index: 15;
-            outline: none;
-        }
-        .btn-toggle-password:hover {
-            color: var(--brand);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+            z-index: 2;
         }
 
-        /* ── Submit Button ── */
+        .password-toggle-btn:hover {
+            color: var(--brand-cyan);
+        }
+
+        /* Primary Submit Button */
         .btn-submit {
-            height: 54px;
-            border-radius: 16px !important;
-            background: linear-gradient(135deg, var(--brand), #0d9488, #2563eb) !important;
-            background-size: 200% auto !important;
-            color: #ffffff !important;
-            font-weight: 800 !important;
-            font-size: 0.98rem !important;
-            letter-spacing: 0.5px;
-            box-shadow: 0 10px 24px rgba(15, 118, 110, 0.28) !important;
-            border: none !important;
+            width: 100%;
+            height: 52px;
+            background: var(--brand-gradient);
+            border: none;
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 26px;
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4);
+            transition: all 0.25s ease;
+            margin-top: 1.75rem;
         }
+
         .btn-submit:hover {
-            background-position: right center !important;
             transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(15, 118, 110, 0.38) !important;
+            box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.55);
+            filter: brightness(1.08);
         }
+
         .btn-submit:active {
             transform: translateY(0);
         }
 
-        /* ── Alerts ── */
+        /* Alert Boxes */
         .alert {
-            padding: 14px 18px !important;
-            border-radius: 16px !important;
-            font-size: 0.88rem !important;
-            font-weight: 600 !important;
-            margin-bottom: 22px !important;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            border: 1px solid transparent;
+            gap: 10px;
+            line-height: 1.4;
         }
+
         .alert-error {
-            background: rgba(244, 63, 94, 0.08) !important;
-            color: #e11d48 !important;
-            border-color: rgba(244, 63, 94, 0.2) !important;
+            background: rgba(225, 29, 72, 0.15);
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            color: #fecdd3;
         }
+
         .alert-success {
-            background: rgba(16, 185, 129, 0.08) !important;
-            color: #059669 !important;
-            border-color: rgba(16, 185, 129, 0.2) !important;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #a7f3d0;
         }
 
+        /* Footer */
         .auth-footer {
-            margin-top: 26px !important;
-            border-top: 1.5px solid rgba(15, 118, 110, 0.08);
-            padding-top: 20px;
-            font-size: 0.9rem !important;
-            font-weight: 600;
-            color: #64748b;
+            margin-top: 1.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        /* ── Responsive ── */
-        @media (max-width: 640px) {
+        .auth-footer a {
+            color: var(--brand-cyan);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            body.auth-page {
+                padding: 1rem;
+            }
             .auth-card {
-                padding: 2rem 1.3rem !important;
-                border-radius: 22px !important;
+                padding: 1.75rem 1.25rem;
+                border-radius: 20px;
             }
-            .auth-header h2 {
-                font-size: 1.4rem;
-            }
-            .auth-header p {
-                font-size: 0.85rem;
-            }
-            .input-wrapper input {
-                height: 48px;
-                padding: 10px 42px 10px 44px !important;
-                font-size: 0.9rem !important;
-                border-radius: 14px !important;
-            }
-            .input-wrapper i.prefix-icon {
-                left: 14px;
-                font-size: 18px;
-            }
-            .btn-toggle-password {
-                right: 14px;
-                font-size: 18px;
-            }
-            .btn-submit {
-                height: 48px;
-                font-size: 0.9rem !important;
-                border-radius: 14px !important;
-                margin-top: 20px;
-            }
-            .form-group {
-                margin-bottom: 16px !important;
-            }
-            .alert {
-                padding: 12px 14px !important;
-                font-size: 0.8rem !important;
-            }
-            .auth-footer {
-                font-size: 0.82rem;
-                margin-top: 20px;
-                padding-top: 16px;
-            }
-            .auth-label-row {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 4px;
+            .welcome-title {
+                font-size: 1.3rem;
             }
         }
     </style>
 </head>
 <body class="auth-page">
-    
-    <!-- Animated Blurred Blobs -->
-    <div class="blob-container">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
 
-    <!-- Page Loader -->
-
-    <div class="page-loader" id="pageLoader">
-        <div class="loader-card">
-            <div class="loader-logo">
-                <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;">
-            </div>
-            <p class="loader-title">Mekong CyberUnit</p>
-            <p class="loader-caption">Loading secure session</p>
-            <div class="loader-spinner"></div>
-            <div class="loader-progress"><span></span></div>
-        </div>
-    </div>
+    <!-- Ambient Glow Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
     <main class="auth-shell">
-        <div class="auth-card auth-card--compact">
-            <div class="auth-header">
+        <div class="auth-card">
+            <!-- Header & Logo -->
+            <div class="brand-header">
                 <a href="<?php echo mc_url('index.php'); ?>" class="auth-logo">
                     <div class="logo-icon">
-                        <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">
+                        <img src="<?php echo mc_asset('images/my-logo.jpg'); ?>" alt="MCU Logo">
                     </div>
-                    <span>Mekong CyberUnit</span>
+                    <div class="brand-title">Mekong <span>CyberUnit</span></div>
                 </a>
-                <h2>Welcome back</h2>
-                <p>Sign in to your account</p>
+                <h1 class="welcome-title">Welcome Back</h1>
+                <p class="welcome-subtitle">Sign in to your Mekong POS account</p>
             </div>
 
+            <!-- Error Notification -->
             <?php if (isset($_GET['error'])): ?>
                 <div class="alert alert-error">
-                    <i class="ph-bold ph-warning-circle" style="font-size: 18px;"></i>
+                    <i class="ph-bold ph-warning-circle" style="font-size: 20px; flex-shrink: 0; color: #f43f5e;"></i>
                     <span><?php echo htmlspecialchars($_GET['error']); ?></span>
                 </div>
             <?php endif; ?>
 
+            <!-- Success Notification -->
             <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success">
-                    <i class="ph-bold ph-check-circle" style="font-size: 18px;"></i>
+                    <i class="ph-bold ph-check-circle" style="font-size: 20px; flex-shrink: 0; color: #10b981;"></i>
                     <span><?php echo htmlspecialchars($_GET['success']); ?></span>
                 </div>
             <?php endif; ?>
 
+            <!-- Login Form -->
             <form method="POST" action="login_process.php">
+                <!-- Username Input -->
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <div class="form-label-row">
+                        <label for="username" class="form-label">Username / ឈ្មោះប្រកាស</label>
+                    </div>
                     <div class="input-wrapper">
-                        <i class="ph ph-user prefix-icon"></i>
-                        <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="username">
+                        <i class="ph-bold ph-user input-icon"></i>
+                        <input type="text" id="username" name="username" class="form-input" required 
+                               placeholder="Enter your username" autocomplete="username" autofocus>
                     </div>
                 </div>
-                
+
+                <!-- Password Input -->
                 <div class="form-group">
-                    <div class="auth-label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <label for="password" style="margin-bottom: 0 !important;">Password</label>
-                        <a href="<?php echo mc_url('forgot_password.php'); ?>" class="link-strong" style="font-size: 0.8rem; font-weight: 700; text-decoration: none;">Forgot password?</a>
+                    <div class="form-label-row">
+                        <label for="password" class="form-label">Password / ពាក្យសម្ងាត់</label>
+                        <a href="<?php echo mc_url('forgot_password.php'); ?>" class="forgot-link">Forgot?</a>
                     </div>
                     <div class="input-wrapper">
-                        <i class="ph ph-lock prefix-icon"></i>
-                        <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
-                        <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
-                            <i class="ph ph-eye" id="togglePasswordIcon"></i>
+                        <i class="ph-bold ph-lock-key input-icon"></i>
+                        <input type="password" id="password" name="password" class="form-input" required 
+                               placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                            <i class="ph-bold ph-eye" id="toggleIcon"></i>
                         </button>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn-submit full-width">
-                    <i class="ph ph-sign-in" style="font-size: 20px;"></i>
-                    <span>Sign In</span>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">
+                    <i class="ph-bold ph-sign-in" style="font-size: 22px;"></i>
+                    <span>Sign In / ចូលប្រព័ន្ធ</span>
                 </button>
             </form>
-            
-            <div class="auth-footer text-center">
-                Don't have an account? <a href="<?php echo mc_url('register.php'); ?>" class="link-strong" style="text-decoration: none;">Sign up</a>
+
+            <!-- Footer -->
+            <div class="auth-footer">
+                Don't have an account? <a href="<?php echo mc_url('register.php'); ?>">Sign up</a>
             </div>
         </div>
     </main>
 
     <script>
         function togglePasswordVisibility() {
-            var passwordField = document.getElementById("password");
-            var icon = document.getElementById("togglePasswordIcon");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                icon.className = "ph ph-eye-slash";
+            var input = document.getElementById("password");
+            var icon = document.getElementById("toggleIcon");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "ph-bold ph-eye-slash";
             } else {
-                passwordField.type = "password";
-                icon.className = "ph ph-eye";
+                input.type = "password";
+                icon.className = "ph-bold ph-eye";
             }
         }
     </script>
-    <script src="<?php echo mc_asset('js/loader.js'); ?>"></script>
 </body>
 </html>
-
