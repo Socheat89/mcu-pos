@@ -55,7 +55,14 @@ class Tenant {
     }
 
     public static function getId() {
-        return self::$currentTenant ? self::$currentTenant['id'] : null;
+        if (self::$currentTenant && isset(self::$currentTenant['id'])) {
+            return self::$currentTenant['id'];
+        }
+        // Fallback: use tenant_id from session (for API calls without URL context)
+        if (isset($_SESSION['tenant_id'])) {
+            return (int)$_SESSION['tenant_id'];
+        }
+        return null;
     }
 
     public static function hasSystem($systemName) {
