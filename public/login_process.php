@@ -93,15 +93,18 @@ try {
 }
 
 /**
- * Create a secure remember_me token, store its hash in DB, set a 90-day cookie.
+ * Create a secure remember_me token, store its hash in DB,
+ * encrypt the raw token with AES-256-GCM, then set a 90-day cookie.
  */
 function _issue_remember_me_token(int $userId, $db): void {
     try {
-        $token  = bin2hex(random_bytes(32)); // 64-char hex token
+        require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+
+        $token  = bin2hex(random_bytes(32)); // 64-char hex — raw plaintext token
         $hash   = hash('sha256', $token);
         $expiry = date('Y-m-d H:i:s', strtotime('+90 days'));
 
-        // Clean old tokens for this user (keep at most 5 devices)
+        // Clean old tokens for this user (keep at most 4 previous devices)
         $db->execute(
             "DELETE FROM remember_tokens WHERE user_id = ?
              AND id NOT IN (
@@ -110,21 +113,24 @@ function _issue_remember_me_token(int $userId, $db): void {
             [$userId, $userId]
         );
 
-        // Insert new token
+        // Insert new token (only the SHA-256 hash is stored — never the plaintext)
         $db->execute(
             "INSERT INTO remember_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)",
             [$userId, $hash, $expiry]
         );
 
-        // Set cookie
+        // ── Encrypt the cookie value before sending ───────────────────────────
+        $crypt  = CookieCrypt::fromConfig();
+        $sealed = $crypt->seal($token); // AES-256-GCM + HMAC-SHA256
+
         $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
 
-        setcookie('remember_me', $token, [
+        setcookie('remember_me', $sealed, [
             'expires'  => strtotime('+90 days'),
             'path'     => '/',
             'secure'   => $isHttps,
-            'httponly' => true,
+            'httponly' => true,   // JS cannot read this cookie
             'samesite' => 'Lax',
         ]);
     } catch (Exception $e) {

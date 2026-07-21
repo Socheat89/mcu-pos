@@ -40,11 +40,25 @@ if (empty($_SESSION['user_id']) && !empty($_COOKIE['remember_me'])) {
     _remember_me_restore($_COOKIE['remember_me']);
 }
 
-function _remember_me_restore(string $cookieToken): void {
+function _remember_me_restore(string $sealedCookie): void {
     try {
+        require_once __DIR__ . '/classes/CookieCrypt.php';
         require_once dirname(__DIR__) . '/core/classes/Database.php';
-        $db = Database::getInstance();
-        $hash = hash('sha256', $cookieToken);
+
+        // ── Step 1: Decrypt + verify cookie ──────────────────────────────────
+        $crypt = CookieCrypt::fromConfig();
+        $plainToken = $crypt->open($sealedCookie);
+
+        if ($plainToken === null) {
+            // Tampered, invalid, or encrypted with a different key → reject
+            setcookie('remember_me', '', ['expires' => time() - 3600, 'path' => '/']);
+            return;
+        }
+
+        // ── Step 2: Hash token and look up in DB ──────────────────────────────
+        $db   = Database::getInstance();
+        $hash = hash('sha256', $plainToken);
+
         $row = $db->fetchOne(
             "SELECT rt.user_id, u.tenant_id, u.status, r.level as role_level
                FROM remember_tokens rt
@@ -58,21 +72,24 @@ function _remember_me_restore(string $cookieToken): void {
         );
 
         if ($row) {
-            // Restore session
+            // ── Step 3: Restore session ───────────────────────────────────────
             session_regenerate_id(true);
-            $_SESSION['user_id']          = $row['user_id'];
-            $_SESSION['tenant_id']        = $row['tenant_id'];
-            $_SESSION['role_level']       = $row['role_level'];
-            // Refresh token expiry (rolling window)
+            $_SESSION['user_id']    = $row['user_id'];
+            $_SESSION['tenant_id']  = $row['tenant_id'];
+            $_SESSION['role_level'] = $row['role_level'];
+
+            // Rolling expiry — extend token lifetime on each visit
             $newExpiry = date('Y-m-d H:i:s', strtotime('+90 days'));
             $db->execute(
                 "UPDATE remember_tokens SET expires_at = ? WHERE token_hash = ?",
                 [$newExpiry, $hash]
             );
-            // Refresh cookie
-            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+
+            // Re-issue encrypted cookie (new seal, same plaintext token)
+            $newSealed = $crypt->seal($plainToken);
+            $isHttps   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
                 || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-            setcookie('remember_me', $cookieToken, [
+            setcookie('remember_me', $newSealed, [
                 'expires'  => strtotime('+90 days'),
                 'path'     => '/',
                 'secure'   => $isHttps,
@@ -80,11 +97,11 @@ function _remember_me_restore(string $cookieToken): void {
                 'samesite' => 'Lax',
             ]);
         } else {
-            // Invalid / expired token — clear cookie
+            // DB token expired or revoked → clear cookie
             setcookie('remember_me', '', ['expires' => time() - 3600, 'path' => '/']);
         }
     } catch (Exception $e) {
-        // Silently fail — don't break the page
+        // Silently fail — never break the page load
     }
 }
 ?>
