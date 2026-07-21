@@ -5,6 +5,8 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
+try {
+
 $root = dirname(__DIR__, 2);
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
@@ -123,6 +125,10 @@ switch ($action) {
     default:
         echo json_encode(['success' => false, 'error' => 'Unknown action']);
         break;
+}
+
+} catch (Throwable $e) {
+    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
 }
 
 exit;

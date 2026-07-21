@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+try {
+
 $root = dirname(__DIR__, 2);
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
@@ -102,6 +104,10 @@ if ($method === 'GET') {
 
 } else {
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+}
+
+} catch (Throwable $e) {
+    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
 }
 
 exit;
