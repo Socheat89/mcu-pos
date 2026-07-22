@@ -4,8 +4,8 @@
 
 return [
     'host' => 'localhost',
-    'database' => 'your_database_name',
-    'username' => 'your_database_user',
+    'database' => 'mekocclj_mekong_saas',
+    'username' => 'root',
     'password' => 'replace_with_a_strong_password',
     'charset' => 'utf8mb4',
 ];
