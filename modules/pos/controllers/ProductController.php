@@ -28,6 +28,14 @@ class ProductController {
         $products = Product::getAll();
         $categories = $this->getCategories();
 
+        // Attach sizes count to each product
+        foreach ($products as &$p) {
+            $sizes = Product::getSizes($p['id']);
+            $p['size_count'] = count($sizes);
+            $p['sizes'] = $sizes;
+        }
+        unset($p);
+
         include __DIR__ . '/../views/products.php';
     }
 
@@ -64,6 +72,7 @@ class ProductController {
             $this->update($id);
         } else {
             $categories = $this->getCategories();
+            $productSizes = Product::getSizes($id);
             include __DIR__ . '/../views/product_form.php';
         }
     }
@@ -172,7 +181,11 @@ class ProductController {
             $data['image'] = $this->uploadImage($_FILES['image']);
         }
 
-        Product::create($data);
+        $productId = Product::create($data);
+
+        // Save product sizes if provided
+        $this->saveSizesFromPost($productId);
+
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
         exit;
@@ -196,6 +209,10 @@ class ProductController {
         }
 
         Product::update($id, $data);
+
+        // Save product sizes if provided
+        $this->saveSizesFromPost($id);
+
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
         exit;
@@ -205,6 +222,31 @@ class ProductController {
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
         exit;
+    }
+
+    private function saveSizesFromPost($productId) {
+        $sizes = [];
+        $sizeNames = $_POST['size_name'] ?? [];
+        $sizePrices = $_POST['size_price'] ?? [];
+
+        if (is_array($sizeNames) && is_array($sizePrices)) {
+            foreach ($sizeNames as $i => $name) {
+                $name = trim($name);
+                if ($name !== '' && isset($sizePrices[$i])) {
+                    $sizes[] = [
+                        'size_name' => $name,
+                        'price'     => (float)$sizePrices[$i]
+                    ];
+                }
+            }
+        }
+
+        if (!empty($sizes)) {
+            Product::saveSizes($productId, $sizes);
+        } else {
+            // If no sizes submitted, clear any existing sizes
+            Product::saveSizes($productId, []);
+        }
     }
 
     private function loadRowsFromUploadedFile($file) {

@@ -25,9 +25,8 @@ if (!hash_equals((string) $requiredKey, (string) $secretKey)) {
 echo '<pre style="font-family:monospace;padding:20px;">';
 echo "🚀 Starting deploy...\n\n";
 
-// Run git pull with hard reset to avoid local conflicts
+// 1. Run git pull with fast-forward only (safe for production)
 $output = [];
-$returnCode = 0;
 chdir(__DIR__);
 exec('git fetch origin 2>&1', $output, $returnCode);
 exec('git pull --ff-only origin main 2>&1', $output2, $returnCode2);
@@ -38,6 +37,50 @@ foreach ($output as $line) {
     echo htmlspecialchars($line) . "\n";
 }
 
+if ($returnCode !== 0) {
+    echo "\n❌ Git pull failed. Aborting deploy.\n";
+    echo '</pre>';
+    exit(1);
+}
+
+echo "\n✅ Code pulled successfully!\n";
+
+// 2. Run database migrations
+echo "\n🗄️ Running database migrations...\n";
+$migrationOutput = [];
+$migrationCode = 0;
+exec('php ' . escapeshellarg(__DIR__ . '/run_migrations.php') . ' 2>&1', $migrationOutput, $migrationCode);
+foreach ($migrationOutput as $line) {
+    echo '  ' . htmlspecialchars($line) . "\n";
+}
+echo $migrationCode === 0 ? "✅ Migrations complete!\n" : "⚠️ Migrations had warnings (check output above)\n";
+
+// 3. Rebuild React frontend
+echo "\n⚛️ Rebuilding frontend...\n";
+$buildOutput = [];
+$buildCode = 0;
+$frontendDir = __DIR__ . '/frontend';
+
+if (is_dir($frontendDir) && file_exists($frontendDir . '/package.json')) {
+    // Check if node_modules exists, if not run npm install first
+    if (!is_dir($frontendDir . '/node_modules')) {
+        echo "  → Installing npm dependencies...\n";
+        exec('cd ' . escapeshellarg($frontendDir) . ' && npm install 2>&1', $installOutput, $installCode);
+        foreach ($installOutput as $line) {
+            echo '    ' . htmlspecialchars($line) . "\n";
+        }
+    }
+    
+    exec('cd ' . escapeshellarg($frontendDir) . ' && npm run build 2>&1', $buildOutput, $buildCode);
+    foreach ($buildOutput as $line) {
+        echo '  ' . htmlspecialchars($line) . "\n";
+    }
+    echo $buildCode === 0 ? "✅ Frontend built!\n" : "⚠️ Frontend build had warnings\n";
+} else {
+    echo "  ⚠️ Frontend directory not found, skipping build.\n";
+}
+
+// 4. Clear PHP caches
 if (function_exists('opcache_reset')) {
     @opcache_reset();
     echo "⚡ OPcache reset successfully!\n";

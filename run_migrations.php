@@ -333,6 +333,29 @@ try {
         echo "→ Free Trial plan already exists.<br>";
     }
 
+    // 11. Create 'product_sizes' table for coffee shops & variable-price products
+    echo "Ensuring 'product_sizes' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'product_sizes'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE product_sizes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            product_id INT NOT NULL,
+            size_name VARCHAR(50) NOT NULL COMMENT 'e.g. Small, Medium, Large',
+            price DECIMAL(10,2) NOT NULL,
+            tenant_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_product_size (product_id, size_name),
+            INDEX idx_product_sizes_product (product_id),
+            INDEX idx_product_sizes_tenant (tenant_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        echo "→ 'product_sizes' table created.<br>";
+    } else {
+        echo "→ 'product_sizes' table already exists.<br>";
+    }
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {

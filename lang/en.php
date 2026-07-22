@@ -449,4 +449,15 @@ return [
     'notify_gps_stop'         => '🛑 GPS Tracking Stop',
     'settings_saved'          => 'Saved!',
 
+    // Product Sizes
+    'product_sizes'           => 'Product Sizes',
+    'product_sizes_hint'      => 'Set different sizes with individual pricing (e.g., Small, Medium, Large for coffee). Leave empty if not needed.',
+    'size_name'               => 'Size',
+    'size_name_placeholder'   => 'e.g. Small, Medium, Large',
+    'size_price'              => 'Price',
+    'add_size'                => 'Add Size',
+    'remove_size'             => 'Remove this size',
+    'sizes'                   => 'Sizes',
+    'select_size'             => 'Select Size',
+
 ];

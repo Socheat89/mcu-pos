@@ -97,6 +97,41 @@
                     </div>
                 </section>
 
+                <section style="margin-bottom: 40px;">
+                    <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
+                        <?php echo __('product_sizes'); ?>
+                    </h3>
+                    <p style="font-size: 13px; color: var(--pos-text-muted); margin-bottom: 16px; font-weight: 500;">
+                        <?php echo __('product_sizes_hint'); ?>
+                    </p>
+                    <div id="sizes-container">
+                        <?php
+                        $existingSizes = $productSizes ?? [];
+                        $sizeCount = max(3, count($existingSizes));
+                        for ($i = 0; $i < $sizeCount; $i++):
+                            $sz = $existingSizes[$i] ?? null;
+                        ?>
+                        <div class="size-row" style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_name'); ?> <?php echo $i + 1; ?></label>
+                                <input type="text" name="size_name[]" class="pos-form-control" value="<?php echo htmlspecialchars($sz['size_name'] ?? ''); ?>" placeholder="<?php echo __('size_name_placeholder'); ?>">
+                            </div>
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_price'); ?> ($)</label>
+                                <input type="number" name="size_price[]" step="0.01" class="pos-form-control size-price-input" value="<?php echo isset($sz['price']) ? number_format($sz['price'], 2, '.', '') : ''; ?>" placeholder="0.00">
+                            </div>
+                            <button type="button" class="btn-remove-size" title="<?php echo __('remove_size'); ?>" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                                <i class="fas fa-times" style="font-size: 12px;"></i>
+                            </button>
+                        </div>
+                        <?php endfor; ?>
+                    </div>
+                    <button type="button" id="btn-add-size" class="btn btn-outline" style="margin-top: 8px; font-size: 13px; padding: 8px 20px;">
+                        <i class="fas fa-plus" style="margin-right: 6px;"></i> <?php echo __('add_size'); ?>
+                    </button>
+                </section>
+
                 <section>
                     <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
@@ -170,6 +205,51 @@
                 previewImage({ files: files });
             }
         });
+
+        // ─── Size Row Management ──────────────────────────
+        const sizesContainer = document.getElementById('sizes-container');
+        const btnAddSize = document.getElementById('btn-add-size');
+        let sizeRowCount = sizesContainer.querySelectorAll('.size-row').length;
+
+        btnAddSize.addEventListener('click', () => {
+            sizeRowCount++;
+            const row = document.createElement('div');
+            row.className = 'size-row';
+            row.style.cssText = 'display: flex; gap: 12px; align-items: center; margin-bottom: 12px;';
+            row.innerHTML = `
+                <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_name'); ?> ${sizeRowCount}</label>
+                    <input type="text" name="size_name[]" class="pos-form-control" placeholder="<?php echo __('size_name_placeholder'); ?>">
+                </div>
+                <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_price'); ?> ($)</label>
+                    <input type="number" name="size_price[]" step="0.01" class="pos-form-control size-price-input" placeholder="0.00">
+                </div>
+                <button type="button" class="btn-remove-size" title="<?php echo __('remove_size'); ?>" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                    <i class="fas fa-times" style="font-size: 12px;"></i>
+                </button>
+            `;
+            sizesContainer.appendChild(row);
+            bindRemoveButton(row.querySelector('.btn-remove-size'));
+        });
+
+        function bindRemoveButton(btn) {
+            btn.addEventListener('click', () => {
+                btn.closest('.size-row').remove();
+                // Re-number labels
+                const rows = sizesContainer.querySelectorAll('.size-row');
+                rows.forEach((row, i) => {
+                    const label = row.querySelector('.pos-form-label');
+                    if (label) {
+                        label.textContent = '<?php echo __('size_name'); ?> ' + (i + 1);
+                    }
+                });
+                sizeRowCount = rows.length;
+            });
+        }
+
+        // Bind existing remove buttons
+        sizesContainer.querySelectorAll('.btn-remove-size').forEach(btn => bindRemoveButton(btn));
     </script>
     
     <?php include __DIR__ . '/partials/footer.php'; ?>

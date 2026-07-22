@@ -67,6 +67,42 @@ class Product {
             [$tenantId, $searchTerm, $searchTerm, $searchTerm]
         );
     }
+
+    // ─── Product Sizes ───────────────────────────────────────
+
+    public static function getSizes($productId, $tenantId = null) {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        return self::$db->fetchAll(
+            "SELECT * FROM product_sizes WHERE product_id = ? AND tenant_id = ? ORDER BY id",
+            [$productId, $tenantId]
+        );
+    }
+
+    public static function saveSizes($productId, $sizes, $tenantId = null) {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        // Delete existing sizes for this product
+        self::$db->delete('product_sizes', 'product_id = ? AND tenant_id = ?', [$productId, $tenantId]);
+        // Insert new sizes
+        foreach ($sizes as $size) {
+            if (!empty($size['size_name']) && isset($size['price'])) {
+                self::$db->insert('product_sizes', [
+                    'product_id' => $productId,
+                    'size_name'  => $size['size_name'],
+                    'price'      => (float)$size['price'],
+                    'tenant_id'  => $tenantId
+                ]);
+            }
+        }
+    }
+
+    public static function getAllWithSizes($tenantId = null) {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        $products = self::getAll($tenantId);
+        foreach ($products as &$product) {
+            $product['sizes'] = self::getSizes($product['id'], $tenantId);
+        }
+        return $products;
+    }
 }
 
 Product::init();

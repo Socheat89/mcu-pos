@@ -34,6 +34,11 @@ class PosController {
 
 
         $products = Product::getAll();
+        // Attach sizes to each product for size-based pricing (e.g., coffee S/M/L)
+        foreach ($products as &$p) {
+            $p['sizes'] = Product::getSizes($p['id'], $tenantId);
+        }
+        unset($p);
         $customers = $this->getCustomers();
         $pendingMenuOrders = Order::getPending($tenantId);
         

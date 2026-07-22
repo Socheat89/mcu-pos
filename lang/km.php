@@ -448,4 +448,15 @@ return [
     'notify_gps_stop'         => '🛑 ពេលបញ្ឈប់តាមដាន GPS',
     'settings_saved'          => 'បានរក្សាទុក!',
 
+    // Product Sizes
+    'product_sizes'           => 'ទំហំផលិតផល',
+    'product_sizes_hint'      => 'កំណត់ទំហំផ្សេងៗគ្នាជាមួយនឹងតម្លៃដាច់ដោយឡែក (ឧ. តូច មធ្យម ធំ សម្រាប់កាហ្វេ)។ ទុកទទេប្រសិនបើមិនត្រូវការ។',
+    'size_name'               => 'ទំហំ',
+    'size_name_placeholder'   => 'ឧ. តូច, មធ្យម, ធំ',
+    'size_price'              => 'តម្លៃ',
+    'add_size'                => 'បន្ថែមទំហំ',
+    'remove_size'             => 'លុបទំហំនេះ',
+    'sizes'                   => 'ទំហំ',
+    'select_size'             => 'ជ្រើសរើសទំហំ',
+
 ];

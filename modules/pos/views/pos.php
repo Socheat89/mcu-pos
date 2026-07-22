@@ -52,6 +52,18 @@ $dashboardUrl = $posBase . '/dashboard';
             $image = !empty($p['image'])
                 ? mc_url('uploads/products/' . $p['image'])
                 : mc_url('public/images/no-image.svg');
+            
+            $sizes = [];
+            if (!empty($p['sizes'])) {
+                foreach ($p['sizes'] as $sz) {
+                    $sizes[] = [
+                        'id' => (int)$sz['id'],
+                        'size_name' => $sz['size_name'],
+                        'price' => (float)$sz['price']
+                    ];
+                }
+            }
+
             return [
                 'id' => (int)$p['id'],
                 'name' => $p['name'],
@@ -60,7 +72,8 @@ $dashboardUrl = $posBase . '/dashboard';
                 'price' => (float)$p['price'],
                 'stock' => (int)$p['stock_quantity'],
                 'category' => $p['category_name'] ?? 'No Category',
-                'image' => $image
+                'image' => $image,
+                'sizes' => $sizes
             ];
         }, $products)); ?>;
         

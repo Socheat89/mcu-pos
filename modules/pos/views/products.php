@@ -69,6 +69,7 @@ $urlPrefix = mc_base_path();
                     <tr>
                         <th style="width: 60px;"><?php echo __('pic'); ?></th>
                         <th><?php echo __('products'); ?></th>
+                        <th><?php echo __('sizes'); ?></th>
                         <th><?php echo __('status'); ?></th>
                         <th><?php echo __('price'); ?></th>
                         <th style="text-align: right;"><?php echo __('actions'); ?></th>
@@ -77,7 +78,7 @@ $urlPrefix = mc_base_path();
                 <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="5" style="padding: 100px; text-align: center;">
+                            <td colspan="6" style="padding: 100px; text-align: center;">
                                 <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
                                     <i class="fas fa-box-open" style="font-size: 32px; color: var(--pos-text-dim);"></i>
                                 </div>
@@ -106,7 +107,19 @@ $urlPrefix = mc_base_path();
                                 <td>
                                     <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($p['name']); ?></div>
                                     <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">SKU: <?php echo htmlspecialchars($p['sku'] ?: 'N/A'); ?></div>
-
+                                </td>
+                                <td>
+                                    <?php if (!empty($p['sizes'])): ?>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            <?php foreach ($p['sizes'] as $sz): ?>
+                                                <span style="display: inline-block; background: rgba(99, 102, 241, 0.08); color: var(--pos-primary); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; white-space: nowrap;">
+                                                    <?php echo htmlspecialchars($sz['size_name']); ?>: $<?php echo number_format($sz['price'], 2); ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span style="font-size: 12px; color: var(--pos-text-muted); font-weight: 500;">—</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="badge <?php echo $badge; ?>">

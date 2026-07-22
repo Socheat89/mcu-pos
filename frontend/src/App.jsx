@@ -399,6 +399,7 @@ export default function App() {
   // Keypad / Numpad state for Odoo POS controls
   const [keypadMode, setKeypadMode] = useState('quantity'); // 'quantity' | 'discount' | 'price'
   const [activeProductId, setActiveProductId] = useState(null);
+  const activeCartKeyRef = useRef(null); // Tracks the cartKey of the selected cart item
   const [keypadValue, setKeypadValue] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -415,6 +416,7 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
   const [mobileTab, setMobileTab] = useState('products'); // 'products' | 'cart' // { message, onConfirm }
+  const [sizeModal, setSizeModal] = useState(null); // { product } when awaiting size selection
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
@@ -554,7 +556,25 @@ export default function App() {
       showToast('warning', t('toast_no_stock', 'អស់ស្តុក'), `${product.name} ${t('toast_no_stock_msg', 'មិនមានក្នុងស្តុកទេ។')}`);
       return;
     }
-    const existing = cart.find(item => item.product.id === product.id);
+
+    // If product has sizes, show size picker modal
+    if (product.sizes && product.sizes.length > 0) {
+      setSizeModal({ product });
+      return;
+    }
+
+    addProductToCart(product, null);
+  };
+
+  const addProductToCart = (product, selectedSize) => {
+    if (product.stock <= 0) {
+      showToast('warning', t('toast_no_stock', 'អស់ស្តុក'), `${product.name} ${t('toast_no_stock_msg', 'មិនមានក្នុងស្តុកទេ។')}`);
+      return;
+    }
+
+    // Create a unique identifier: product id + size id (or just product id for no-size products)
+    const cartKey = selectedSize ? `${product.id}_s${selectedSize.id}` : `${product.id}`;
+    const existing = cart.find(item => item.cartKey === cartKey);
     let newCart;
     if (existing) {
       if (existing.quantity >= product.stock) {
@@ -562,17 +582,26 @@ export default function App() {
         return;
       }
       newCart = cart.map(item =>
-        item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        item.cartKey === cartKey ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
-      newCart = [...cart, { product, quantity: 1, discount: 0, customPrice: undefined }];
+      const customPrice = selectedSize ? selectedSize.price : undefined;
+      newCart = [...cart, {
+        product,
+        quantity: 1,
+        discount: 0,
+        customPrice,
+        selectedSize,
+        cartKey
+      }];
     }
     
     updateActiveOrder(() => ({ cart: newCart }));
     
-    // Auto-select/focus added product
+    // Auto-select/focus the added item
     setActiveProductId(product.id);
-    const addedItem = newCart.find(item => item.product.id === product.id);
+    activeCartKeyRef.current = cartKey;
+    const addedItem = newCart.find(item => item.cartKey === cartKey);
     if (keypadMode === 'quantity') {
       setKeypadValue(String(addedItem.quantity));
     } else if (keypadMode === 'discount') {
@@ -582,15 +611,17 @@ export default function App() {
     }
   };
 
-  const updateCartQty = (productId, delta) => {
-    const existing = cart.find(item => item.product.id === productId);
+  const updateCartQty = (cartKey, delta) => {
+    const existing = cart.find(item => item.cartKey === cartKey);
     if (!existing) return;
     const nextQty = existing.quantity + delta;
     let newCart;
     if (nextQty <= 0) {
-      newCart = cart.filter(item => item.product.id !== productId);
-      if (activeProductId === productId) {
-        setActiveProductId(null);
+      newCart = cart.filter(item => item.cartKey !== cartKey);
+      if (activeProductId === existing.product.id) {
+        // Check if there are other items of same product
+        const stillHasProduct = newCart.some(item => item.product.id === existing.product.id);
+        if (!stillHasProduct) setActiveProductId(null);
       }
     } else {
       if (nextQty > existing.product.stock) {
@@ -598,9 +629,9 @@ export default function App() {
         return;
       }
       newCart = cart.map(item =>
-        item.product.id === productId ? { ...item, quantity: nextQty } : item
+        item.cartKey === cartKey ? { ...item, quantity: nextQty } : item
       );
-      if (activeProductId === productId && keypadMode === 'quantity') {
+      if (activeProductId === existing.product.id && keypadMode === 'quantity') {
         setKeypadValue(String(nextQty));
       }
     }
@@ -614,6 +645,7 @@ export default function App() {
       onConfirm: () => {
         updateActiveOrder(() => ({ cart: [] }));
         setActiveProductId(null);
+        activeCartKeyRef.current = null;
         showToast('info', t('toast_clear', 'បានលុប'), t('toast_clear_msg', 'កន្ត្រកទទេហើយ។'));
       }
     });
@@ -637,8 +669,9 @@ export default function App() {
   // ─── Keypad Actions ───────────────────────────────────────
   const changeKeypadMode = (mode) => {
     setKeypadMode(mode);
-    if (activeProductId) {
-      const activeItem = cart.find(item => item.product.id === activeProductId);
+    const cartKey = activeCartKeyRef.current;
+    if (cartKey) {
+      const activeItem = cart.find(item => item.cartKey === cartKey);
       if (activeItem) {
         if (mode === 'quantity') {
           setKeypadValue(String(activeItem.quantity));
@@ -651,10 +684,11 @@ export default function App() {
     }
   };
 
-  const handleSelectCartItem = (productId) => {
-    setActiveProductId(productId);
-    const activeItem = cart.find(item => item.product.id === productId);
+  const handleSelectCartItem = (cartKey) => {
+    const activeItem = cart.find(item => item.cartKey === cartKey);
     if (activeItem) {
+      setActiveProductId(activeItem.product.id);
+      activeCartKeyRef.current = cartKey;
       if (keypadMode === 'quantity') {
         setKeypadValue(String(activeItem.quantity));
       } else if (keypadMode === 'discount') {
@@ -666,7 +700,8 @@ export default function App() {
   };
 
   const handleKeypadPress = (val) => {
-    if (!activeProductId) return;
+    const cartKey = activeCartKeyRef.current;
+    if (!cartKey || !activeProductId) return;
     
     let currentValStr = keypadValue;
     if (val === 'backspace') {
@@ -695,7 +730,7 @@ export default function App() {
     
     updateActiveOrder(order => {
       const updatedCart = order.cart.map(item => {
-        if (item.product.id === activeProductId) {
+        if (item.cartKey === cartKey) {
           if (keypadMode === 'quantity') {
             if (numVal > item.product.stock) {
               showToast('warning', t('toast_limit_stock'), t('toast_limit_stock_msg').replace(':qty', item.product.stock));
@@ -709,11 +744,12 @@ export default function App() {
           }
         }
         return item;
-      }).filter(item => item.quantity > 0 || (item.product.id === activeProductId && keypadMode !== 'quantity'));
+      }).filter(item => item.quantity > 0 || (item.cartKey === cartKey && keypadMode !== 'quantity'));
       
-      const hasActiveItem = updatedCart.some(item => item.product.id === activeProductId);
+      const hasActiveItem = updatedCart.some(item => item.cartKey === cartKey);
       if (!hasActiveItem && keypadMode === 'quantity') {
         setActiveProductId(null);
+        activeCartKeyRef.current = null;
       }
       
       return { cart: updatedCart };
@@ -861,10 +897,16 @@ export default function App() {
         <input type="hidden" name="customer_id" value={selectedCustomerId || ""} />
         {resumeOrder && <input type="hidden" name="resume_order_id" value={resumeOrder.id} />}
         {cart.map((item, index) => (
-          <React.Fragment key={item.product.id}>
+          <React.Fragment key={item.cartKey || item.product.id}>
             <input type="hidden" name={`items[${index}][product_id]`} value={item.product.id} />
             <input type="hidden" name={`items[${index}][quantity]`} value={item.quantity} />
             <input type="hidden" name={`items[${index}][unit_price]`} value={getItemUnitPrice(item)} />
+            {item.selectedSize && (
+              <>
+                <input type="hidden" name={`items[${index}][size_name]`} value={item.selectedSize.size_name} />
+                <input type="hidden" name={`items[${index}][size_id]`} value={item.selectedSize.id} />
+              </>
+            )}
           </React.Fragment>
         ))}
       </form>
@@ -1234,8 +1276,23 @@ export default function App() {
 
                             {/* Price badge - floating */}
                             <span className="pos-price-badge">
-                              ${prod.price.toFixed(2)}
+                              {prod.sizes && prod.sizes.length > 0
+                                ? `$${Math.min(...prod.sizes.map(s => s.price)).toFixed(2)}+`
+                                : `$${prod.price.toFixed(2)}`
+                              }
                             </span>
+
+                            {/* Size indicator */}
+                            {prod.sizes && prod.sizes.length > 0 && (
+                              <span style={{
+                                position: 'absolute', bottom: '4px', left: '4px',
+                                background: 'rgba(99, 102, 241, 0.9)', color: '#fff',
+                                fontSize: '9px', fontWeight: 800, padding: '1px 6px',
+                                borderRadius: '6px', letterSpacing: '0.5px'
+                              }}>
+                                {prod.sizes.length} {prod.sizes.length === 1 ? 'SIZE' : 'SIZES'}
+                              </span>
+                            )}
 
                             {/* Stock dot */}
                             <span className={`pos-stock-dot ${isOutOfStock ? 'bg-red-500' : isLowStock ? 'bg-amber-500' : 'bg-emerald-500'}`} 
@@ -1345,8 +1402,8 @@ export default function App() {
                 ) : (
                   cart.map(item => (
                     <div
-                      key={item.product.id}
-                      onClick={() => handleSelectCartItem(item.product.id)}
+                      key={item.cartKey || item.product.id}
+                      onClick={() => handleSelectCartItem(item.cartKey || String(item.product.id))}
                       className={`pos-cart-item cursor-pointer transition-all ${
                         item.product.id === activeProductId
                           ? 'bg-[#FFF8F0] border-l-2 border-l-[#E76F51]'
@@ -1361,9 +1418,16 @@ export default function App() {
                         )}
                       </div>
                       <div className="pos-cart-item-info">
-                        <div className="pos-cart-item-name">{item.product.name}</div>
+                        <div className="pos-cart-item-name">
+                          {item.product.name}
+                          {item.selectedSize && (
+                            <span style={{ fontSize: '10px', fontWeight: 600, color: '#E76F51', marginLeft: '4px' }}>
+                              ({item.selectedSize.size_name})
+                            </span>
+                          )}
+                        </div>
                         <div className="pos-cart-item-price">
-                          {item.quantity}× ${item.product.price.toFixed(2)}
+                          {item.quantity}× ${(item.customPrice !== undefined ? item.customPrice : item.product.price).toFixed(2)}
                           {item.discount > 0 && <span className="text-[#E76F51] ml-1">(-{item.discount}%)</span>}
                         </div>
                       </div>
@@ -1871,6 +1935,59 @@ export default function App() {
                 {t('cancel', 'បោះបង់ Cancel')}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Size Selection Modal ═══ */}
+      {sizeModal && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+          onClick={() => setSizeModal(null)}
+        >
+          <div
+            className={`w-full max-w-xs rounded-3xl shadow-glass-lg border p-6 flex flex-col gap-4 animate-scale-in ${
+              darkMode ? 'bg-brand-surfDark border-white/10 text-brand-textDark' : 'bg-white border-slate-200 text-brand-textLight'
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <div className="h-12 w-12 rounded-2xl bg-brand-cyan/15 flex items-center justify-center mx-auto mb-3">
+                <CoffeeIcon name={sizeModal.product.name} />
+              </div>
+              <h3 className="text-sm font-black tracking-tight">{sizeModal.product.name}</h3>
+              <p className="text-[11px] text-brand-muted font-semibold mt-1">
+                {currentLang === 'km' ? 'ជ្រើសរើសទំហំ' : currentLang === 'zh' ? '选择尺寸' : 'Select Size'}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {sizeModal.product.sizes.map(sz => (
+                <button
+                  key={sz.id}
+                  onClick={() => {
+                    addProductToCart(sizeModal.product, sz);
+                    setSizeModal(null);
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all border ${
+                    darkMode
+                      ? 'border-white/10 hover:bg-white/5 text-brand-textDark'
+                      : 'border-gray-200 hover:bg-gray-50 text-brand-textLight'
+                  }`}
+                >
+                  <span>{sz.size_name}</span>
+                  <span className="text-brand-cyan font-black">${sz.price.toFixed(2)}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setSizeModal(null)}
+              className={`w-full py-2.5 rounded-xl text-xs font-black border transition-all ${
+                darkMode ? 'border-white/10 text-brand-muted hover:bg-white/5' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              {t('cancel', 'Cancel')}
+            </button>
           </div>
         </div>
       )}
