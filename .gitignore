@@ -4,6 +4,13 @@
 .env
 .env.local
 .env.*.local
+.env.production
+*.log
+error_log
+/logs/*.json
+/public/admin.zip
+/public/api/*.txt
+/config/*.local.php
 .DS_Store
 Thumbs.db
 /vendor

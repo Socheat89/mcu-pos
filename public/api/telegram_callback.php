@@ -5,11 +5,27 @@ header('Content-Type: application/json');
 error_reporting(0); // Be silent on live for stability
 ini_set('display_errors', 0);
 
+$root = dirname(__DIR__, 2);
+$tgConfig = require $root . '/config/telegram.php';
+$token = $tgConfig['bot_token'] ?? '';
+$webhookSecret = $tgConfig['webhook_secret'] ?? '';
+
+if ($webhookSecret !== '') {
+    $providedSecret = $_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '';
+    if (!hash_equals($webhookSecret, $providedSecret)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false]);
+        exit;
+    }
+} elseif (empty($tgConfig['is_local'])) {
+    http_response_code(403);
+    echo json_encode(['ok' => false]);
+    exit;
+}
+
 function debugLog($msg) {
     @file_put_contents(__DIR__ . '/debug_hits.txt', "[" . date("Y-m-d H:i:s") . "] " . $msg . "\n", FILE_APPEND);
 }
-
-$token = '';
 
 try {
     $content = file_get_contents("php://input");
@@ -32,9 +48,13 @@ try {
     foreach(['::', ':', '_'] as $s) { if(strpos($data, $s) !== false) { $sep = $s; break; } }
     if(!$sep) throw new Exception("Invalid separator");
 
-    list($action, $ref) = explode($sep, $data);
+    list($action, $ref) = explode($sep, $data, 2);
     $action = strtolower(trim($action));
     $ref = trim($ref);
+
+    if (!in_array($action, ['approve', 'reject'], true) || !preg_match('/^[A-Za-z0-9._:-]{6,128}$/', $ref)) {
+        throw new Exception('Invalid approval payload');
+    }
 
     // 2. Load Transactions
     require_once __DIR__ . '/TransactionLogger.php';
@@ -58,29 +78,8 @@ try {
     $newText = preg_replace('/Please verify.*/is', '', $newText);
     $newText .= "\n\n<b>Admin Action: $statusText</b>\nTime: " . date('H:i:s');
 
-    // Update Message and Answer UI
-    $token = '';
-    $root = $_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__, 2);
-    $projectRoot = dirname(__DIR__, 2);
-    $normalizedRoot = rtrim(str_replace('\\', '/', $root), '/');
-    $configCandidates = array_unique(array_filter([
-        __DIR__ . '/../../config/telegram.php',
-        $projectRoot . '/config/telegram.php',
-        $normalizedRoot ? ($normalizedRoot . '/config/telegram.php') : null
-    ]));
-
-    foreach ($configCandidates as $path) {
-        if ($path && file_exists($path)) {
-            $tgConfig = require $path;
-            $token = $tgConfig['bot_token'] ?? '';
-            if (!empty($token)) {
-                break;
-            }
-        }
-    }
-
     if (empty($token)) {
-        throw new Exception('Telegram token missing or config not found');
+        throw new Exception('Telegram token missing');
     }
 
     if (!empty($token)) {
@@ -95,12 +94,12 @@ try {
     debugLog("ERROR: " . $e->getMessage());
     try {
         if (!empty($token) && !empty($callbackId)) {
-            answerCallback($callbackId, 'Approval failed: ' . $e->getMessage(), $token);
+            answerCallback($callbackId, 'Approval failed', $token);
         }
     } catch (Throwable $inner) {
         debugLog('ERROR (callback reply): ' . $inner->getMessage());
     }
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['ok' => false, 'error' => 'Approval failed']);
 }
 
 function answerCallback($id, $text, $token) {

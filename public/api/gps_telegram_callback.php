@@ -11,6 +11,25 @@ require_once $root . '/config/telegram.php';
 
 $sysConfig = require $root . '/config/telegram.php';
 $BOT_TOKEN = $sysConfig['bot_token'] ?? '';
+$webhookSecret = $sysConfig['webhook_secret'] ?? '';
+
+if ($webhookSecret !== '') {
+    $providedSecret = $_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '';
+    if (!hash_equals($webhookSecret, $providedSecret)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false]);
+        exit;
+    }
+} elseif (empty($sysConfig['is_local'])) {
+    http_response_code(403);
+    echo json_encode(['ok' => false]);
+    exit;
+}
+
+if ($BOT_TOKEN === '') {
+    echo json_encode(['ok' => true]);
+    exit;
+}
 
 $update = json_decode(file_get_contents('php://input'), true);
 if (!$update) { echo json_encode(['ok' => true]); exit; }
@@ -148,7 +167,7 @@ function generateOrGetCode($db, $chatId, $chatTitle, $chatType, $botToken) {
     $db->insert('telegram_pending_links', [
         'setup_code' => $code, 'chat_id' => $chatId,
         'chat_title' => $chatTitle, 'chat_type' => $chatType,
-        'bot_token'  => $botToken,
+        'bot_token'  => null,
         'expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours'))
     ]);
     return $code;

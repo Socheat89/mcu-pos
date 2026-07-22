@@ -25,6 +25,10 @@ class BakongRelay {
         if (is_writable($logDir)) {
              // file_put_contents($logDir . '/payment_debug.log', date('[Y-m-d H:i:s] ') . "Config Loaded: " . json_encode($config) . "\n", FILE_APPEND);
         }
+
+        if (empty($config['api_token']) || empty($config['bank_account']) || empty($config['merchant_name'])) {
+            throw new RuntimeException('Bakong credentials are not configured.');
+        }
         
         $this->token = $config['api_token'];
         $this->baseUrl = rtrim($config['base_url'], '/');
@@ -60,7 +64,7 @@ class BakongRelay {
             
             $billNumber = 'BILL' . date('ymd') . rand(1000, 9999);
             
-            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Model info: BankAcc={$this->bankAccount}, Merchant={$this->merchantName}" . "\n", FILE_APPEND);
+            file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Model info prepared for QR generation\n", FILE_APPEND);
 
             if (strpos($this->bankAccount, '@') !== false) {
                 // Individual Account
@@ -139,12 +143,12 @@ class BakongRelay {
             if (is_writable($logDir)) {
                 file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Exception in generateQR: " . $e->getMessage() . "\n", FILE_APPEND);
             }
-            return ['success' => false, 'error' => 'Local Generation Error: ' . $e->getMessage()];
+            return ['success' => false, 'error' => 'QR generation failed'];
         } catch (\Error $e) {
             if (is_writable($logDir)) {
                 file_put_contents($logFile, date('[Y-m-d H:i:s] ') . "Fatal Error in generateQR: " . $e->getMessage() . "\n", FILE_APPEND);
             }
-            return ['success' => false, 'error' => 'System Error: ' . $e->getMessage()];
+            return ['success' => false, 'error' => 'QR generation failed'];
         }
     }
 
@@ -176,8 +180,7 @@ class BakongRelay {
                 if (isset($officialResult['responseCode']) && ($officialResult['responseCode'] === 0 || $officialResult['responseCode'] === '00')) {
                     return ['success' => true, 'data' => $officialResult];
                 } else {
-                    $msg = $officialResult['responseMessage'] ?? ($officialResult['error'] ?? 'NBC API Rejected');
-                    return ['success' => false, 'error' => 'NBC Error: ' . $msg, 'response' => $officialResult];
+                    return ['success' => false, 'error' => 'Payment verification rejected'];
                 }
             } catch (\Exception $e) {
                  if (is_writable($logDir)) {
@@ -352,8 +355,7 @@ class BakongRelay {
         // If all retries failed
         return [
             'success' => false,
-            'error' => "API Error: Max Retries Exceeded (Likely IP Blocked)",
-            'response' => $response ?? null
+            'error' => 'Payment API request failed'
         ];
     }
 }

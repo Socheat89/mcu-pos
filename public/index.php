@@ -506,8 +506,9 @@ $structuredData = [
                 <?php endforeach; ?>
                 <?php } 
                 } catch (Exception $e) {
+                    error_log('Pricing page database error: ' . $e->getMessage());
                     echo '<div style="grid-column: 1/-1; color: #f87171; padding: 1rem; border: 1px solid #ef4444; border-radius: 0.5rem; background: rgba(239, 68, 68, 0.1);">
-                            <strong>DATABASE ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '
+                            <strong>PLANS UNAVAILABLE:</strong> Please try again shortly.
                            </div>';
 
                 }

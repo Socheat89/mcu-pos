@@ -39,10 +39,10 @@ try {
     // For login, we need to determine the tenant
     $db = Database::getInstance();
     $user = $db->fetchOne(
-        "SELECT u.*, t.subdomain, r.name as role_name, r.level as role_level 
-         FROM users u 
-         JOIN tenants t ON u.tenant_id = t.id 
-         JOIN roles r ON u.role_id = r.id 
+        "SELECT u.*, t.subdomain, r.name as role_name, r.level as role_level
+         FROM users u
+         JOIN tenants t ON u.tenant_id = t.id
+         JOIN roles r ON u.role_id = r.id
          WHERE u.username = ? AND u.status = 'active' AND t.status = 'active'",
         [$username]
     );
@@ -87,10 +87,10 @@ try {
 } catch (Throwable $e) {
     error_log("Login Error: " . $e->getMessage());
     if ($isAjax) {
-        echo json_encode(['success' => false, 'error' => 'System error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'error' => 'System error occurred']);
         exit;
     }
-    header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred: ' . $e->getMessage()));
+    header("Location: $urlPrefix/login.php?error=" . urlencode('System error occurred'));
     exit;
 }
 
@@ -156,4 +156,4 @@ function _issue_remember_me_token(int $userId, $db): void {
         error_log("Remember Me Error: " . $e->getMessage());
     }
 }
-?>
+?>

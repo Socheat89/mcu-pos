@@ -344,7 +344,8 @@ class OrderController {
 
         } catch (Exception $e) {
             $db->getConnection()->rollBack();
-            die('Order creation failed: ' . $e->getMessage());
+            error_log('Order creation failed for tenant ' . $tenantId . ': ' . $e->getMessage());
+            die('Order creation failed. Please review the order and try again.');
         }
     }
 

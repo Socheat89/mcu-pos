@@ -687,31 +687,18 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     function testPosTelegram() {
                         const msgEl = document.getElementById('posTgConfigMsg');
                         msgEl.innerHTML = '<span style="color:#0088cc;">⏳ កំពុងផ្ញើសារសាកល្បង...</span>';
-                        fetch('<?php echo mc_base_path(); ?>/public/api/gps_telegram_config.php')
-                        .then(res => res.json())
-                        .then(data => {
-                            if (!data.success || !data.config || !data.config.chat_id) {
-                                msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនទាន់បានភ្ជាប់ Telegram ទេ។</span>';
-                                return;
-                            }
-                            const botToken = data.config.bot_token || '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
-                            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-                            return fetch(url, {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({
-                                    chat_id: data.config.chat_id,
-                                    text: '🔔 <b>សាកល្បងការជូនដំណឹង / Test Notification</b>\n\nប្រព័ន្ធ MCU POS បានភ្ជាប់ជាមួយ Telegram របស់អ្នកដោយរលូន!',
-                                    parse_mode: 'HTML'
-                                })
-                            });
+                        fetch('<?php echo mc_base_path(); ?>/public/api/gps_telegram_config.php', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ action: 'test' })
                         })
-                        .then(res => res ? res.json() : null)
+                        .then(res => res.json())
                         .then(res => {
-                            if (res && res.ok) {
+                            if (res && res.success) {
                                 msgEl.innerHTML = '<span style="color:#10b981;">✅ បានផ្ញើសារសាកល្បងទៅកាន់ក្រុម Telegram រួចរាល់!</span>';
-                            } else if (res) {
-                                msgEl.innerHTML = `<span style="color:#ef4444;">❌ Telegram API: ${res.description || ' Error'}</span>`;
+                            } else {
+                                msgEl.innerHTML = `<span style="color:#ef4444;">❌ ${res.error || 'មិនអាចផ្ញើសារបានទេ។'}</span>`;
                             }
                         })
                         .catch(() => {

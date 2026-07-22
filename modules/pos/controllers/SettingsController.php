@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
 require_once __DIR__ . '/../../../core/classes/User.php';
 require_once __DIR__ . '/../../../core/classes/Tenant.php';
 require_once __DIR__ . '/../../../core/helpers/url.php';
+require_once __DIR__ . '/../../../core/helpers/upload.php';
 
 class SettingsController {
     public function index() {
@@ -128,33 +129,25 @@ class SettingsController {
              // Handle Logo Upload if present
              if (isset($_FILES['logo_upload']) && $_FILES['logo_upload']['error'] === UPLOAD_ERR_OK) {
                  $uploadDir = __DIR__ . '/../../../public/uploads/tenants/' . $tenantId . '/';
-                 if (!is_dir($uploadDir)) {
-                     mkdir($uploadDir, 0777, true);
-                 }
-                 
-                 $fileName = 'logo_' . time() . '_' . basename($_FILES['logo_upload']['name']);
-                 $targetPath = $uploadDir . $fileName;
-                 
-                 if (move_uploaded_file($_FILES['logo_upload']['tmp_name'], $targetPath)) {
+                 try {
+                     $fileName = mc_store_uploaded_image_as_webp($_FILES['logo_upload'], $uploadDir, 'logo_' . $tenantId);
                      $webPath = mc_url('public/uploads/tenants/' . $tenantId . '/' . $fileName);
                      Settings::set('receipt_logo_path', $webPath, $tenantId);
+                 } catch (Throwable $e) {
+                     error_log('Receipt logo upload error: ' . $e->getMessage());
                  }
              }
 
              // Handle KHQR Image Upload if present
              if (isset($_FILES['khqr_upload']) && $_FILES['khqr_upload']['error'] === UPLOAD_ERR_OK) {
                  $uploadDir = __DIR__ . '/../../../public/uploads/tenants/' . $tenantId . '/';
-                 if (!is_dir($uploadDir)) {
-                     mkdir($uploadDir, 0777, true);
-                 }
-                 
-                 $fileName = 'khqr_' . time() . '_' . basename($_FILES['khqr_upload']['name']);
-                 $targetPath = $uploadDir . $fileName;
-                 
-                 if (move_uploaded_file($_FILES['khqr_upload']['tmp_name'], $targetPath)) {
+                 try {
+                     $fileName = mc_store_uploaded_image_as_webp($_FILES['khqr_upload'], $uploadDir, 'khqr_' . $tenantId);
                      $webPath = mc_url('public/uploads/tenants/' . $tenantId . '/' . $fileName);
                      Settings::set('pos_method_khqr_image', $webPath, $tenantId);
                      Settings::set('payment_qr_path', $webPath, $tenantId);
+                 } catch (Throwable $e) {
+                     error_log('KHQR image upload error: ' . $e->getMessage());
                  }
              }
 

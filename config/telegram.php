@@ -1,13 +1,15 @@
 <?php
 // config/telegram.php
 
-$isLocal = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', '::1'])
-    || (strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false);
+require_once __DIR__ . '/env.php';
+
+$isLocal = mc_is_local_request();
 
 return [
-    'bot_token'    => '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY',
-    'chat_id'      => '7372079283',
+    'bot_token'      => mc_env('MC_TELEGRAM_BOT_TOKEN', ''),
+    'chat_id'        => mc_env('MC_TELEGRAM_CHAT_ID', ''),
+    'webhook_secret' => mc_env('MC_TELEGRAM_WEBHOOK_SECRET', ''),
     // Local = empty (use polling/sync_telegram.php), Live = webhook URL
-    'callback_url' => $isLocal ? '' : 'https://mcu-pos.me/public/api/gps_telegram_callback.php',
-    'is_local'     => $isLocal,
+    'callback_url'   => mc_env('MC_TELEGRAM_CALLBACK_URL', $isLocal ? '' : ''),
+    'is_local'       => $isLocal,
 ];

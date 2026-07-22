@@ -1,18 +1,25 @@
 <?php
 /**
  * GPS Tracking Migration for Production
- * Visit: https://pos.mekongcyberunit.app/public/api/migrate_gps.php?key=mcu-deploy-2026
- * Or: https://mcu-pos.me/public/api/migrate_gps.php?key=mcu-deploy-2026
+ * Disabled by default. Enable only temporarily with MC_ENABLE_WEB_MIGRATIONS=1
+ * and MC_MIGRATION_KEY set in the server environment.
  * 
  * This creates the GPS tracking tables on your production database.
  * Safe to run multiple times — skips existing tables.
  */
 
-// Security key
+require_once __DIR__ . '/../../config/env.php';
+
+$requiredKey = mc_env('MC_MIGRATION_KEY', '');
+if (!mc_bool_env('MC_ENABLE_WEB_MIGRATIONS', false) || $requiredKey === '') {
+    http_response_code(404);
+    die('<h1>404 - Not Found</h1>');
+}
+
 $secretKey = $_GET['key'] ?? '';
-if ($secretKey !== 'mcu-deploy-2026') {
+if (!hash_equals((string) $requiredKey, (string) $secretKey)) {
     http_response_code(403);
-    die('<h1>403 - Access Denied</h1><p>Add ?key=mcu-deploy-2026 to the URL.</p>');
+    die('<h1>403 - Access Denied</h1>');
 }
 
 require_once __DIR__ . '/../../core/classes/Database.php';
@@ -52,7 +59,8 @@ try {
                 preg_match('/ADD COLUMN\s+`?(\w+)`?/i', $stmt, $m);
                 echo '<span class="skip">⏭️  Skip:</span> ' . ($m[1] ?? 'column') . " (already exists)\n";
             } else {
-                echo '<span class="err">❌ Error:</span> ' . htmlspecialchars($msg) . "\n";
+                error_log('GPS migration statement failed: ' . $msg);
+                echo '<span class="err">❌ Error:</span> Could not apply migration statement.\n';
             }
         }
     }
@@ -70,7 +78,8 @@ try {
                 echo "<span class=\"err\">❌</span> $t — NOT FOUND\n";
             }
         } catch (Exception $e) {
-            echo "<span class=\"err\">❌</span> $t — ERROR: " . htmlspecialchars($e->getMessage()) . "\n";
+            error_log('GPS migration verification failed for ' . $t . ': ' . $e->getMessage());
+            echo "<span class=\"err\">❌</span> $t — ERROR\n";
         }
     }
     echo '</pre>';
@@ -80,8 +89,9 @@ try {
     echo '<p><a href="../.." style="color:#06b6d4;">← Back to Dashboard</a></p>';
 
 } catch (Exception $e) {
+    error_log('GPS migration connection failed: ' . $e->getMessage());
     echo '<h2 class="err">❌ Connection Failed</h2>';
-    echo '<pre class="err">' . htmlspecialchars($e->getMessage()) . '</pre>';
+    echo '<pre class="err">Unable to connect to the database.</pre>';
 }
 
 echo '</body></html>';

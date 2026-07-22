@@ -4,8 +4,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ob_start();
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('GET, OPTIONS');
 
 // -------------------------------------------------------------
 // STANDALONE CLASS (No external file needed)
@@ -22,29 +23,10 @@ class BakongFinal {
     private $terminalLabel;
 
     public function __construct() {
-        $root = $_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__, 2);
-        $projectRoot = dirname(__DIR__, 2);
-        $normalizedRoot = rtrim(str_replace('\\', '/', $root), '/');
-        
-        $possiblePaths = array_unique(array_filter([
-            $projectRoot . '/config/bakong.php',
-            __DIR__ . '/../../config/bakong.php',
-            $normalizedRoot ? ($normalizedRoot . '/config/bakong.php') : null
-        ]));
-
-        $configPath = null;
-        foreach ($possiblePaths as $path) {
-            if (file_exists($path)) {
-                $configPath = $path;
-                break;
-            }
+        $config = require dirname(__DIR__, 2) . '/config/bakong.php';
+        if (empty($config['api_token']) || empty($config['bank_account']) || empty($config['merchant_name'])) {
+            throw new Exception('Bakong credentials are not configured.');
         }
-
-        if (!$configPath) {
-             $searched = implode(" || ", $possiblePaths);
-            throw new Exception("Config not found! Searched: " . $searched);
-        }
-        $config = require $configPath;
         
         $this->token = $config['api_token'];
         $this->baseUrl = rtrim($config['base_url'], '/');
@@ -77,7 +59,7 @@ class BakongFinal {
             }
 
             if (!$autoloadPath) {
-                return ['success' => false, 'error' => 'Vendor Autoload missing. Please upload "vendor" folder.'];
+                return ['success' => false, 'error' => 'Payment library is unavailable.'];
             }
             require_once $autoloadPath;
             
@@ -122,7 +104,8 @@ class BakongFinal {
             return ['success' => false, 'error' => 'Failed to generate KHQR data'];
 
         } catch (\Exception $e) {
-            return ['success' => false, 'error' => 'Gen Error: ' . $e->getMessage()];
+            error_log('Final QR generation error: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'QR generation failed'];
         }
     }
 }
@@ -140,8 +123,7 @@ if (isset($_GET['amount']) && is_numeric($_GET['amount'])) $amount = (float)$_GE
 
 if ($amount <= 0) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Invalid amount']);
-    exit;
+    mc_json_error('Invalid amount', 400);
 }
 
 try {
@@ -153,7 +135,7 @@ try {
         $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($result['qr']);
         
         ob_clean();
-        echo json_encode([
+        mc_json([
             'success' => true,
             'qr' => $result['qr'], // String
             'md5' => $result['md5'],
@@ -161,11 +143,13 @@ try {
             'is_static' => false
         ]);
     } else {
+        error_log('Final QR error: ' . ($result['error'] ?? 'Unknown error'));
         ob_clean();
-        echo json_encode(['success' => false, 'error' => $result['error']]);
+        mc_json_error('QR generation failed', 502);
     }
 } catch (Exception $e) {
+    error_log('Final QR error: ' . $e->getMessage());
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Critical Error V5: ' . $e->getMessage()]);
+    mc_json_error('QR generation failed', 500);
 }
 ?>

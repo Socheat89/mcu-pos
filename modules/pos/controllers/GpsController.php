@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../../core/classes/Database.php';
 require_once __DIR__ . '/../../../core/classes/Tenant.php';
 require_once __DIR__ . '/../../../core/classes/Auth.php';
 require_once __DIR__ . '/../../../core/classes/TelegramBot.php';
+require_once __DIR__ . '/../../../core/helpers/api.php';
 require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
 
@@ -81,8 +82,7 @@ class GpsController {
     /* ========== API: Get live locations for dashboard (AJAX polling) ========== */
 
     public function apiLiveLocations() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('GET, OPTIONS');
 
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -121,8 +121,7 @@ class GpsController {
     /* ========== API: Get location history for a specific session ========== */
 
     public function apiLocationHistory() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('GET, OPTIONS');
 
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -163,8 +162,7 @@ class GpsController {
     /* ========== API: Receive GPS ping from seller's device ========== */
 
     public function apiTrack() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('POST, OPTIONS');
 
         // Must be authenticated
         AuthMiddleware::handle();
@@ -188,7 +186,7 @@ class GpsController {
         $latitude  = isset($input['latitude']) ? (float)$input['latitude'] : null;
         $longitude = isset($input['longitude']) ? (float)$input['longitude'] : null;
 
-        if (!$latitude || !$longitude) {
+        if ($latitude === null || $longitude === null || $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
             echo json_encode(['success' => false, 'error' => 'Missing latitude/longitude']);
             exit;
         }
@@ -259,8 +257,7 @@ class GpsController {
     /* ========== API: Stop GPS tracking (called when session closes) ========== */
 
     public function apiStop() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('POST, OPTIONS');
 
         AuthMiddleware::handle();
 
@@ -396,8 +393,7 @@ class GpsController {
     /* ========== API: Save Telegram Config for tenant ========== */
 
     public function apiSaveTelegramConfig() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('POST, OPTIONS');
 
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -422,8 +418,7 @@ class GpsController {
         );
 
         $data = [
-            'bot_token'           => $input['bot_token'] ?? null,
-            'chat_id'             => $input['chat_id'] ?? null,
+            'chat_id'             => isset($input['chat_id']) ? substr(trim((string) $input['chat_id']), 0, 100) : null,
             'notify_session_open' => isset($input['notify_session_open']) ? (int)$input['notify_session_open'] : 1,
             'notify_session_close'=> isset($input['notify_session_close']) ? (int)$input['notify_session_close'] : 1,
             'notify_sales_report' => isset($input['notify_sales_report']) ? (int)$input['notify_sales_report'] : 1,
@@ -434,7 +429,9 @@ class GpsController {
         if ($existing) {
             $db->update('tenant_telegram_config', $data, 'id = ?', [$existing['id']]);
         } else {
+            $sysConfig = require __DIR__ . '/../../../config/telegram.php';
             $data['tenant_id'] = $tenantId;
+            $data['bot_token'] = $sysConfig['bot_token'] ?? '';
             $db->insert('tenant_telegram_config', $data);
         }
 
@@ -445,8 +442,7 @@ class GpsController {
     /* ========== API: Get Telegram Config ========== */
 
     public function apiGetTelegramConfig() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('GET, OPTIONS');
 
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -455,7 +451,10 @@ class GpsController {
         $tenantId = Tenant::getId();
 
         $config = $db->fetchOne(
-            "SELECT * FROM tenant_telegram_config WHERE tenant_id = ?",
+            "SELECT chat_id, chat_title, setup_code, notify_session_open, notify_session_close,
+                    notify_sales_report, notify_gps_start, notify_gps_stop, is_active,
+                    CASE WHEN bot_token IS NULL OR bot_token = '' THEN 0 ELSE 1 END AS bot_configured
+               FROM tenant_telegram_config WHERE tenant_id = ?",
             [$tenantId]
         );
 
@@ -466,8 +465,7 @@ class GpsController {
     /* ========== API: Send test Telegram message ========== */
 
     public function apiTestTelegram() {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        mc_api_apply_cors('POST, OPTIONS');
 
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -507,7 +505,7 @@ class GpsController {
 
         $result = $this->sendTelegramRaw($botToken, $chatId, $message);
 
-        echo json_encode(['success' => true, 'message' => 'Test message sent', 'result' => $result]);
+        echo json_encode(['success' => true, 'message' => 'Test message sent']);
         exit;
     }
 }

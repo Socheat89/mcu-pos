@@ -2,6 +2,20 @@
 // public/api/reset_cache.php
 // Clears PHP OPcache and stat cache on production server
 
+require_once __DIR__ . '/../../config/env.php';
+
+$requiredKey = mc_env('MC_CACHE_RESET_KEY', '');
+if (!mc_bool_env('MC_ENABLE_WEB_CACHE_RESET', false) || $requiredKey === '') {
+    http_response_code(404);
+    die('<h1>404 - Not Found</h1>');
+}
+
+$providedKey = $_GET['key'] ?? '';
+if (!hash_equals((string) $requiredKey, (string) $providedKey)) {
+    http_response_code(403);
+    die('<h1>403 - Access Denied</h1>');
+}
+
 if (function_exists('opcache_reset')) {
     @opcache_reset();
     $status = "✅ PHP OPcache reset successfully!";

@@ -2,25 +2,16 @@
 // public/api/gps_stop.php
 // API to stop GPS tracking (called when POS session closes)
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
 $root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('POST, OPTIONS');
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
 require_once $root . '/core/classes/Tenant.php';
 require_once $root . '/core/classes/Auth.php';
 
 if (!Auth::check()) {
-    echo json_encode(['success' => false, 'error' => 'Authentication required']);
-    exit;
+    mc_json_error('Authentication required', 401);
 }
 
 $db = Database::getInstance();
@@ -95,5 +86,4 @@ if ($trackingSession) {
     }
 }
 
-echo json_encode(['success' => true, 'message' => 'Tracking stopped']);
-exit;
+mc_json(['success' => true, 'message' => 'Tracking stopped']);

@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: $urlPrefix/public/login.php?success=" . urlencode('Your password has been changed successfully. Please log in with your new password.'));
             exit;
         } catch (Exception $e) {
-            $error = 'Failed to update password: ' . $e->getMessage();
+            error_log('Change expired password error: ' . $e->getMessage());
+            $error = 'Failed to update password. Please try again.';
         }
     }
 }

@@ -1,16 +1,16 @@
 <?php
 // public/api/check_approval.php
 // VERSION: V5_ROBUST_PATH
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); 
 error_reporting(0); 
+
+require_once __DIR__ . '/../../core/helpers/api.php';
+mc_api_preflight('GET, OPTIONS');
 
 // Accept both 'md5' and 'ref' parameters for compatibility
 $md5 = $_GET['md5'] ?? $_GET['ref'] ?? '';
 
 if (empty($md5)) {
-    echo json_encode(['success' => false, 'status' => 'INVALID']);
-    exit;
+    mc_json(['success' => false, 'status' => 'INVALID'], 400);
 }
 
 // HARDENED PATH LOGIC V7 (Using Class)
@@ -28,30 +28,25 @@ try {
         $statusDb = strtoupper($dbTx['status']);
     }
 } catch (Exception $e) {
-    $statusDb = 'DB_ERROR: ' . $e->getMessage();
+    error_log('Approval status DB error: ' . $e->getMessage());
+    $statusDb = 'DB_ERROR';
 }
 
 $finalStatus = ($statusJson !== 'NOT_FOUND') ? $statusJson : $statusDb;
 
 if ($finalStatus !== 'NOT_FOUND') {
     if ($finalStatus === 'APPROVED' || $finalStatus === 'SUCCESS') {
-        echo json_encode(['success' => true, 'status' => 'SUCCESS', 'db' => $statusDb, 'json' => $statusJson]);
+        mc_json(['success' => true, 'status' => 'SUCCESS']);
     } elseif ($finalStatus === 'REJECTED') {
-        echo json_encode(['success' => true, 'status' => 'REJECTED', 'db' => $statusDb, 'json' => $statusJson]); 
+        mc_json(['success' => true, 'status' => 'REJECTED']);
     } else {
         // Return PENDING status as is
-        echo json_encode(['success' => true, 'status' => $finalStatus, 'db' => $statusDb, 'json' => $statusJson]);
+        mc_json(['success' => true, 'status' => $finalStatus]);
     }
 } else {
-    echo json_encode([
+    mc_json([
         'success' => false, 
-        'status' => 'NOT_FOUND', 
-        'debug' => [
-            'path' => TransactionLogger::getPath(),
-            'db_status' => $statusDb,
-            'json_status' => $statusJson,
-            'reference_id' => $md5
-        ]
-    ]);
+        'status' => 'NOT_FOUND'
+    ], 404);
 }
 ?>

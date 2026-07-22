@@ -2,6 +2,7 @@
 // admin/register_process.php
 require_once __DIR__ . '/../core/bootstrap_session.php';
 require_once __DIR__ . '/../core/classes/Database.php';
+require_once __DIR__ . '/../config/env.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: register.php");
@@ -25,11 +26,24 @@ if ($password !== $confirm_password) {
     exit;
 }
 
-// Security Check (Simple Hardcoded Key for Setup Phase)
-// Allowed keys: Mekong2026, admin, 123456
-$valid_secrets = ['Mekong2026', 'admin', '123456'];
-if (!in_array($secret, $valid_secrets)) {
-     header("Location: register.php?error=" . urlencode('Invalid Admin Secret Key'));
+if (strlen($password) < 12) {
+    header("Location: register.php?error=" . urlencode('Password must be at least 12 characters'));
+    exit;
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header("Location: register.php?error=" . urlencode('Valid email is required'));
+    exit;
+}
+
+$expectedSecret = mc_env('MC_ADMIN_SETUP_SECRET', '');
+if ($expectedSecret === '') {
+    header("Location: register.php?error=" . urlencode('Admin registration is disabled until MC_ADMIN_SETUP_SECRET is configured.'));
+    exit;
+}
+
+if (!hash_equals((string) $expectedSecret, (string) $secret)) {
+    header("Location: register.php?error=" . urlencode('Invalid Admin Secret Key'));
     exit;
 }
 
@@ -74,6 +88,6 @@ try {
 } catch (Exception $e) {
     // Log error for debug
     error_log("Register Error: " . $e->getMessage());
-    header("Location: register.php?error=" . urlencode('System Error: ' . $e->getMessage()));
+    header("Location: register.php?error=" . urlencode('System error occurred.'));
     exit;
 }

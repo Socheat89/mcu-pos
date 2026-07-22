@@ -4,8 +4,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ob_start();
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Allow CORS for testing
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('GET, OPTIONS');
 
 // -------------------------------------------------------------
 // EMBEDDED Check - Rename Class to avoid conflicts
@@ -47,16 +48,18 @@ if (!class_exists('BakongRelayEmbed')) {
             }
 
             if (!$configPath) {
-                // Return detailed error for debugging
-                $searched = implode(" || ", $possiblePaths);
-                throw new Exception("V5 Config Missing! Searched in: " . $searched);
+                throw new Exception("Bakong config missing.");
             }
 
             $config = require $configPath;
             
             // Validate Config
             if (!is_array($config) || !isset($config['api_token'])) {
-                throw new Exception("Invalid Config Config content at: " . $configPath);
+                throw new Exception("Invalid Bakong config.");
+            }
+
+            if (empty($config['api_token']) || empty($config['bank_account']) || empty($config['merchant_name'])) {
+                throw new Exception("Bakong credentials are not configured.");
             }
             
             $this->token = $config['api_token'];
@@ -88,8 +91,7 @@ if (!class_exists('BakongRelayEmbed')) {
                 }
 
                 if (!$autoloadPath) {
-                    $searched = implode(" || ", $possibleAutoloads);
-                    return ['success' => false, 'error' => 'Vendor Autoload missing. Searched: ' . $searched];
+                    return ['success' => false, 'error' => 'Payment library is unavailable.'];
                 }
                 
                 require_once $autoloadPath;
@@ -144,7 +146,8 @@ if (!class_exists('BakongRelayEmbed')) {
                 }
                 return ['success' => false, 'error' => 'Failed to generate KHQR string'];
             } catch (\Exception $e) {
-                return ['success' => false, 'error' => 'Local Gen Error: ' . $e->getMessage()];
+                error_log('Bakong QR generation error: ' . $e->getMessage());
+                return ['success' => false, 'error' => 'QR generation failed'];
             }
         }
 
@@ -175,8 +178,7 @@ if (isset($_GET['amount']) && is_numeric($_GET['amount'])) {
 
 if ($amount <= 0) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Invalid plan or amount']);
-    exit;
+    mc_json_error('Invalid plan or amount', 400);
 }
 
 // Case 1: ACLEDA (Static QR)
@@ -204,7 +206,7 @@ try {
         $imageResult = $bakong->generateQRImage($qrData['qr']);
         
         ob_clean();
-        echo json_encode([
+        mc_json([
             'success' => true,
             'qr' => $qrData['qr'],
             'md5' => $qrData['md5'],
@@ -214,12 +216,13 @@ try {
         ]);
     } else {
         $errorMsg = $result['error'] ?? 'QR generation failed';
+        error_log('Bakong QR error: ' . $errorMsg);
         ob_clean();
-        echo json_encode(['success' => false, 'error' => $errorMsg]);
+        mc_json_error('QR generation failed', 502);
     }
 } catch (Exception $e) {
+    error_log('Bakong QR error: ' . $e->getMessage());
     ob_clean();
-    // V5 Error Message to verify this file is active
-    echo json_encode(['success' => false, 'error' => 'V5 Error: ' . $e->getMessage()]);
+    mc_json_error('QR generation failed', 500);
 }
 ?>

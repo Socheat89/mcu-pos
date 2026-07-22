@@ -2,12 +2,12 @@
 // public/api/gps_dashboard.php
 // Live GPS Dashboard API - Returns real-time locations for owner dashboard
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('GET, OPTIONS');
 
 try {
 
-$root = dirname(__DIR__, 2);
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
 require_once $root . '/core/classes/Tenant.php';
@@ -15,8 +15,7 @@ require_once $root . '/core/classes/Auth.php';
 
 // Must be authenticated
 if (!Auth::check()) {
-    echo json_encode(['success' => false, 'error' => 'Authentication required']);
-    exit;
+    mc_json_error('Authentication required', 401);
 }
 
 $db = Database::getInstance();
@@ -24,8 +23,7 @@ $tenantId = Tenant::getId();
 
 // Admin only for full dashboard
 if (!Auth::isTenantAdmin()) {
-    echo json_encode(['success' => false, 'error' => 'Admin access required']);
-    exit;
+    mc_json_error('Admin access required', 403);
 }
 
 $action = $_GET['action'] ?? 'live';
@@ -58,8 +56,7 @@ switch ($action) {
             }
         }
 
-        echo json_encode(['success' => true, 'sessions' => $result]);
-        break;
+        mc_json(['success' => true, 'sessions' => $result]);
 
     case 'history':
         // Get location history for a specific tracking session
@@ -67,8 +64,7 @@ switch ($action) {
         $limit = isset($_GET['limit']) ? min((int)$_GET['limit'], 500) : 200;
 
         if (!$trackingId) {
-            echo json_encode(['success' => false, 'error' => 'Missing tracking_id']);
-            exit;
+            mc_json_error('Missing tracking_id', 400);
         }
 
         // Verify ownership
@@ -77,8 +73,7 @@ switch ($action) {
             [$trackingId, $tenantId]
         );
         if (!$session) {
-            echo json_encode(['success' => false, 'error' => 'Session not found']);
-            exit;
+            mc_json_error('Session not found', 404);
         }
 
         $locations = $db->fetchAll(
@@ -90,8 +85,7 @@ switch ($action) {
             [$trackingId, $limit]
         );
 
-        echo json_encode(['success' => true, 'locations' => $locations]);
-        break;
+        mc_json(['success' => true, 'locations' => $locations]);
 
     case 'stats':
         // Get tracking statistics for this tenant
@@ -112,7 +106,7 @@ switch ($action) {
             [$tenantId, $todayStart]
         );
 
-        echo json_encode([
+        mc_json([
             'success' => true,
             'stats' => [
                 'active_trackers'   => (int)($activeCount['cnt'] ?? 0),
@@ -120,15 +114,12 @@ switch ($action) {
                 'today_points'      => (int)($todayPoints['cnt'] ?? 0),
             ]
         ]);
-        break;
 
     default:
-        echo json_encode(['success' => false, 'error' => 'Unknown action']);
-        break;
+        mc_json_error('Unknown action', 400);
 }
 
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
+    mc_log_exception('GPS dashboard error', $e);
+    mc_json_error('Server error', 500);
 }
-
-exit;

@@ -54,7 +54,8 @@ class Database
     public function insert($table, $data)
     {
 
-        $columns = implode(', ', array_keys($data));
+        $table = $this->quoteIdentifier($table);
+        $columns = implode(', ', array_map([$this, 'quoteIdentifier'], array_keys($data)));
         $placeholders = ':' . implode(', :', array_keys($data));
         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
         $this->query($sql, $data);
@@ -64,9 +65,10 @@ class Database
     public function update($table, $data, $where, $whereParams = [])
     {
 
+        $table = $this->quoteIdentifier($table);
         $set = [];
         foreach ($data as $key => $value) {
-            $set[] = "{$key} = :{$key}";
+            $set[] = $this->quoteIdentifier($key) . " = :{$key}";
         }
         $setStr = implode(', ', $set);
 
@@ -90,6 +92,7 @@ class Database
     public function delete($table, $where, $params = [])
     {
 
+        $table = $this->quoteIdentifier($table);
         $sql = "DELETE FROM {$table} WHERE {$where}";
         return $this->query($sql, $params)->rowCount();
     }
@@ -97,6 +100,15 @@ class Database
     public function execute($sql, $params = [])
     {
         return $this->query($sql, $params);
+    }
+
+    private function quoteIdentifier($identifier)
+    {
+        if (!is_string($identifier) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $identifier)) {
+            throw new InvalidArgumentException('Invalid database identifier.');
+        }
+
+        return '`' . $identifier . '`';
     }
 }
 ?>

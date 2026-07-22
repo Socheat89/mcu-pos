@@ -1,13 +1,15 @@
 <?php
 // config/bakong.php
 
+require_once __DIR__ . '/env.php';
+
 return [
-    'api_token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiZmYwNmNkZTY1MDMxNDRiOCJ9LCJpYXQiOjE3Njg5OTg0ODUsImV4cCI6MTc3Njc3NDQ4NX0.v6R1FLiSgchrHmUF1WQAV4AAhhnVI0ZKJcqVKIcIDds',
-    'base_url' => 'https://api-bakong.nbc.gov.kh',
-    'bank_account' => 'doem_socheat@bkrt',
-    'merchant_name' => 'Doem Socheat',
-    'merchant_city' => 'Phnom Penh',
-    'store_label' => 'Mekong CyberUnit',
-    'phone_number' => '85516367859',
-    'terminal_label' => 'Web Checkout'
+    'api_token'      => mc_env('MC_BAKONG_API_TOKEN', ''),
+    'base_url'       => mc_env('MC_BAKONG_BASE_URL', 'https://api-bakong.nbc.gov.kh'),
+    'bank_account'   => mc_env('MC_BAKONG_BANK_ACCOUNT', ''),
+    'merchant_name'  => mc_env('MC_BAKONG_MERCHANT_NAME', ''),
+    'merchant_city'  => mc_env('MC_BAKONG_MERCHANT_CITY', 'Phnom Penh'),
+    'store_label'    => mc_env('MC_BAKONG_STORE_LABEL', 'Mekong CyberUnit'),
+    'phone_number'   => mc_env('MC_BAKONG_PHONE_NUMBER', ''),
+    'terminal_label' => mc_env('MC_BAKONG_TERMINAL_LABEL', 'Web Checkout')
 ];

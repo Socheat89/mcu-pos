@@ -50,9 +50,16 @@ if (!function_exists('mc_base_path')) {
 
 if (!function_exists('mc_url')) {
     function mc_url(string $path = '', bool $absolute = false): string {
-        // If the path contains a full URL, extract and return it directly
-        if (preg_match('#https?://.+$#i', $path, $matches)) {
-            return $matches[0];
+        // Allow absolute URLs only when they target this same host.
+        if (preg_match('#^https?://#i', $path)) {
+            $urlHost = strtolower((string) parse_url($path, PHP_URL_HOST));
+            $currentHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+            $currentHost = preg_replace('/:\d+$/', '', $currentHost);
+            if ($urlHost !== '' && hash_equals($currentHost, $urlHost)) {
+                return $path;
+            }
+
+            $path = '';
         }
         $base = mc_base_path();
         $normalizedPath = $path === '' ? '' : '/' . ltrim($path, '/');

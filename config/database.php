@@ -1,35 +1,15 @@
 <?php
 // config/database.php
 
-// Determine environment
-$isProduction = false;
-if (isset($_SERVER['HTTP_HOST']) && (
-    strpos($_SERVER['HTTP_HOST'], 'mekongcyberunit.app') !== false || 
-    strpos($_SERVER['HTTP_HOST'], 'mekongcy') !== false ||
-    strpos($_SERVER['HTTP_HOST'], 'mcu-pos.me') !== false
-)) {
-    $isProduction = true;
-}
+require_once __DIR__ . '/env.php';
 
-if ($isProduction) {
-    // Production Credentials
-    return [
-        'host' => 'localhost',
-        'database' => 'mekocclj_mekong_saas',
-        'username' => 'mekocclj_mekong_saas',
-        'password' => 'Socheat@2026',
-        'charset' => 'utf8mb4'
-    ];
-} else {
-    // Local Development Credentials - with fallback for cPanel environments
-    // Try cPanel hosted credentials first
-    return [
-        'host' => '127.0.0.1;port=3307',
-        'database' => 'mekocclj_mekong_saas',
+$isProduction = mc_is_production_request();
 
-        'username' => 'root',
-        'password' => '',
-        'charset' => 'utf8mb4'
-    ];
-}
+return [
+    'host'     => $isProduction ? mc_required_env('MC_DB_HOST') : mc_env('MC_DB_HOST', '127.0.0.1;port=3307'),
+    'database' => $isProduction ? mc_required_env('MC_DB_DATABASE') : mc_env('MC_DB_DATABASE', 'mekocclj_mekong_saas'),
+    'username' => $isProduction ? mc_required_env('MC_DB_USERNAME') : mc_env('MC_DB_USERNAME', 'root'),
+    'password' => $isProduction ? mc_required_env('MC_DB_PASSWORD') : mc_env('MC_DB_PASSWORD', ''),
+    'charset'  => mc_env('MC_DB_CHARSET', 'utf8mb4'),
+];
 ?>

@@ -6,10 +6,17 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../../core/classes/Database.php';
+require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/TransactionLogger.php';
 
 $config = require __DIR__ . '/../../config/telegram.php';
 $token  = $config['bot_token'];
+
+if (!mc_is_local_request()) {
+    http_response_code(403);
+    echo "Telegram local sync is only available from localhost.";
+    exit;
+}
 
 echo "<!DOCTYPE html>
 <html lang='en'>
@@ -33,7 +40,7 @@ echo "<!DOCTYPE html>
 <body>
 <h2>🔄 Telegram Local Sync (Polling Mode)</h2>";
 
-if (empty($token) || $token === 'YOUR_BOT_TOKEN_HERE') {
+if (empty($token)) {
     echo "<p class='err'>❌ Bot token not configured in config/telegram.php</p></body></html>";
     exit;
 }

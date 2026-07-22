@@ -604,29 +604,17 @@ $tenantSlug = Tenant::getCurrent()['subdomain'] ?? '';
         msgEl.innerHTML = '<span style="color:#f59e0b;">⏳ កំពុងផ្ញើសារសាកល្បង...</span>';
 
         fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
-            method: 'GET',
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action: 'test' }),
             credentials: 'same-origin'
         })
         .then(r => r.json())
-        .then(res => {
-            if (!res.success || !res.config || !res.config.chat_id) {
-                msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនទាន់បានភ្ជាប់ Telegram ទេ។ សូមបញ្ចូលលេខកូដ ៦ ខ្ទង់សិន។</span>';
-                return;
-            }
-
-            const botToken = res.config.bot_token || '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
-            const testMsg = "✅ <b>MCU POS — សាកល្បង / Test</b>\n🕐 " + new Date().toLocaleString();
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            const body = new URLSearchParams({ chat_id: res.config.chat_id, text: testMsg, parse_mode: 'HTML' });
-
-            return fetch(url, { method: 'POST', body: body });
-        })
-        .then(r => r ? r.json() : null)
         .then(tgRes => {
-            if (tgRes && tgRes.ok) {
+            if (tgRes && tgRes.success) {
                 msgEl.innerHTML = '<span style="color:#10b981;">✅ បានផ្ញើសារសាកល្បង! សូមពិនិត្យមើលក្រុម Telegram របស់អ្នក។</span>';
             } else {
-                msgEl.innerHTML = '<span style="color:#ef4444;">❌ បរាជ័យ / Failed: ' + ((tgRes && tgRes.description) || 'Unknown') + '</span>';
+                msgEl.innerHTML = '<span style="color:#ef4444;">❌ បរាជ័យ / Failed: ' + ((tgRes && tgRes.error) || 'Unknown') + '</span>';
             }
             setTimeout(() => msgEl.innerHTML = '', 8000);
         })

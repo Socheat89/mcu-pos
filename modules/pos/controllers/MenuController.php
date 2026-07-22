@@ -143,8 +143,9 @@ class MenuController {
 
         } catch (Exception $e) {
             $db->getConnection()->rollBack();
+            error_log('Digital menu order error: ' . $e->getMessage());
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Order failed: ' . $e->getMessage()]);
+            echo json_encode(['success' => false, 'message' => 'Order failed. Please try again.']);
             exit;
         }
     }

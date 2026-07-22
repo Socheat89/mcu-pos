@@ -38,5 +38,6 @@ try {
     }
 
 } catch (Exception $e) {
-    echo "Migration failed: " . $e->getMessage() . "\n";
+    error_log('Admin migration failed: ' . $e->getMessage());
+    echo "Migration failed. Review the server logs for details.\n";
 }

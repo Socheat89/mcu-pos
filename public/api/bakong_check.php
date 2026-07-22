@@ -3,15 +3,16 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 ob_start();
-header('Content-Type: application/json');
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('GET, OPTIONS');
 require_once __DIR__ . '/../../core/classes/BakongRelay.php';
 
 $md5 = $_GET['md5'] ?? '';
 
-if (empty($md5)) {
+if (empty($md5) || !preg_match('/^[a-f0-9]{32}$/i', $md5)) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Missing MD5']);
-    exit;
+    mc_json_error('Invalid payment reference', 400);
 }
 
 try {
@@ -42,14 +43,13 @@ try {
         // Log for debugging
         $logDir = __DIR__ . '/../../logs';
         if (is_writable($logDir)) {
-            file_put_contents($logDir . '/payment_debug.log', date('[Y-m-d H:i:s] ') . "MD5: $md5 | Status Found: $status | Full Response: " . json_encode($fullData) . "\n", FILE_APPEND);
+            file_put_contents($logDir . '/payment_debug.log', date('[Y-m-d H:i:s] ') . "MD5: $md5 | Status Found: $status\n", FILE_APPEND);
         }
 
         ob_clean();
-        echo json_encode([
+        mc_json([
             'success' => true,
-            'status' => strtoupper($status),
-            'raw' => $fullData
+            'status' => strtoupper($status)
         ]);
     } else {
         $errorMsg = $result['error'] ?? 'Unknown API error';
@@ -58,14 +58,10 @@ try {
             file_put_contents($logDir . '/payment_debug.log', date('[Y-m-d H:i:s] ') . "MD5: $md5 | Error: $errorMsg\n", FILE_APPEND);
         }
         ob_clean();
-        echo json_encode(['success' => false, 'error' => $errorMsg]);
+        mc_json_error('Unable to verify payment status', 502);
     }
 } catch (Throwable $e) {
+    error_log('Bakong check error: ' . $e->getMessage());
     ob_clean();
-    echo json_encode([
-        'success' => false, 
-        'error' => 'System Error: ' . $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
-    ]);
+    mc_json_error('Unable to verify payment status', 500);
 }

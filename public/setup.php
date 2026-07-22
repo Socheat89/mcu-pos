@@ -2,22 +2,32 @@
 // public/setup.php
 require_once __DIR__ . '/../core/helpers/url.php';
 require_once __DIR__ . '/../core/classes/Database.php';
+require_once __DIR__ . '/../core/classes/PaymentApproval.php';
 
 $plan = $_GET['plan'] ?? 'starter';
-$ref = $_GET['ref'] ?? '';
-$paid = $_GET['paid'] ?? 'false';
-$trial = $_GET['trial'] ?? 'false';
-
-if ($paid !== 'true' && $trial !== 'true') {
-    header('Location: ' . mc_url('public/register.php?error=' . urlencode('Payment verification required to access setup.')));
-    exit;
-}
+$ref = trim($_GET['ref'] ?? '');
+$paid = ($_GET['paid'] ?? 'false') === 'true';
+$trial = ($_GET['trial'] ?? 'false') === 'true';
 
 // Fetch plan ID from DB by plan name/code
 $db = Database::getInstance();
 $planSystem = $db->fetchOne("SELECT id, name, price FROM systems WHERE (name = ? OR REPLACE(LOWER(name), ' ', '_') = ?) AND status = 'active'", [$plan, $plan]);
-$planId = $planSystem ? $planSystem['id'] : 1;
-$isTrial = ($trial === 'true');
+if (!$planSystem) {
+    header('Location: ' . mc_url('public/register.php?error=' . urlencode('Selected plan is not available.')));
+    exit;
+}
+
+$planId = (int) $planSystem['id'];
+$planSystem['code'] = $plan;
+$isFreePlan = ((float) $planSystem['price'] === 0.0);
+$isTrial = $trial && $isFreePlan;
+
+if (!$isTrial) {
+    if (!$paid || !PaymentApproval::isApproved($ref, $planSystem)) {
+        header('Location: ' . mc_url('public/register.php?error=' . urlencode('Payment approval is required before setup.')));
+        exit;
+    }
+}
 
 $displayHost = $_SERVER['HTTP_HOST'] ?? 'mekongcyberunit.app';
 $displayHost = preg_replace('/^www\./', '', $displayHost);
@@ -560,7 +570,7 @@ $workspaceBasePreview = $displayHost . ($setupBase ? '/' . $setupBase : '') . '/
             </div>
             <div>
                 <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Plan Selected</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Cloud POS <?php echo ucfirst(str_replace('_', ' ', $plan)); ?> &mdash; <?php echo $ref ? 'Ref: ' . htmlspecialchars($ref) : ($isTrial ? 'Free Trial' : 'Paid'); ?></div>
+                <div style="font-size: 0.75rem; color: #64748b;">Cloud POS <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $plan))); ?> &mdash; <?php echo $ref ? 'Ref: ' . htmlspecialchars($ref) : ($isTrial ? 'Free Trial' : 'Paid'); ?></div>
             </div>
         </div>
 

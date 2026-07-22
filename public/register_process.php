@@ -2,6 +2,7 @@
 // public/register_process.php
 require_once __DIR__ . '/../core/classes/Database.php';
 require_once __DIR__ . '/../core/classes/Settings.php';
+require_once __DIR__ . '/../core/classes/PaymentApproval.php';
 require_once __DIR__ . '/../core/helpers/url.php';
 
 
@@ -18,7 +19,12 @@ $adminUsername = trim($_POST['admin_username']);
 $adminPassword = $_POST['admin_password'];
 $confirmPassword = $_POST['confirm_password'];
 $paymentStatus = $_POST['payment_status'] ?? 'pending';
+$paymentRef = trim($_POST['payment_ref'] ?? '');
 $selectedSystems = $_POST['systems'] ?? [];
+if (!is_array($selectedSystems)) {
+    $selectedSystems = [$selectedSystems];
+}
+$selectedSystems = array_values(array_filter(array_map('intval', $selectedSystems)));
 
 // Validation
 $errors = [];
@@ -60,17 +66,23 @@ $db = Database::getInstance();
 
 // Check if selected plan is a free trial (price = 0)
 $isFreeTrial = false;
+$planCheck = null;
 if (!empty($selectedSystems)) {
-    $planCheck = $db->fetchOne("SELECT price FROM systems WHERE id = ? AND status = 'active'", [$selectedSystems[0]]);
+    $planCheck = $db->fetchOne("SELECT id, name, price FROM systems WHERE id = ? AND status = 'active'", [$selectedSystems[0]]);
     if ($planCheck && (float)$planCheck['price'] === 0.00) {
         $isFreeTrial = true;
     }
 }
 
-// For free plans: any payment_status is accepted (trial or paid)
-// For paid plans: only 'paid' is accepted — prevents trial bypass on paid plans
-if (!$isFreeTrial && $paymentStatus !== 'paid') {
-    $errors[] = 'Payment is required to create an account';
+if (!$planCheck) {
+    $errors[] = 'Selected plan is not available';
+}
+
+// Free plans may use trial setup. Paid plans require a server-approved payment reference.
+if ($isFreeTrial) {
+    $paymentStatus = 'trial';
+} elseif ($paymentStatus !== 'paid' || !PaymentApproval::isApproved($paymentRef, $planCheck)) {
+    $errors[] = 'Approved payment is required to create an account';
 }
 
 if (!empty($errors)) {

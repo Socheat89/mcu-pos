@@ -44,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ], $tenantId);
             $message = 'User created successfully!';
         } catch (Exception $e) {
-            $error = $e->getMessage();
+            error_log('Tenant user creation failed for tenant ' . $tenantId . ': ' . $e->getMessage());
+            $error = 'Unable to create the user. Please review the details and try again.';
         }
     }
 }

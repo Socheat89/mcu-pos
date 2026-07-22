@@ -8,6 +8,14 @@ header('Content-Type: application/json');
 $root = dirname(__DIR__, 2);
 $config = require $root . '/config/telegram.php';
 $botToken = $config['bot_token'] ?? null;
+$setupToken = $_SERVER['HTTP_X_SETUP_TOKEN'] ?? ($_GET['token'] ?? '');
+$webhookSecret = $config['webhook_secret'] ?? '';
+
+if (empty($config['is_local']) && ($webhookSecret === '' || !hash_equals($webhookSecret, (string) $setupToken))) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden']);
+    exit;
+}
 
 if (!$botToken) {
     echo json_encode(['success' => false, 'error' => 'No bot token configured in config/telegram.php']);
@@ -27,11 +35,16 @@ $currentData = json_decode($currentInfo, true);
 
 // Set the webhook
 $setWebhookUrl = "https://api.telegram.org/bot{$botToken}/setWebhook";
-$postData = http_build_query([
+$webhookParams = [
     'url' => $webhookUrl,
     'allowed_updates' => json_encode(['message', 'my_chat_member']),
     'drop_pending_updates' => false
-]);
+];
+if ($webhookSecret !== '') {
+    $webhookParams['secret_token'] = $webhookSecret;
+}
+
+$postData = http_build_query($webhookParams);
 
 $ctx = stream_context_create([
     'http' => [

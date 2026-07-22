@@ -2,9 +2,12 @@
 // public/api/notify_payment.php
 error_reporting(0);
 ini_set('display_errors', 0);
-header('Content-Type: application/json');
-require_once __DIR__ . '/../../core/classes/Database.php';
-require_once __DIR__ . '/../../core/classes/TelegramBot.php';
+
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('POST, OPTIONS');
+require_once $root . '/core/classes/Database.php';
+require_once $root . '/core/classes/TelegramBot.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $plan = $data['plan'] ?? '';
@@ -12,9 +15,11 @@ $amount = $data['amount'] ?? 0;
 $ref = 'PAY-' . strtoupper(substr(uniqid(), -6));
 
 if (empty($plan)) {
-    echo json_encode(['success' => false, 'error' => 'Missing plan']);
-    exit;
+    mc_json_error('Missing plan', 400);
 }
+
+$plan = substr(preg_replace('/[^a-z0-9 _-]/i', '', (string) $plan), 0, 80);
+$amount = max(0, (float) $amount);
 
 try {
     $db = Database::getInstance();
@@ -43,7 +48,8 @@ try {
 
     $result = $telegram->sendMessage($message, $keyboard);
 
-    echo json_encode(['success' => true, 'ref' => $ref]);
+    mc_json(['success' => true, 'ref' => $ref]);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    error_log('Notify payment error: ' . $e->getMessage());
+    mc_json_error('Unable to notify payment reviewer', 500);
 }

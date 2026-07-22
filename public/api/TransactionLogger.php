@@ -14,7 +14,7 @@ class TransactionLogger {
         
         // Ensure dir exists
         if (!is_dir($logDir)) {
-            if (!@mkdir($logDir, 0777, true)) {
+            if (!@mkdir($logDir, 0750, true)) {
                 // Return null if we can't create it (permission issue)
                 return null;
             }

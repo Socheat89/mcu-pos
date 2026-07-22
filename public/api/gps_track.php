@@ -3,18 +3,10 @@
 // GPS Tracking API - Receives location pings from seller devices
 // This is the main endpoint called by the GPS tracker JS on seller's POS page
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
 // Bootstrap session and required classes
 $root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
+mc_api_preflight('POST, OPTIONS', 'Content-Type, X-API-Key');
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
 require_once $root . '/core/classes/Tenant.php';
@@ -23,8 +15,7 @@ require_once $root . '/config/telegram.php';
 
 // Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'error' => 'POST required']);
-    exit;
+    mc_json_error('POST required', 405);
 }
 
 // Check authentication via session (same domain) or API key (mobile)
@@ -55,8 +46,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['tenant_id'])) {
     }
 
     if (!$userId) {
-        echo json_encode(['success' => false, 'error' => 'Authentication required', 'code' => 'AUTH_REQUIRED']);
-        exit;
+        mc_json_error('Authentication required', 401, 'AUTH_REQUIRED');
     }
 }
 
@@ -65,9 +55,8 @@ $input = json_decode(file_get_contents('php://input'), true);
 $latitude  = isset($input['latitude']) ? (float)$input['latitude'] : null;
 $longitude = isset($input['longitude']) ? (float)$input['longitude'] : null;
 
-if (!$latitude || !$longitude) {
-    echo json_encode(['success' => false, 'error' => 'Missing latitude/longitude']);
-    exit;
+if ($latitude === null || $longitude === null || $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+    mc_json_error('Invalid latitude/longitude', 400);
 }
 
 $db = Database::getInstance();
@@ -90,8 +79,7 @@ if (!$trackingSession) {
     );
 
     if (!$posSession) {
-        echo json_encode(['success' => false, 'error' => 'No active POS session', 'code' => 'NO_POS_SESSION']);
-        exit;
+        mc_json_error('No active POS session', 409, 'NO_POS_SESSION');
     }
 
     // Auto-create tracking session
@@ -124,9 +112,8 @@ $db->insert('gps_locations', [
     'recorded_at'         => date('Y-m-d H:i:s')
 ]);
 
-echo json_encode([
+mc_json([
     'success'     => true,
     'tracking_id' => $trackingSessionId,
     'message'     => 'Location recorded'
 ]);
-exit;

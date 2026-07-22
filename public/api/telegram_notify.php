@@ -1,40 +1,21 @@
 <?php
 // public/api/telegram_notify.php
 // VERSION: V5_FINAL_TELEGRAM_ONLY
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); 
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // Suppress errors in JSON output
 
 // --- CONFIGURATION ---
-$root = $_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__, 2);
-$projectRoot = dirname(__DIR__, 2);
-$normalizedRoot = rtrim(str_replace('\\', '/', $root), '/');
-$possiblePaths = array_unique(array_filter([
-    $projectRoot . '/config/telegram.php',
-    __DIR__ . '/../../config/telegram.php',
-    $normalizedRoot ? ($normalizedRoot . '/config/telegram.php') : null
-]));
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
 
-$configPath = null;
-foreach ($possiblePaths as $path) {
-    if (file_exists($path)) {
-        $configPath = $path;
-        break;
-    }
-}
+mc_api_preflight('POST, OPTIONS');
 
-if (!$configPath) {
-    $searched = implode(" || ", $possiblePaths);
-    echo json_encode(['success' => false, 'error' => 'Telegram config not found. Searched: ' . $searched]);
-    exit;
-}
-
-$tgConfig = require $configPath;
+$tgConfig = require $root . '/config/telegram.php';
 
 $TELEGRAM_BOT_TOKEN = $tgConfig['bot_token'] ?? '';
 $TELEGRAM_CHAT_ID = $tgConfig['chat_id'] ?? '';
 $callbackUrl = $tgConfig['callback_url'] ?? '';
+$webhookSecret = $tgConfig['webhook_secret'] ?? '';
 
 if (empty($callbackUrl)) {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -48,8 +29,7 @@ if (empty($callbackUrl)) {
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
-    echo json_encode(['success' => false, 'error' => 'No data received']);
-    exit;
+    mc_json_error('No data received', 400);
 }
 
 $md5 = $data['md5'] ?? '';
@@ -60,10 +40,15 @@ $type = $data['type'] ?? 'registration'; // registration or renewal
 $businessName = $data['business_name'] ?? 'New Customer';
 $tenantId = $data['tenant_id'] ?? null;
 
-if (empty($md5)) {
-    echo json_encode(['success' => false, 'error' => 'MD5 reference missing']);
-    exit;
+if (empty($md5) || !preg_match('/^[A-Za-z0-9._:-]{6,128}$/', (string) $md5)) {
+    mc_json_error('Payment reference missing', 400);
 }
+
+$amount = max(0, (float) $amount);
+$plan = substr(preg_replace('/[^a-z0-9 _-]/i', '', (string) $plan), 0, 80);
+$method = substr(preg_replace('/[^a-z0-9 _-]/i', '', (string) $method), 0, 40);
+$type = in_array($type, ['registration', 'renewal'], true) ? $type : 'registration';
+$businessName = substr(strip_tags((string) $businessName), 0, 120);
 
 // 2. Save Transaction as PENDING (Main Log)
 require_once __DIR__ . '/TransactionLogger.php';
@@ -95,13 +80,12 @@ try {
 } catch (Exception $e) {}
 
 // 3. Send Telegram Notification
-if ($TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || empty($TELEGRAM_BOT_TOKEN)) {
-    echo json_encode(['success' => true, 'status' => 'PENDING', 'message' => 'Token not configured/empty, simulated mode.']);
-    exit;
+if (empty($TELEGRAM_BOT_TOKEN)) {
+    mc_json(['success' => true, 'status' => 'PENDING', 'message' => 'Payment is pending review.']);
 }
 
 if (stripos($callbackUrl, 'https://') === 0) {
-    ensureWebhookRegistered($TELEGRAM_BOT_TOKEN, $callbackUrl);
+    ensureWebhookRegistered($TELEGRAM_BOT_TOKEN, $callbackUrl, $webhookSecret);
 }
 
 $title = ($type === 'renewal') ? "🔄 Subscription Renewal Request" : "🔔 New Registration Payment";
@@ -133,10 +117,10 @@ $response = telegramApiRequest($TELEGRAM_BOT_TOKEN, 'sendMessage', [
 ]);
 
 if (isset($response['ok']) && $response['ok']) {
-    echo json_encode(['success' => true, 'status' => 'WAITING_APPROVAL']);
+    mc_json(['success' => true, 'status' => 'WAITING_APPROVAL']);
 } else {
-    $apiErr = $response['description'] ?? ($response['error'] ?? 'Unknown API error');
-    echo json_encode(['success' => false, 'error' => "Telegram API Error: $apiErr"]);
+    error_log('Telegram payment notification failed: ' . json_encode($response));
+    mc_json_error('Unable to notify payment reviewer', 502);
 }
 
 function telegramApiRequest(string $token, string $method, array $params = []): array {
@@ -157,7 +141,7 @@ function telegramApiRequest(string $token, string $method, array $params = []): 
     return json_decode($response, true) ?: ['ok' => false, 'error' => 'Invalid JSON response'];
 }
 
-function ensureWebhookRegistered(string $token, string $expectedUrl): void {
+function ensureWebhookRegistered(string $token, string $expectedUrl, string $secret = ''): void {
     static $checked = false;
     if ($checked || empty($token) || empty($expectedUrl)) {
         return;
@@ -170,6 +154,11 @@ function ensureWebhookRegistered(string $token, string $expectedUrl): void {
         return;
     }
 
-    telegramApiRequest($token, 'setWebhook', ['url' => $expectedUrl]);
+    $params = ['url' => $expectedUrl];
+    if ($secret !== '') {
+        $params['secret_token'] = $secret;
+    }
+
+    telegramApiRequest($token, 'setWebhook', $params);
 }
 ?>

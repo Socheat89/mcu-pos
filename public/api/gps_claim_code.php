@@ -3,29 +3,24 @@
 // Simple API: Tenant claims a Telegram setup code to link their group
 // POST { setup_code: "ABC123" }
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+$root = dirname(__DIR__, 2);
+require_once $root . '/core/helpers/api.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
+mc_api_preflight('POST, OPTIONS');
 
 try {
 
-$root = dirname(__DIR__, 2);
 require_once $root . '/core/bootstrap_session.php';
 require_once $root . '/core/classes/Database.php';
 require_once $root . '/core/classes/Tenant.php';
 require_once $root . '/core/classes/Auth.php';
 
 if (!Auth::check()) {
-    echo json_encode(['success' => false, 'error' => 'Authentication required']);
-    exit;
+    mc_json_error('Authentication required', 401);
 }
 
 if (!Auth::isTenantAdmin()) {
-    echo json_encode(['success' => false, 'error' => 'Admin access required']);
-    exit;
+    mc_json_error('Admin access required', 403);
 }
 
 $db = Database::getInstance();
@@ -33,15 +28,13 @@ $tenantId = Tenant::getId();
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input || !isset($input['setup_code'])) {
-    echo json_encode(['success' => false, 'error' => 'Missing setup_code']);
-    exit;
+    mc_json_error('Missing setup_code', 400);
 }
 
 $setupCode = strtoupper(trim($input['setup_code']));
 
 if (strlen($setupCode) !== 6) {
-    echo json_encode(['success' => false, 'error' => 'លេខកូដត្រូវតែ ៦ ខ្ទង់ / Code must be 6 characters']);
-    exit;
+    mc_json_error('លេខកូដត្រូវតែ ៦ ខ្ទង់ / Code must be 6 characters', 400);
 }
 
 // Find the pending link
@@ -53,11 +46,16 @@ $pending = $db->fetchOne(
 );
 
 if (!$pending) {
-    echo json_encode([
+    mc_json([
         'success' => false, 
         'error' => 'លេខកូដមិនត្រឹមត្រូវ ឬផុតកំណត់ហើយ។ សូមវាយ /code ក្នុងក្រុម Telegram ដើម្បីទទួលបានលេខកូដថ្មី។ / Invalid or expired code. Type /code in your Telegram group.'
-    ]);
-    exit;
+    ], 404);
+}
+
+$sysConfig = require $root . '/config/telegram.php';
+$botToken = $sysConfig['bot_token'] ?? ($pending['bot_token'] ?? '');
+if ($botToken === '') {
+    mc_json_error('Telegram bot is not configured', 500);
 }
 
 // Claim it
@@ -70,6 +68,7 @@ $configData = [
     'chat_id'    => $pending['chat_id'],
     'chat_title' => $pending['chat_title'],
     'setup_code' => $setupCode,
+    'bot_token'  => $botToken,
     'is_active'  => 1,
 ];
 
@@ -77,7 +76,6 @@ if ($existingConfig) {
     $db->update('tenant_telegram_config', $configData, 'id = ?', [$existingConfig['id']]);
 } else {
     $configData['tenant_id'] = $tenantId;
-    $configData['bot_token'] = $pending['bot_token'] ?? '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
     $db->insert('tenant_telegram_config', $configData);
 }
 
@@ -88,7 +86,6 @@ $db->update('telegram_pending_links', [
 ], 'id = ?', [$pending['id']]);
 
 // Confirm to group
-$botToken = $pending['bot_token'] ?? '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
 $tenant = $db->fetchOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
 $msg = "✅ <b>បានភ្ជាប់ដោយជោគជ័យ! / Connected!</b>\n\n";
 $msg .= "🏪 ហាង / Store: " . ($tenant['name'] ?? 'N/A') . "\n";
@@ -99,15 +96,14 @@ $msg .= "🟢 ប្រព័ន្ធបានត្រៀមរួចរាល
     'chat_id' => $pending['chat_id'], 'text' => $msg, 'parse_mode' => 'HTML'
 ]));
 
-echo json_encode([
+mc_json([
     'success'    => true,
     'message'    => '✅ បានភ្ជាប់ដោយជោគជ័យ! ក្រុម Telegram របស់អ្នកបានតភ្ជាប់ហើយ។ / Connected successfully!',
     'chat_title' => $pending['chat_title'],
     'chat_id'    => $pending['chat_id']
 ]);
-exit;
 
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
-    exit;
+    mc_log_exception('GPS claim code error', $e);
+    mc_json_error('Server error', 500);
 }

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../core/classes/Tenant.php';
 require_once __DIR__ . '/../core/classes/Auth.php';
 require_once __DIR__ . '/../core/classes/Settings.php';
 require_once __DIR__ . '/../core/helpers/url.php';
+require_once __DIR__ . '/../core/helpers/upload.php';
 require_once __DIR__ . '/../middleware/TenantMiddleware.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -40,52 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle Logo Upload
         if (isset($_FILES['receipt_logo']) && $_FILES['receipt_logo']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['receipt_logo'];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-            
-            if (in_array($file['type'], $allowedTypes)) {
+            try {
                 $uploadDir = __DIR__ . '/../public/uploads/logos/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $extension = 'webp';
-                $filename = 'logo_' . $tenantId . '_' . time() . '.' . $extension;
-                $targetPath = $uploadDir . $filename;
-                
-                // Create image resource based on type
-                $sourceImage = null;
-                switch ($file['type']) {
-                    case 'image/jpeg':
-                    case 'image/jpg':
-                        $sourceImage = imagecreatefromjpeg($file['tmp_name']);
-                        break;
-                    case 'image/png':
-                        $sourceImage = imagecreatefrompng($file['tmp_name']);
-                        imagepalettetotruecolor($sourceImage);
-                        imagealphablending($sourceImage, true);
-                        imagesavealpha($sourceImage, true);
-                        break;
-                    case 'image/webp':
-                        $sourceImage = imagecreatefromwebp($file['tmp_name']);
-                        break;
-                }
-
-                if ($sourceImage) {
-                    imagepalettetotruecolor($sourceImage);
-                    imagealphablending($sourceImage, true);
-                    imagesavealpha($sourceImage, true);
-                    
-                    if (imagewebp($sourceImage, $targetPath, 80)) {
-                        imagedestroy($sourceImage);
-                        Settings::set('receipt_logo_path', mc_url('public/uploads/logos/' . $filename), $tenantId);
-                    } else {
-                        $error = "Failed to save WebP image.";
-                    }
-                } else {
-                    $error = "Failed to process image.";
-                }
-            } else {
-                $error = "Invalid file type. Only JPG, PNG, and WebP are allowed.";
+                $filename = mc_store_uploaded_image_as_webp($file, $uploadDir, 'logo_' . $tenantId);
+                Settings::set('receipt_logo_path', mc_url('public/uploads/logos/' . $filename), $tenantId);
+            } catch (Throwable $e) {
+                error_log('Tenant receipt logo upload error: ' . $e->getMessage());
+                $error = "Invalid image upload. Only JPG, PNG, GIF, and WebP up to 5 MB are allowed.";
             }
         }
     } elseif (isset($_POST['update_company_info'])) {
@@ -110,21 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle Payment QR Upload
         if (isset($_FILES['payment_qr_image']) && $_FILES['payment_qr_image']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['payment_qr_image'];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-            if (in_array($file['type'], $allowedTypes)) {
+            try {
                 $uploadDir = __DIR__ . '/../public/uploads/qr/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                $filename = 'qr_' . $tenantId . '_' . time() . '.' . ($ext ?: 'png');
-                $targetPath = $uploadDir . $filename;
-                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                    $qrUrl = mc_url('public/uploads/qr/' . $filename);
-                    Settings::set('payment_qr_path', $qrUrl, $tenantId);
-                    Settings::set('pos_method_khqr_image', $qrUrl, $tenantId);
-                }
-            } else {
+                $filename = mc_store_uploaded_image_as_webp($file, $uploadDir, 'qr_' . $tenantId);
+                $qrUrl = mc_url('public/uploads/qr/' . $filename);
+                Settings::set('payment_qr_path', $qrUrl, $tenantId);
+                Settings::set('pos_method_khqr_image', $qrUrl, $tenantId);
+            } catch (Throwable $e) {
+                error_log('Tenant payment QR upload error: ' . $e->getMessage());
                 $error = "ប្រភេទរូបភាពមិនត្រឹមត្រូវ! ( Invalid file type. Only JPG, PNG, WebP allowed)";
             }
         }
@@ -1149,31 +1104,18 @@ $telegramConfig = $db->fetchOne("SELECT * FROM tenant_telegram_config WHERE tena
             function testTelegram() {
                 const msgEl = document.getElementById('tgConfigMsg');
                 msgEl.innerHTML = '<span style="color:#0088cc;">⏳ កំពុងផ្ញើសារសាកល្បង...</span>';
-                fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php')
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success || !data.config || !data.config.chat_id) {
-                        msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនទាន់បានភ្ជាប់ Telegram ទេ។</span>';
-                        return;
-                    }
-                    const botToken = data.config.bot_token || '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
-                    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-                    return fetch(url, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            chat_id: data.config.chat_id,
-                            text: '🔔 <b>សាកល្បងការជូនដំណឹង / Test Notification</b>\n\nប្រព័ន្ធ MCU POS បានភ្ជាប់ជាមួយ Telegram របស់អ្នកដោយរលូន!',
-                            parse_mode: 'HTML'
-                        })
-                    });
+                fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ action: 'test' })
                 })
-                .then(res => res ? res.json() : null)
+                .then(res => res.json())
                 .then(res => {
-                    if (res && res.ok) {
+                    if (res && res.success) {
                         msgEl.innerHTML = '<span style="color:#10b981;">✅ បានផ្ញើសារសាកល្បងទៅកាន់ក្រុម Telegram រួចរាល់!</span>';
-                    } else if (res) {
-                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ Telegram API: ${res.description || ' Error'}</span>`;
+                    } else {
+                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ ${res.error || 'មិនអាចផ្ញើសារបានទេ។'}</span>`;
                     }
                 })
                 .catch(() => {

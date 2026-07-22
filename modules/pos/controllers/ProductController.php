@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
 require_once __DIR__ . '/../models/Product.php';
 require_once dirname(__DIR__, 3) . '/core/helpers/url.php';
+require_once dirname(__DIR__, 3) . '/core/helpers/upload.php';
 
 class ProductController {
     public function index() {
@@ -124,10 +125,11 @@ class ProductController {
                 'details' => $result['errors']
             ];
         } catch (Throwable $e) {
+            error_log('Product import failed: ' . $e->getMessage());
             $_SESSION['product_import_flash'] = [
                 'type' => 'danger',
                 'title' => __('product_import_failed'),
-                'message' => $e->getMessage(),
+                'message' => __('product_import_failed'),
                 'details' => []
             ];
         }
@@ -724,60 +726,15 @@ class ProductController {
 
     private function uploadImage($file) {
         $uploadDir = __DIR__ . '/../../../uploads/products/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
 
         // Increase memory limit for processing large images
         ini_set('memory_limit', '512M');
 
-        // Generate unique filename with .webp extension
-        $fileName = uniqid() . '.webp';
-        $targetPath = $uploadDir . $fileName;
-
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            die('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.');
-        }
-
-        // Convert image to WebP
-        $image = null;
-        switch ($file['type']) {
-            case 'image/jpeg':
-            case 'image/jpg':
-                $image = imagecreatefromjpeg($file['tmp_name']);
-                break;
-            case 'image/png':
-                $image = imagecreatefrompng($file['tmp_name']);
-                // Preserve transparency for PNG
-                imagepalettetotruecolor($image);
-                imagealphablending($image, true);
-                imagesavealpha($image, true);
-                break;
-            case 'image/gif':
-                $image = imagecreatefromgif($file['tmp_name']);
-                break;
-            case 'image/webp':
-                // If already WebP, just move it
-                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                    return $fileName;
-                } else {
-                    die('Failed to upload image.');
-                }
-                break;
-        }
-
-        if ($image === null) {
-            die('Failed to process image.');
-        }
-
-        // Convert and save as WebP with 80% quality
-        if (imagewebp($image, $targetPath, 80)) {
-            imagedestroy($image);
-            return $fileName;
-        } else {
-            imagedestroy($image);
-            die('Failed to save converted image.');
+        try {
+            return mc_store_uploaded_image_as_webp($file, $uploadDir, 'product');
+        } catch (Throwable $e) {
+            error_log('Product image upload error: ' . $e->getMessage());
+            die('Invalid image upload.');
         }
     }
 }

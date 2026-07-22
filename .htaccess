@@ -1,7 +1,23 @@
 # Security: Disable Directory Listing
-# Options -Indexes
+Options -Indexes
 
 RewriteEngine On
+
+# Block sensitive files and artifacts that should never be served directly.
+<FilesMatch "(^\.|composer\.(json|lock|phar)$|package(-lock)?\.json$|README\.md$|error_log$|.*\.(log|sql|zip|bak|old|swp)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+RewriteRule ^(deploy|diagnose|fix_db|migrate_gps|run_migrations|scratch_query|temp_post|test_db)\.php$ - [F,L]
+RewriteRule ^test_vhost\.txt$ - [F,L]
+RewriteRule ^public/(admin\.zip|error_log|logs/|api/(debug_hits|bakong_debug)\.txt)$ - [F,L]
+RewriteRule ^public/api/(migrate_gps|reset_cache)\.php$ - [F,L]
+RewriteRule ^(uploads|public/uploads)/.*\.(php[0-9]?|phtml|phar|pl|py|cgi|sh)$ - [F,L,NC]
 
 # ── Detect environment ──────────────────────────────────────────────────────
 # On live (domain root), RewriteBase is /.
