@@ -23,6 +23,7 @@ if (!Auth::isTenantAdmin()) {
 }
 
 $tenantId = Tenant::getId();
+$db = Database::getInstance();
 $message = '';
 $error = '';
 
@@ -60,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                     case 'image/png':
                         $sourceImage = imagecreatefrompng($file['tmp_name']);
-                        // Handle transparency for PNG
                         imagepalettetotruecolor($sourceImage);
                         imagealphablending($sourceImage, true);
                         imagesavealpha($sourceImage, true);
@@ -71,15 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($sourceImage) {
-                    // Convert and save as WebP
-                    // Preserve transparency if possible
                     imagepalettetotruecolor($sourceImage);
                     imagealphablending($sourceImage, true);
                     imagesavealpha($sourceImage, true);
                     
                     if (imagewebp($sourceImage, $targetPath, 80)) {
                         imagedestroy($sourceImage);
-                        // Save new path to settings (relative URL)
                         Settings::set('receipt_logo_path', mc_url('public/uploads/logos/' . $filename), $tenantId);
                     } else {
                         $error = "Failed to save WebP image.";
@@ -110,15 +107,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         Settings::set('enabled_payment_methods', json_encode($enabledMethods), $tenantId);
         
-        // Save QR payment provider preference
-        Settings::set('qr_payment_provider', $_POST['qr_payment_provider'] ?? 'bakong', $tenantId);
-        
+        // Handle Payment QR Upload
+        if (isset($_FILES['payment_qr_image']) && $_FILES['payment_qr_image']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['payment_qr_image'];
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            if (in_array($file['type'], $allowedTypes)) {
+                $uploadDir = __DIR__ . '/../public/uploads/qr/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = 'qr_' . $tenantId . '_' . time() . '.' . ($ext ?: 'png');
+                $targetPath = $uploadDir . $filename;
+                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    $qrUrl = mc_url('public/uploads/qr/' . $filename);
+                    Settings::set('payment_qr_path', $qrUrl, $tenantId);
+                    Settings::set('pos_method_khqr_image', $qrUrl, $tenantId);
+                }
+            } else {
+                $error = "ប្រភេទរូបភាពមិនត្រឹមត្រូវ! ( Invalid file type. Only JPG, PNG, WebP allowed)";
+            }
+        }
+
         $message = 'Payment settings updated successfully!';
     }
 }
 
 // Get current settings
 $settings = Settings::getAll($tenantId);
+
+// Get Telegram config
+$telegramConfig = $db->fetchOne("SELECT * FROM tenant_telegram_config WHERE tenant_id = ?", [$tenantId]) ?: [];
 ?>
 
 <!DOCTYPE html>
@@ -640,6 +659,7 @@ $settings = Settings::getAll($tenantId);
                 <button class="tab-button active" onclick="openTab('company')"><i class="fas fa-building"></i> <?php echo __('company_info'); ?></button>
                 <button class="tab-button" onclick="openTab('receipt')"><i class="fas fa-receipt"></i> <?php echo __('receipt_design'); ?></button>
                 <button class="tab-button" onclick="openTab('payment')"><i class="fas fa-credit-card"></i> <?php echo __('payment_methods'); ?></button>
+                <button class="tab-button" onclick="openTab('telegram')"><i class="fab fa-telegram-plane" style="color: #0088cc;"></i> <?php echo __('telegram_setup'); ?></button>
             </div>
 
             <div id="company" class="tab-content active">
@@ -822,9 +842,9 @@ $settings = Settings::getAll($tenantId);
 
             <div id="payment" class="tab-content">
                 <h3><i class="fas fa-credit-card" style="color: var(--primary);"></i> Payment Method Configuration</h3>
-                <p style="color: var(--text-muted); margin-bottom: 2rem;">Configure available payment methods for your POS system. These settings control which payment options are available during checkout.</p>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Configure available payment methods and uploaded QR Code for your POS system.</p>
                 
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">
                         <!-- Left Column: Enable/Disable Methods -->
                         <div>
@@ -843,7 +863,7 @@ $settings = Settings::getAll($tenantId);
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <i class="fas fa-money-bill-wave" style="color: #10b981; font-size: 1.2rem;"></i>
                                         <div>
-                                            <div style="font-weight: 600;">Cash Payment</div>
+                                            <div style="font-weight: 600;">Cash Payment (សាច់ប្រាក់)</div>
                                             <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">Traditional cash transactions</div>
                                         </div>
                                     </div>
@@ -856,8 +876,8 @@ $settings = Settings::getAll($tenantId);
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <i class="fas fa-qrcode" style="color: #E31E26; font-size: 1.2rem;"></i>
                                         <div>
-                                            <div style="font-weight: 600;">QR Code Payment</div>
-                                            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">Bakong or ACLEDA QR payments</div>
+                                            <div style="font-weight: 600;">QR Code Payment (ទូទាត់តាម QR)</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">Display uploaded store QR Code image</div>
                                         </div>
                                     </div>
                                 </label>
@@ -869,7 +889,7 @@ $settings = Settings::getAll($tenantId);
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <i class="fas fa-credit-card" style="color: #005494; font-size: 1.2rem;"></i>
                                         <div>
-                                            <div style="font-weight: 600;">Card Payment</div>
+                                            <div style="font-weight: 600;">Card Payment (កាតធនាគារ)</div>
                                             <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">Credit/Debit card transactions</div>
                                         </div>
                                     </div>
@@ -877,55 +897,290 @@ $settings = Settings::getAll($tenantId);
                             </div>
                         </div>
 
-                        <!-- Right Column: Default & Provider Settings -->
+                        <!-- Right Column: Default & Upload Settings -->
                         <div>
                             <h4 style="margin-bottom: 1rem; color: var(--text); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-star" style="color: var(--warning);"></i> Default Settings
+                                <i class="fas fa-qrcode" style="color: var(--primary);"></i> QR Code Image Configuration
                             </h4>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Configure default payment preferences</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Upload your store QR code image for payment</p>
                             
                             <div class="form-group">
                                 <label><i class="fas fa-check-circle"></i> Default Payment Method</label>
                                 <select name="default_payment_method" style="padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: var(--bg); width: 100%;">
-                                    <option value="cash" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'cash' ? 'selected' : ''; ?>>Cash</option>
-                                    <option value="qr" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'qr' ? 'selected' : ''; ?>>QR Code</option>
-                                    <option value="card" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'card' ? 'selected' : ''; ?>>Card</option>
+                                    <option value="cash" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'cash' ? 'selected' : ''; ?>>Cash (សាច់ប្រាក់)</option>
+                                    <option value="qr" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'qr' ? 'selected' : ''; ?>>QR Code (ទូទាត់តាម QR)</option>
+                                    <option value="card" <?php echo ($settings['default_payment_method'] ?? 'cash') === 'card' ? 'selected' : ''; ?>>Card (កាត)</option>
                                 </select>
-                                <small style="color: var(--text-muted); display: block; margin-top: 5px;">This method will be pre-selected at checkout</small>
                             </div>
 
                             <div class="form-group">
-                                <label><i class="fas fa-qrcode"></i> QR Payment Provider</label>
-                                <select name="qr_payment_provider" style="padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: var(--bg); width: 100%;">
-                                    <option value="bakong" <?php echo ($settings['qr_payment_provider'] ?? 'bakong') === 'bakong' ? 'selected' : ''; ?>>
-                                        Bakong (Dynamic QR)
-                                    </option>
-                                    <option value="acleda" <?php echo ($settings['qr_payment_provider'] ?? 'bakong') === 'acleda' ? 'selected' : ''; ?>>
-                                        ACLEDA Bank (Static QR)
-                                    </option>
-                                </select>
-                                <small style="color: var(--text-muted); display: block; margin-top: 5px;">Choose your preferred QR code payment gateway</small>
+                                <label><i class="fas fa-upload"></i> Upload Store Payment QR Code / រូបភាព QR Code</label>
+                                <input type="file" name="payment_qr_image" accept="image/jpeg,image/png,image/jpg,image/webp">
+                                <small style="color: var(--text-muted); display: block; margin-top: 5px;">Supported: JPG, PNG, WebP. Displayed in POS Checkout Modal.</small>
                             </div>
 
-                            <!-- Info Box -->
-                            <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(106, 92, 255, 0.05) 0%, rgba(138, 63, 252, 0.05) 100%); border: 1px solid rgba(106, 92, 255, 0.2); border-radius: 12px;">
-                                <div style="display: flex; align-items: start; gap: 12px;">
-                                    <i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.5rem; margin-top: 2px;"></i>
-                                    <div>
-                                        <h5 style="margin: 0 0 8px 0; color: var(--primary); font-size: 1rem;">Professional Plan Feature</h5>
-                                        <p style="margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.5;">
-                                            Payment method configuration is available on the <strong>Professional ($50/mo)</strong> and <strong>Enterprise ($100/mo)</strong> plans. 
-                                            Customize your checkout experience to match your business needs.
-                                        </p>
+                            <?php 
+                            $qrPath = $settings['payment_qr_path'] ?? $settings['pos_method_khqr_image'] ?? '';
+                            if (!empty($qrPath)): 
+                            ?>
+                                <div class="form-group">
+                                    <label>Current QR Code / រូបភាព QR Code បច្ចុប្បន្ន</label>
+                                    <div style="background: #ffffff; padding: 12px; border: 2px dashed var(--primary); display: inline-block; border-radius: 14px; box-shadow: var(--shadow);">
+                                        <img src="<?php echo htmlspecialchars($qrPath); ?>" alt="Store Payment QR" style="max-width: 180px; max-height: 180px; display: block; border-radius: 8px;">
                                     </div>
                                 </div>
-                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <button type="submit" name="update_payment_settings" class="btn"><i class="fas fa-save"></i> Save Payment Settings</button>
                 </form>
             </div>
+
+            <!-- Tab: Telegram Setup -->
+            <div id="telegram" class="tab-content">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <h3><i class="fab fa-telegram-plane" style="color: #0088cc;"></i> ការកំណត់ Telegram / Telegram Setup</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">ភ្ជាប់ Telegram Bot ដើម្បីទទួលបានការជូនដំណឹងពីការបើក/បិទវគ្គលក់ របាយការណ៍លក់ និងការតាមដាន GPS ក្នុងក្រុម Telegram របស់អ្នក។</p>
+
+                    <?php $isConnected = !empty($telegramConfig['chat_id']); ?>
+
+                    <!-- Connection Card -->
+                    <div style="background: var(--bg); border: 2px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 32px;">
+                        <?php if ($isConnected): ?>
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="width: 56px; height: 56px; background: rgba(16, 185, 129, 0.15); border-radius: 50%; display: grid; place-items: center; color: #10b981; font-size: 24px;">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 4px;">✅ បានភ្ជាប់ Telegram ដោយជោគជ័យ!</h4>
+                                        <div style="font-size: 0.95rem; color: var(--text-muted);">
+                                            ក្រុម Telegram៖ <strong style="color: var(--primary);"><?php echo htmlspecialchars($telegramConfig['chat_title'] ?? 'Telegram Group'); ?></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    🟢 Active / ដំណើរការ
+                                </span>
+                            </div>
+                        <?php else: ?>
+                            <div style="text-align: center; margin-bottom: 24px;">
+                                <div style="width: 64px; height: 64px; background: rgba(0, 136, 204, 0.1); border-radius: 50%; display: inline-grid; place-items: center; color: #0088cc; font-size: 28px; margin-bottom: 12px;">
+                                    <i class="fab fa-telegram-plane"></i>
+                                </div>
+                                <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 6px;">ភ្ជាប់ Telegram Bot ក្នុង ៣ ជំហានងាយៗ</h4>
+                                <p style="color: var(--text-muted); font-size: 0.95rem;">មិនចាំបាច់ស្វែងរក Chat ID ដោយដៃទេ! គ្រាន់តែធ្វើតាមជំហានខាងក្រោម៖</p>
+                            </div>
+
+                            <!-- 3 Step Cards -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 28px;">
+                                <div style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                                    <div style="width: 42px; height: 42px; background: #0088cc; color: white; border-radius: 12px; display: inline-grid; place-items: center; font-size: 18px; font-weight: 800; margin-bottom: 12px;">1</div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 6px;">បន្ថែម Bot ចូលក្រុម</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Add bot as admin to group</div>
+                                    <a href="https://t.me/mcu_pos_bot?startgroup=true" target="_blank" class="btn" style="background: #0088cc; font-size: 0.85rem; padding: 8px 16px; border-radius: 8px; width: 100%; text-decoration: none;">
+                                        <i class="fab fa-telegram-plane"></i> បើក Telegram
+                                    </a>
+                                </div>
+
+                                <div style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                                    <div style="width: 42px; height: 42px; background: #f59e0b; color: white; border-radius: 12px; display: inline-grid; place-items: center; font-size: 18px; font-weight: 800; margin-bottom: 12px;">2</div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 6px;">ទទួលលេខកូដ</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Bot ផ្ញើលេខកូដ ៦ ខ្ទង់ក្នុងក្រុម</div>
+                                    <div style="background: rgba(245,158,11,0.1); border-radius: 8px; padding: 8px; font-size: 0.8rem; color: #d97706; font-weight: 600;">
+                                        💡 វាយ <b>/code</b> ក្នុងក្រុមដើម្បីទទួលបានកូដថ្មី
+                                    </div>
+                                </div>
+
+                                <div style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                                    <div style="width: 42px; height: 42px; background: #10b981; color: white; border-radius: 12px; display: inline-grid; place-items: center; font-size: 18px; font-weight: 800; margin-bottom: 12px;">3</div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 6px;">បញ្ចូលលេខកូដ</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">បញ្ចូលលេខកូដ ៦ ខ្ទង់ខាងក្រោម</div>
+                                    <div style="background: rgba(16,185,129,0.1); border-radius: 8px; padding: 8px; font-size: 0.8rem; color: #059669; font-weight: 600;">
+                                        ⚡ ភ្ជាប់ភ្លាមៗ រហ័ស និងងាយស្រួល
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Code Input Area -->
+                            <div style="background: white; border: 2px dashed rgba(0,136,204,0.3); border-radius: 16px; padding: 24px; text-align: center;">
+                                <label style="display: block; font-weight: 800; font-size: 1rem; color: var(--text); margin-bottom: 4px;">
+                                    🔑 បញ្ចូលលេខកូដ ៦ ខ្ទង់ / Enter 6-Digit Code
+                                </label>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">លេខកូដដែល Bot បានផ្ញើក្នុងក្រុម Telegram របស់អ្នក</p>
+                                
+                                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                                    <input type="text" id="setupCodeInput" maxlength="6" placeholder="_ _ _ _ _ _"
+                                           style="width: 220px; padding: 14px; text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 6px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg); color: #0088cc; text-transform: uppercase; outline: none; font-family: monospace;"
+                                           oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()">
+                                    <button type="button" class="btn" style="background: #0088cc; padding: 14px 28px; font-size: 0.95rem; border-radius: 12px;" onclick="claimSetupCode()">
+                                        <i class="fas fa-link"></i> ភ្ជាប់ / Connect
+                                    </button>
+                                </div>
+                                <div id="tgClaimMsg" style="font-size: 0.9rem; font-weight: 600; margin-top: 12px; min-height: 20px;"></div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Notification Options Form -->
+                    <form id="telegramConfigForm">
+                        <h4 style="margin-bottom: 16px; color: var(--text); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-bell" style="color: var(--warning);"></i> ជ្រើសរើសការជូនដំណឹង / Notification Options
+                        </h4>
+
+                        <div style="display: grid; gap: 12px; margin-bottom: 28px;">
+                            <?php
+                            $checkboxes = [
+                                'notify_session_open'  => ['label' => '🔔 ពេលបើកវគ្គលក់ (POS Session Open)', 'desc' => 'ផ្ញើសារជូនដំណឹងនៅពេលបុគ្គលិកបើកវគ្គលក់'],
+                                'notify_session_close' => ['label' => '📊 ពេលបិទវគ្គលក់ + របាយការណ៍ (Session Close & Sales Report)', 'desc' => 'ផ្ញើសាររួមមានសរុបប្រាក់លក់ ការបែងចែកសាច់ប្រាក់/QR/កាត'],
+                                'notify_gps_start'     => ['label' => '📍 ពេលចាប់ផ្តើមតាមដាន GPS (GPS Tracking Start)', 'desc' => 'ផ្ញើទីតាំង GPS នៅពេលបុគ្គលិកចាប់ផ្តើមតាមដាន'],
+                                'notify_gps_stop'      => ['label' => '🛑 ពេលបញ្ឈប់តាមដាន GPS (GPS Tracking Stop)', 'desc' => 'ផ្ញើសារនៅពេលការតាមដានទីតាំង GPS ត្រូវបានបញ្ឈប់'],
+                            ];
+                            foreach ($checkboxes as $key => $info):
+                                $checked = ($telegramConfig[$key] ?? 1) ? 'checked' : '';
+                            ?>
+                            <div class="checkbox-group" style="margin-bottom: 0;">
+                                <input type="checkbox" name="<?php echo $key; ?>" id="<?php echo $key; ?>" <?php echo $checked; ?>>
+                                <label for="<?php echo $key; ?>">
+                                    <div style="font-weight: 700; color: var(--text);"><?php echo $info['label']; ?></div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;"><?php echo $info['desc']; ?></div>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                            <button type="button" class="btn" style="background: #0088cc;" onclick="saveTelegramConfig()">
+                                <i class="fas fa-save"></i> រក្សាទុក / Save Preferences
+                            </button>
+
+                            <?php if ($isConnected): ?>
+                                <button type="button" class="btn" style="background: #475569; color: white;" onclick="testTelegram()">
+                                    <i class="fas fa-paper-plane"></i> សាកល្បងផ្ញើសារ / Test Notification
+                                </button>
+                                <button type="button" class="btn" style="background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3);" onclick="disconnectTelegram()">
+                                    <i class="fas fa-unlink"></i> ផ្តាច់ Telegram / Disconnect
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                        <div id="tgConfigMsg" style="font-size: 0.9rem; font-weight: 600; margin-top: 14px; min-height: 24px;"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function claimSetupCode() {
+                const code = document.getElementById('setupCodeInput').value.trim();
+                const msgEl = document.getElementById('tgClaimMsg');
+                if (!code || code.length !== 6) {
+                    msgEl.innerHTML = '<span style="color:#ef4444;">❌ សូមបញ្ចូលលេខកូដ ៦ ខ្ទង់!</span>';
+                    return;
+                }
+                msgEl.innerHTML = '<span style="color:#0088cc;">⏳ កំពុងភ្ជាប់...</span>';
+                fetch('<?php echo $urlPrefix; ?>/public/api/gps_claim_code.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ setup_code: code })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        msgEl.innerHTML = '<span style="color:#10b981;">✅ ភ្ជាប់ជោគជ័យ! កំពុងផ្លាស់ប្តូរទិន្នន័យ...</span>';
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ ${data.error || 'លេខកូដមិនត្រឹមត្រូវ'}</span>`;
+                    }
+                })
+                .catch(() => {
+                    msgEl.innerHTML = '<span style="color:#ef4444;">❌ មានបញ្ហាបច្ចេកទេស ក្នុងការតភ្ជាប់។</span>';
+                });
+            }
+
+            function saveTelegramConfig() {
+                const form = document.getElementById('telegramConfigForm');
+                const msgEl = document.getElementById('tgConfigMsg');
+                const data = {
+                    notify_session_open: form.notify_session_open.checked ? 1 : 0,
+                    notify_session_close: form.notify_session_close.checked ? 1 : 0,
+                    notify_gps_start: form.notify_gps_start.checked ? 1 : 0,
+                    notify_gps_stop: form.notify_gps_stop.checked ? 1 : 0,
+                };
+                msgEl.innerHTML = '<span style="color:#0088cc;">⏳ កំពុងរក្សាទុក...</span>';
+                fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        msgEl.innerHTML = '<span style="color:#10b981;">✅ បានរក្សាទុកការកំណត់ Telegram ដោយជោគជ័យ!</span>';
+                        setTimeout(() => { msgEl.innerHTML = ''; }, 3000);
+                    } else {
+                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ ${res.error || 'បរាជ័យក្នុងការរក្សាទុក'}</span>`;
+                    }
+                })
+                .catch(() => {
+                    msgEl.innerHTML = '<span style="color:#ef4444;">❌ មានបញ្ហាបច្ចេកទេស។</span>';
+                });
+            }
+
+            function disconnectTelegram() {
+                if (!confirm('តើអ្នកពិតជាចង់ផ្តាច់ Telegram ក្រុមនេះមែនទេ?')) return;
+                const msgEl = document.getElementById('tgConfigMsg');
+                msgEl.innerHTML = '<span style="color:#ef4444;">⏳ កំពុងផ្តាច់...</span>';
+                fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: '', chat_title: '', setup_code: '', is_active: 0 })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ ${data.error || 'បរាជ័យ'}</span>`;
+                    }
+                });
+            }
+
+            function testTelegram() {
+                const msgEl = document.getElementById('tgConfigMsg');
+                msgEl.innerHTML = '<span style="color:#0088cc;">⏳ កំពុងផ្ញើសារសាកល្បង...</span>';
+                fetch('<?php echo $urlPrefix; ?>/public/api/gps_telegram_config.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || !data.config || !data.config.chat_id) {
+                        msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនទាន់បានភ្ជាប់ Telegram ទេ។</span>';
+                        return;
+                    }
+                    const botToken = data.config.bot_token || '8688625817:AAHSiH0UAjrdZiSIEUieudrhIGK3leNgFyY';
+                    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            chat_id: data.config.chat_id,
+                            text: '🔔 <b>សាកល្បងការជូនដំណឹង / Test Notification</b>\n\nប្រព័ន្ធ MCU POS បានភ្ជាប់ជាមួយ Telegram របស់អ្នកដោយរលូន!',
+                            parse_mode: 'HTML'
+                        })
+                    });
+                })
+                .then(res => res ? res.json() : null)
+                .then(res => {
+                    if (res && res.ok) {
+                        msgEl.innerHTML = '<span style="color:#10b981;">✅ បានផ្ញើសារសាកល្បងទៅកាន់ក្រុម Telegram រួចរាល់!</span>';
+                    } else if (res) {
+                        msgEl.innerHTML = `<span style="color:#ef4444;">❌ Telegram API: ${res.description || ' Error'}</span>`;
+                    }
+                })
+                .catch(() => {
+                    msgEl.innerHTML = '<span style="color:#ef4444;">❌ មិនអាចផ្ញើសារបានទេ។</span>';
+                });
+            }
+        </script>
         </div>
 
         <script>

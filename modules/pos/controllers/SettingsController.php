@@ -154,6 +154,7 @@ class SettingsController {
                  if (move_uploaded_file($_FILES['khqr_upload']['tmp_name'], $targetPath)) {
                      $webPath = mc_url('public/uploads/tenants/' . $tenantId . '/' . $fileName);
                      Settings::set('pos_method_khqr_image', $webPath, $tenantId);
+                     Settings::set('payment_qr_path', $webPath, $tenantId);
                  }
              }
 

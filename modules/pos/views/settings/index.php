@@ -409,8 +409,8 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                                     <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); display: grid; place-items: center; color: var(--pos-danger);"><i class="fas fa-qrcode"></i></div>
 
                                     <div>
-                                        <div style="font-weight: 700;">KHQR / Bakong</div>
-                                        <div class="pos-small">Scan to pay with mobile app</div>
+                                        <div style="font-weight: 700;">QR Code Payment</div>
+                                        <div class="pos-small">Scan to pay with mobile banking app</div>
                                     </div>
                                 </div>
                                 <label class="pos-toggle">
@@ -452,8 +452,8 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     </div>
 
                     <div style="background: var(--pos-card); backdrop-filter: blur(12px); border: 1px solid var(--pos-border); border-radius: 16px; padding: 24px;">
-                        <p class="pos-card-title">KHQR Configuration</p>
-                        <p class="pos-card-sub" style="margin-bottom: 20px;">Upload your static KHQR image for customers to scan.</p>
+                        <p class="pos-card-title">QR Code Payment Configuration</p>
+                        <p class="pos-card-sub" style="margin-bottom: 20px;">Upload your store payment QR Code image for customers to scan.</p>
                         
                         <div style="text-align: center; background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
                             <img src="<?php echo htmlspecialchars($settings['pos_method_khqr_image']); ?>" style="width: 200px; height: 200px; object-fit: contain; background: white; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: block; margin: 0 auto; box-shadow: var(--pos-shadow-sm);">
@@ -466,8 +466,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                         <div style="display: flex; gap: 12px; background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2); color: var(--pos-warning);">
                             <i class="fas fa-lightbulb" style="font-size: 18px;"></i>
                             <p class="pos-small" style="color: var(--pos-warning); margin: 0; line-height: 1.4;">
-
-                                This QR code will be displayed in the checkout modal when 'KHQR' is selected as the payment method.
+                                This QR code will be displayed in the checkout modal when 'QR Code' is selected as the payment method.
                             </p>
                         </div>
                     </div>

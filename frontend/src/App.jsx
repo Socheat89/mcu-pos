@@ -77,11 +77,11 @@ const translations = {
     total_payable: "Total Payable",
     payment_method: "Payment Method",
     cash: "Cash",
-    khqr: "KHQR",
+    khqr: "QR Code",
     card: "Card",
     cash_received: "Cash Received",
     change: "Change",
-    waiting_khqr: "Waiting for Bakong payment...",
+    waiting_khqr: "Waiting for QR payment...",
     connecting_card: "Connecting to card reader...",
     insert_card: "Insert card into POS reader device",
     submit_handshake: "Submit to initialize handshake",
@@ -146,11 +146,11 @@ const translations = {
     total_payable: "ទឹកប្រាក់សរុប",
     payment_method: "វិធីបង់ប្រាក់",
     cash: "សាច់ប្រាក់",
-    khqr: "KHQR",
+    khqr: "ទូទាត់តាម QR",
     card: "កាត Card",
     cash_received: "ប្រាក់ទទួលបាន",
     change: "ប្រាក់អាប់ Change",
-    waiting_khqr: "កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...",
+    waiting_khqr: "កំពុងរង់ចាំការទូទាត់តាម QR...",
     connecting_card: "កំពុងភ្ជាប់ទៅឧបករណ៍កាត...",
     insert_card: "បញ្ចូលកាត POS reader device",
     submit_handshake: "Submit to initialize handshake",
@@ -160,25 +160,25 @@ const translations = {
     out_of_stock: "អស់ស្តុក",
     low_stock: "នៅសល់",
     toast_added: "បានបន្ថែម",
-    toast_added_msg: "បានបញ្ចូលក្នុងកន្ត្រក។",
+    toast_added_msg: "បានបន្ថែមទៅក្នុងកន្ត្រក។",
     toast_no_stock: "អស់ស្តុក",
-    toast_no_stock_msg: "មិនមានក្នុងស្តុកទេ។",
+    toast_no_stock_msg: "មុខទំនិញនេះអស់ពីស្តុកហើយ។",
     toast_limit_stock: "ដល់កម្រិតស្តុក",
-    toast_limit_stock_msg: "មានតែ :qty គ្រាប់នៅសល់។",
-    toast_clear: "បានលុប",
-    toast_clear_msg: "កន្ត្រកទទេហើយ។",
-    toast_recovered: "បានស្ដារ Order",
-    toast_recovered_msg: "កំពុងបន្ត order #:id",
-    toast_insufficient_cash: "ប្រាក់មិនគ្រប់",
-    toast_insufficient_cash_msg: "ចំនួនទឹកប្រាក់តិចជាងសរុប।",
+    toast_limit_stock_msg: "នៅសល់តែ :qty នៅក្នុងស្តុកប៉ុណ្ណោះ។",
+    toast_clear: "បានសម្អាត",
+    toast_clear_msg: "កន្ត្រកត្រូវបានសម្អាត។",
+    toast_recovered: "បានស្តារ Order ឡើងវិញ",
+    toast_recovered_msg: "បន្ត Order #:id",
+    toast_insufficient_cash: "ប្រាក់ទទួលបានមិនគ្រប់",
+    toast_insufficient_cash_msg: "ចំនួនប្រាក់ទទួលបានតិចជាងសរុប។",
     toast_checkout_success: "ជោគជ័យ!",
     toast_checkout_success_msg: "កំពុងដំណើរការ...",
     sales_by_category: "ការលក់តាមប្រភេទ (USD)",
     current_stock_levels: "ស្តុកបច្ចុប្បន្ន",
-    report_title: "របាយការណ៍លក់ និងស្តុក",
+    report_title: "របាយការណ៍លក់ & ស្តុក",
     close_report: "បិទរបាយការណ៍",
     no_products: "រកមិនឃើញទំនិញទេ",
-    no_products_subtitle: "No products match your search",
+    no_products_subtitle: "មិនមានទំនិញត្រូវនឹងការស្វែងរករបស់អ្នកទេ",
     products_label: "ទំនិញ",
     stock_alerts: "ស្តុកតិច/អស់",
     out: "អស់",
@@ -215,11 +215,11 @@ const translations = {
     total_payable: "应付总额",
     payment_method: "付款方式",
     cash: "现金",
-    khqr: "KHQR",
+    khqr: "扫码支付",
     card: "刷卡",
     cash_received: "实收金额",
     change: "找零",
-    waiting_khqr: "等待巴孔扫码支付...",
+    waiting_khqr: "等待扫码支付...",
     connecting_card: "正在连接刷卡机...",
     insert_card: "请将卡插入POS机",
     submit_handshake: "确认以初始化握手",
@@ -1693,7 +1693,7 @@ export default function App() {
                     }`}
                   >
                     <QrCode className="h-4 w-4" />
-                    <span className="text-[10px] font-bold">KHQR</span>
+                    <span className="text-[10px] font-bold">{t('khqr', 'ទូទាត់តាម QR')}</span>
                   </button>
                 )}
                 {settings.pos_method_card_enabled === '1' && (
@@ -1791,9 +1791,9 @@ export default function App() {
                   <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
                     <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
                       <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
-                        alt="Bakong KHQR Code"
-                        className="h-44 w-44 mx-auto rounded-xl relative z-10"
+                        src={settings.payment_qr_path || settings.pos_method_khqr_image || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
+                        alt="Payment QR Code"
+                        className="h-44 w-44 mx-auto rounded-xl relative z-10 object-contain"
                       />
                       <div className="absolute inset-x-0 h-0.5 bg-red-500 shadow-[0_0_10px_#f43f5e] animate-scanner-laser top-3.5 z-20"></div>
                     </div>
@@ -1801,9 +1801,9 @@ export default function App() {
                   <div className="flex flex-col items-center justify-center gap-1.5">
                     <div className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-cyan animate-pulse flex items-center gap-2 justify-center">
                       <span className="h-2 w-2 rounded-full bg-brand-cyan animate-ping"></span>
-                      {t('waiting_khqr', 'កំពុងរង់ចាំការផ្ទេរប្រាក់ Bakong...')}
+                      {t('waiting_khqr', 'កំពុងរង់ចាំការទូទាត់តាម QR...')}
                     </div>
-                    <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Syncing with Bakong Network</span>
+                    <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Scan to Pay / ស្កែនដើម្បីទូទាត់</span>
                   </div>
                 </div>
               )}
