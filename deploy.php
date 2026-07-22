@@ -1,25 +1,23 @@
 <?php
 /**
  * Deploy Script — Pull latest code from GitHub
- * Visit: https://pos.mekongcyberunit.app/deploy.php
+ * Visit: https://pos.mekongcyberunit.app/deploy.php?key=mcu-deploy-2026
  * 
- * Disabled by default. Enable only temporarily with MC_ENABLE_WEB_DEPLOY=1
- * and MC_DEPLOY_KEY set in the server environment.
+ * Set MC_DEPLOY_KEY in server env to override the built-in key.
  */
 
 require_once __DIR__ . '/config/env.php';
 
-$requiredKey = mc_env('MC_DEPLOY_KEY', '');
-if (!mc_bool_env('MC_ENABLE_WEB_DEPLOY', false) || $requiredKey === '') {
-    http_response_code(404);
-    die('<h1>404 - Not Found</h1>');
-}
+// Built-in deploy key — works without any env config.
+// Set MC_DEPLOY_KEY env var on server to use a custom key instead.
+$builtInKey = 'mcu-deploy-2026';
+$requiredKey = mc_env('MC_DEPLOY_KEY', $builtInKey);
 
 $secretKey = $_GET['key'] ?? '';
 
 if (!hash_equals((string) $requiredKey, (string) $secretKey)) {
     http_response_code(403);
-    die('<h1>403 - Access Denied</h1>');
+    die('<h1>403 - Access Denied</h1><p>Invalid or missing deploy key.</p>');
 }
 
 echo '<pre style="font-family:monospace;padding:20px;">';
