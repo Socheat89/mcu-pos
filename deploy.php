@@ -32,6 +32,12 @@ foreach ($output as $line) {
     echo htmlspecialchars($line) . "\n";
 }
 
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+    echo "⚡ OPcache reset successfully!\n";
+}
+clearstatcache(true);
+
 echo "\n" . ($returnCode === 0 ? '✅ Deploy successful!' : '❌ Deploy failed!') . "\n";
 
 // Show last 3 commits
