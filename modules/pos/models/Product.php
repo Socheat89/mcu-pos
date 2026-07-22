@@ -70,8 +70,28 @@ class Product {
 
     // ─── Product Sizes ───────────────────────────────────────
 
+    private static $sizesTableChecked = false;
+    private static $sizesTableExists = false;
+
+    private static function ensureSizesTable() {
+        if (self::$sizesTableChecked) {
+            return self::$sizesTableExists;
+        }
+        self::$sizesTableChecked = true;
+        try {
+            self::$db->fetchAll("SELECT 1 FROM product_sizes LIMIT 1");
+            self::$sizesTableExists = true;
+        } catch (\PDOException $e) {
+            self::$sizesTableExists = false;
+        }
+        return self::$sizesTableExists;
+    }
+
     public static function getSizes($productId, $tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
+        if (!self::ensureSizesTable()) {
+            return [];
+        }
         return self::$db->fetchAll(
             "SELECT * FROM product_sizes WHERE product_id = ? AND tenant_id = ? ORDER BY id",
             [$productId, $tenantId]
@@ -80,6 +100,9 @@ class Product {
 
     public static function saveSizes($productId, $sizes, $tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
+        if (!self::ensureSizesTable()) {
+            return; // Table not yet created, silently skip
+        }
         // Delete existing sizes for this product
         self::$db->delete('product_sizes', 'product_id = ? AND tenant_id = ?', [$productId, $tenantId]);
         // Insert new sizes
