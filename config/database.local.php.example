@@ -1,0 +1,11 @@
+<?php
+// Copy this file to database.local.php on the production server and set the
+// values from the hosting control panel. Do not commit database.local.php.
+
+return [
+    'host' => 'localhost',
+    'database' => 'your_database_name',
+    'username' => 'your_database_user',
+    'password' => 'replace_with_a_strong_password',
+    'charset' => 'utf8mb4',
+];

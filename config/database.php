@@ -3,6 +3,18 @@
 
 require_once __DIR__ . '/env.php';
 
+$localConfigPath = __DIR__ . '/database.local.php';
+if (is_file($localConfigPath)) {
+    $localConfig = require $localConfigPath;
+    $requiredKeys = ['host', 'database', 'username', 'password', 'charset'];
+
+    if (!is_array($localConfig) || array_diff($requiredKeys, array_keys($localConfig))) {
+        throw new RuntimeException('Invalid local database configuration.');
+    }
+
+    return $localConfig;
+}
+
 $isProduction = mc_is_production_request();
 
 return [
