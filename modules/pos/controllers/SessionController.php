@@ -327,16 +327,28 @@ class SessionController {
         $paymentMethods = array_keys($paymentSummary);
         $itemsByPayment = [];
         foreach ($paymentMethods as $method) {
+            // Build WHERE clause — handle cash_khr vs cash split
+            if ($method === 'cash_khr') {
+                $where = "o.session_id = ? AND o.status = 'completed' AND pay.method = 'cash' AND pay.currency = 'KHR'";
+                $params = [$id];
+            } elseif ($method === 'cash') {
+                $where = "o.session_id = ? AND o.status = 'completed' AND pay.method = 'cash' AND (pay.currency = 'USD' OR pay.currency IS NULL)";
+                $params = [$id];
+            } else {
+                $where = "o.session_id = ? AND o.status = 'completed' AND pay.method = ?";
+                $params = [$id, $method];
+            }
+            
             $itemsByPayment[$method] = $db->fetchAll(
                 "SELECT prod.name, prod.sku, SUM(oi.quantity) as qty_sold, SUM(oi.total) as total_revenue
                  FROM order_items oi
                  JOIN orders o ON oi.order_id = o.id
                  JOIN payments pay ON pay.order_id = o.id
                  JOIN products prod ON oi.product_id = prod.id
-                 WHERE o.session_id = ? AND o.status = 'completed' AND pay.method = ?
+                 WHERE {$where}
                  GROUP BY prod.id, prod.name, prod.sku
                  ORDER BY qty_sold DESC",
-                [$id, $method]
+                $params
             );
         }
 
