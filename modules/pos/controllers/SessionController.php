@@ -328,6 +328,19 @@ class SessionController {
             [$id]
         );
 
+        // Get payment info per order for display
+        $orderPaymentsRaw = $db->fetchAll(
+            "SELECT p.order_id, p.method, p.bank_name
+             FROM payments p
+             JOIN orders o ON p.order_id = o.id
+             WHERE o.session_id = ? AND o.status = 'completed'",
+            [$id]
+        );
+        $orderPayments = [];
+        foreach ($orderPaymentsRaw as $op) {
+            $orderPayments[$op['order_id']] = $op;
+        }
+
         include __DIR__ . '/../views/session_detail.php';
     }
 

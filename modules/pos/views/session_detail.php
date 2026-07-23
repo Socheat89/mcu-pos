@@ -109,8 +109,26 @@ $isClosed        = $session['status'] === 'closed';
 
         <!-- ── Main Tabs ── -->
         <?php
-        $methodIcons = ['cash' => 'fas fa-money-bill-wave', 'khqr' => 'fas fa-qrcode', 'card' => 'fas fa-credit-card'];
-        $methodLabels= ['cash' => 'Cash', 'khqr' => 'KHQR', 'card' => 'Card'];
+        $methodIcons = [
+            'cash' => 'fas fa-money-bill-wave', 
+            'khqr' => 'fas fa-qrcode', 
+            'card' => 'fas fa-credit-card',
+            'aba' => 'fas fa-university',
+            'acleda' => 'fas fa-university',
+            'wing' => 'fas fa-university',
+            'truemoney' => 'fas fa-mobile-alt',
+            'other' => 'fas fa-university'
+        ];
+        $methodLabels = [
+            'cash' => 'Cash', 
+            'khqr' => 'KHQR', 
+            'card' => 'Card',
+            'aba' => 'ABA Bank',
+            'acleda' => 'ACLEDA Bank',
+            'wing' => 'Wing Bank',
+            'truemoney' => 'TrueMoney',
+            'other' => 'Other'
+        ];
         ?>
 
         <div class="sd-tabs" id="sdTabs" role="tablist">
@@ -272,16 +290,22 @@ $isClosed        = $session['status'] === 'closed';
                         <table class="pos-table">
                             <thead>
                                 <tr>
-                                    <th style="width:100px;"><?php echo __('reference'); ?></th>
+                                    <th style="width:80px;"><?php echo __('reference'); ?></th>
                                     <th><?php echo __('customer'); ?></th>
+                                    <th>Payment</th>
                                     <th>Order Date</th>
                                     <th><?php echo __('amount'); ?></th>
-                                    <th><?php echo __('status'); ?></th>
                                     <th style="text-align:right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($orders as $o): ?>
+                                <?php foreach ($orders as $o): 
+                                    $orderPay = $orderPayments[$o['id']] ?? null;
+                                    $payMethod = $orderPay['method'] ?? 'cash';
+                                    $payBank   = $orderPay['bank_name'] ?? null;
+                                    $payLabel  = $methodLabels[$payMethod] ?? strtoupper($payMethod);
+                                    if ($payBank) $payLabel .= ' (' . htmlspecialchars($payBank) . ')';
+                                ?>
                                     <tr>
                                         <td style="font-weight:800; color:var(--pos-primary);">#<?php echo $o['id']; ?></td>
                                         <td>
@@ -290,9 +314,14 @@ $isClosed        = $session['status'] === 'closed';
                                                 <span style="font-weight:700; color:var(--pos-text);"><?php echo htmlspecialchars($o['customer_name'] ?? 'Walk-in Customer'); ?></span>
                                             </div>
                                         </td>
+                                        <td>
+                                            <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(99,102,241,0.08); padding:3px 10px; border-radius:10px; font-size:11px; font-weight:700; color:var(--pos-primary);">
+                                                <i class="<?php echo $methodIcons[$payMethod] ?? 'fas fa-dollar-sign'; ?>"></i>
+                                                <?php echo $payLabel; ?>
+                                            </span>
+                                        </td>
                                         <td style="font-size:13px; color:var(--pos-text-muted);"><?php echo date('d M Y, h:i A', strtotime($o['created_at'])); ?></td>
                                         <td style="font-weight:800; color:var(--pos-text); font-size:15px;">$<?php echo number_format($o['total'], 2); ?></td>
-                                        <td><span class="badge badge-success"><?php echo ucfirst($o['status']); ?></span></td>
                                         <td style="text-align:right;">
                                             <a href="<?php echo htmlspecialchars($posUrl('orders/' . $o['id'])); ?>" class="pos-icon-btn" title="View Details">
                                                 <i class="fas fa-eye" style="font-size:13px;"></i>

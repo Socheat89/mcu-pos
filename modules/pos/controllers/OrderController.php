@@ -232,10 +232,12 @@ class OrderController {
 
                 if ($status === 'completed') {
                     $paymentMethod = $_POST['payment_method'] ?? 'cash';
+                    $bankName = $_POST['bank_name'] ?? null;
                     $db->insert('payments', [
                         'order_id' => $resumeOrderId,
                         'amount' => $total,
                         'method' => $paymentMethod,
+                        'bank_name' => $bankName,
                         'status' => 'completed'
                     ]);
                 }
@@ -320,10 +322,12 @@ class OrderController {
             if ($status === 'completed') {
                 // Process payment
                 $paymentMethod = $_POST['payment_method'] ?? 'cash';
+                $bankName = $_POST['bank_name'] ?? null;
                 $paymentData = [
                     'order_id' => $orderId,
                     'amount' => $total,
                     'method' => $paymentMethod,
+                    'bank_name' => $bankName,
                     'status' => 'completed'
                 ];
 
