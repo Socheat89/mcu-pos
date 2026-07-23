@@ -99,6 +99,17 @@ class CashierController {
         }
         $cashierRoleId = $cashierRole ? (int)$cashierRole['id'] : 0;
 
+        // ── Calculate cashier limits BEFORE POST handling ──
+        $cashierCount = $db->fetchOne(
+            "SELECT COUNT(*) as cnt FROM users u
+             JOIN roles r ON u.role_id = r.id
+             WHERE u.tenant_id = ? AND r.level = 1",
+            [$tenantId]
+        );
+        $totalUsers = (int)($cashierCount['cnt'] ?? 0);
+        $maxUsers   = Tenant::getCashierLimit();
+        $canCreate  = ($maxUsers === 0) || ($totalUsers < $maxUsers);
+
         // ── Handle POST actions ──────────────────────────────────
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $action = $_POST['_action'] ?? '';
