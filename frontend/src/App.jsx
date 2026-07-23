@@ -1729,15 +1729,15 @@ export default function App() {
 
       {/* ═══ Payment Modal ═══ */}
       {paymentModalOpen && (
-        <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
+        <div className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-2 sm:p-4 animate-fade-in" onClick={() => setPaymentModalOpen(false)}>
           <div
-            className={`w-full max-w-md rounded-3xl shadow-glass-lg p-6 border transition-all duration-300 ${
+            className={`w-full max-w-md max-h-[95vh] overflow-y-auto rounded-2xl sm:rounded-3xl shadow-glass-lg p-4 sm:p-5 border transition-all duration-300 ${
               darkMode ? 'bg-brand-surfDark/95 border-white/10 text-brand-textDark shadow-glow-violet' : 'bg-white/95 border-slate-200 text-brand-textLight'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`flex items-center justify-between pb-4 border-b ${darkMode ? 'border-white/5' : 'border-slate-100'}`}>
+            <div className={`flex items-center justify-between pb-3 border-b ${darkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-violet text-white flex items-center justify-center shadow-glow-cyan">
                   <CreditCard className="h-5 w-5" />
@@ -1758,7 +1758,7 @@ export default function App() {
             </div>
 
             {/* Total with Currency Toggle */}
-            <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border ${
+            <div className={`mt-3 p-3 rounded-2xl flex items-center justify-between border ${
               darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
             }`}>
               <div>
@@ -1781,9 +1781,9 @@ export default function App() {
             </div>
 
             {/* Payment Method Tabs */}
-            <div className="mt-5 space-y-2">
+            <div className="mt-3 space-y-1.5">
               <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block">{t('payment_method', 'វិធីបង់ប្រាក់')}</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
                     onClick={() => { setPaymentMethod('cash'); setSelectedBank(''); }}
@@ -1851,7 +1851,7 @@ export default function App() {
             </div>
 
             {/* Payment Details */}
-            <div className="mt-4">
+            <div className="mt-3">
               {paymentMethod === 'cash' && (
                 <div className="space-y-3.5 animate-fade-in">
                   <div>
