@@ -381,6 +381,77 @@ class SessionController {
     }
 
     /**
+     * Printable daily report — Stella Mobile Café style
+     * Route: /pos/sessions/{id}/printReport
+     */
+    public function printReport($id) {
+        TenantMiddleware::handle();
+        AuthMiddleware::handle();
+
+        $db = Database::getInstance();
+        $tenantId = Tenant::getId();
+        $id = (int)$id;
+
+        $session = $db->fetchOne(
+            "SELECT s.*, u.username FROM pos_sessions s
+             JOIN users u ON s.user_id = u.id
+             WHERE s.id = ? AND s.tenant_id = ?",
+            [$id, $tenantId]
+        );
+        if (!$session) die('Session not found');
+
+        $isClosed = $session['status'] === 'closed';
+        $currentTenant = Tenant::getCurrent();
+        $tenantName = $currentTenant['name'] ?? '';
+
+        // Load settings
+        require_once __DIR__ . '/../../../core/classes/Settings.php';
+        $settings = Settings::getAll($tenantId);
+        $exchangeRate = (float)($settings['exchange_rate_usd_khr'] ?? 4100);
+
+        // Payment summary with currency split
+        $payments = $db->fetchAll(
+            "SELECT p.method, p.currency, COALESCE(SUM(p.amount),0) as total_amount
+             FROM payments p JOIN orders o ON p.order_id = o.id
+             WHERE o.session_id = ? AND o.status = 'completed'
+             GROUP BY p.method, p.currency",
+            [$id]
+        );
+        $paymentSummary = [];
+        $cashKHRRaw = 0; $cashUSDRaw = 0;
+        foreach ($payments as $p) {
+            $amt = (float)$p['total_amount'];
+            if ($p['method'] === 'cash' && $p['currency'] === 'KHR') {
+                $cashKHRRaw = $amt;
+                $paymentSummary['cash_khr'] = $amt;
+            } elseif ($p['method'] === 'cash') {
+                $cashUSDRaw = $amt;
+                $paymentSummary['cash'] = $amt;
+            } else {
+                $paymentSummary[$p['method']] = $amt;
+            }
+        }
+
+        // Method labels
+        $methodLabels = [
+            'cash'=>'Cash (USD)','cash_khr'=>'Cash (KHR)','aba'=>'ABA','acleda'=>'ACLEDA',
+            'wing'=>'Wing','truemoney'=>'TrueMoney','card'=>'Card','other'=>'Other'
+        ];
+
+        // Sold products
+        $soldProducts = $db->fetchAll(
+            "SELECT p.id, p.name, p.sku, SUM(oi.quantity) as qty_sold, SUM(oi.total) as total_revenue
+             FROM order_items oi JOIN orders o ON oi.order_id = o.id
+             JOIN products p ON oi.product_id = p.id
+             WHERE o.session_id = ? AND o.status = 'completed'
+             GROUP BY p.id, p.name, p.sku ORDER BY qty_sold DESC",
+            [$id]
+        );
+
+        include __DIR__ . '/../views/session_report_print.php';
+    }
+
+    /**
      * Send Telegram notification for session open/close with optional sales report
      */
     private function sendTelegramSessionNotification($tenantId, $userId, $action, $openingBalance = null, $sessionId = null, $totalSales = null, $paymentSummary = null) {

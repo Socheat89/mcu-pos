@@ -64,6 +64,9 @@ $isClosed        = $session['status'] === 'closed';
                         <i class="fas fa-power-off"></i> <?php echo __('close_session'); ?>
                     </a>
                 <?php endif; ?>
+                <a href="<?php echo htmlspecialchars($posUrl('sessions/' . $session['id'] . '/printReport')); ?>" class="btn btn-primary" style="text-decoration:none;" target="_blank">
+                    <i class="fas fa-print"></i> <?php echo __('print_report'); ?>
+                </a>
                 <a href="<?php echo htmlspecialchars($posUrl('sessions')); ?>" class="btn btn-outline" style="text-decoration:none;">
                     <i class="fas fa-arrow-left"></i> <?php echo __('session_list'); ?>
                 </a>
