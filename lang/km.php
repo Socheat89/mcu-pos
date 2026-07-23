@@ -470,6 +470,9 @@ return [
     'new_category'            => 'ប្រភេទថ្មី',
     'category_name_placeholder' => 'ឈ្មោះប្រភេទ ឧ. ភេសជ្ជៈ, ម្ហូប...',
     'create'                  => 'បង្កើត',
+    'all_products'            => 'ផលិតផលទាំងអស់',
+    'add_product'             => 'បន្ថែមផលិតផល',
+    'add_category'            => 'បន្ថែមប្រភេទ',
 
     // General Settings
     'general'                 => 'ទូទៅ',
