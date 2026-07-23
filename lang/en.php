@@ -471,9 +471,12 @@ return [
     'new_category'            => 'New Category',
     'category_name_placeholder' => 'Category name e.g. Drinks, Food...',
     'create'                  => 'Create',
-    'all_products'            => 'All Products',
+    'add_new'                 => 'Add New',
     'add_product'             => 'Add Product',
     'add_category'            => 'Add Category',
+    'save_category'           => 'Save Category',
+    'category_name'           => 'Category Name',
+    'existing_categories'     => 'Existing Categories',
 
     // General Settings
     'general'                 => 'General',

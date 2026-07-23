@@ -146,26 +146,9 @@ $navLabel = function (string $key): string {
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
                 <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
-                <!-- Inventory with dropdown submenu -->
-                <div class="pos-nav-group">
-                    <a class="pos-side-link pos-nav-parent <?php echo $activeClass('products'); ?>" 
-                       href="<?php echo htmlspecialchars($posUrl('products')); ?>"
-                       onclick="toggleSubNav(event, 'subnav-inventory')">
-                        <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
-                        <i class="fas fa-chevron-down pos-nav-arrow" id="arrow-inventory"></i>
-                    </a>
-                    <div class="pos-subnav" id="subnav-inventory" style="display: none;">
-                        <a class="pos-side-link pos-sublink" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
-                            <i class="fas fa-list"></i><span><?php echo __('all_products'); ?></span>
-                        </a>
-                        <a class="pos-side-link pos-sublink" href="<?php echo htmlspecialchars($posUrl('products/create')); ?>">
-                            <i class="fas fa-plus-circle"></i><span><?php echo __('add_product'); ?></span>
-                        </a>
-                        <a class="pos-side-link pos-sublink" href="javascript:void(0)" onclick="openCategoryModal()">
-                            <i class="fas fa-folder-plus"></i><span><?php echo __('add_category'); ?></span>
-                        </a>
-                    </div>
-                </div>
+                <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
+                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
+                </a>
                 <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'customers')): ?>
@@ -312,30 +295,6 @@ $navLabel = function (string $key): string {
                         background: var(--pos-primary-light);
                         color: var(--pos-primary);
                     }
-
-                    /* ── Inventory Dropdown Subnav ── */
-                    .pos-nav-group { position: relative; }
-                    .pos-nav-parent { justify-content: flex-start; cursor: pointer; }
-                    .pos-nav-arrow { 
-                        margin-left: auto; 
-                        font-size: 10px; 
-                        transition: transform 0.2s; 
-                        opacity: 0.6;
-                    }
-                    .pos-nav-parent.open .pos-nav-arrow { transform: rotate(180deg); opacity: 1; }
-                    .pos-subnav { 
-                        margin-left: 20px; 
-                        border-left: 2px solid rgba(var(--pos-primary-rgb), 0.2);
-                        padding-left: 8px;
-                        margin-bottom: 4px;
-                    }
-                    .pos-sublink { 
-                        padding: 8px 14px !important; 
-                        font-size: 13px !important;
-                        opacity: 0.85;
-                    }
-                    .pos-sublink:hover { opacity: 1; }
-                    .pos-sublink i { font-size: 12px !important; width: 18px !important; }
                 </style>
                 <div class="pos-lang-switcher" id="posLangSwitcher">
                     <button class="pos-lang-btn" type="button" onclick="togglePosLang(event)">
@@ -673,70 +632,4 @@ $navLabel = function (string $key): string {
         }
     });
 })();
-</script>
-
-<!-- ── Inventory Subnav Toggle ── -->
-<script>
-function toggleSubNav(e, subnavId) {
-    e.preventDefault();
-    var sub = document.getElementById(subnavId);
-    var parent = e.currentTarget;
-    if (!sub || !parent) return;
-    
-    if (sub.style.display === 'none' || sub.style.display === '') {
-        sub.style.display = 'block';
-        parent.classList.add('open');
-    } else {
-        sub.style.display = 'none';
-        parent.classList.remove('open');
-    }
-}
-
-// Auto-open subnav if any sublink matches current page
-(function() {
-    var path = window.location.pathname;
-    var subnav = document.getElementById('subnav-inventory');
-    var parent = document.querySelector('.pos-nav-parent[href*="products"]');
-    if (subnav && parent && path.indexOf('/products') !== -1) {
-        subnav.style.display = 'block';
-        parent.classList.add('open');
-    }
-})();
-</script>
-
-<!-- ═══ Quick Add Category Modal ═══ -->
-<div id="category-modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.55); backdrop-filter:blur(6px); align-items:center; justify-content:center;" onclick="closeCategoryModal(event)">
-    <div style="background:var(--pos-card); border-radius:24px; padding:32px; max-width:440px; width:90%; border:1.5px solid var(--pos-border); box-shadow:0 25px 60px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
-        <h3 style="font-size:18px; font-weight:900; margin:0 0 8px; color:var(--pos-text);">
-            <i class="fas fa-folder-plus" style="color:var(--pos-primary);"></i> <?php echo __('add_category'); ?>
-        </h3>
-        <p style="font-size:13px; color:var(--pos-text-muted); margin-bottom:20px;"><?php echo __('category_name_placeholder'); ?></p>
-        <form method="POST" action="<?php echo htmlspecialchars($posUrl('products/createCategory')); ?>">
-            <input type="text" name="category_name" class="pos-form-control" placeholder="<?php echo __('category_name_placeholder'); ?>" required style="margin-bottom:16px; width:100%;">
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('category-modal-overlay').style.display='none'">
-                    <?php echo __('cancel'); ?>
-                </button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> <?php echo __('create'); ?>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-function openCategoryModal() {
-    document.getElementById('category-modal-overlay').style.display = 'flex';
-    setTimeout(function() {
-        var inp = document.querySelector('#category-modal-overlay input[name="category_name"]');
-        if (inp) inp.focus();
-    }, 100);
-}
-
-function closeCategoryModal(e) {
-    if (!e || e.target === document.getElementById('category-modal-overlay')) {
-        document.getElementById('category-modal-overlay').style.display = 'none';
-    }
-}
 </script>
