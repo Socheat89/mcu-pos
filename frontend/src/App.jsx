@@ -378,7 +378,8 @@ export default function App() {
     store_label: 'Mekong CyberUnit',
     pos_method_cash_enabled: '1',
     pos_method_khqr_enabled: '1',
-    pos_method_card_enabled: '1'
+    pos_method_card_enabled: '1',
+    exchange_rate_usd_khr: '4100'
   };
   const initialPendingOrders = window.PENDING_ORDERS || [];
   const initialResumeOrder = window.RESUME || null;
@@ -417,6 +418,8 @@ export default function App() {
   const [confirmModal, setConfirmModal] = useState(null);
   const [mobileTab, setMobileTab] = useState('products'); // 'products' | 'cart' // { message, onConfirm }
   const [sizeModal, setSizeModal] = useState(null); // { product } when awaiting size selection
+  const [currency, setCurrency] = useState('USD'); // 'USD' | 'KHR'
+  const [selectedBank, setSelectedBank] = useState(''); // Bank selection for QR
 
   const [timeStr, setTimeStr] = useState(new Date().toLocaleTimeString());
   const formRef = useRef(null);
@@ -769,6 +772,31 @@ export default function App() {
 
   const getSubtotal = () => cart.reduce((sum, item) => sum + getItemTotal(item), 0);
   const getGrandTotal = () => getSubtotal();
+  
+  // ─── Currency Helpers ────────────────────────────────────
+  const exchangeRate = () => parseFloat(settings.exchange_rate_usd_khr || '4100');
+  const formatMoney = (amountUSD) => {
+    if (currency === 'KHR') {
+      const khr = Math.round(amountUSD * exchangeRate());
+      return khr.toLocaleString('en') + '៛';
+    }
+    return '$' + amountUSD.toFixed(2);
+  };
+  const convertToUSD = (amountInCurrency) => {
+    if (currency === 'KHR') {
+      return parseFloat(amountInCurrency) / exchangeRate();
+    }
+    return parseFloat(amountInCurrency) || 0;
+  };
+  const getChange = () => {
+    const totalUSD = getGrandTotal();
+    if (currency === 'KHR') {
+      const totalKHR = Math.round(totalUSD * exchangeRate());
+      const givenKHR = parseFloat(cashGiven) || 0;
+      return Math.max(0, givenKHR - totalKHR);
+    }
+    return Math.max(0, (parseFloat(cashGiven) || 0) - totalUSD);
+  };
   const getCategories = () => ['All', ...new Set(products.map(p => p.category))];
 
   const getFilteredProducts = () => {
@@ -812,9 +840,9 @@ export default function App() {
       return;
     }
     if (paymentMethod === 'cash') {
-      const total = getGrandTotal();
-      const cashVal = parseFloat(cashGiven) || 0;
-      if (cashVal < total) {
+      const totalUSD = getGrandTotal();
+      const cashInUSD = convertToUSD(cashGiven);
+      if (cashInUSD < totalUSD) {
         showToast('error', t('toast_insufficient_cash', 'ប្រាក់មិនគ្រប់'), t('toast_insufficient_cash_msg', 'ចំនួនទឹកប្រាក់តិចជាងសរុប។'));
         return;
       }
@@ -894,7 +922,9 @@ export default function App() {
         <input type="hidden" name="order_status" value={orderStatus} />
         <input type="hidden" name="payment_method" value={paymentMethod} />
         <input type="hidden" name="cash_given" value={cashGiven} />
+        <input type="hidden" name="currency" value={currency} />
         <input type="hidden" name="customer_id" value={selectedCustomerId || ""} />
+        {selectedBank && <input type="hidden" name="bank_name" value={selectedBank} />}
         {resumeOrder && <input type="hidden" name="resume_order_id" value={resumeOrder.id} />}
         {cart.map((item, index) => (
           <React.Fragment key={item.cartKey || item.product.id}>
@@ -1717,17 +1747,27 @@ export default function App() {
               </button>
             </div>
 
-            {/* Total */}
+            {/* Total with Currency Toggle */}
             <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border ${
               darkMode ? 'bg-brand-bgDark/60 border-white/5' : 'bg-slate-50 border-slate-100'
             }`}>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-brand-muted">{t('total_payable', 'ទឹកប្រាក់សរុប')}</div>
-                <div className="text-2xl font-black text-gradient mt-0.5">${getGrandTotal().toFixed(2)}</div>
+                <div className="text-2xl font-black text-gradient mt-0.5">{formatMoney(getGrandTotal())}</div>
               </div>
-              <span className="text-[9px] font-black uppercase bg-brand-cyan/15 text-brand-cyan px-3 py-1.5 rounded-full tracking-wider border border-brand-cyan/25 shadow-glow-cyan">
-                USD
-              </span>
+              <button
+                onClick={() => {
+                  setCurrency(currency === 'USD' ? 'KHR' : 'USD');
+                  setCashGiven('');
+                }}
+                className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-full tracking-wider border transition-all ${
+                  currency === 'KHR'
+                    ? 'bg-amber-400/20 text-amber-600 border-amber-400/30'
+                    : 'bg-brand-cyan/15 text-brand-cyan border-brand-cyan/25 shadow-glow-cyan'
+                }`}
+              >
+                {currency === 'USD' ? 'USD $' : 'KHR ៛'}
+              </button>
             </div>
 
             {/* Payment Method Tabs */}
@@ -1783,11 +1823,11 @@ export default function App() {
                   <div>
                     <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">{t('cash_received', 'ប្រាក់ទទួលបាន')}</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-brand-muted">$</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-brand-muted">{currency === 'KHR' ? '៛' : '$'}</span>
                       <input
                         type="number"
-                        step="0.01"
-                        placeholder="0.00"
+                        step={currency === 'KHR' ? '100' : '0.01'}
+                        placeholder="0"
                         value={cashGiven}
                         onChange={(e) => setCashGiven(e.target.value)}
                         className={`w-full py-2.5 pl-9 pr-4 text-lg font-black rounded-lg border transition-all duration-200 ${
@@ -1797,27 +1837,20 @@ export default function App() {
                         }`}
                       />
                     </div>
-                    {/* Visual Bill Selector Pad */}
+                    {/* Quick Tender Bills - dynamic by currency */}
                     <div className="mt-3 space-y-2">
                       <div className="text-[8px] font-extrabold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
                       <div className="grid grid-cols-4 gap-1.5">
-                        {[
-                          { val: 1.00, label: '$1' },
-                          { val: 5.00, label: '$5' },
-                          { val: 10.00, label: '$10' },
-                          { val: 20.00, label: '$20' },
-                          { val: 50.00, label: '$50' },
-                          { val: 100.00, label: '$100' },
-                          { val: 2.50, label: '10K' },
-                          { val: 5.00, label: '20K' },
-                          { val: 12.50, label: '50K' }
-                        ].map(bill => (
+                        {(currency === 'USD'
+                          ? [{ val: 1, label: '$1' }, { val: 5, label: '$5' }, { val: 10, label: '$10' }, { val: 20, label: '$20' }, { val: 50, label: '$50' }, { val: 100, label: '$100' }, { val: getGrandTotal(), label: '=' }]
+                          : [{ val: 1000, label: '1K' }, { val: 5000, label: '5K' }, { val: 10000, label: '10K' }, { val: 20000, label: '20K' }, { val: 50000, label: '50K' }, { val: 100000, label: '100K' }, { val: Math.round(getGrandTotal() * exchangeRate()), label: '=' }]
+                        ).map(bill => (
                           <button
                             key={bill.label}
                             type="button"
                             onClick={() => {
                               const current = parseFloat(cashGiven) || 0;
-                              setCashGiven((current + bill.val).toFixed(2));
+                              setCashGiven((current + bill.val).toFixed(currency === 'KHR' ? 0 : 2));
                             }}
                             className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
                               darkMode
@@ -1839,11 +1872,14 @@ export default function App() {
                     </div>
                   </div>
 
-                  {parseFloat(cashGiven) > 0 && (
+                  {(parseFloat(cashGiven) || 0) > 0 && (
                     <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
                       <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
                       <span className="text-xl font-black text-brand-success">
-                        ${Math.max(0, parseFloat(cashGiven) - getGrandTotal()).toFixed(2)}
+                        {currency === 'KHR'
+                          ? getChange().toLocaleString('en') + '៛'
+                          : '$' + getChange().toFixed(2)
+                        }
                       </span>
                     </div>
                   )}
@@ -1852,6 +1888,34 @@ export default function App() {
 
               {paymentMethod === 'khqr' && (
                 <div className="text-center space-y-4 animate-fade-in">
+                  {/* Bank Selection */}
+                  <div className="text-left">
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">
+                      {currentLang === 'km' ? 'ជ្រើសរើសធនាគារ' : 'Select Bank'}
+                    </label>
+                    <select
+                      value={selectedBank}
+                      onChange={(e) => setSelectedBank(e.target.value)}
+                      className={`w-full py-2.5 px-4 text-sm font-bold rounded-lg border transition-all duration-200 ${
+                        darkMode
+                          ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50'
+                          : 'bg-white border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan'
+                      }`}
+                    >
+                      <option value="">{currentLang === 'km' ? '-- ជ្រើសរើស --' : '-- Select Bank --'}</option>
+                      <option value="aba">ABA Bank</option>
+                      <option value="acleda">ACLEDA Bank</option>
+                      <option value="wing">Wing Bank</option>
+                      <option value="truemoney">TrueMoney</option>
+                      <option value="cb">Cambodia Public Bank (CPB)</option>
+                      <option value="ftb">Foreign Trade Bank (FTB)</option>
+                      <option value="canadia">Canadia Bank</option>
+                      <option value="prasac">Prasac MFI</option>
+                      <option value="lolc">LOLC MFI</option>
+                      <option value="amret">Amret MFI</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
                   <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
                     <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
                       <img

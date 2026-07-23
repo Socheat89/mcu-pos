@@ -103,7 +103,9 @@ $dashboardUrl = $posBase . '/dashboard';
             'store_label' => $settings['store_label'] ?? '',
             'pos_method_cash_enabled' => $settings['pos_method_cash_enabled'] ?? '1',
             'pos_method_khqr_enabled' => $settings['pos_method_khqr_enabled'] ?? '1',
-            'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1'
+            'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1',
+            'exchange_rate_usd_khr' => $settings['exchange_rate_usd_khr'] ?? '4100',
+            'payment_qr_path' => $settings['payment_qr_path'] ?? ($settings['pos_method_khqr_image'] ?? ''),
         ]); ?>;
 
         window.CURRENT_LANG = "<?php echo Language::getCurrentLang(); ?>";
