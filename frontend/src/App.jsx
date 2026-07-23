@@ -792,10 +792,21 @@ export default function App() {
     const totalUSD = getGrandTotal();
     if (currency === 'KHR') {
       const totalKHR = Math.round(totalUSD * exchangeRate());
-      const givenKHR = parseFloat(cashGiven) || 0;
-      return Math.max(0, givenKHR - totalKHR);
+      const givenKHR = Math.round(parseFloat(cashGiven) || 0);
+      const diff = givenKHR - totalKHR;
+      return diff > 0 ? diff : 0;
     }
-    return Math.max(0, (parseFloat(cashGiven) || 0) - totalUSD);
+    const total = totalUSD;
+    const given = parseFloat(cashGiven) || 0;
+    const diff = given - total;
+    return diff > 0 ? diff : 0;
+  };
+  const hasSufficientCash = () => {
+    const totalUSD = getGrandTotal();
+    if (currency === 'KHR') {
+      return Math.round(parseFloat(cashGiven) || 0) >= Math.round(totalUSD * exchangeRate());
+    }
+    return (parseFloat(cashGiven) || 0) >= totalUSD;
   };
   const getCategories = () => ['All', ...new Set(products.map(p => p.category))];
 
@@ -840,16 +851,15 @@ export default function App() {
       return;
     }
     if (paymentMethod === 'cash') {
-      const totalUSD = getGrandTotal();
-      const cashInUSD = convertToUSD(cashGiven);
-      if (cashInUSD < totalUSD) {
+      if (!hasSufficientCash()) {
         showToast('error', t('toast_insufficient_cash', 'ប្រាក់មិនគ្រប់'), t('toast_insufficient_cash_msg', 'ចំនួនទឹកប្រាក់តិចជាងសរុប។'));
         return;
       }
       submitCheckout();
     } else if (paymentMethod === 'card') {
       startCardSimulation();
-    } else if (paymentMethod === 'khqr') {
+    } else {
+      // Bank transfer / QR payment — no cash validation needed
       submitCheckout();
     }
   };
@@ -1776,7 +1786,7 @@ export default function App() {
               <div className="grid grid-cols-3 gap-2">
                 {settings.pos_method_cash_enabled === '1' && (
                   <button
-                    onClick={() => setPaymentMethod('cash')}
+                    onClick={() => { setPaymentMethod('cash'); setSelectedBank(''); }}
                     className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'cash'
                         ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
@@ -1789,28 +1799,52 @@ export default function App() {
                 )}
                 {settings.pos_method_khqr_enabled === '1' && (
                   <button
-                    onClick={() => setPaymentMethod('khqr')}
+                    onClick={() => { setPaymentMethod('aba'); setSelectedBank('aba'); }}
                     className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
-                      paymentMethod === 'khqr'
+                      paymentMethod === 'aba'
                         ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <QrCode className="h-4 w-4" />
-                    <span className="text-[10px] font-bold">{t('khqr', 'ទូទាត់តាម QR')}</span>
+                    <span className="text-[10px] font-black">ABA</span>
                   </button>
                 )}
+                <button
+                  onClick={() => { setPaymentMethod('acleda'); setSelectedBank('acleda'); }}
+                  className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
+                    paymentMethod === 'acleda'
+                      ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                      : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
+                  }`}
+                >
+                  <span className="text-[10px] font-black">ACLEDA</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {['wing', 'truemoney', 'other'].map(bank => (
+                  <button
+                    key={bank}
+                    onClick={() => { setPaymentMethod(bank); setSelectedBank(bank); }}
+                    className={`p-2.5 rounded-lg border text-center flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                      paymentMethod === bank
+                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black">{bank === 'wing' ? 'Wing' : bank === 'truemoney' ? 'TrueMoney' : currentLang === 'km' ? 'ផ្សេងៗ' : 'Other'}</span>
+                  </button>
+                ))}
                 {settings.pos_method_card_enabled === '1' && (
                   <button
-                    onClick={() => setPaymentMethod('card')}
-                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
+                    onClick={() => { setPaymentMethod('card'); setSelectedBank(''); }}
+                    className={`p-2.5 rounded-lg border text-center flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                       paymentMethod === 'card'
                         ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
                     }`}
                   >
-                    <CreditCard className="h-4 w-4" />
-                    <span className="text-[10px] font-bold">{t('card', 'Card')}</span>
+                    <CreditCard className="h-3.5 w-3.5" />
+                    <span className="text-[9px] font-bold">{t('card', 'Card')}</span>
                   </button>
                 )}
               </div>
@@ -1886,52 +1920,19 @@ export default function App() {
                 </div>
               )}
 
-              {paymentMethod === 'khqr' && (
-                <div className="text-center space-y-4 animate-fade-in">
-                  {/* Bank Selection */}
-                  <div className="text-left">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-brand-muted block mb-1.5">
-                      {currentLang === 'km' ? 'ជ្រើសរើសធនាគារ' : 'Select Bank'}
-                    </label>
-                    <select
-                      value={selectedBank}
-                      onChange={(e) => setSelectedBank(e.target.value)}
-                      className={`w-full py-2.5 px-4 text-sm font-bold rounded-lg border transition-all duration-200 ${
-                        darkMode
-                          ? 'bg-brand-bgDark border-white/5 text-brand-textDark focus:border-brand-cyan/50'
-                          : 'bg-white border-slate-200 text-brand-textLight focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan'
-                      }`}
-                    >
-                      <option value="">{currentLang === 'km' ? '-- ជ្រើសរើស --' : '-- Select Bank --'}</option>
-                      <option value="aba">ABA Bank</option>
-                      <option value="acleda">ACLEDA Bank</option>
-                      <option value="wing">Wing Bank</option>
-                      <option value="truemoney">TrueMoney</option>
-                      <option value="cb">Cambodia Public Bank (CPB)</option>
-                      <option value="ftb">Foreign Trade Bank (FTB)</option>
-                      <option value="canadia">Canadia Bank</option>
-                      <option value="prasac">Prasac MFI</option>
-                      <option value="lolc">LOLC MFI</option>
-                      <option value="amret">Amret MFI</option>
-                      <option value="other">Other</option>
-                    </select>
+              {(paymentMethod === 'aba' || paymentMethod === 'acleda' || paymentMethod === 'wing' || paymentMethod === 'truemoney' || paymentMethod === 'other') && (
+                <div className="text-center space-y-4 animate-fade-in p-4 rounded-2xl border border-brand-cyan/20 bg-brand-cyan/5">
+                  <div className="h-12 w-12 mx-auto rounded-2xl bg-brand-cyan/15 flex items-center justify-center">
+                    <QrCode className="h-6 w-6 text-brand-cyan" />
                   </div>
-                  <div className="relative inline-block p-1 rounded-3xl bg-slate-100 border border-slate-200 overflow-hidden shadow-inner">
-                    <div className="relative qr-container inline-block border border-slate-300/40 rounded-2xl bg-white overflow-hidden p-3.5 z-10">
-                      <img
-                        src={settings.payment_qr_path || settings.pos_method_khqr_image || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getKHQRString())}`}
-                        alt="Payment QR Code"
-                        className="h-44 w-44 mx-auto rounded-xl relative z-10 object-contain"
-                      />
-                      <div className="absolute inset-x-0 h-0.5 bg-red-500 shadow-[0_0_10px_#f43f5e] animate-scanner-laser top-3.5 z-20"></div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center justify-center gap-1.5">
-                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-brand-cyan animate-pulse flex items-center gap-2 justify-center">
-                      <span className="h-2 w-2 rounded-full bg-brand-cyan animate-ping"></span>
-                      {t('waiting_khqr', 'កំពុងរង់ចាំការទូទាត់តាម QR...')}
-                    </div>
-                    <span className="text-[9px] text-brand-muted font-bold uppercase tracking-wider">Scan to Pay / ស្កែនដើម្បីទូទាត់</span>
+                  <div>
+                    <p className="text-sm font-black text-brand-cyan">
+                      {paymentMethod === 'aba' ? 'ABA Bank' : paymentMethod === 'acleda' ? 'ACLEDA Bank' : paymentMethod === 'wing' ? 'Wing Bank' : paymentMethod === 'truemoney' ? 'TrueMoney' : currentLang === 'km' ? 'ធនាគារផ្សេងៗ' : 'Other Bank'}
+                    </p>
+                    <p className="text-[10px] text-brand-muted font-bold mt-1">
+                      {currentLang === 'km' ? 'សូមឱ្យអតិថិជនស្កែន QR ដើម្បីទូទាត់' : 'Ask customer to scan & pay'}
+                    </p>
+                    <p className="text-lg font-black text-gradient mt-2">{formatMoney(getGrandTotal())}</p>
                   </div>
                 </div>
               )}
