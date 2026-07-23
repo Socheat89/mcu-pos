@@ -1876,8 +1876,25 @@ export default function App() {
                       <div className="text-[8px] font-extrabold uppercase tracking-widest text-brand-muted">{t('quick_tender', 'Quick Tender Notes')}</div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {(currency === 'USD'
-                          ? [{ val: 1, label: '$1' }, { val: 5, label: '$5' }, { val: 10, label: '$10' }, { val: 20, label: '$20' }, { val: 50, label: '$50' }, { val: 100, label: '$100' }, { val: getGrandTotal(), label: '=' }]
-                          : [{ val: 1000, label: '1K' }, { val: 5000, label: '5K' }, { val: 10000, label: '10K' }, { val: 20000, label: '20K' }, { val: 50000, label: '50K' }, { val: 100000, label: '100K' }, { val: Math.round(getGrandTotal() * exchangeRate()), label: '=' }]
+                          ? [
+                              { val: 1, label: '$1' },
+                              { val: 5, label: '$5' },
+                              { val: 10, label: '$10' },
+                              { val: 20, label: '$20' },
+                              { val: 50, label: '$50' },
+                              { val: 100, label: '$100' },
+                              { val: getGrandTotal(), label: '=' }
+                            ]
+                          : [
+                              { val: 500, label: '500' },
+                              { val: 1000, label: '1,000' },
+                              { val: 2000, label: '2,000' },
+                              { val: 5000, label: '5,000' },
+                              { val: 10000, label: '10,000' },
+                              { val: 20000, label: '20,000' },
+                              { val: 50000, label: '50,000' },
+                              { val: Math.round(getGrandTotal() * exchangeRate()), label: '=' }
+                            ]
                         ).map(bill => (
                           <button
                             key={bill.label}
@@ -1907,15 +1924,29 @@ export default function App() {
                   </div>
 
                   {(parseFloat(cashGiven) || 0) > 0 && (
-                    <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
-                      <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
-                      <span className="text-xl font-black text-brand-success">
-                        {currency === 'KHR'
-                          ? getChange().toLocaleString('en') + '៛'
-                          : '$' + getChange().toFixed(2)
-                        }
-                      </span>
-                    </div>
+                    hasSufficientCash() ? (
+                      <div className="p-3.5 rounded-2xl border border-brand-success/20 bg-brand-success/10 flex items-center justify-between animate-scale-in">
+                        <span className="text-[11px] font-extrabold text-brand-success">{t('change', 'ប្រាក់អាប់ Change')}</span>
+                        <span className="text-xl font-black text-brand-success">
+                          {currency === 'KHR'
+                            ? getChange().toLocaleString('en') + '៛'
+                            : '$' + getChange().toFixed(2)
+                          }
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 rounded-2xl border border-brand-danger/20 bg-brand-danger/5 flex items-center justify-between animate-scale-in">
+                        <span className="text-[11px] font-extrabold text-brand-danger">
+                          {currentLang === 'km' ? 'ប្រាក់មិនគ្រប់' : 'Insufficient'}
+                        </span>
+                        <span className="text-sm font-black text-brand-danger">
+                          {currency === 'KHR'
+                            ? 'ត្រូវការ ' + (Math.round(getGrandTotal() * exchangeRate()) - Math.round(parseFloat(cashGiven) || 0)).toLocaleString('en') + '៛ បន្ថែម'
+                            : 'Need $' + (getGrandTotal() - (parseFloat(cashGiven) || 0)).toFixed(2) + ' more'
+                          }
+                        </span>
+                      </div>
+                    )
                   )}
                 </div>
               )}
