@@ -115,6 +115,60 @@ class ProductController {
         exit;
     }
 
+    /**
+     * Update category name — POST category_id + category_name
+     * Route: /pos/products/updateCategory
+     */
+    public function updateCategory() {
+        TenantMiddleware::handle();
+        AuthMiddleware::handle();
+
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = (int)($_POST['category_id'] ?? 0);
+            $name = trim($_POST['category_name'] ?? '');
+            if ($id > 0 && $name !== '') {
+                $db = Database::getInstance();
+                $tenantId = Tenant::getId();
+                $db->update('categories', ['name' => $name], 'id = ? AND tenant_id = ?', [$id, $tenantId]);
+            }
+        }
+
+        $prefix = mc_base_path();
+        header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
+        exit;
+    }
+
+    /**
+     * Delete category — GET with ID
+     * Route: /pos/products/deleteCategory/{id}
+     */
+    public function deleteCategory($id) {
+        TenantMiddleware::handle();
+        AuthMiddleware::handle();
+
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
+        $id = (int)$id;
+        if ($id > 0) {
+            $db = Database::getInstance();
+            $tenantId = Tenant::getId();
+            // Unlink products first to avoid FK issues
+            $db->update('products', ['category_id' => null], 'category_id = ? AND tenant_id = ?', [$id, $tenantId]);
+            // Delete the category
+            $db->delete('categories', 'id = ? AND tenant_id = ?', [$id, $tenantId]);
+        }
+
+        $prefix = mc_base_path();
+        header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
+        exit;
+    }
+
     public function import() {
         TenantMiddleware::handle();
         AuthMiddleware::handle();

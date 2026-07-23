@@ -150,7 +150,7 @@ $urlPrefix = mc_base_path();
             </div>
         </div>
 
-        <div class="pos-grid cols-4" style="margin-bottom: 32px;">
+        <div class="pos-grid cols-4" style="margin-bottom: 24px;">
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_skus'); ?></span>
                 <p class="v"><?php echo count($products); ?></p>
@@ -159,8 +159,58 @@ $urlPrefix = mc_base_path();
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_categories'); ?></span>
                 <p class="v"><?php echo count($categories); ?></p>
-
                 <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-tags"></i></div>
+            </div>
+        </div>
+
+        <!-- ─── Category Management Dropdown ─── -->
+        <div style="margin-bottom: 24px; background: #ffffff; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); overflow: hidden;">
+            <button type="button" onclick="toggleCategoryPanel()" 
+                style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: none; border: none; cursor: pointer; font-weight: 800; font-size: 14px; color: var(--pos-text);">
+                <span>
+                    <i class="fas fa-tags" style="color: var(--pos-primary); margin-right: 8px;"></i>
+                    <?php echo __('category_management'); ?>
+                    <span style="font-weight: 500; font-size: 12px; color: var(--pos-text-muted); margin-left: 8px;">(<?php echo count($categories); ?>)</span>
+                </span>
+                <i id="cat-panel-chevron" class="fas fa-chevron-down" style="font-size: 12px; color: var(--pos-text-muted); transition: transform 0.2s;"></i>
+            </button>
+            <div id="category-panel" style="display: none; border-top: 1px solid var(--pos-border); padding: 16px 20px;">
+                <?php if (empty($categories)): ?>
+                    <p style="text-align: center; color: var(--pos-text-muted); font-size: 13px; font-weight: 600; padding: 20px 0;">
+                        <?php echo __('no_categories_yet'); ?>
+                    </p>
+                <?php else: ?>
+                    <div style="display: grid; gap: 8px;">
+                        <?php foreach ($categories as $cat): 
+                            $catProductCount = 0;
+                            foreach ($products as $p) {
+                                if ($p['category_id'] == $cat['id']) $catProductCount++;
+                            }
+                        ?>
+                        <div class="cat-row" data-cat-id="<?php echo $cat['id']; ?>" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #e5e7eb; transition: all 0.15s;">
+                            <i class="fas fa-folder" style="color: var(--pos-primary); font-size: 14px;"></i>
+                            <span class="cat-name-display" style="flex: 1; font-weight: 700; font-size: 13px; color: var(--pos-text);"><?php echo htmlspecialchars($cat['name']); ?></span>
+                            <span style="font-size: 11px; font-weight: 600; color: var(--pos-text-muted); background: #e5e7eb; padding: 2px 8px; border-radius: 8px;"><?php echo $catProductCount; ?> <?php echo __('products'); ?></span>
+                            <div class="cat-actions" style="display: flex; gap: 4px;">
+                                <button type="button" class="cat-edit-btn" title="<?php echo __('edit'); ?>" onclick="editCategory(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars(addslashes($cat['name'])); ?>')" style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; color: var(--pos-primary); font-size: 12px;">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <a href="<?php echo htmlspecialchars($posUrl('products/deleteCategory/' . $cat['id'])); ?>" 
+                                   class="cat-del-btn" title="<?php echo __('delete'); ?>"
+                                   onclick="return confirm('<?php echo __('confirm_delete_category'); ?>')"
+                                   style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid #fecaca; background: #fff; cursor: pointer; color: #ef4444; font-size: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--pos-border);">
+                    <button type="button" class="btn btn-primary" onclick="openCategoryModal()" style="width: 100%; font-size: 13px; padding: 10px;">
+                        <i class="fas fa-plus"></i> <?php echo __('add_category'); ?>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -318,6 +368,48 @@ $urlPrefix = mc_base_path();
                 document.getElementById('inventory-dropdown').style.display = 'none';
             }
         });
+
+        // ─── Category Panel Toggle ──────────────────────────
+        function toggleCategoryPanel() {
+            const panel = document.getElementById('category-panel');
+            const chevron = document.getElementById('cat-panel-chevron');
+            const isOpen = panel.style.display === 'block';
+            panel.style.display = isOpen ? 'none' : 'block';
+            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        // ─── Inline Category Edit ───────────────────────────
+        function editCategory(catId, currentName) {
+            const row = document.querySelector(`.cat-row[data-cat-id="${catId}"]`);
+            if (!row) return;
+            const nameSpan = row.querySelector('.cat-name-display');
+            const actionsDiv = row.querySelector('.cat-actions');
+            const originalHtml = row.innerHTML;
+
+            // Replace with inline edit form
+            row.innerHTML = `
+                <form method="POST" action="<?php echo htmlspecialchars($posUrl('products/updateCategory')); ?>" style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    <input type="hidden" name="category_id" value="${catId}">
+                    <i class="fas fa-folder" style="color: var(--pos-primary); font-size: 14px; flex-shrink: 0;"></i>
+                    <input type="text" name="category_name" class="pos-form-control" value="${currentName.replace(/"/g, '&quot;')}" style="flex: 1; padding: 8px 12px; font-size: 13px; margin-bottom: 0;" autofocus>
+                    <button type="submit" class="btn btn-primary" style="padding: 8px 14px; font-size: 12px;"><i class="fas fa-check"></i></button>
+                    <button type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 12px;" onclick="cancelEdit(this, '${catId}')"><i class="fas fa-times"></i></button>
+                </form>
+            `;
+
+            // Store original for cancel
+            row.setAttribute('data-original', originalHtml);
+        }
+
+        function cancelEdit(btn, catId) {
+            const row = document.querySelector(`.cat-row[data-cat-id="${catId}"]`);
+            if (!row) return;
+            const original = row.getAttribute('data-original');
+            if (original) {
+                row.innerHTML = original;
+                row.removeAttribute('data-original');
+            }
+        }
     </script>
     
     <?php include __DIR__ . '/partials/footer.php'; ?>

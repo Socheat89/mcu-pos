@@ -477,6 +477,10 @@ return [
     'save_category'           => 'Save Category',
     'category_name'           => 'Category Name',
     'existing_categories'     => 'Existing Categories',
+    'category_management'     => 'Category Management',
+    'no_categories_yet'       => 'No categories yet. Add your first category below.',
+    'confirm_delete_category' => 'Delete this category? Products in this category will become uncategorized.',
+    'category_updated'        => 'Category updated!',
 
     // General Settings
     'general'                 => 'General',

@@ -476,6 +476,10 @@ return [
     'save_category'           => 'រក្សាទុកប្រភេទ',
     'category_name'           => 'ឈ្មោះប្រភេទ',
     'existing_categories'     => 'ប្រភេទដែលមានស្រាប់',
+    'category_management'     => 'គ្រប់គ្រងប្រភេទ',
+    'no_categories_yet'       => 'មិនទាន់មានប្រភេទទេ។ បន្ថែមប្រភេទដំបូងរបស់អ្នកខាងក្រោម។',
+    'confirm_delete_category' => 'លុបប្រភេទនេះ? ផលិតផលក្នុងប្រភេទនេះនឹងក្លាយទៅជាគ្មានប្រភេទ។',
+    'category_updated'        => 'បានធ្វើបច្ចុប្បន្នភាពប្រភេទ!',
 
     // General Settings
     'general'                 => 'ទូទៅ',
