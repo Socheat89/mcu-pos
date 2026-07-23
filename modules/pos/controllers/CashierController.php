@@ -163,6 +163,10 @@ class CashierController {
                         } catch (Exception $e) {
                             error_log('Cashier creation failed for tenant ' . $tenantId . ': ' . $e->getMessage());
                             $error = 'Unable to create the cashier. Please review the details and try again.';
+                            // Show actual error for tenant admins (help debug)
+                            if (Auth::isTenantAdmin()) {
+                                $error .= ' [Debug: ' . htmlspecialchars($e->getMessage()) . ']';
+                            }
                         }
                     }
                 }

@@ -41,11 +41,14 @@ class User {
 
     public static function getUserLimit($tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
-        // Use same plan-based limit as Tenant::getCashierLimit() if available,
-        // fall back to settings max_free_users (0 = unlimited)
-        if (method_exists('Tenant', 'getCashierLimit')) {
-            $planLimit = Tenant::getCashierLimit();
-            if ($planLimit > 0) return $planLimit;
+        // Try plan-based limit first (safe — catches missing columns)
+        try {
+            if (method_exists('Tenant', 'getCashierLimit')) {
+                $planLimit = Tenant::getCashierLimit();
+                if ($planLimit > 0) return $planLimit;
+            }
+        } catch (\Exception $e) {
+            // Column may not exist yet — fall through to settings
         }
         $settingsLimit = (int) Settings::get('max_free_users', $tenantId, 0);
         return $settingsLimit; // 0 = unlimited
