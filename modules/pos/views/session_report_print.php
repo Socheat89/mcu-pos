@@ -1,6 +1,6 @@
 <?php
 // modules/pos/views/session_report_print.php
-// Clean printable daily report — Professional Khmer POS Style
+// Clean printable daily report — Siemreap Font Style (No Icons)
 $companyName = $tenantName ?? ($currentTenant['name'] ?? 'POS');
 $staffName = htmlspecialchars($session['username'] ?? '');
 $sessionDate = date('d M Y', strtotime($session['opened_at']));
@@ -25,11 +25,11 @@ foreach ($paymentSummary as $method => $amt) {
     <title>Daily Sales Report — <?php echo htmlspecialchars($companyName); ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&family=Kantumruy+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Siemreap&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Kantumruy Pro', 'Battambang', 'Courier New', monospace, sans-serif;
+            font-family: 'Siemreap', 'Kantumruy Pro', 'Courier New', monospace, sans-serif;
             font-size: 13px;
             color: #000000;
             background: #f8fafc;
@@ -221,7 +221,7 @@ foreach ($paymentSummary as $method => $amt) {
 
 <!-- Print Button Toolbar -->
 <div class="toolbar no-print">
-    <button class="btn-print" onclick="window.print()">🖨️ Print Daily Report / បោះពុម្ព</button>
+    <button class="btn-print" onclick="window.print()">Print Daily Report / បោះពុម្ព</button>
 </div>
 
 <div class="report-container">
@@ -253,7 +253,7 @@ foreach ($paymentSummary as $method => $amt) {
     </div>
 
     <!-- Section 1: Items Sold -->
-    <div class="section-title">📋 មុខទំនិញលក់ចេញ / Items Sold</div>
+    <div class="section-title">មុខទំនិញលក់ចេញ / Items Sold</div>
     <table class="report-table">
         <thead>
             <tr>
@@ -290,7 +290,7 @@ foreach ($paymentSummary as $method => $amt) {
     </table>
 
     <!-- Section 2: Sale Income Today -->
-    <div class="section-title">💰 ចំណូលថ្ងៃនេះ / Sale Income Today</div>
+    <div class="section-title">ចំណូលថ្ងៃនេះ / Sale Income Today</div>
     <table class="report-table">
         <thead>
             <tr>
@@ -302,14 +302,14 @@ foreach ($paymentSummary as $method => $amt) {
         <tbody>
             <?php if ($cashUSD_amt > 0): ?>
             <tr>
-                <td>💵 Cash — USD</td>
+                <td>Cash — USD</td>
                 <td class="text-right bold">$<?php echo number_format($cashUSD_amt, 2); ?></td>
                 <td class="text-right">—</td>
             </tr>
             <?php endif; ?>
             <?php if ($cashKHR_usd > 0): ?>
             <tr>
-                <td>💵 Cash — KHR</td>
+                <td>Cash — KHR</td>
                 <td class="text-right">$<?php echo number_format($cashKHR_usd, 2); ?></td>
                 <td class="text-right bold"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</td>
             </tr>
@@ -317,16 +317,15 @@ foreach ($paymentSummary as $method => $amt) {
             <?php foreach ($paymentSummary as $method => $amt): 
                 if ($method === 'cash' || $method === 'cash_khr') continue;
                 $label = $methodLabels[$method] ?? strtoupper($method);
-                $icon = ($method === 'card') ? '💳' : '🏦';
             ?>
             <tr>
-                <td><?php echo $icon . ' ' . htmlspecialchars($label); ?></td>
+                <td><?php echo htmlspecialchars($label); ?></td>
                 <td class="text-right bold">$<?php echo number_format($amt, 2); ?></td>
                 <td class="text-right">—</td>
             </tr>
             <?php endforeach; ?>
             <tr class="total-row">
-                <td>📊 Grand Total / សរុបរួម</td>
+                <td>Grand Total / សរុបរួម</td>
                 <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
                 <td class="text-right bold"><?php echo number_format($totalRevenue * $rate, 0); ?>៛</td>
             </tr>
@@ -335,7 +334,7 @@ foreach ($paymentSummary as $method => $amt) {
     <div class="rate-note">អត្រាប្តូរ: 1$ = <?php echo number_format($rate, 0); ?>៛</div>
 
     <!-- Section 3: Cash Balance -->
-    <div class="section-title">🔒 សាច់ប្រាក់ / Cash Balance</div>
+    <div class="section-title">សាច់ប្រាក់ / Cash Balance</div>
     <table class="report-table">
         <thead>
             <tr>
@@ -345,21 +344,21 @@ foreach ($paymentSummary as $method => $amt) {
         </thead>
         <tbody>
             <tr>
-                <td>💰 Opening Balance / សាច់ប្រាក់ដើម</td>
+                <td>Opening Balance / សាច់ប្រាក់ដើម</td>
                 <td class="text-right bold">$<?php echo number_format($session['opening_balance'], 2); ?></td>
             </tr>
             <tr>
-                <td>➕ Total Sales / លក់បានសរុប</td>
+                <td>Total Sales / លក់បានសរុប</td>
                 <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
             </tr>
             <?php if ($isClosed): ?>
             <tr>
-                <td>🔒 Closing Balance / សាច់ប្រាក់បិទ</td>
+                <td>Closing Balance / សាច់ប្រាក់បិទ</td>
                 <td class="text-right bold">$<?php echo number_format($session['closing_balance'], 2); ?></td>
             </tr>
             <?php $diff = $session['closing_balance'] - ($session['opening_balance'] + $totalRevenue); ?>
             <tr>
-                <td><?php echo $diff >= 0 ? '✅' : '⚠️'; ?> Difference / ខុសគ្នា</td>
+                <td>Difference / ខុសគ្នា</td>
                 <td class="text-right bold" style="color:<?php echo $diff >= 0 ? '#10b981' : '#ef4444'; ?>;">
                     <?php echo ($diff >= 0 ? '+' : '') . number_format($diff, 2); ?>
                 </td>
@@ -383,4 +382,5 @@ foreach ($paymentSummary as $method => $amt) {
 </script>
 </body>
 </html>
+
 
