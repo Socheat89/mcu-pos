@@ -108,19 +108,19 @@ $isClosed        = $session['status'] === 'closed';
         </div>
 
         <!-- ── Cash Breakdown (USD vs KHR) ── -->
-        <?php $cashUSD = $cashUSDRaw ?? 0; $cashKHR = $cashKHRRaw ?? 0; $rate = $exchangeRate ?? 4100; ?>
-        <?php if ($cashUSD > 0 || $cashKHR > 0): ?>
+        <?php $cashUSD_amt = $cashUSDRaw ?? 0; $cashKHR_usd = $cashKHRRaw ?? 0; $rate = $exchangeRate ?? 4100; ?>
+        <?php if ($cashUSD_amt > 0 || $cashKHR_usd > 0): ?>
         <div class="pos-grid cols-2" style="margin-bottom:24px;">
-            <?php if ($cashUSD > 0): ?>
+            <?php if ($cashUSD_amt > 0): ?>
             <div class="pos-stat" style="border-left:4px solid #10b981;">
                 <span class="k">💵 Cash — USD ($)</span>
-                <p class="v">$<?php echo number_format($cashUSD, 2); ?></p>
+                <p class="v">$<?php echo number_format($cashUSD_amt, 2); ?></p>
             </div>
             <?php endif; ?>
-            <?php if ($cashKHR > 0): ?>
+            <?php if ($cashKHR_usd > 0): ?>
             <div class="pos-stat" style="border-left:4px solid #f59e0b;">
-                <span class="k">💵 Cash — KHR (៛) ~$<?php echo number_format($cashKHR / max($rate, 1), 2); ?></span>
-                <p class="v"><?php echo number_format($cashKHR, 0); ?>៛</p>
+                <span class="k">💵 Cash — KHR (៛) ~$<?php echo number_format($cashKHR_usd, 2); ?></span>
+                <p class="v"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</p>
             </div>
             <?php endif; ?>
         </div>
@@ -157,11 +157,16 @@ $isClosed        = $session['status'] === 'closed';
                 <span class="tab-badge"><?php echo count($soldProducts); ?></span>
             </button>
 
-            <?php foreach ($paymentSummary as $method => $amount): ?>
+            <?php foreach ($paymentSummary as $method => $amount): 
+                $badgeLabel = '$' . number_format($amount, 2);
+                if ($method === 'cash_khr') {
+                    $badgeLabel .= ' / ' . number_format($amount * $rate, 0) . '៛';
+                }
+            ?>
                 <button class="sd-tab-btn" data-tab="tab-pm-<?php echo htmlspecialchars($method); ?>" role="tab">
                     <i class="<?php echo $methodIcons[$method] ?? 'fas fa-dollar-sign'; ?>"></i>
                     <?php echo $methodLabels[$method] ?? strtoupper($method); ?>
-                    <span class="tab-badge">$<?php echo number_format($amount, 2); ?></span>
+                    <span class="tab-badge"><?php echo $badgeLabel; ?></span>
                 </button>
             <?php endforeach; ?>
 

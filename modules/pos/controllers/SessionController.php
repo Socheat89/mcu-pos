@@ -301,27 +301,25 @@ class SessionController {
         );
 
         $paymentSummary = [];
-        $cashKHR = 0.0;
-        $cashUSD = 0.0;
+        $cashKHR = 0.0;  // USD amount paid in KHR
+        $cashUSD = 0.0;  // USD amount paid in USD
         foreach ($payments as $p) {
             $key = $p['method'];
-            // For cash, split by currency
+            $amt = (float)$p['total_amount'];
+            // For cash, split by currency (amount is always in USD)
             if ($p['method'] === 'cash' && $p['currency'] === 'KHR') {
-                $cashKHR = (float)$p['total_amount'];
-                // Convert KHR to USD for total calculation
-                $rate = (float)($settings['exchange_rate_usd_khr'] ?? 4100);
-                $usdEquiv = $rate > 0 ? $cashKHR / $rate : 0;
+                $cashKHR = $amt;
                 $key = 'cash_khr';
-                $paymentSummary[$key] = $usdEquiv; // Store as USD equivalent
+                $paymentSummary[$key] = $amt; // Store USD amount
             } elseif ($p['method'] === 'cash') {
-                $cashUSD = (float)$p['total_amount'];
-                $paymentSummary[$key] = (float)$p['total_amount'];
+                $cashUSD = $amt;
+                $paymentSummary[$key] = $amt;
             } else {
-                $paymentSummary[$key] = (float)$p['total_amount'];
+                $paymentSummary[$key] = $amt;
             }
         }
         
-        // Pass raw KHR/USD cash totals to view
+        // Pass raw cash totals (USD amounts) to view
         $cashKHRRaw = $cashKHR;
         $cashUSDRaw = $cashUSD;
 
