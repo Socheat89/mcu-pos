@@ -39,7 +39,19 @@ $urlPrefix = mc_base_path();
             <a href="<?php echo htmlspecialchars($posUrl('products/create')); ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> <?php echo __('add'); ?>
             </a>
+        </div>
 
+        <!-- Quick Category Creation -->
+        <div style="margin-bottom: 24px; padding: 16px 20px; background: #ffffff; border-radius: var(--pos-radius); border: 1.5px solid var(--pos-border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span style="font-weight: 800; font-size: 13px; color: var(--pos-text); white-space: nowrap;">
+                <i class="fas fa-tags" style="color: var(--pos-primary); margin-right: 6px;"></i><?php echo __('quick_add_category'); ?>
+            </span>
+            <form method="POST" action="<?php echo htmlspecialchars($posUrl('products/createCategory')); ?>" style="display: flex; gap: 8px; flex: 1; min-width: 250px;">
+                <input type="text" name="category_name" class="pos-form-control" placeholder="<?php echo __('category_name_placeholder'); ?>" required style="margin-bottom: 0; flex: 1;">
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-size: 13px; white-space: nowrap;">
+                    <i class="fas fa-plus"></i> <?php echo __('create'); ?>
+                </button>
+            </form>
         </div>
 
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
@@ -50,7 +62,7 @@ $urlPrefix = mc_base_path();
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('active_categories'); ?></span>
-                <p class="v">12</p>
+                <p class="v"><?php echo count($categories); ?></p>
 
                 <div class="chip" style="background: rgba(139, 92, 246, 0.1); color: var(--pos-secondary);"><i class="fas fa-tags"></i></div>
             </div>
@@ -71,6 +83,7 @@ $urlPrefix = mc_base_path();
                         <th><?php echo __('products'); ?></th>
                         <th><?php echo __('sizes'); ?></th>
                         <th><?php echo __('status'); ?></th>
+                        <th><?php echo __('cost'); ?></th>
                         <th><?php echo __('price'); ?></th>
                         <th style="text-align: right;"><?php echo __('actions'); ?></th>
                     </tr>
@@ -78,7 +91,7 @@ $urlPrefix = mc_base_path();
                 <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="6" style="padding: 100px; text-align: center;">
+                            <td colspan="7" style="padding: 100px; text-align: center;">
                                 <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
                                     <i class="fas fa-box-open" style="font-size: 32px; color: var(--pos-text-dim);"></i>
                                 </div>
@@ -125,6 +138,20 @@ $urlPrefix = mc_base_path();
                                     <span class="badge <?php echo $badge; ?>">
                                         <?php echo __('in_stock_msg', ['count' => $stock]); ?>
                                     </span>
+                                </td>
+                                <td>
+                                    <?php $cost = (float)($p['cost_price'] ?? 0); ?>
+                                    <div style="font-weight: 600; color: var(--pos-text-muted); font-size: 13px;">
+                                        <?php if ($cost > 0): ?>
+                                            $<?php echo number_format($cost, 2); ?>
+                                            <?php $margin = (float)$p['price'] - $cost; ?>
+                                            <span style="font-size: 10px; color: <?php echo $margin > 0 ? '#10b981' : '#ef4444'; ?>; margin-left: 4px;">
+                                                (<?php echo $margin > 0 ? '+' : ''; ?><?php echo number_format($margin, 2); ?>)
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="color: #cbd5e1;">—</span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td>
                                     <div style="font-weight: 900; color: var(--pos-primary); font-size: 16px;">$<?php echo number_format($p['price'], 2); ?></div>

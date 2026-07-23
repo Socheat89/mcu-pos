@@ -356,6 +356,16 @@ try {
         echo "→ 'product_sizes' table already exists.<br>";
     }
 
+    // 12. Add 'cost_price' column to products for purchase cost tracking
+    echo "Checking 'products.cost_price'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM products LIKE 'cost_price'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE products ADD COLUMN cost_price DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Purchase/cost price' AFTER price");
+        echo "→ 'products.cost_price' added.<br>";
+    } else {
+        echo "→ 'products.cost_price' already exists.<br>";
+    }
+
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {

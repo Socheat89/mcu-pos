@@ -459,4 +459,24 @@ return [
     'sizes'                   => 'ទំហំ',
     'select_size'             => 'ជ្រើសរើសទំហំ',
 
+    // Cost Price & Margin
+    'cost_price'              => 'តម្លៃដើម',
+    'cost'                    => 'ដើម',
+    'margin'                  => 'ចំណេញ',
+    'profit'                  => 'ប្រាក់ចំណេញ',
+
+    // Categories
+    'quick_add_category'      => 'បន្ថែមប្រភេទថ្មី',
+    'new_category'            => 'ប្រភេទថ្មី',
+    'category_name_placeholder' => 'ឈ្មោះប្រភេទ ឧ. ភេសជ្ជៈ, ម្ហូប...',
+    'create'                  => 'បង្កើត',
+
+    // General Settings
+    'general'                 => 'ទូទៅ',
+    'general_settings'        => 'ការកំណត់ទូទៅ',
+    'general_settings_hint'   => 'កំណត់អត្រាប្តូរប្រាក់ និងចំណូលចិត្តផ្សេងទៀត។',
+    'exchange_rate'           => 'អត្រាប្តូរប្រាក់',
+    'exchange_rate_hint'      => 'កំណត់អត្រាប្តូរប្រាក់ពីដុល្លារ (USD) ទៅរៀលខ្មែរ (KHR)។ អត្រានេះនឹងត្រូវបានប្រើដើម្បីបង្ហាញតម្លៃជារូបិយប័ណ្ណទាំងពីរ។',
+    'exchange_rate_example'   => 'ឧទាហរណ៍',
+
 ];

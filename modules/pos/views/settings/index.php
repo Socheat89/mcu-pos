@@ -161,6 +161,9 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                 <div class="pos-tab-link" onclick="switchTab('payment', this)">
                     <i class="fas fa-credit-card"></i> Pay Methods
                 </div>
+                <div class="pos-tab-link" onclick="switchTab('general', this)">
+                    <i class="fas fa-cog"></i> <?php echo __('general'); ?>
+                </div>
                 <div class="pos-tab-link" onclick="switchTab('telegram', this)">
                     <i class="fab fa-telegram-plane" style="color: #0088cc;"></i> Telegram Setup
                 </div>
@@ -475,6 +478,39 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                             <p class="pos-small" style="color: var(--pos-warning); margin: 0; line-height: 1.4;">
                                 This QR code will be displayed in the checkout modal when 'QR Code' is selected as the payment method.
                             </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Settings Tab (Exchange Rate) -->
+            <div id="tab-general" class="tab-content">
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <p class="pos-card-title"><i class="fas fa-cog"></i> <?php echo __('general_settings'); ?></p>
+                    <p class="pos-card-sub" style="margin-bottom: 24px;"><?php echo __('general_settings_hint'); ?></p>
+
+                    <div style="background: var(--pos-elevated); border: 1px solid var(--pos-border); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+                        <div class="pos-form-group" style="margin-bottom: 0;">
+                            <label class="pos-form-label">
+                                <i class="fas fa-money-bill-wave" style="color: var(--pos-primary);"></i> 
+                                <?php echo __('exchange_rate'); ?> (USD → KHR)
+                            </label>
+                            <p class="pos-small" style="margin-bottom: 10px;">
+                                <?php echo __('exchange_rate_hint'); ?>
+                            </p>
+                            <div style="display: flex; align-items: center; gap: 12px; max-width: 400px;">
+                                <span style="font-weight: 800; font-size: 16px; color: var(--pos-text);">1 USD =</span>
+                                <input type="number" name="exchange_rate_usd_khr" step="1" class="pos-form-control" 
+                                    value="<?php echo htmlspecialchars($settings['exchange_rate_usd_khr'] ?? '4100'); ?>" 
+                                    style="max-width: 200px; text-align: center; font-size: 20px; font-weight: 900;" required>
+                                <span style="font-weight: 800; font-size: 16px; color: var(--pos-text);">៛ KHR</span>
+                            </div>
+                            <?php $rate = (float)($settings['exchange_rate_usd_khr'] ?? 4100); ?>
+                            <div style="margin-top: 12px; font-size: 12px; color: var(--pos-text-muted); font-weight: 600;">
+                                <?php echo __('exchange_rate_example'); ?>: $1.00 = <?php echo number_format($rate, 0); ?>៛ &nbsp;|&nbsp; 
+                                $5.00 = <?php echo number_format(5 * $rate, 0); ?>៛ &nbsp;|&nbsp; 
+                                $10.00 = <?php echo number_format(10 * $rate, 0); ?>៛
+                            </div>
                         </div>
                     </div>
                 </div>

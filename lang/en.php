@@ -460,4 +460,24 @@ return [
     'sizes'                   => 'Sizes',
     'select_size'             => 'Select Size',
 
+    // Cost Price & Margin
+    'cost_price'              => 'Cost Price',
+    'cost'                    => 'Cost',
+    'margin'                  => 'Margin',
+    'profit'                  => 'Profit',
+
+    // Categories
+    'quick_add_category'      => 'Quick Add Category',
+    'new_category'            => 'New Category',
+    'category_name_placeholder' => 'Category name e.g. Drinks, Food...',
+    'create'                  => 'Create',
+
+    // General Settings
+    'general'                 => 'General',
+    'general_settings'        => 'General Settings',
+    'general_settings_hint'   => 'Configure exchange rate and other global preferences.',
+    'exchange_rate'           => 'Exchange Rate',
+    'exchange_rate_hint'      => 'Set the conversion rate from USD to Cambodian Riel (KHR). This will be used to display prices in both currencies.',
+    'exchange_rate_example'   => 'Examples',
+
 ];

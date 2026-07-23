@@ -51,14 +51,29 @@
                     <div class="pos-grid cols-2" style="margin-top: 24px;">
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('classification_category'); ?></label>
-                            <select name="category_id" class="pos-form-control pos-form-select">
-                                <option value=""><?php echo __('uncategorized'); ?></option>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?php echo $category['id']; ?>" <?php echo (isset($product) && $product['category_id'] == $category['id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($category['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                                <select name="category_id" class="pos-form-control pos-form-select" style="flex: 1;">
+                                    <option value=""><?php echo __('uncategorized'); ?></option>
+                                    <?php foreach ($categories as $category): ?>
+                                        <option value="<?php echo $category['id']; ?>" <?php echo (isset($product) && $product['category_id'] == $category['id']) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($category['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn btn-outline" onclick="toggleQuickCategory()" title="<?php echo __('quick_add_category'); ?>" style="padding: 10px 14px; font-size: 13px; white-space: nowrap; flex-shrink: 0;">
+                                    <i class="fas fa-plus"></i> <?php echo __('new_category'); ?>
+                                </button>
+                            </div>
+                            <div id="quick-category-box" style="display: none; margin-top: 8px; padding: 10px 14px; background: rgba(99,102,241,0.04); border-radius: 8px; border: 1px dashed var(--pos-border);">
+                                <form method="POST" action="<?php echo htmlspecialchars($posUrl('products/createCategory')); ?>" style="display: flex; gap: 8px; align-items: flex-end;">
+                                    <div style="flex: 1;">
+                                        <input type="text" name="category_name" class="pos-form-control" placeholder="<?php echo __('category_name_placeholder'); ?>" required style="margin-bottom: 0;">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">
+                                        <i class="fas fa-save"></i> <?php echo __('save'); ?>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('status'); ?></label>
@@ -77,22 +92,31 @@
                     </h3>
                     <div class="pos-grid cols-2">
                         <div class="pos-form-group">
-                            <label class="pos-form-label"><?php echo __('retail_price'); ?> <span style="color:red;">*</span></label>
-                            <input type="number" name="price" step="0.01" class="pos-form-control" value="<?php echo $product['price'] ?? ''; ?>" required placeholder="0.00">
+                            <label class="pos-form-label"><?php echo __('cost_price'); ?> ($)</label>
+                            <input type="number" name="cost_price" step="0.01" class="pos-form-control" value="<?php echo isset($product['cost_price']) ? number_format($product['cost_price'], 2, '.', '') : '0.00'; ?>" placeholder="0.00">
                         </div>
                         <div class="pos-form-group">
-                            <label class="pos-form-label"><?php echo __('opening_stock'); ?> <span style="color:red;">*</span></label>
-                            <input type="number" name="stock_quantity" class="pos-form-control" value="<?php echo $product['stock_quantity'] ?? 0; ?>" required placeholder="0">
+                            <label class="pos-form-label"><?php echo __('retail_price'); ?> <span style="color:red;">*</span></label>
+                            <input type="number" name="price" step="0.01" class="pos-form-control" value="<?php echo $product['price'] ?? ''; ?>" required placeholder="0.00">
                         </div>
                     </div>
                     <div class="pos-grid cols-2" style="margin-top: 24px;">
                         <div class="pos-form-group">
+                            <label class="pos-form-label"><?php echo __('opening_stock'); ?> <span style="color:red;">*</span></label>
+                            <input type="number" name="stock_quantity" class="pos-form-control" value="<?php echo $product['stock_quantity'] ?? 0; ?>" required placeholder="0">
+                        </div>
+                        <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('sku_ref_id'); ?></label>
                             <input type="text" name="sku" class="pos-form-control" value="<?php echo htmlspecialchars($product['sku'] ?? ''); ?>" placeholder="E.g., PROD-2024-001">
                         </div>
+                    </div>
+                    <div class="pos-grid cols-2" style="margin-top: 24px;">
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('barcode_num'); ?></label>
                             <input type="text" name="barcode" class="pos-form-control" value="<?php echo htmlspecialchars($product['barcode'] ?? ''); ?>" placeholder="<?php echo __('scan_barcode_placeholder', ['default' => 'Scan product barcode']); ?>">
+                        </div>
+                        <div class="pos-form-group">
+                            <!-- spacer to keep grid aligned -->
                         </div>
                     </div>
                 </section>
@@ -250,6 +274,12 @@
 
         // Bind existing remove buttons
         sizesContainer.querySelectorAll('.btn-remove-size').forEach(btn => bindRemoveButton(btn));
+
+        // ─── Quick Category Toggle ─────────────────────────
+        function toggleQuickCategory() {
+            const box = document.getElementById('quick-category-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
     </script>
     
     <?php include __DIR__ . '/partials/footer.php'; ?>

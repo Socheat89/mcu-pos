@@ -91,6 +91,30 @@ class ProductController {
         exit;
     }
 
+    /**
+     * Quick category creation — POST name, redirect back to products
+     * Route: /pos/products/createCategory
+     */
+    public function createCategory() {
+        TenantMiddleware::handle();
+        AuthMiddleware::handle();
+
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = trim($_POST['category_name'] ?? '');
+            if ($name !== '') {
+                $this->findOrCreateCategory($name, Tenant::getId());
+            }
+        }
+
+        $prefix = mc_base_path();
+        header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
+        exit;
+    }
+
     public function import() {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -169,6 +193,7 @@ class ProductController {
             'name' => $_POST['name'],
             'description' => $_POST['description'] ?? '',
             'price' => (float)$_POST['price'],
+            'cost_price' => (float)($_POST['cost_price'] ?? 0),
             'category_id' => $_POST['category_id'] ?: null,
             'stock_quantity' => (int)$_POST['stock_quantity'],
             'sku' => $_POST['sku'] ?? '',
@@ -196,6 +221,7 @@ class ProductController {
             'name' => $_POST['name'],
             'description' => $_POST['description'] ?? '',
             'price' => (float)$_POST['price'],
+            'cost_price' => (float)($_POST['cost_price'] ?? 0),
             'category_id' => $_POST['category_id'] ?: null,
             'stock_quantity' => (int)$_POST['stock_quantity'],
             'sku' => $_POST['sku'] ?? '',
