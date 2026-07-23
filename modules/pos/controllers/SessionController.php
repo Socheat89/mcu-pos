@@ -284,20 +284,46 @@ class SessionController {
             [$id, $tenantId]
         );
 
-        // Get payment breakdown (summary)
+        // Get payment breakdown (summary) — include currency for cash split
+        // Load exchange rate from settings
+        require_once __DIR__ . '/../../../core/classes/Settings.php';
+        $settings = Settings::getAll($tenantId);
+        $exchangeRate = (float)($settings['exchange_rate_usd_khr'] ?? 4100);
+        
         $payments = $db->fetchAll(
-            "SELECT p.method, COALESCE(SUM(p.amount), 0) as total_amount
+            "SELECT p.method, p.currency, COALESCE(SUM(p.amount), 0) as total_amount
              FROM payments p
              JOIN orders o ON p.order_id = o.id
              WHERE o.session_id = ? AND o.status = 'completed'
-             GROUP BY p.method",
+             GROUP BY p.method, p.currency
+             ORDER BY p.method, p.currency",
             [$id]
         );
 
         $paymentSummary = [];
+        $cashKHR = 0.0;
+        $cashUSD = 0.0;
         foreach ($payments as $p) {
-            $paymentSummary[$p['method']] = (float)$p['total_amount'];
+            $key = $p['method'];
+            // For cash, split by currency
+            if ($p['method'] === 'cash' && $p['currency'] === 'KHR') {
+                $cashKHR = (float)$p['total_amount'];
+                // Convert KHR to USD for total calculation
+                $rate = (float)($settings['exchange_rate_usd_khr'] ?? 4100);
+                $usdEquiv = $rate > 0 ? $cashKHR / $rate : 0;
+                $key = 'cash_khr';
+                $paymentSummary[$key] = $usdEquiv; // Store as USD equivalent
+            } elseif ($p['method'] === 'cash') {
+                $cashUSD = (float)$p['total_amount'];
+                $paymentSummary[$key] = (float)$p['total_amount'];
+            } else {
+                $paymentSummary[$key] = (float)$p['total_amount'];
+            }
         }
+        
+        // Pass raw KHR/USD cash totals to view
+        $cashKHRRaw = $cashKHR;
+        $cashUSDRaw = $cashUSD;
 
         // Get items sold per payment method (for the detailed payment tab breakdown)
         $paymentMethods = array_keys($paymentSummary);

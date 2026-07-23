@@ -107,6 +107,25 @@ $isClosed        = $session['status'] === 'closed';
             <?php endif; ?>
         </div>
 
+        <!-- ── Cash Breakdown (USD vs KHR) ── -->
+        <?php $cashUSD = $cashUSDRaw ?? 0; $cashKHR = $cashKHRRaw ?? 0; $rate = $exchangeRate ?? 4100; ?>
+        <?php if ($cashUSD > 0 || $cashKHR > 0): ?>
+        <div class="pos-grid cols-2" style="margin-bottom:24px;">
+            <?php if ($cashUSD > 0): ?>
+            <div class="pos-stat" style="border-left:4px solid #10b981;">
+                <span class="k">💵 Cash — USD ($)</span>
+                <p class="v">$<?php echo number_format($cashUSD, 2); ?></p>
+            </div>
+            <?php endif; ?>
+            <?php if ($cashKHR > 0): ?>
+            <div class="pos-stat" style="border-left:4px solid #f59e0b;">
+                <span class="k">💵 Cash — KHR (៛) ~$<?php echo number_format($cashKHR / max($rate, 1), 2); ?></span>
+                <p class="v"><?php echo number_format($cashKHR, 0); ?>៛</p>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
         <!-- ── Main Tabs ── -->
         <?php
         $methodIcons = [

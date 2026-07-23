@@ -233,9 +233,11 @@ class OrderController {
                 if ($status === 'completed') {
                     $paymentMethod = $_POST['payment_method'] ?? 'cash';
                     $bankName = $_POST['bank_name'] ?? null;
+                    $currency  = $_POST['currency'] ?? 'USD';
                     $db->insert('payments', [
                         'order_id' => $resumeOrderId,
                         'amount' => $total,
+                        'currency' => $currency,
                         'method' => $paymentMethod,
                         'bank_name' => $bankName,
                         'status' => 'completed'
@@ -323,9 +325,11 @@ class OrderController {
                 // Process payment
                 $paymentMethod = $_POST['payment_method'] ?? 'cash';
                 $bankName = $_POST['bank_name'] ?? null;
+                $currency  = $_POST['currency'] ?? 'USD';
                 $paymentData = [
                     'order_id' => $orderId,
                     'amount' => $total,
+                    'currency' => $currency,
                     'method' => $paymentMethod,
                     'bank_name' => $bankName,
                     'status' => 'completed'

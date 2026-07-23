@@ -366,16 +366,26 @@ try {
         echo "→ 'products.cost_price' already exists.<br>";
     }
 
-    // 13. Expand payments.method to VARCHAR + add bank_name
-    echo "Updating 'payments' table for bank support...<br>";
+    // 13. Expand payments.method to VARCHAR + add bank_name + currency
+    echo "Updating 'payments' table for bank & currency support...<br>";
     $cols = $db->fetchAll("SHOW COLUMNS FROM payments LIKE 'bank_name'");
     if (empty($cols)) {
         $db->query("ALTER TABLE payments MODIFY COLUMN method VARCHAR(50) NOT NULL DEFAULT 'cash' COMMENT 'cash, aba, acleda, wing, truemoney, card, other'");
         $db->query("ALTER TABLE payments ADD COLUMN bank_name VARCHAR(50) DEFAULT NULL COMMENT 'Bank name if payment via bank transfer' AFTER method");
-        $db->query("ALTER TABLE payments ADD INDEX idx_bank_name (bank_name)");
-        echo "→ 'payments' updated: method→VARCHAR, bank_name added.<br>";
+        echo "→ 'payments': method→VARCHAR, bank_name added.<br>";
     } else {
         echo "→ 'payments' already has bank_name.<br>";
+    }
+    $cols2 = $db->fetchAll("SHOW COLUMNS FROM payments LIKE 'currency'");
+    if (empty($cols2)) {
+        $db->query("ALTER TABLE payments ADD COLUMN currency VARCHAR(3) DEFAULT 'USD' COMMENT 'USD or KHR' AFTER amount");
+        echo "→ 'payments': currency column added.<br>";
+    } else {
+        echo "→ 'payments' already has currency.<br>";
+    }
+    $indexes = $db->fetchAll("SHOW INDEX FROM payments WHERE Key_name = 'idx_bank_name'");
+    if (empty($indexes)) {
+        $db->query("ALTER TABLE payments ADD INDEX idx_bank_name (bank_name)");
     }
 
 
