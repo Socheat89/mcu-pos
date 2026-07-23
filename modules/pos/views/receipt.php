@@ -11,6 +11,28 @@ $headerText = $receiptSettings['receipt_header_text'] ?? 'Point of Sale Receipt'
 $footerText = $receiptSettings['receipt_footer_text'] ?? 'Thank you for your business!';
 $fontSize = (int) ($receiptSettings['receipt_font_size'] ?? 12);
 $paperWidth = (int) ($receiptSettings['receipt_paper_width'] ?? 400);
+$exchangeRate = (float) ($receiptSettings['exchange_rate_usd_khr'] ?? 4100);
+
+// Determine if paid in KHR
+$paymentCurrency = 'USD';
+if (!empty($order['payments'])) {
+    foreach ($order['payments'] as $pmt) {
+        if (($pmt['currency'] ?? 'USD') === 'KHR') {
+            $paymentCurrency = 'KHR';
+            break;
+        }
+    }
+}
+$isKHR = ($paymentCurrency === 'KHR');
+$rate = $exchangeRate > 0 ? $exchangeRate : 4100;
+
+function fmtMoney($amount, $isKHR, $rate) {
+    if ($isKHR) {
+        $khr = round($amount * $rate);
+        return number_format($khr, 0) . '៛';
+    }
+    return '$' . number_format($amount, 2);
+}
 
 $currentTenant = Tenant::getCurrent();
 $subdomain = $currentTenant['subdomain'] ?? '';
@@ -196,9 +218,14 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             </div>
             <?php foreach ($order['items'] as $item): ?>
                 <div class="item">
-                    <span class="item-name"><?php echo htmlspecialchars($item['product_name']); ?></span>
+                    <span class="item-name">
+                        <?php echo htmlspecialchars($item['product_name']); ?>
+                        <?php if (!empty($item['size_name'])): ?>
+                            <small style="color:#666;">(<?php echo htmlspecialchars($item['size_name']); ?>)</small>
+                        <?php endif; ?>
+                    </span>
                     <span class="item-qty"><?php echo $item['quantity']; ?></span>
-                    <span class="item-price">$<?php echo number_format($item['total'], 2); ?></span>
+                    <span class="item-price"><?php echo fmtMoney($item['total'], $isKHR, $rate); ?></span>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -206,33 +233,45 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
         <div class="total">
             <div class="info-row">
                 <span><?php echo __('subtotal'); ?>:</span>
-                <span>$<?php echo number_format($order['total'] - ($order['tax'] ?? 0) - ($order['discount'] ?? 0), 2); ?></span>
+                <span><?php echo fmtMoney($order['total'] - ($order['tax'] ?? 0) - ($order['discount'] ?? 0), $isKHR, $rate); ?></span>
             </div>
             <?php if ($order['tax'] ?? 0 > 0): ?>
             <div class="info-row">
                 <span><?php echo __('tax'); ?>:</span>
-                <span>$<?php echo number_format($order['tax'], 2); ?></span>
+                <span><?php echo fmtMoney($order['tax'], $isKHR, $rate); ?></span>
             </div>
             <?php endif; ?>
             <?php if ($order['discount'] ?? 0 > 0): ?>
             <div class="info-row">
                 <span><?php echo __('discount'); ?>:</span>
-                <span>-$<?php echo number_format($order['discount'], 2); ?></span>
+                <span>-<?php echo fmtMoney($order['discount'], $isKHR, $rate); ?></span>
             </div>
             <?php endif; ?>
             <div class="info-row" style="font-size: 14px;">
                 <span><?php echo __('total_all_caps', ['default' => 'TOTAL']); ?>:</span>
+                <span><?php echo fmtMoney($order['total'], $isKHR, $rate); ?></span>
+            </div>
+            <?php if ($isKHR): ?>
+            <div class="info-row" style="font-size: 10px; color: #666;">
+                <span>($1 = <?php echo number_format($rate, 0); ?>៛)</span>
                 <span>$<?php echo number_format($order['total'], 2); ?></span>
             </div>
+            <?php endif; ?>
         </div>
 
         <?php if (!empty($order['payments'])): ?>
         <div style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px;">
             <div style="font-weight: bold; margin-bottom: 5px;"><?php echo __('payment'); ?>:</div>
-            <?php foreach ($order['payments'] as $payment): ?>
+            <?php foreach ($order['payments'] as $payment): 
+                $payMethod = $payment['method'] ?? 'cash';
+                $payBank   = $payment['bank_name'] ?? null;
+                $payLabel  = ucfirst($payMethod);
+                if ($payBank) $payLabel .= ' (' . htmlspecialchars($payBank) . ')';
+                $payIsKHR  = ($payment['currency'] ?? 'USD') === 'KHR';
+            ?>
                 <div class="info-row">
-                    <span><?php echo ucfirst($payment['method']); ?>:</span>
-                    <span>$<?php echo number_format($payment['amount'], 2); ?></span>
+                    <span><?php echo $payLabel; ?>:</span>
+                    <span><?php echo fmtMoney($payment['amount'], $payIsKHR, $rate); ?></span>
                 </div>
             <?php endforeach; ?>
         </div>

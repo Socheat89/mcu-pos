@@ -139,7 +139,8 @@ $isClosed        = $session['status'] === 'closed';
             'other' => 'fas fa-university'
         ];
         $methodLabels = [
-            'cash' => 'Cash', 
+            'cash' => 'Cash (USD)', 
+            'cash_khr' => 'Cash (KHR)',
             'khqr' => 'KHQR', 
             'card' => 'Card',
             'aba' => 'ABA Bank',
