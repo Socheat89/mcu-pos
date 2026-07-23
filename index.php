@@ -192,10 +192,14 @@ try {
                     if (isset($segments[3])) {
                         $thirdSeg = $segments[3];
                         
-                        // Case A: /module/action (e.g., /products/create)
+                        // Case A: /module/action (e.g., /products/create or /products/deleteCategory/5)
                         if (!is_numeric($thirdSeg) && method_exists($controller, $thirdSeg)) {
                             $action = $thirdSeg;
-                            $controller->$action();
+                            if (isset($segments[4])) {
+                                $controller->$action($segments[4]);
+                            } else {
+                                $controller->$action();
+                            }
                         } 
                         // Case B: /module/id/... (e.g., /products/5 or /products/5/edit)
                         else {

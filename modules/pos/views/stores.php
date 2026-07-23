@@ -134,38 +134,101 @@ $currentStore = $currentStore ?? Store::getCurrent($tenantId);
             font-size: 15px;
         }
 
-        /* Modal */
+        /* ── Store Creation / Edit Modal ── */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         .modal-overlay.active {
             display: flex;
         }
         .modal {
-            background: var(--pos-card);
+            background: var(--pos-card, #ffffff);
             border-radius: 24px;
             padding: 32px;
-            max-width: 520px;
-            width: 90%;
-            border: 1px solid var(--pos-border);
-            box-shadow: var(--pos-shadow-xl);
-            animation: fadeUp 0.3s ease-out;
+            max-width: 560px;
+            width: 100%;
+            border: 1px solid var(--pos-border, #e2e8f0);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: modalFadeScale 0.25s ease-out;
+            position: relative;
+        }
+        @keyframes modalFadeScale {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--pos-border, #f1f5f9);
+        }
+        .modal-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .modal-title-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: var(--pos-primary-light, rgba(6,182,212,0.1));
+            color: var(--pos-primary, #06b6d4);
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            flex-shrink: 0;
         }
         .modal h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
-            color: var(--pos-text);
-            margin: 0 0 24px;
+            color: var(--pos-text, #0f172a);
+            margin: 0;
+        }
+        .modal .sub {
+            font-size: 13px;
+            color: var(--pos-text-muted, #64748b);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+        .modal-close-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--pos-border, #e2e8f0);
+            background: transparent;
+            color: var(--pos-text-muted, #64748b);
+            font-size: 18px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fecaca;
+        }
+        .modal .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
         .modal .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
+        }
+        .modal .form-group.full-width {
+            grid-column: 1 / -1;
         }
         .modal label {
             display: block;
@@ -173,39 +236,67 @@ $currentStore = $currentStore ?? Store::getCurrent($tenantId);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--pos-text-muted);
-            margin-bottom: 6px;
+            color: var(--pos-text-muted, #64748b);
+            margin-bottom: 8px;
+        }
+        .modal label span.req {
+            color: #ef4444;
         }
         .modal input, .modal textarea {
             width: 100%;
             padding: 12px 16px;
-            border: 1.5px solid var(--pos-border);
-            border-radius: 14px;
+            border: 1.5px solid var(--pos-border, #cbd5e1);
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
-            color: var(--pos-text);
-            background: #fff;
+            color: var(--pos-text, #0f172a);
+            background: #ffffff;
             transition: all 0.2s;
             outline: none;
             box-sizing: border-box;
+            font-family: inherit;
         }
         .modal input:focus, .modal textarea:focus {
-            border-color: var(--pos-primary);
-            box-shadow: 0 0 0 4px rgba(var(--pos-primary-rgb), 0.1);
+            border-color: var(--pos-primary, #06b6d4);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
         }
         .modal textarea {
             resize: vertical;
-            min-height: 70px;
+            min-height: 75px;
+        }
+        .modal-toggle-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--pos-primary-light, rgba(6,182,212,0.05));
+            border: 1px solid rgba(6,182,212,0.2);
+            border-radius: 14px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .modal-toggle-card input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--pos-primary, #06b6d4);
+            cursor: pointer;
+        }
+        .modal-toggle-card label {
+            margin: 0;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--pos-text, #0f172a);
+            text-transform: none;
+            letter-spacing: 0;
+            cursor: pointer;
         }
         .modal .btn-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
-            margin-top: 24px;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--pos-border, #f1f5f9);
         }
     </style>
 </head>
@@ -288,40 +379,55 @@ $currentStore = $currentStore ?? Store::getCurrent($tenantId);
     <!-- Add/Edit Store Modal -->
     <div class="modal-overlay" id="storeModal">
         <div class="modal">
-            <h2 id="modalTitle"><?php echo __('add_new_store'); ?></h2>
+            <div class="modal-header-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div>
+                        <h2 id="modalTitle"><?php echo __('add_new_store'); ?></h2>
+                        <div class="sub"><?php echo __('configure_store_details', ['default' => 'Fill in branch & store information']); ?></div>
+                    </div>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
             <form method="POST" action="<?php echo htmlspecialchars($posUrl('stores/create')); ?>" id="storeForm">
                 <input type="hidden" name="store_id" id="editStoreId">
                 <input type="hidden" name="_method" id="formMethod" value="POST">
 
-                <div class="form-group">
-                    <label><?php echo __('store_name'); ?> *</label>
-                    <input type="text" name="name" id="storeName" required placeholder="<?php echo __('store_name_placeholder'); ?>">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><?php echo __('store_name'); ?> <span class="req">*</span></label>
+                        <input type="text" name="name" id="storeName" required placeholder="<?php echo __('store_name_placeholder'); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label><?php echo __('store_code'); ?></label>
+                        <input type="text" name="code" id="storeCode" placeholder="e.g. MAIN, TKG" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label><?php echo __('phone_number'); ?></label>
+                        <input type="text" name="phone" id="storePhone" placeholder="+855 XX XXX XXX">
+                    </div>
+                    <div class="form-group">
+                        <label><?php echo __('email_address'); ?></label>
+                        <input type="email" name="email" id="storeEmail" placeholder="store@example.com">
+                    </div>
+                    <div class="form-group full-width">
+                        <label><?php echo __('address'); ?></label>
+                        <textarea name="address" id="storeAddress" placeholder="<?php echo __('store_address_placeholder'); ?>"></textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><?php echo __('store_code'); ?></label>
-                    <input type="text" name="code" id="storeCode" placeholder="e.g. MAIN, TKG" maxlength="10">
-                </div>
-                <div class="form-group">
-                    <label><?php echo __('address'); ?></label>
-                    <textarea name="address" id="storeAddress" placeholder="<?php echo __('store_address_placeholder'); ?>"></textarea>
-                </div>
-                <div class="form-group">
-                    <label><?php echo __('phone_number'); ?></label>
-                    <input type="text" name="phone" id="storePhone" placeholder="+855 XX XXX XXX">
-                </div>
-                <div class="form-group">
-                    <label><?php echo __('email_address'); ?></label>
-                    <input type="email" name="email" id="storeEmail" placeholder="store@example.com">
-                </div>
-                <div class="form-group" style="display:flex;align-items:center;gap:10px;">
-                    <input type="checkbox" name="is_default" id="storeIsDefault" value="1" style="width:18px;height:18px;">
-                    <label for="storeIsDefault" style="margin:0;cursor:pointer;"><?php echo __('set_as_default_store'); ?></label>
+
+                <div class="modal-toggle-card">
+                    <input type="checkbox" name="is_default" id="storeIsDefault" value="1">
+                    <label for="storeIsDefault"><?php echo __('set_as_default_store'); ?></label>
                 </div>
 
                 <div class="btn-row">
                     <button type="button" class="btn btn-outline" onclick="closeModal()"><?php echo __('cancel'); ?></button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> <?php echo __('save_store'); ?>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 24px;">
+                        <i class="fas fa-save" style="margin-right: 6px;"></i> <?php echo __('save_store'); ?>
                     </button>
                 </div>
             </form>

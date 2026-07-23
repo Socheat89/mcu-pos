@@ -65,14 +65,14 @@
                                 </button>
                             </div>
                             <div id="quick-category-box" style="display: none; margin-top: 8px; padding: 10px 14px; background: rgba(99,102,241,0.04); border-radius: 8px; border: 1px dashed var(--pos-border);">
-                                <form method="POST" action="<?php echo htmlspecialchars($posUrl('products/createCategory')); ?>" style="display: flex; gap: 8px; align-items: flex-end;">
+                                <div style="display: flex; gap: 8px; align-items: flex-end;">
                                     <div style="flex: 1;">
-                                        <input type="text" name="category_name" class="pos-form-control" placeholder="<?php echo __('category_name_placeholder'); ?>" required style="margin-bottom: 0;">
+                                        <input type="text" id="quick_category_name" class="pos-form-control" placeholder="<?php echo __('category_name_placeholder'); ?>" style="margin-bottom: 0;">
                                     </div>
-                                    <button type="submit" class="btn btn-primary" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">
+                                    <button type="button" onclick="saveQuickCategory()" class="btn btn-primary" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">
                                         <i class="fas fa-save"></i> <?php echo __('save'); ?>
                                     </button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                         <div class="pos-form-group">
@@ -275,10 +275,41 @@
         // Bind existing remove buttons
         sizesContainer.querySelectorAll('.btn-remove-size').forEach(btn => bindRemoveButton(btn));
 
-        // ─── Quick Category Toggle ─────────────────────────
+        // ─── Quick Category Toggle & AJAX Save ─────────────────
         function toggleQuickCategory() {
             const box = document.getElementById('quick-category-box');
             box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function saveQuickCategory() {
+            const input = document.getElementById('quick_category_name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const formData = new FormData();
+            formData.append('category_name', name);
+
+            fetch('<?php echo htmlspecialchars($posUrl('products/createCategory')); ?>', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.id) {
+                    const select = document.querySelector('select[name="category_id"]');
+                    const option = document.createElement('option');
+                    option.value = data.id;
+                    option.textContent = data.name;
+                    option.selected = true;
+                    select.appendChild(option);
+                    input.value = '';
+                    toggleQuickCategory();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
         }
     </script>
     

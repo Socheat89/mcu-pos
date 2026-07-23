@@ -105,8 +105,16 @@ class ProductController {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['category_name'] ?? '');
+            $catId = 0;
             if ($name !== '') {
-                $this->findOrCreateCategory($name, Tenant::getId());
+                $catId = $this->findOrCreateCategory($name, Tenant::getId());
+            }
+
+            $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'id' => $catId, 'name' => $name]);
+                exit;
             }
         }
 
