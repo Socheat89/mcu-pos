@@ -1900,8 +1900,13 @@ export default function App() {
                             key={bill.label}
                             type="button"
                             onClick={() => {
-                              const current = parseFloat(cashGiven) || 0;
-                              setCashGiven((current + bill.val).toFixed(currency === 'KHR' ? 0 : 2));
+                              if (bill.label === '=') {
+                                // Set exact total
+                                setCashGiven(String(bill.val));
+                              } else {
+                                const current = parseFloat(cashGiven) || 0;
+                                setCashGiven((current + bill.val).toFixed(currency === 'KHR' ? 0 : 2));
+                              }
                             }}
                             className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
                               darkMode
