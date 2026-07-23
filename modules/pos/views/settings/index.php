@@ -498,18 +498,38 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                             <p class="pos-small" style="margin-bottom: 10px;">
                                 <?php echo __('exchange_rate_hint'); ?>
                             </p>
-                            <div style="display: flex; align-items: center; gap: 12px; max-width: 400px;">
+                            <?php 
+                            $currentRate = (float)($settings['exchange_rate_usd_khr'] ?? 4100);
+                            $rateOptions = [3800, 3900, 4000, 4050, 4100, 4150, 4200, 4300, 4400, 4500];
+                            $isCustom = !in_array((int)$currentRate, $rateOptions);
+                            ?>
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                                 <span style="font-weight: 800; font-size: 16px; color: var(--pos-text);">1 USD =</span>
-                                <input type="number" name="exchange_rate_usd_khr" step="1" class="pos-form-control" 
-                                    value="<?php echo htmlspecialchars($settings['exchange_rate_usd_khr'] ?? '4100'); ?>" 
-                                    style="max-width: 200px; text-align: center; font-size: 20px; font-weight: 900;" required>
-                                <span style="font-weight: 800; font-size: 16px; color: var(--pos-text);">៛ KHR</span>
+                                <select name="exchange_rate_preset" id="exchange-rate-preset" class="pos-form-control pos-form-select" 
+                                    style="max-width: 220px; font-size: 16px; font-weight: 700;" 
+                                    onchange="handleRateChange(this)">
+                                    <?php foreach ($rateOptions as $opt): ?>
+                                        <option value="<?php echo $opt; ?>" <?php echo ((int)$currentRate === $opt) ? 'selected' : ''; ?>>
+                                            <?php echo number_format($opt, 0); ?>៛
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="custom" <?php echo $isCustom ? 'selected' : ''; ?>>ផ្សេងៗ (Custom)...</option>
+                                </select>
+                                <span style="font-weight: 800; font-size: 16px; color: var(--pos-text);">KHR</span>
                             </div>
-                            <?php $rate = (float)($settings['exchange_rate_usd_khr'] ?? 4100); ?>
-                            <div style="margin-top: 12px; font-size: 12px; color: var(--pos-text-muted); font-weight: 600;">
-                                <?php echo __('exchange_rate_example'); ?>: $1.00 = <?php echo number_format($rate, 0); ?>៛ &nbsp;|&nbsp; 
-                                $5.00 = <?php echo number_format(5 * $rate, 0); ?>៛ &nbsp;|&nbsp; 
-                                $10.00 = <?php echo number_format(10 * $rate, 0); ?>៛
+                            <div id="custom-rate-box" style="margin-top: 12px; <?php echo $isCustom ? '' : 'display: none;'; ?>">
+                                <input type="number" id="exchange-rate-custom" step="1" class="pos-form-control" 
+                                    value="<?php echo htmlspecialchars($settings['exchange_rate_usd_khr'] ?? '4100'); ?>" 
+                                    style="max-width: 200px; text-align: center; font-size: 18px; font-weight: 900; display: inline-block;"
+                                    placeholder="e.g. 4100">
+                                <span style="font-weight: 600; font-size: 14px; color: var(--pos-text-muted); margin-left: 8px;">៛</span>
+                            </div>
+                            <!-- Hidden input always submitted with the actual rate -->
+                            <input type="hidden" name="exchange_rate_usd_khr" id="exchange-rate-final" value="<?php echo htmlspecialchars($settings['exchange_rate_usd_khr'] ?? '4100'); ?>">
+                            <div style="margin-top: 12px; font-size: 12px; color: var(--pos-text-muted); font-weight: 600;" id="rate-examples">
+                                $1.00 = <?php echo number_format($currentRate, 0); ?>៛ &nbsp;|&nbsp; 
+                                $5.00 = <?php echo number_format(5 * $currentRate, 0); ?>៛ &nbsp;|&nbsp; 
+                                $10.00 = <?php echo number_format(10 * $currentRate, 0); ?>៛
                             </div>
                         </div>
                     </div>
@@ -827,6 +847,50 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         if(settings.phone) settings.phone.addEventListener('input', updateContact);
         if(settings.email) settings.email.addEventListener('input', updateContact);
         if(settings.address) settings.address.addEventListener('input', updateContact);
+
+        // ─── Exchange Rate Dropdown Handler ─────────────────
+        function handleRateChange(select) {
+            const customBox = document.getElementById('custom-rate-box');
+            const customInput = document.getElementById('exchange-rate-custom');
+            const finalInput = document.getElementById('exchange-rate-final');
+            const examplesDiv = document.getElementById('rate-examples');
+            
+            if (select.value === 'custom') {
+                customBox.style.display = 'block';
+                // Use current custom value
+                updateRateDisplay(parseFloat(customInput.value) || 4100);
+                customInput.addEventListener('input', function() {
+                    updateRateDisplay(parseFloat(this.value) || 4100);
+                    finalInput.value = this.value;
+                });
+            } else {
+                customBox.style.display = 'none';
+                const rate = parseInt(select.value);
+                finalInput.value = rate;
+                updateRateDisplay(rate);
+            }
+        }
+
+        function updateRateDisplay(rate) {
+            const finalInput = document.getElementById('exchange-rate-final');
+            const examplesDiv = document.getElementById('rate-examples');
+            finalInput.value = rate;
+            if (examplesDiv) {
+                examplesDiv.innerHTML = 
+                    '$1.00 = ' + rate.toLocaleString() + '៛ &nbsp;|&nbsp; ' +
+                    '$5.00 = ' + (5 * rate).toLocaleString() + '៛ &nbsp;|&nbsp; ' +
+                    '$10.00 = ' + (10 * rate).toLocaleString() + '៛';
+            }
+        }
+
+        // Initialize custom input listener
+        const customInput = document.getElementById('exchange-rate-custom');
+        if (customInput) {
+            customInput.addEventListener('input', function() {
+                updateRateDisplay(parseFloat(this.value) || 4100);
+                document.getElementById('exchange-rate-final').value = this.value;
+            });
+        }
 
     </script>
     
