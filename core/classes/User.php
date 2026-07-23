@@ -17,9 +17,15 @@ class User {
     public static function create($data, $tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
 
-        // Check user creation limit
-        if (!self::canCreateUser($tenantId)) {
-            throw new Exception('User creation limit reached. Please upgrade your plan.');
+        // Check user creation limit (skip if CashierController already checked via getCashierLimit)
+        // Only enforce this limit if the caller hasn't already done a plan-based check.
+        // We keep this as a safety net but treat 0 as unlimited.
+        $limit = self::getUserLimit($tenantId);
+        if ($limit > 0) {
+            $currentUsers = self::countUsers($tenantId);
+            if ($currentUsers >= $limit) {
+                throw new Exception('User creation limit reached. Please upgrade your plan.');
+            }
         }
 
         $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -33,13 +39,24 @@ class User {
         ]);
     }
 
+    public static function getUserLimit($tenantId = null) {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        // Use same plan-based limit as Tenant::getCashierLimit() if available,
+        // fall back to settings max_free_users (0 = unlimited)
+        if (method_exists('Tenant', 'getCashierLimit')) {
+            $planLimit = Tenant::getCashierLimit();
+            if ($planLimit > 0) return $planLimit;
+        }
+        $settingsLimit = (int) Settings::get('max_free_users', $tenantId, 0);
+        return $settingsLimit; // 0 = unlimited
+    }
+
     public static function canCreateUser($tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
-
-        $maxFreeUsers = (int) Settings::get('max_free_users', $tenantId, 5);
+        $limit = self::getUserLimit($tenantId);
+        if ($limit <= 0) return true; // 0 = unlimited
         $currentUsers = self::countUsers($tenantId);
-
-        return $currentUsers < $maxFreeUsers;
+        return $currentUsers < $limit;
     }
 
     public static function countUsers($tenantId = null) {
