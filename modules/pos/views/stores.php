@@ -325,6 +325,19 @@ $currentStore = $currentStore ?? Store::getCurrent($tenantId);
             <?php endif; ?>
         </div>
 
+        <?php if (!empty($_SESSION['store_error'])): ?>
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; padding: 14px 20px; border-radius: 16px; margin-bottom: 24px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 18px;"></i>
+                    <span><?php echo htmlspecialchars($_SESSION['store_error']); ?></span>
+                </div>
+                <a href="<?php echo mc_base_path(); ?>/pricing.php" class="btn btn-sm btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none;">
+                    <i class="fas fa-arrow-up"></i> Upgrade Plan
+                </a>
+            </div>
+            <?php unset($_SESSION['store_error']); ?>
+        <?php endif; ?>
+
         <!-- Store Cards -->
         <div class="store-grid">
             <?php foreach ($stores as $store): ?>

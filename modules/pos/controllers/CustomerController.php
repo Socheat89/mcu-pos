@@ -10,12 +10,8 @@ class CustomerController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
-        if (!Tenant::hasModule('pos')) {
+        if (!Tenant::hasModule('pos') && Tenant::getPosLevel() < 1) {
             die('POS system not subscribed for your plan');
-        }
-
-        if (!Tenant::hasFeature('pos', 'customers')) {
-            die('Upgrade to POS Standard or Premium to manage customers.');
         }
 
         if (!Auth::hasPermission('pos', 'read')) {

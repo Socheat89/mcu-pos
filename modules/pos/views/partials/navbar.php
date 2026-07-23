@@ -151,11 +151,9 @@ $navLabel = function (string $key): string {
                 </a>
                 <?php endif; ?>
 
-                <?php if ($hasFeature('pos', 'customers')): ?>
                 <a class="pos-side-link <?php echo $activeClass('customers'); ?>" href="<?php echo htmlspecialchars($posUrl('customers')); ?>">
                     <i class="fas fa-user-group"></i><span><?php echo $navLabel('customers'); ?></span>
                 </a>
-                <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">

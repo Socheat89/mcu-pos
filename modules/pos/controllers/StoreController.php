@@ -81,8 +81,13 @@ class StoreController
             $storeLimit = Tenant::getStoreLimit();
             $currentCount = count(Store::getAll($tenantId));
 
+            $prefix = mc_base_path();
+            $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
+
             if ($storeLimit > 0 && $currentCount >= $storeLimit) {
-                die(__('store_limit_reached') . " ({$currentCount}/{$storeLimit})");
+                $_SESSION['store_error'] = __('store_limit_reached') . " ({$currentCount}/{$storeLimit})";
+                header('Location: ' . $prefix . '/' . $subdomain . '/pos/stores');
+                exit;
             }
 
             $data = [
@@ -94,7 +99,9 @@ class StoreController
             ];
 
             if (empty($data['name'])) {
-                die(__('store_name_required'));
+                $_SESSION['store_error'] = __('store_name_required');
+                header('Location: ' . $prefix . '/' . $subdomain . '/pos/stores');
+                exit;
             }
 
             $storeId = Store::create($data, $tenantId);
