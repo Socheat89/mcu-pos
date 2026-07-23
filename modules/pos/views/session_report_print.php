@@ -128,52 +128,81 @@ foreach ($paymentSummary as $method => $amt) {
 
 <!-- Section 2: Income Summary -->
 <div class="section-title">💰 ចំណូលថ្ងៃនេះ / Sale Income Today</div>
-<div class="summary-grid">
-    <?php if ($cashUSD_amt > 0): ?>
-    <div class="summary-card">
-        <div class="label">💵 Cash — USD</div>
-        <div class="value">$<?php echo number_format($cashUSD_amt, 2); ?></div>
-    </div>
-    <?php endif; ?>
-    <?php if ($cashKHR_usd > 0): ?>
-    <div class="summary-card">
-        <div class="label">💵 Cash — KHR</div>
-        <div class="value"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</div>
-        <div class="sub">≈ $<?php echo number_format($cashKHR_usd, 2); ?></div>
-    </div>
-    <?php endif; ?>
-    <?php foreach ($paymentSummary as $method => $amt): 
-        if ($method === 'cash' || $method === 'cash_khr') continue;
-        $label = $methodLabels[$method] ?? strtoupper($method);
-    ?>
-    <div class="summary-card">
-        <div class="label">🏦 <?php echo $label; ?></div>
-        <div class="value">$<?php echo number_format($amt, 2); ?></div>
-    </div>
-    <?php endforeach; ?>
-    <div class="summary-card" style="border:2px solid #000;">
-        <div class="label">📊 Grand Total</div>
-        <div class="value">$<?php echo number_format($totalRevenue, 2); ?></div>
-        <?php if ($rate > 0): ?>
-        <div class="sub">≈ <?php echo number_format($totalRevenue * $rate, 0); ?>៛ (1$ = <?php echo number_format($rate, 0); ?>៛)</div>
+<table>
+    <thead>
+        <tr>
+            <th>Payment / វិធីបង់ប្រាក់</th>
+            <th class="text-right">USD ($)</th>
+            <th class="text-right">KHR (៛)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if ($cashUSD_amt > 0): ?>
+        <tr>
+            <td>💵 Cash — USD</td>
+            <td class="text-right bold">$<?php echo number_format($cashUSD_amt, 2); ?></td>
+            <td class="text-right">—</td>
+        </tr>
         <?php endif; ?>
-    </div>
-</div>
+        <?php if ($cashKHR_usd > 0): ?>
+        <tr>
+            <td>💵 Cash — KHR</td>
+            <td class="text-right">$<?php echo number_format($cashKHR_usd, 2); ?></td>
+            <td class="text-right bold"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</td>
+        </tr>
+        <?php endif; ?>
+        <?php foreach ($paymentSummary as $method => $amt): 
+            if ($method === 'cash' || $method === 'cash_khr') continue;
+            $label = $methodLabels[$method] ?? strtoupper($method);
+        ?>
+        <tr>
+            <td>🏦 <?php echo $label; ?></td>
+            <td class="text-right bold">$<?php echo number_format($amt, 2); ?></td>
+            <td class="text-right">—</td>
+        </tr>
+        <?php endforeach; ?>
+        <tr class="total-row">
+            <td>📊 Grand Total / សរុបរួម</td>
+            <td class="text-right">$<?php echo number_format($totalRevenue, 2); ?></td>
+            <td class="text-right"><?php echo number_format($totalRevenue * $rate, 0); ?>៛</td>
+        </tr>
+    </tbody>
+</table>
+<div style="font-size:10px;color:#888;text-align:right;margin-bottom:8px;">អត្រាប្តូរ: 1$ = <?php echo number_format($rate, 0); ?>៛</div>
 
 <!-- Section 3: Opening/Closing Cash -->
 <div class="section-title">🔐 សាច់ប្រាក់ / Cash Balance</div>
-<div class="summary-grid">
-    <div class="summary-card">
-        <div class="label">Opening Balance</div>
-        <div class="value">$<?php echo number_format($session['opening_balance'], 2); ?></div>
-    </div>
-    <?php if ($isClosed): ?>
-    <div class="summary-card">
-        <div class="label">Closing Balance</div>
-        <div class="value">$<?php echo number_format($session['closing_balance'], 2); ?></div>
-    </div>
-    <?php endif; ?>
-</div>
+<table>
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th class="text-right">Amount (USD)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>💰 Opening Balance / សាច់ប្រាក់ដើម</td>
+            <td class="text-right bold">$<?php echo number_format($session['opening_balance'], 2); ?></td>
+        </tr>
+        <tr>
+            <td>➕ Total Sales / លក់បានសរុប</td>
+            <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
+        </tr>
+        <?php if ($isClosed): ?>
+        <tr>
+            <td>🔒 Closing Balance / សាច់ប្រាក់បិទ</td>
+            <td class="text-right bold">$<?php echo number_format($session['closing_balance'], 2); ?></td>
+        </tr>
+        <?php $diff = $session['closing_balance'] - ($session['opening_balance'] + $totalRevenue); ?>
+        <tr>
+            <td><?php echo $diff >= 0 ? '✅' : '⚠️'; ?> Difference / ខុសគ្នា</td>
+            <td class="text-right bold" style="color:<?php echo $diff >= 0 ? '#10b981' : '#ef4444'; ?>;">
+                <?php echo ($diff >= 0 ? '+' : '') . number_format($diff, 2); ?>
+            </td>
+        </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
 
 <div class="footer">
     <p>Printed on <?php echo date('d M Y H:i'); ?> — Powered by Mekong POS</p>
