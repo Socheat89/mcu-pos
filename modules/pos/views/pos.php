@@ -106,6 +106,7 @@ $dashboardUrl = $posBase . '/dashboard';
             'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1',
             'exchange_rate_usd_khr' => $settings['exchange_rate_usd_khr'] ?? '4100',
             'payment_qr_path' => $settings['payment_qr_path'] ?? ($settings['pos_method_khqr_image'] ?? ''),
+            'price_decimal_places' => (int)($settings['price_decimal_places'] ?? 2),
         ]); ?>;
 
         window.CURRENT_LANG = "<?php echo Language::getCurrentLang(); ?>";

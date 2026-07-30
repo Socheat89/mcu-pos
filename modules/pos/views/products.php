@@ -272,7 +272,7 @@ $urlPrefix = mc_base_path();
                                         <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                                             <?php foreach ($p['sizes'] as $sz): ?>
                                                 <span style="display: inline-block; background: rgba(99, 102, 241, 0.08); color: var(--pos-primary); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; white-space: nowrap;">
-                                                    <?php echo htmlspecialchars($sz['size_name']); ?>: $<?php echo number_format($sz['price'], 2); ?>
+                                                    <?php echo htmlspecialchars($sz['size_name']); ?>: $<?php echo Settings::formatPrice($sz['price']); ?>
                                                 </span>
                                             <?php endforeach; ?>
                                         </div>
@@ -289,10 +289,10 @@ $urlPrefix = mc_base_path();
                                     <?php $cost = (float)($p['cost_price'] ?? 0); ?>
                                     <div style="font-weight: 600; color: var(--pos-text-muted); font-size: 13px;">
                                         <?php if ($cost > 0): ?>
-                                            $<?php echo number_format($cost, 2); ?>
+                                            $<?php echo Settings::formatPrice($cost); ?>
                                             <?php $margin = (float)$p['price'] - $cost; ?>
                                             <span style="font-size: 10px; color: <?php echo $margin > 0 ? '#10b981' : '#ef4444'; ?>; margin-left: 4px;">
-                                                (<?php echo $margin > 0 ? '+' : ''; ?><?php echo number_format($margin, 2); ?>)
+                                                (<?php echo $margin > 0 ? '+' : ''; ?><?php echo Settings::formatPrice($margin); ?>)
                                             </span>
                                         <?php else: ?>
                                             <span style="color: #cbd5e1;">—</span>
@@ -300,7 +300,7 @@ $urlPrefix = mc_base_path();
                                     </div>
                                 </td>
                                 <td>
-                                    <div style="font-weight: 900; color: var(--pos-primary); font-size: 16px;">$<?php echo number_format($p['price'], 2); ?></div>
+                                    <div style="font-weight: 900; color: var(--pos-primary); font-size: 16px;">$<?php echo Settings::formatPrice($p['price']); ?></div>
                                 </td>
                                 <td>
                                     <div style="display: flex; justify-content: flex-end; gap: 10px;">

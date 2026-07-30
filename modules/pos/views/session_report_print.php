@@ -275,16 +275,16 @@ foreach ($paymentSummary as $method => $amt) {
                 <td><?php echo $i; ?></td>
                 <td><?php echo htmlspecialchars($p['name']); ?></td>
                 <td class="text-center bold"><?php echo (int)$p['qty_sold']; ?></td>
-                <td class="text-right">$<?php echo number_format($unitPrice, 2); ?></td>
+                <td class="text-right">$<?php echo Settings::formatPrice($unitPrice); ?></td>
                 <td class="text-right"><?php echo number_format($unitPrice * $rate, 0); ?>៛</td>
-                <td class="text-right bold">$<?php echo number_format($p['total_revenue'], 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($p['total_revenue']); ?></td>
             </tr>
             <?php endforeach; endif; ?>
             <tr class="total-row">
                 <td colspan="3" class="bold">Total / សរុប</td>
                 <td></td>
                 <td></td>
-                <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($totalRevenue); ?></td>
             </tr>
         </tbody>
     </table>
@@ -303,14 +303,14 @@ foreach ($paymentSummary as $method => $amt) {
             <?php if ($cashUSD_amt > 0): ?>
             <tr>
                 <td>Cash — USD</td>
-                <td class="text-right bold">$<?php echo number_format($cashUSD_amt, 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($cashUSD_amt); ?></td>
                 <td class="text-right">—</td>
             </tr>
             <?php endif; ?>
             <?php if ($cashKHR_usd > 0): ?>
             <tr>
                 <td>Cash — KHR</td>
-                <td class="text-right">$<?php echo number_format($cashKHR_usd, 2); ?></td>
+                <td class="text-right">$<?php echo Settings::formatPrice($cashKHR_usd); ?></td>
                 <td class="text-right bold"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</td>
             </tr>
             <?php endif; ?>
@@ -320,13 +320,13 @@ foreach ($paymentSummary as $method => $amt) {
             ?>
             <tr>
                 <td><?php echo htmlspecialchars($label); ?></td>
-                <td class="text-right bold">$<?php echo number_format($amt, 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($amt); ?></td>
                 <td class="text-right">—</td>
             </tr>
             <?php endforeach; ?>
             <tr class="total-row">
                 <td>Grand Total / សរុបរួម</td>
-                <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($totalRevenue); ?></td>
                 <td class="text-right bold"><?php echo number_format($totalRevenue * $rate, 0); ?>៛</td>
             </tr>
         </tbody>
@@ -345,22 +345,22 @@ foreach ($paymentSummary as $method => $amt) {
         <tbody>
             <tr>
                 <td>Opening Balance / សាច់ប្រាក់ដើម</td>
-                <td class="text-right bold">$<?php echo number_format($session['opening_balance'], 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($session['opening_balance']); ?></td>
             </tr>
             <tr>
                 <td>Total Sales / លក់បានសរុប</td>
-                <td class="text-right bold">$<?php echo number_format($totalRevenue, 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($totalRevenue); ?></td>
             </tr>
             <?php if ($isClosed): ?>
             <tr>
                 <td>Closing Balance / សាច់ប្រាក់បិទ</td>
-                <td class="text-right bold">$<?php echo number_format($session['closing_balance'], 2); ?></td>
+                <td class="text-right bold">$<?php echo Settings::formatPrice($session['closing_balance']); ?></td>
             </tr>
             <?php $diff = $session['closing_balance'] - ($session['opening_balance'] + $totalRevenue); ?>
             <tr>
                 <td>Difference / ខុសគ្នា</td>
                 <td class="text-right bold" style="color:<?php echo $diff >= 0 ? '#10b981' : '#ef4444'; ?>;">
-                    <?php echo ($diff >= 0 ? '+' : '') . number_format($diff, 2); ?>
+                    <?php echo ($diff >= 0 ? '+' : '') . Settings::formatPrice($diff); ?>
                 </td>
             </tr>
             <?php endif; ?>

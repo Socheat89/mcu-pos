@@ -86,7 +86,7 @@
                         <div style="display: flex; align-items: center; gap: 40px;">
                             <div style="text-align: right;">
                                 <div style="font-size: 11px; font-weight: 800; color: var(--pos-text-muted); text-transform: uppercase; margin-bottom: 4px;"><?php echo __('value'); ?></div>
-                                <div style="font-weight: 900; font-size: 24px; color: var(--pos-text);">$<?php echo number_format($total, 2); ?></div>
+                                <div style="font-weight: 900; font-size: 24px; color: var(--pos-text);">$<?php echo Settings::formatPrice($total); ?></div>
                             </div>
                             <div style="display: flex; gap: 10px;">
                                 <a href="<?php echo htmlspecialchars($posUrl('pos?resume=' . $id)); ?>" class="btn btn-primary" style="padding: 12px 24px; font-weight: 900;">

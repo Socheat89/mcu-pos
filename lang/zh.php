@@ -459,5 +459,7 @@ return [
     'test_sent_success'       => '测试消息已发送！请检查您的 Telegram 群组。',
     'test_failed'             => '测试失败',
     'settings_saved'          => '设置保存成功！',
+    'price_decimal_places'    => '价格和成本小数位数',
+    'price_decimal_places_hint' => '指定价格和成本显示及接受的小数位数（例如，0 表示没有小数，2 表示 0.00）。',
 
 ];

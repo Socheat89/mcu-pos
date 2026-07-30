@@ -93,11 +93,11 @@
                     <div class="pos-grid cols-2">
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('cost_price'); ?> ($)</label>
-                            <input type="number" name="cost_price" step="0.01" class="pos-form-control" value="<?php echo isset($product['cost_price']) ? number_format($product['cost_price'], 2, '.', '') : '0.00'; ?>" placeholder="0.00">
+                            <input type="number" name="cost_price" step="<?php echo Settings::priceStep(); ?>" class="pos-form-control" value="<?php echo isset($product['cost_price']) ? Settings::formatPriceInput($product['cost_price']) : Settings::formatPriceInput(0); ?>" placeholder="<?php echo Settings::pricePlaceholder(); ?>">
                         </div>
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('retail_price'); ?> <span style="color:red;">*</span></label>
-                            <input type="number" name="price" step="0.01" class="pos-form-control" value="<?php echo $product['price'] ?? ''; ?>" required placeholder="0.00">
+                            <input type="number" name="price" step="<?php echo Settings::priceStep(); ?>" class="pos-form-control" value="<?php echo isset($product['price']) ? Settings::formatPriceInput($product['price']) : ''; ?>" required placeholder="<?php echo Settings::pricePlaceholder(); ?>">
                         </div>
                     </div>
                     <div class="pos-grid cols-2" style="margin-top: 24px;">
@@ -143,7 +143,7 @@
                             </div>
                             <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
                                 <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_price'); ?> ($)</label>
-                                <input type="number" name="size_price[]" step="0.01" class="pos-form-control size-price-input" value="<?php echo isset($sz['price']) ? number_format($sz['price'], 2, '.', '') : ''; ?>" placeholder="0.00">
+                                <input type="number" name="size_price[]" step="<?php echo Settings::priceStep(); ?>" class="pos-form-control size-price-input" value="<?php echo isset($sz['price']) ? Settings::formatPriceInput($sz['price']) : ''; ?>" placeholder="<?php echo Settings::pricePlaceholder(); ?>">
                             </div>
                             <button type="button" class="btn-remove-size" title="<?php echo __('remove_size'); ?>" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
                                 <i class="fas fa-times" style="font-size: 12px;"></i>
@@ -247,7 +247,7 @@
                 </div>
                 <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
                     <label class="pos-form-label" style="font-size: 11px;"><?php echo __('size_price'); ?> ($)</label>
-                    <input type="number" name="size_price[]" step="0.01" class="pos-form-control size-price-input" placeholder="0.00">
+                    <input type="number" name="size_price[]" step="<?php echo Settings::priceStep(); ?>" class="pos-form-control size-price-input" placeholder="<?php echo Settings::pricePlaceholder(); ?>">
                 </div>
                 <button type="button" class="btn-remove-size" title="<?php echo __('remove_size'); ?>" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
                     <i class="fas fa-times" style="font-size: 12px;"></i>

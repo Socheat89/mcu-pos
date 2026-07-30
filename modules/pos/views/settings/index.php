@@ -512,6 +512,32 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                                 $10.00 = <?php echo number_format(10 * $rate, 0); ?>៛
                             </div>
                         </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--pos-border); margin: 24px 0;">
+
+                        <div class="pos-form-group" style="margin-bottom: 0;">
+                            <label class="pos-form-label">
+                                <i class="fas fa-coins" style="color: var(--pos-primary);"></i> 
+                                <?php echo __('price_decimal_places'); ?>
+                            </label>
+                            <p class="pos-small" style="margin-bottom: 10px;">
+                                <?php echo __('price_decimal_places_hint'); ?>
+                            </p>
+                            <select name="price_decimal_places" class="pos-form-control pos-form-select" style="max-width: 250px; font-weight: 700; height: auto; padding: 10px 14px;">
+                                <?php 
+                                $currentDec = (int)($settings['price_decimal_places'] ?? 2);
+                                for ($i = 0; $i <= 4; $i++): 
+                                    $example = '0';
+                                    if ($i > 0) {
+                                        $example .= '.' . str_repeat('0', $i);
+                                    }
+                                ?>
+                                    <option value="<?php echo $i; ?>" <?php echo $currentDec === $i ? 'selected' : ''; ?>>
+                                        <?php echo $i; ?> (<?php echo $example; ?>)
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -558,7 +584,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                                     <div style="width: 38px; height: 38px; background: #0088cc; color: white; border-radius: 10px; display: inline-grid; place-items: center; font-size: 16px; font-weight: 800; margin-bottom: 10px;">1</div>
                                     <div style="font-weight: 800; font-size: 0.9rem; color: var(--pos-text); margin-bottom: 4px;">បន្ថែម Bot ចូលក្រុម</div>
                                     <div style="font-size: 0.8rem; color: var(--pos-text-muted); margin-bottom: 12px;">Add bot as admin to group</div>
-                                    <a href="https://t.me/mcu_pos_bot?startgroup=true" target="_blank" style="display: inline-block; background: #0088cc; color: white; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; width: 100%;">
+                                    <a href="https://t.me/mcuPOS_bot?startgroup=true" target="_blank" style="display: inline-block; background: #0088cc; color: white; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; width: 100%;">
                                         <i class="fab fa-telegram-plane"></i> បើក Telegram
                                     </a>
                                 </div>

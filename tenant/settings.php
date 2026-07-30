@@ -934,7 +934,7 @@ $telegramConfig = $db->fetchOne("SELECT * FROM tenant_telegram_config WHERE tena
                                     <div style="width: 42px; height: 42px; background: #0088cc; color: white; border-radius: 12px; display: inline-grid; place-items: center; font-size: 18px; font-weight: 800; margin-bottom: 12px;">1</div>
                                     <div style="font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 6px;">បន្ថែម Bot ចូលក្រុម</div>
                                     <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Add bot as admin to group</div>
-                                    <a href="https://t.me/mcu_pos_bot?startgroup=true" target="_blank" class="btn" style="background: #0088cc; font-size: 0.85rem; padding: 8px 16px; border-radius: 8px; width: 100%; text-decoration: none;">
+                                    <a href="https://t.me/mcuPOS_bot?startgroup=true" target="_blank" class="btn" style="background: #0088cc; font-size: 0.85rem; padding: 8px 16px; border-radius: 8px; width: 100%; text-decoration: none;">
                                         <i class="fab fa-telegram-plane"></i> បើក Telegram
                                     </a>
                                 </div>

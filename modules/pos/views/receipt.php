@@ -27,11 +27,13 @@ $isKHR = ($paymentCurrency === 'KHR');
 $rate = $exchangeRate > 0 ? $exchangeRate : 4100;
 
 function fmtMoney($amount, $isKHR, $rate) {
+    global $receiptSettings;
     if ($isKHR) {
         $khr = round($amount * $rate);
         return number_format($khr, 0) . '៛';
     }
-    return '$' . number_format($amount, 2);
+    $dec = (int)($receiptSettings['price_decimal_places'] ?? 2);
+    return '$' . number_format($amount, $dec);
 }
 
 $currentTenant = Tenant::getCurrent();
@@ -254,7 +256,7 @@ $autoPrint = (($_GET['autoprint'] ?? '') === '1');
             <?php if ($isKHR): ?>
             <div class="info-row" style="font-size: 10px; color: #666;">
                 <span>($1 = <?php echo number_format($rate, 0); ?>៛)</span>
-                <span>$<?php echo number_format($order['total'], 2); ?></span>
+                <span>$<?php echo number_format($order['total'], (int)($receiptSettings['price_decimal_places'] ?? 2)); ?></span>
             </div>
             <?php endif; ?>
         </div>

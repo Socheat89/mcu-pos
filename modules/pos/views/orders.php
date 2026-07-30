@@ -104,7 +104,7 @@
                                     <div style="font-size: 12px; color: var(--pos-text-muted); font-weight: 600; margin-top: 2px;"><?php echo date('h:i A', strtotime($o['created_at'])); ?></div>
                                 </td>
                                 <td>
-                                    <div style="font-weight: 900; color: var(--pos-text); font-size: 16px;">$<?php echo number_format($o['total'], 2); ?></div>
+                                    <div style="font-weight: 900; color: var(--pos-text); font-size: 16px;">$<?php echo Settings::formatPrice($o['total']); ?></div>
                                 </td>
                                 <td>
                                     <span class="badge <?php echo $badge; ?>">

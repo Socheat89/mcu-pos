@@ -203,7 +203,7 @@ function sendSetupCodeToGroup($token, $chatId, $chatTitle, $code) {
 function getBotUsername($token) {
     $info = @file_get_contents("https://api.telegram.org/bot{$token}/getMe");
     $data = json_decode($info, true);
-    return $data['result']['username'] ?? 'mcu_pos_bot';
+    return $data['result']['username'] ?? 'mcuPOS_bot';
 }
 
 function answerCallback($token, $callbackId, $text = '') {

@@ -54,6 +54,30 @@ class Settings {
         return $result;
     }
 
+    public static function getDecimalPlaces($tenantId = null) {
+        return (int) self::get('price_decimal_places', $tenantId, 2);
+    }
+
+    public static function formatPrice($amount, $tenantId = null) {
+        $decimalPlaces = self::getDecimalPlaces($tenantId);
+        return number_format((float)$amount, $decimalPlaces);
+    }
+
+    public static function formatPriceInput($amount, $tenantId = null) {
+        $decimalPlaces = self::getDecimalPlaces($tenantId);
+        return number_format((float)$amount, $decimalPlaces, '.', '');
+    }
+
+    public static function pricePlaceholder($tenantId = null) {
+        $decimalPlaces = self::getDecimalPlaces($tenantId);
+        return ($decimalPlaces > 0) ? '0.' . str_repeat('0', $decimalPlaces) : '0';
+    }
+
+    public static function priceStep($tenantId = null) {
+        $decimalPlaces = self::getDecimalPlaces($tenantId);
+        return ($decimalPlaces > 0) ? '0.' . str_repeat('0', $decimalPlaces - 1) . '1' : '1';
+    }
+
     public static function initializeDefaults($tenantId) {
         $defaults = [
             'max_free_users' => '2',
@@ -66,7 +90,8 @@ class Settings {
             'company_phone' => '',
             'company_email' => '',
             'company_tax_id' => '',
-            'company_website' => ''
+            'company_website' => '',
+            'price_decimal_places' => '2'
         ];
 
         foreach ($defaults as $key => $value) {

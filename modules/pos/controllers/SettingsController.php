@@ -48,7 +48,8 @@ class SettingsController {
             'pos_method_khqr_image' => mc_url('public/images/khqr_preview.png'),
             'pos_method_card_enabled' => '1',
             'pos_method_transfer_enabled' => '1',
-            'exchange_rate_usd_khr' => '4100' // Default: 1 USD = 4100 KHR
+            'exchange_rate_usd_khr' => '4100', // Default: 1 USD = 4100 KHR
+            'price_decimal_places' => '2'
         ];
 
         foreach ($defaults as $key => $default) {
@@ -92,7 +93,8 @@ class SettingsController {
                  'company_email',
                  'company_tax_id',
                  'company_website',
-                 'exchange_rate_usd_khr'
+                 'exchange_rate_usd_khr',
+                 'price_decimal_places'
              ];
 
              $checkboxes = [

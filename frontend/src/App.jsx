@@ -379,7 +379,8 @@ export default function App() {
     pos_method_cash_enabled: '1',
     pos_method_khqr_enabled: '1',
     pos_method_card_enabled: '1',
-    exchange_rate_usd_khr: '4100'
+    exchange_rate_usd_khr: '4100',
+    price_decimal_places: 2
   };
   const initialPendingOrders = window.PENDING_ORDERS || [];
   const initialResumeOrder = window.RESUME || null;
@@ -388,6 +389,7 @@ export default function App() {
   const [products] = useState(initialProducts);
   const [customers] = useState(initialCustomers);
   const [settings] = useState(initialSettings);
+  const decimals = parseInt(settings.price_decimal_places ?? 2, 10);
   const [pendingOrders] = useState(initialPendingOrders);
   const [resumeOrder] = useState(initialResumeOrder);
 
@@ -780,7 +782,7 @@ export default function App() {
       const khr = Math.round(amountUSD * exchangeRate());
       return khr.toLocaleString('en') + '៛';
     }
-    return '$' + amountUSD.toFixed(2);
+    return '$' + amountUSD.toFixed(decimals);
   };
   const convertToUSD = (amountInCurrency) => {
     if (currency === 'KHR') {
@@ -899,7 +901,7 @@ export default function App() {
     products.forEach(p => {
       map[p.category] = (map[p.category] || 0) + (p.price * (Math.floor(Math.random() * 20) + 5));
     });
-    return Object.keys(map).map(cat => ({ name: cat, sales: parseFloat(map[cat].toFixed(2)) }));
+    return Object.keys(map).map(cat => ({ name: cat, sales: parseFloat(map[cat].toFixed(decimals)) }));
   };
 
   const getStockLevelsData = () => {
@@ -918,7 +920,7 @@ export default function App() {
     Math.ceil(getGrandTotal() / 10) * 10
   ]
     .filter(amount => amount > 0 && amount >= getGrandTotal())
-    .map(amount => Number(amount.toFixed(2)))
+    .map(amount => Number(amount.toFixed(decimals)))
   )).slice(0, 4);
 
   // ═══════════════════════════════════════════════════════════
@@ -1158,7 +1160,7 @@ export default function App() {
 
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 {[
-                  { label: t('cart', 'Cart'), value: `$${getGrandTotal().toFixed(2)}`, icon: Receipt },
+                  { label: t('cart', 'Cart'), value: `$${getGrandTotal().toFixed(decimals)}`, icon: Receipt },
                   { label: t('items', 'items'), value: cartItemCount, icon: ShoppingBag },
                   { label: t('stock_alerts', 'Stock alerts'), value: `${lowStockCount}/${outOfStockCount}`, icon: AlertTriangle },
                   { label: t('pending', 'Hold'), value: pendingOrders.length, icon: Clock }
@@ -1317,8 +1319,8 @@ export default function App() {
                             {/* Price badge - floating */}
                             <span className="pos-price-badge">
                               {prod.sizes && prod.sizes.length > 0
-                                ? `$${Math.min(...prod.sizes.map(s => s.price)).toFixed(2)}+`
-                                : `$${prod.price.toFixed(2)}`
+                                ? `$${Math.min(...prod.sizes.map(s => s.price)).toFixed(decimals)}+`
+                                : `$${prod.price.toFixed(decimals)}`
                               }
                             </span>
 
@@ -1467,11 +1469,11 @@ export default function App() {
                           )}
                         </div>
                         <div className="pos-cart-item-price">
-                          {item.quantity}× ${(item.customPrice !== undefined ? item.customPrice : item.product.price).toFixed(2)}
+                          {item.quantity}× ${(item.customPrice !== undefined ? item.customPrice : item.product.price).toFixed(decimals)}
                           {item.discount > 0 && <span className="text-[#E76F51] ml-1">(-{item.discount}%)</span>}
                         </div>
                       </div>
-                      <div className="font-black text-sm text-[#E76F51]">${getItemTotal(item).toFixed(2)}</div>
+                      <div className="font-black text-sm text-[#E76F51]">${getItemTotal(item).toFixed(decimals)}</div>
                     </div>
                   ))
                 )}
@@ -1594,11 +1596,11 @@ export default function App() {
                 <div className="p-2.5 rounded bg-white dark:bg-brand-bgDark border border-gray-200 dark:border-white/5 space-y-1 text-[11px] font-medium text-brand-muted dark:text-gray-400">
                   <div className="flex justify-between items-center">
                     <span>{t('subtotal', 'Subtotal')}</span>
-                    <span>${getSubtotal().toFixed(2)}</span>
+                    <span>${getSubtotal().toFixed(decimals)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs font-black text-slate-800 dark:text-gray-200 border-t border-gray-100 dark:border-white/5 pt-1.5 mt-1">
                     <span>{t('total', 'Total')}</span>
-                    <span className="text-sm font-black text-brand-cyan">${getGrandTotal().toFixed(2)}</span>
+                    <span className="text-sm font-black text-brand-cyan">${getGrandTotal().toFixed(decimals)}</span>
                   </div>
                 </div>
               </div>
@@ -1636,7 +1638,7 @@ export default function App() {
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
                   </svg>
-                  <span className="text-[10px] font-bold">{t('cart', 'Cart')} (${getGrandTotal().toFixed(2)})</span>
+                  <span className="text-[10px] font-bold">{t('cart', 'Cart')} (${getGrandTotal().toFixed(decimals)})</span>
                   {cartItemCount > 0 && (
                     <span className="absolute top-1 right-1/4 bg-[#E76F51] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
                       {cartItemCount}
@@ -1701,7 +1703,7 @@ export default function App() {
                           <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                      <span className="text-sm font-black text-brand-cyan">${parseFloat(order.total).toFixed(2)}</span>
+                      <span className="text-sm font-black text-brand-cyan">${parseFloat(order.total).toFixed(decimals)}</span>
                     </div>
 
                     {order.notes && (
@@ -1905,7 +1907,7 @@ export default function App() {
                                 setCashGiven(String(bill.val));
                               } else {
                                 const current = parseFloat(cashGiven) || 0;
-                                setCashGiven((current + bill.val).toFixed(currency === 'KHR' ? 0 : 2));
+                                setCashGiven((current + bill.val).toFixed(currency === 'KHR' ? 0 : decimals));
                               }
                             }}
                             className={`rounded-xl border py-2 text-[10px] font-black transition-all ${
@@ -1935,7 +1937,7 @@ export default function App() {
                         <span className="text-xl font-black text-brand-success">
                           {currency === 'KHR'
                             ? getChange().toLocaleString('en') + '៛'
-                            : '$' + getChange().toFixed(2)
+                            : '$' + getChange().toFixed(decimals)
                           }
                         </span>
                       </div>
@@ -1947,7 +1949,7 @@ export default function App() {
                         <span className="text-sm font-black text-brand-danger">
                           {currency === 'KHR'
                             ? 'ត្រូវការ ' + (Math.round(getGrandTotal() * exchangeRate()) - Math.round(parseFloat(cashGiven) || 0)).toLocaleString('en') + '៛ បន្ថែម'
-                            : 'Need $' + (getGrandTotal() - (parseFloat(cashGiven) || 0)).toFixed(2) + ' more'
+                            : 'Need $' + (getGrandTotal() - (parseFloat(cashGiven) || 0)).toFixed(decimals) + ' more'
                           }
                         </span>
                       </div>
@@ -2077,7 +2079,7 @@ export default function App() {
                   }`}
                 >
                   <span>{sz.size_name}</span>
-                  <span className="text-brand-cyan font-black">${sz.price.toFixed(2)}</span>
+                  <span className="text-brand-cyan font-black">${sz.price.toFixed(decimals)}</span>
                 </button>
               ))}
             </div>

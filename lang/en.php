@@ -489,6 +489,8 @@ return [
     'exchange_rate'           => 'Exchange Rate',
     'exchange_rate_hint'      => 'Set the conversion rate from USD to Cambodian Riel (KHR). This will be used to display prices in both currencies.',
     'exchange_rate_example'   => 'Examples',
+    'price_decimal_places'    => 'Price & Cost Decimal Places',
+    'price_decimal_places_hint' => 'Specify how many decimal places to display and accept for prices and costs (e.g., 0 for no decimals, 2 for 0.00).',
 
     // Currency & Bank
     'currency'                => 'Currency',

@@ -2,6 +2,7 @@
 // modules/pos/controllers/ProductController.php
 require_once __DIR__ . '/../../../core/classes/Database.php';
 require_once __DIR__ . '/../../../core/classes/Tenant.php';
+require_once __DIR__ . '/../../../core/classes/Settings.php';
 require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
 require_once __DIR__ . '/../models/Product.php';

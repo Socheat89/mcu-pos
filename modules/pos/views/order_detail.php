@@ -82,7 +82,7 @@
             <div class="summary-box pos-shadow-xl">
                 <div>
                     <span class="detail-label" style="color: rgba(255,255,255,0.7);"><?php echo __('net_payable'); ?></span>
-                    <div style="font-size: 36px; font-weight: 900; margin-top: 8px;">$<?php echo number_format($order['total'], 2); ?></div>
+                    <div style="font-size: 36px; font-weight: 900; margin-top: 8px;">$<?php echo Settings::formatPrice($order['total']); ?></div>
                 </div>
                 <div style="font-size: 13px; font-weight: 600; opacity: 0.9;"><?php echo __('total_value_tax_msg'); ?></div>
             </div>
@@ -119,8 +119,8 @@
                                 </div>
                             </td>
                             <td style="text-align: center; font-weight: 700;">&times; <?php echo $item['quantity']; ?></td>
-                            <td style="text-align: right; font-weight: 700;">$<?php echo number_format($item['unit_price'], 2); ?></td>
-                            <td style="text-align: right; font-weight: 900; color: var(--pos-primary);">$<?php echo number_format($item['total'], 2); ?></td>
+                            <td style="text-align: right; font-weight: 700;">$<?php echo Settings::formatPrice($item['unit_price']); ?></td>
+                            <td style="text-align: right; font-weight: 900; color: var(--pos-primary);">$<?php echo Settings::formatPrice($item['total']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -131,15 +131,15 @@
                 <div style="width: 320px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                         <span style="font-weight: 700; color: var(--pos-text-muted);"><?php echo __('line_subtotal'); ?></span>
-                        <span style="font-weight: 800;">$<?php echo number_format($order['total'], 2); ?></span>
+                        <span style="font-weight: 800;">$<?php echo Settings::formatPrice($order['total']); ?></span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1.5px dashed var(--pos-border);">
                         <span style="font-weight: 700; color: var(--pos-text-muted);"><?php echo __('surcharge_tax'); ?></span>
-                        <span style="font-weight: 800;">$0.00</span>
+                        <span style="font-weight: 800;">$<?php echo Settings::formatPriceInput(0); ?></span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-weight: 900; font-size: 18px;"><?php echo __('grand_total'); ?></span>
-                        <span style="font-weight: 900; font-size: 28px; color: var(--pos-primary);">$<?php echo number_format($order['total'], 2); ?></span>
+                        <span style="font-weight: 900; font-size: 28px; color: var(--pos-primary);">$<?php echo Settings::formatPrice($order['total']); ?></span>
                     </div>
                 </div>
             </div>

@@ -77,26 +77,26 @@ $isClosed        = $session['status'] === 'closed';
         <div class="pos-grid cols-4" style="margin-bottom:32px;">
             <div class="pos-stat">
                 <span class="k"><?php echo __('opening_balance'); ?></span>
-                <p class="v">$<?php echo number_format($session['opening_balance'], 2); ?></p>
+                <p class="v">$<?php echo Settings::formatPrice($session['opening_balance']); ?></p>
                 <div class="chip" style="background:rgba(6,182,212,0.1); color:var(--pos-primary);"><i class="fas fa-key"></i></div>
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_sales'); ?></span>
-                <p class="v">$<?php echo number_format($session['total_sales'], 2); ?></p>
+                <p class="v">$<?php echo Settings::formatPrice($session['total_sales']); ?></p>
                 <div class="chip" style="background:rgba(99,102,241,0.1); color:var(--pos-secondary);"><i class="fas fa-chart-line"></i></div>
             </div>
             <?php if ($isClosed && $difference !== null): ?>
                 <div class="pos-stat">
                     <span class="k">Expected Cash</span>
-                    <p class="v">$<?php echo number_format($expectedCash, 2); ?></p>
+                    <p class="v">$<?php echo Settings::formatPrice($expectedCash); ?></p>
                     <div class="chip" style="background:rgba(16,185,129,0.1); color:var(--pos-success);"><i class="fas fa-calculator"></i></div>
                 </div>
                 <div class="pos-stat">
                     <span class="k"><?php echo __('closing_balance'); ?> / Diff</span>
                     <p class="v" style="font-size:18px;">
-                        $<?php echo number_format($session['closing_balance'], 2); ?>
+                        $<?php echo Settings::formatPrice($session['closing_balance']); ?>
                         <span style="color:<?php echo $difference >= 0 ? 'var(--pos-success)' : 'var(--pos-danger)'; ?>; font-size:12px; font-weight:700; display:block; margin-top:4px;">
-                            (<?php echo ($difference >= 0 ? '+' : '') . number_format($difference, 2); ?> diff)
+                            (<?php echo ($difference >= 0 ? '+' : '') . Settings::formatPrice($difference); ?> diff)
                         </span>
                     </p>
                     <div class="chip" style="background:rgba(244,63,94,0.1); color:var(--pos-danger);"><i class="fas fa-scale-balanced"></i></div>
@@ -117,12 +117,12 @@ $isClosed        = $session['status'] === 'closed';
             <?php if ($cashUSD_amt > 0): ?>
             <div class="pos-stat" style="border-left:4px solid #10b981;">
                 <span class="k">💵 Cash — USD ($)</span>
-                <p class="v">$<?php echo number_format($cashUSD_amt, 2); ?></p>
+                <p class="v">$<?php echo Settings::formatPrice($cashUSD_amt); ?></p>
             </div>
             <?php endif; ?>
             <?php if ($cashKHR_usd > 0): ?>
             <div class="pos-stat" style="border-left:4px solid #f59e0b;">
-                <span class="k">💵 Cash — KHR (៛) ~$<?php echo number_format($cashKHR_usd, 2); ?></span>
+                <span class="k">💵 Cash — KHR (៛) ~$<?php echo Settings::formatPrice($cashKHR_usd); ?></span>
                 <p class="v"><?php echo number_format($cashKHR_usd * $rate, 0); ?>៛</p>
             </div>
             <?php endif; ?>
@@ -161,7 +161,7 @@ $isClosed        = $session['status'] === 'closed';
             </button>
 
             <?php foreach ($paymentSummary as $method => $amount): 
-                $badgeLabel = '$' . number_format($amount, 2);
+                $badgeLabel = '$' . Settings::formatPrice($amount);
                 if ($method === 'cash_khr') {
                     $badgeLabel .= ' / ' . number_format($amount * $rate, 0) . '៛';
                 }
@@ -212,7 +212,7 @@ $isClosed        = $session['status'] === 'closed';
                                                 <?php echo (int)$p['qty_sold']; ?>
                                             </span>
                                         </td>
-                                        <td style="text-align:right; font-weight:800; color:var(--pos-primary);">$<?php echo number_format($p['total_revenue'], 2); ?></td>
+                                        <td style="text-align:right; font-weight:800; color:var(--pos-primary);">$<?php echo Settings::formatPrice($p['total_revenue']); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -223,7 +223,7 @@ $isClosed        = $session['status'] === 'closed';
                                         <?php echo array_sum(array_column($soldProducts, 'qty_sold')); ?>
                                     </td>
                                     <td style="text-align:right; font-weight:900; color:var(--pos-primary); font-size:16px;">
-                                        $<?php echo number_format(array_sum(array_column($soldProducts, 'total_revenue')), 2); ?>
+                                        $<?php echo Settings::formatPrice(array_sum(array_column($soldProducts, 'total_revenue'))); ?>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -251,7 +251,7 @@ $isClosed        = $session['status'] === 'closed';
                             <h3 class="pos-card-title" style="margin:0;"><?php echo $pmLabel; ?> — Items Sold</h3>
                             <p style="margin:4px 0 0; font-size:13px; color:var(--pos-text-muted);">
                                 Total collected via <?php echo $pmLabel; ?>:
-                                <strong style="color:var(--pos-primary);">$<?php echo number_format($totalAmount, 2); ?></strong>
+                                <strong style="color:var(--pos-primary);">$<?php echo Settings::formatPrice($totalAmount); ?></strong>
                             </p>
                         </div>
                     </div>
@@ -282,7 +282,7 @@ $isClosed        = $session['status'] === 'closed';
                                                     <?php echo (int)$item['qty_sold']; ?>
                                                 </span>
                                             </td>
-                                            <td style="text-align:right; font-weight:800; color:var(--pos-primary);">$<?php echo number_format($item['total_revenue'], 2); ?></td>
+                                            <td style="text-align:right; font-weight:800; color:var(--pos-primary);">$<?php echo Settings::formatPrice($item['total_revenue']); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -293,7 +293,7 @@ $isClosed        = $session['status'] === 'closed';
                                             <?php echo array_sum(array_column($pmItems, 'qty_sold')); ?>
                                         </td>
                                         <td style="text-align:right; font-weight:900; color:var(--pos-primary); font-size:16px;">
-                                            $<?php echo number_format($totalAmount, 2); ?>
+                                            $<?php echo Settings::formatPrice($totalAmount); ?>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -349,7 +349,7 @@ $isClosed        = $session['status'] === 'closed';
                                             </span>
                                         </td>
                                         <td style="font-size:13px; color:var(--pos-text-muted);"><?php echo date('d M Y, h:i A', strtotime($o['created_at'])); ?></td>
-                                        <td style="font-weight:800; color:var(--pos-text); font-size:15px;">$<?php echo number_format($o['total'], 2); ?></td>
+                                        <td style="font-weight:800; color:var(--pos-text); font-size:15px;">$<?php echo Settings::formatPrice($o['total']); ?></td>
                                         <td style="text-align:right;">
                                             <a href="<?php echo htmlspecialchars($posUrl('orders/' . $o['id'])); ?>" class="pos-icon-btn" title="View Details">
                                                 <i class="fas fa-eye" style="font-size:13px;"></i>

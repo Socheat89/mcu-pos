@@ -42,12 +42,12 @@
                     
                     <div class="summary-row">
                         <span class="summary-label"><?php echo __('opening_balance'); ?></span>
-                        <span class="summary-value">$<?php echo number_format($activeSession['opening_balance'], 2); ?></span>
+                        <span class="summary-value">$<?php echo Settings::formatPrice($activeSession['opening_balance']); ?></span>
                     </div>
                     
                     <div class="summary-row">
                         <span class="summary-label"><?php echo __('cash') . ' ' . __('revenue'); ?></span>
-                        <span class="summary-value">$<?php echo number_format($cashSales, 2); ?></span>
+                        <span class="summary-value">$<?php echo Settings::formatPrice($cashSales); ?></span>
                     </div>
 
                     <?php foreach ($paymentSummary as $method => $amount): 
@@ -55,13 +55,13 @@
                     ?>
                         <div class="summary-row">
                             <span class="summary-label"><?php echo strtoupper($method) . ' ' . __('revenue'); ?></span>
-                            <span class="summary-value">$<?php echo number_format($amount, 2); ?></span>
+                            <span class="summary-value">$<?php echo Settings::formatPrice($amount); ?></span>
                         </div>
                     <?php endforeach; ?>
 
                     <div class="summary-row" style="background: rgba(6, 182, 212, 0.05); border-color: rgba(6, 182, 212, 0.2);">
                         <span class="summary-label" style="color: var(--pos-primary);"><?php echo __('expected_balance'); ?> (Cash in Drawer)</span>
-                        <span class="highlight-value">$<?php echo number_format($expectedCash, 2); ?></span>
+                        <span class="highlight-value">$<?php echo Settings::formatPrice($expectedCash); ?></span>
                     </div>
                 </section>
 
@@ -72,7 +72,7 @@
                     </h3>
                     <div class="pos-form-group">
                         <label class="pos-form-label"><?php echo __('closing_balance'); ?> (Actual Cash in Drawer) <span style="color:red;">*</span></label>
-                        <input type="number" step="0.01" min="0" name="closing_balance" class="pos-form-control" value="<?php echo number_format($expectedCash, 2, '.', ''); ?>" required style="font-size: 20px; font-weight: 800; text-align: center; color: var(--pos-success);">
+                        <input type="number" step="<?php echo Settings::priceStep(); ?>" min="0" name="closing_balance" class="pos-form-control" value="<?php echo Settings::formatPriceInput($expectedCash); ?>" required style="font-size: 20px; font-weight: 800; text-align: center; color: var(--pos-success);">
                     </div>
                 </section>
 
@@ -93,7 +93,7 @@
                             type: 'danger',
                             title: '<?php echo __('close_session'); ?>',
                             subtitle: '<?php echo __('close_session_confirm'); ?>',
-                            message: '<?php echo __('cash_control'); ?>: <strong>$<?php echo number_format($expectedCash, 2); ?></strong>',
+                            message: '<?php echo __('cash_control'); ?>: <strong>$<?php echo Settings::formatPrice($expectedCash); ?></strong>',
                             okText: '<?php echo __('close_session'); ?>',
                             cancelText: '<?php echo __('cancel'); ?>',
                             onOk: function () {

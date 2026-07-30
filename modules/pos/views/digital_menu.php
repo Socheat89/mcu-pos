@@ -661,7 +661,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                                 <div class="product-name"><?php echo htmlspecialchars($product['name']); ?></div>
                                 <p class="product-description"><?php echo htmlspecialchars($product['description'] ?: __('product_desc_fallback', ['default' => 'Tailored to perfection with the finest ingredients.'])); ?></p>
                                 <div class="product-footer">
-                                    <span class="price-tag">$<?php echo number_format($product['price'], 2); ?></span>
+                                    <span class="price-tag">$<?php echo number_format($product['price'], (int)($settings['price_decimal_places'] ?? 2)); ?></span>
                                     <?php if ($product['status'] !== 'active'): ?>
                                         <span class="badge" style="background:#fee2e2; color:#ef4444; border: 1px solid #fecaca;"><?php echo __('sold_out'); ?></span>
                                     <?php else: ?>
@@ -758,6 +758,8 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
 
 
 <script>
+    const PRICE_DECIMALS = <?php echo (int)($settings['price_decimal_places'] ?? 2); ?>;
+
     function filterMenu() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
@@ -818,7 +820,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
                     ${item.image ? `<img src="${item.image}" class="cart-item-img">` : `<div class="cart-item-img" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#94a3b8;"><i class="fas fa-utensils"></i></div>`}
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                        <div class="cart-item-price">$${item.price.toFixed(PRICE_DECIMALS)}</div>
                     </div>
                     <div class="qty-controls">
                         <button class="qty-btn" onclick="changeQty(${index}, -1)"><i class="fas fa-minus"></i></button>
@@ -829,7 +831,7 @@ $prefilledTable = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table']))
             `;
         });
 
-        cartTotalText.innerText = `$${total.toFixed(2)}`;
+        cartTotalText.innerText = `$${total.toFixed(PRICE_DECIMALS)}`;
         localStorage.setItem('myMenuCart', JSON.stringify(cart));
     }
 

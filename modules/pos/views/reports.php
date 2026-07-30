@@ -86,7 +86,7 @@
         <div class="pos-grid cols-4" style="margin-bottom: 32px;">
             <div class="pos-stat">
                 <span class="k"><?php echo __('total_revenue'); ?></span>
-                <p class="v">$<?php echo number_format($salesSummary['total_sales'] ?? 0, 2); ?></p>
+                <p class="v">$<?php echo Settings::formatPrice($salesSummary['total_sales'] ?? 0); ?></p>
                 <div class="chip" style="background: #ecfdf5; color: #2c8a3c;"><i class="fas fa-dollar-sign"></i></div>
             </div>
             <div class="pos-stat">
@@ -96,7 +96,7 @@
             </div>
             <div class="pos-stat">
                 <span class="k"><?php echo __('avg_ticket_size'); ?></span>
-                <p class="v">$<?php echo number_format($salesSummary['avg_order_value'] ?? 0, 2); ?></p>
+                <p class="v">$<?php echo Settings::formatPrice($salesSummary['avg_order_value'] ?? 0); ?></p>
                 <div class="chip" style="background: #f0faf9; color: #00A09D;"><i class="fas fa-chart-line"></i></div>
             </div>
             <div class="pos-stat">
@@ -123,7 +123,7 @@
                     <div style="display:flex;flex-direction:column;gap:4px;">
                         <div style="display:flex;justify-content:space-between;">
                             <span style="font-size:11px;color:var(--pos-text-muted);"><?php echo __('revenue'); ?></span>
-                            <span style="font-weight:800;font-size:15px;color:var(--pos-primary);">$<?php echo number_format($ss['total_sales'], 2); ?></span>
+                            <span style="font-weight:800;font-size:15px;color:var(--pos-primary);">$<?php echo Settings::formatPrice($ss['total_sales']); ?></span>
                         </div>
                         <div style="display:flex;justify-content:space-between;">
                             <span style="font-size:11px;color:var(--pos-text-muted);"><?php echo __('orders'); ?></span>
@@ -131,7 +131,7 @@
                         </div>
                         <div style="display:flex;justify-content:space-between;">
                             <span style="font-size:11px;color:var(--pos-text-muted);">Avg</span>
-                            <span style="font-weight:700;font-size:13px;">$<?php echo number_format($ss['avg_order'], 2); ?></span>
+                            <span style="font-weight:700;font-size:13px;">$<?php echo Settings::formatPrice($ss['avg_order']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -174,7 +174,7 @@
                                         <?php endif; ?>
                                     </p>
                                 </div>
-                                <div style="font-weight: 900; color: var(--pos-primary); font-size: 15px;">$<?php echo number_format($p['total_revenue'], 2); ?></div>
+                                <div style="font-weight: 900; color: var(--pos-primary); font-size: 15px;">$<?php echo Settings::formatPrice($p['total_revenue']); ?></div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -215,7 +215,7 @@
                                 </td>
                                 <td><?php echo htmlspecialchars($ps['product_name']); ?></td>
                                 <td style="font-weight:700;"><?php echo number_format($ps['qty_sold']); ?></td>
-                                <td style="font-weight:800;color:var(--pos-primary);">$<?php echo number_format($ps['revenue'], 2); ?></td>
+                                <td style="font-weight:800;color:var(--pos-primary);">$<?php echo Settings::formatPrice($ps['revenue']); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../../../core/helpers/url.php';
+require_once __DIR__ . '/../../../core/classes/Settings.php';
 $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
+$decimal_places = Settings::getDecimalPlaces();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1086,7 +1088,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     <div class="cart-total" id="cartTotal" style="display: none;">
                         <div class="total-row">
                             <span><?php echo __('total'); ?>:</span>
-                            <span id="totalAmount">$0.00</span>
+                            <span id="totalAmount">$<?php echo number_format(0, $decimal_places); ?></span>
                         </div>
                     </div>
 
@@ -1111,6 +1113,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         let allProducts = <?php echo json_encode($products); ?>;
         const PRODUCT_IMAGE_BASE = '<?php echo mc_url('uploads/products/'); ?>';
         const PRODUCT_FALLBACK_IMAGE = '<?php echo mc_url('public/images/no-image.svg'); ?>';
+        const PRICE_DECIMALS = <?php echo $decimal_places; ?>;
 
         function filterProducts() {
             const searchTerm = document.getElementById('productSearch').value.toLowerCase();
@@ -1127,7 +1130,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     productCard.innerHTML = `
                         <img src="${imageSrc}" alt="${product.name}" class="product-image">
                         <div class="product-name">${product.name}</div>
-                        <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
+                        <div class="product-price">$${parseFloat(product.price).toFixed(PRICE_DECIMALS)}</div>
                         <div class="product-stock">Stock: ${product.stock_quantity}</div>
                     `;
                     productsGrid.appendChild(productCard);
@@ -1201,7 +1204,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                            <div class="cart-item-price">$${item.price.toFixed(PRICE_DECIMALS)} each</div>
                         </div>
                         <div class="quantity-controls">
                             <button type="button" class="quantity-btn" onclick="updateQuantity(${item.product_id}, ${item.quantity - 1})">-</button>
@@ -1209,7 +1212,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                             <button type="button" class="quantity-btn" onclick="updateQuantity(${item.product_id}, ${item.quantity + 1})">+</button>
                             <button type="button" class="remove-btn" onclick="removeFromCart(${item.product_id})">×</button>
                         </div>
-                        <div style="font-weight: bold; color: #28a745;">$${itemTotal.toFixed(2)}</div>
+                        <div style="font-weight: bold; color: #28a745;">$${itemTotal.toFixed(PRICE_DECIMALS)}</div>
                     </div>
                 `;
             });
@@ -1222,7 +1225,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                 form.innerHTML += `<input type="hidden" name="items[${item.product_id}][quantity]" value="${item.quantity}">`;
             });
 
-            document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `$${total.toFixed(PRICE_DECIMALS)}`;
             cartTotal.style.display = 'block';
             paymentOptions.style.display = 'block';
             checkoutBtn.disabled = !(cart.length > 0);
