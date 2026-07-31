@@ -23,7 +23,7 @@ if ($botToken === '') {
 return [
     'bot_token'      => $botToken,
     'chat_id'        => mc_env('MC_TELEGRAM_CHAT_ID', ''),
-    'webhook_secret' => mc_env('MC_TELEGRAM_WEBHOOK_SECRET', 'mcu_tele_sec_99'),
+    'webhook_secret' => mc_env('MC_TELEGRAM_WEBHOOK_SECRET', ''),
     // Local = empty (use polling/sync_telegram.php), Live = webhook URL
     'callback_url'   => mc_env('MC_TELEGRAM_CALLBACK_URL', $isLocal ? '' : ''),
     'is_local'       => $isLocal,
