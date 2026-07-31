@@ -475,8 +475,7 @@ class SessionController {
                 $chatId = $sysConfig['chat_id'];
             }
 
-            require_once __DIR__ . '/../../core/classes/CookieCrypt.php';
-            $botToken = CookieCrypt::decrypt($botToken);
+
 
             if (!$botToken || !$chatId) return;
 

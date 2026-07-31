@@ -50,8 +50,7 @@ if ($trackingSession) {
             $chatId = $sysConfig['chat_id'];
         }
 
-        require_once $root . '/core/classes/CookieCrypt.php';
-        $botToken = CookieCrypt::decrypt($botToken);
+
 
         if ($botToken && $chatId) {
             $user = Auth::user();

@@ -70,7 +70,7 @@ $configData = [
     'chat_id'    => $pending['chat_id'],
     'chat_title' => $pending['chat_title'],
     'setup_code' => $setupCode,
-    'bot_token'  => CookieCrypt::encrypt($botToken),
+    'bot_token'  => $botToken,
     'is_active'  => 1,
 ];
 

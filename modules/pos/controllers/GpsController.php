@@ -430,9 +430,8 @@ class GpsController {
             $db->update('tenant_telegram_config', $data, 'id = ?', [$existing['id']]);
         } else {
             $sysConfig = require __DIR__ . '/../../../config/telegram.php';
-            require_once __DIR__ . '/../../core/classes/CookieCrypt.php';
             $data['tenant_id'] = $tenantId;
-            $data['bot_token'] = CookieCrypt::encrypt($sysConfig['bot_token'] ?? '');
+            $data['bot_token'] = $sysConfig['bot_token'] ?? '';
             $db->insert('tenant_telegram_config', $data);
         }
 
@@ -494,8 +493,7 @@ class GpsController {
             $chatId = $sysConfig['chat_id'];
         }
 
-        require_once __DIR__ . '/../../core/classes/CookieCrypt.php';
-        $botToken = CookieCrypt::decrypt($botToken);
+
 
         if (!$botToken || !$chatId) {
             echo json_encode(['success' => false, 'error' => 'No Telegram bot configured. Please configure first.']);
