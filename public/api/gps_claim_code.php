@@ -52,7 +52,8 @@ if (!$pending) {
     ], 404);
 }
 
-$sysConfig = require $root . '/config/telegram.php';
+require_once $root . '/core/classes/TelegramBot.php';
+$sysConfig = TelegramBot::getSystemConfig();
 $botToken = $sysConfig['bot_token'] ?? ($pending['bot_token'] ?? '');
 if ($botToken === '') {
     mc_json_error('Telegram bot is not configured', 500);

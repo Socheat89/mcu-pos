@@ -44,9 +44,10 @@ if ($trackingSession) {
         $chatId = $tgConfig['chat_id'] ?? null;
 
         if (!$botToken || !$chatId) {
-            $sysConfig = require $root . '/config/telegram.php';
-            $botToken = $sysConfig['bot_token'] ?? null;
-            $chatId = $sysConfig['chat_id'] ?? null;
+            require_once $root . '/core/classes/TelegramBot.php';
+            $sysConfig = TelegramBot::getSystemConfig();
+            $botToken = $sysConfig['bot_token'];
+            $chatId = $sysConfig['chat_id'];
         }
 
         require_once $root . '/core/classes/CookieCrypt.php';

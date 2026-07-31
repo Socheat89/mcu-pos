@@ -125,7 +125,8 @@ function sendTelegramTest(Database $db, int $tenantId, string $root): void {
     );
 
     if (!$config || empty($config['chat_id'])) {
-        $sysConfig = require $root . '/config/telegram.php';
+        require_once $root . '/core/classes/TelegramBot.php';
+        $sysConfig = TelegramBot::getSystemConfig();
         $config = [
             'bot_token' => $sysConfig['bot_token'] ?? '',
             'chat_id'   => $sysConfig['chat_id'] ?? '',

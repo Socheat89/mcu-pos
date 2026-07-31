@@ -488,9 +488,10 @@ class GpsController {
         $chatId = $tgConfig['chat_id'] ?? null;
 
         if (!$botToken || !$chatId) {
-            $sysConfig = require __DIR__ . '/../../../config/telegram.php';
-            $botToken = $sysConfig['bot_token'] ?? null;
-            $chatId = $sysConfig['chat_id'] ?? null;
+            require_once __DIR__ . '/../../../core/classes/TelegramBot.php';
+            $sysConfig = TelegramBot::getSystemConfig();
+            $botToken = $sysConfig['bot_token'];
+            $chatId = $sysConfig['chat_id'];
         }
 
         require_once __DIR__ . '/../../core/classes/CookieCrypt.php';
