@@ -49,7 +49,10 @@ class SettingsController {
             'pos_method_card_enabled' => '1',
             'pos_method_transfer_enabled' => '1',
             'exchange_rate_usd_khr' => '4100', // Default: 1 USD = 4100 KHR
-            'price_decimal_places' => '2'
+            'price_decimal_places' => '2',
+            'business_type' => 'coffee', // 'coffee' or 'mart'
+            'business_name' => '',
+            'business_logo_path' => ''
         ];
 
         foreach ($defaults as $key => $default) {
@@ -94,7 +97,9 @@ class SettingsController {
                  'company_tax_id',
                  'company_website',
                  'exchange_rate_usd_khr',
-                 'price_decimal_places'
+                 'price_decimal_places',
+                 'business_type',
+                 'business_name'
              ];
 
              $checkboxes = [
@@ -139,6 +144,18 @@ class SettingsController {
                      Settings::set('receipt_logo_path', $webPath, $tenantId);
                  } catch (Throwable $e) {
                      error_log('Receipt logo upload error: ' . $e->getMessage());
+                 }
+             }
+
+             // Handle Business Logo Upload if present
+             if (isset($_FILES['business_logo_upload']) && $_FILES['business_logo_upload']['error'] === UPLOAD_ERR_OK) {
+                 $uploadDir = __DIR__ . '/../../../public/uploads/tenants/' . $tenantId . '/';
+                 try {
+                     $fileName = mc_store_uploaded_image_as_webp($_FILES['business_logo_upload'], $uploadDir, 'bizlogo_' . $tenantId);
+                     $webPath = mc_url('public/uploads/tenants/' . $tenantId . '/' . $fileName);
+                     Settings::set('business_logo_path', $webPath, $tenantId);
+                 } catch (Throwable $e) {
+                     error_log('Business logo upload error: ' . $e->getMessage());
                  }
              }
 

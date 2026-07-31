@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . '/../../../core/helpers/url.php';
+require_once __DIR__ . '/../../../core/classes/Settings.php';
 $urlPrefix = mc_base_path();
+
+// Determine business type for column visibility
+$__businessType = 'coffee';
+if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
+    $__businessType = Settings::get('business_type', Tenant::getId(), 'coffee');
+}
+$__isMart = ($__businessType === 'mart');
 
 ?>
 <!DOCTYPE html>
@@ -227,7 +235,9 @@ $urlPrefix = mc_base_path();
                     <tr>
                         <th style="width: 60px;"><?php echo __('pic'); ?></th>
                         <th><?php echo __('products'); ?></th>
+                        <?php if (!$__isMart): ?>
                         <th><?php echo __('sizes'); ?></th>
+                        <?php endif; ?>
                         <th><?php echo __('status'); ?></th>
                         <th><?php echo __('cost'); ?></th>
                         <th><?php echo __('price'); ?></th>
@@ -237,7 +247,7 @@ $urlPrefix = mc_base_path();
                 <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="7" style="padding: 100px; text-align: center;">
+                            <td colspan="<?php echo $__isMart ? '6' : '7'; ?>" style="padding: 100px; text-align: center;">
                                 <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid var(--pos-border); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
                                     <i class="fas fa-box-open" style="font-size: 32px; color: var(--pos-text-dim);"></i>
                                 </div>
@@ -267,6 +277,7 @@ $urlPrefix = mc_base_path();
                                     <div style="font-weight: 800; font-size: 15px; color: var(--pos-text);"><?php echo htmlspecialchars($p['name']); ?></div>
                                     <div style="font-size: 12px; font-weight: 600; color: var(--pos-text-muted); margin-top: 2px;">SKU: <?php echo htmlspecialchars($p['sku'] ?: 'N/A'); ?></div>
                                 </td>
+                                <?php if (!$__isMart): ?>
                                 <td>
                                     <?php if (!empty($p['sizes'])): ?>
                                         <div style="display: flex; flex-wrap: wrap; gap: 4px;">
@@ -280,6 +291,7 @@ $urlPrefix = mc_base_path();
                                         <span style="font-size: 12px; color: var(--pos-text-muted); font-weight: 500;">—</span>
                                     <?php endif; ?>
                                 </td>
+                                <?php endif; ?>
                                 <td>
                                     <span class="badge <?php echo $badge; ?>">
                                         <?php echo __('in_stock_msg', ['count' => $stock]); ?>

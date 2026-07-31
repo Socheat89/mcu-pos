@@ -51,9 +51,14 @@
                 <h1><?php echo __('analytics'); ?></h1>
                 <p><?php echo __('performance_monitor_msg'); ?></p>
             </div>
-            <button class="btn btn-outline" onclick="window.print()">
-                <i class="fas fa-file-pdf"></i> <?php echo __('export_overview'); ?>
-            </button>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <a href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>" class="btn btn-outline" style="display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-boxes-stacked" style="color:var(--pos-primary);"></i> Stock In-Out
+                </a>
+                <button class="btn btn-outline" onclick="window.print()">
+                    <i class="fas fa-file-pdf"></i> <?php echo __('export_overview'); ?>
+                </button>
+            </div>
         </div>
 
         <!-- 🔽 Store Filter -->

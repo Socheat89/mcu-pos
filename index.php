@@ -188,6 +188,9 @@ try {
                     require_once $baseDir . '/modules/pos/controllers/OrderController.php';
                     $controller = new OrderController();
                     $action = 'holds';
+                } elseif ($sub === 'stock-report') {
+                    require_once $baseDir . '/modules/pos/controllers/StockReportController.php';
+                    $controller = new StockReportController();
                 }
 
                 if ($controller) {

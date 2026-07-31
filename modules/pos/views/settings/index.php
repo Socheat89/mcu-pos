@@ -150,7 +150,10 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         
         <div class="pos-card pad" style="margin-bottom: 40px; border-radius: 28px;">
             <div class="pos-tabs">
-                <div class="pos-tab-link active" onclick="switchTab('users', this)">
+                <div class="pos-tab-link active" onclick="switchTab('business', this)">
+                    <i class="fas fa-building"></i> ព័ត៌មានអាជីវកម្ម
+                </div>
+                <div class="pos-tab-link" onclick="switchTab('users', this)">
                     <i class="fas fa-shield-halved"></i> User Access
                 </div>
                 <?php if (Tenant::getPosLevel() >= 2): ?>
@@ -169,8 +172,103 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                 </div>
             </div>
 
+            <!-- Business Info Tab -->
+            <div id="tab-business" class="tab-content active">
+                <div class="pos-grid cols-2">
+                    <div>
+                        <p class="pos-card-title"><i class="fas fa-building" style="color:var(--pos-primary);margin-right:8px;"></i>ព័ត៌មានអាជីវកម្ម / Business Information</p>
+                        <p class="pos-card-sub" style="margin-bottom:20px;">ដាក់ព័ត៌មានអំពីអាជីវកម្មរបស់អ្នក ដែលនឹងបង្ហាញលើ Receipt និងទូទៅ</p>
+
+                        <div class="pos-form-group">
+                            <label class="pos-form-label"><i class="fas fa-store" style="color:var(--pos-primary);"></i> ឈ្មោះអាជីវកម្ម / Business Name</label>
+                            <input type="text" name="business_name" class="pos-form-control" 
+                                value="<?php echo htmlspecialchars($settings['business_name'] ?? ''); ?>" 
+                                placeholder="e.g. My Cafe, Super Mart...">
+                        </div>
+
+                        <!-- Business Type Selector -->
+                        <div class="pos-form-group">
+                            <label class="pos-form-label"><i class="fas fa-tags" style="color:var(--pos-primary);"></i> ប្រភេទអាជីវកម្ម / Business Type</label>
+                            <p class="pos-small" style="margin-bottom:12px;">ជ្រើសរើសប្រភេទអាជីវកម្ម — នឹងប្ដូររចនាសម្ព័ន្ធ menu, product, ingredients ដោយស្វ័យប្រវត្តិ</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <?php $bizType = $settings['business_type'] ?? 'coffee'; ?>
+                                <label style="cursor:pointer;">
+                                    <input type="radio" name="business_type" value="coffee" <?php echo $bizType === 'coffee' ? 'checked' : ''; ?> style="display:none;" id="biz_coffee">
+                                    <div class="biz-type-card" id="biz_coffee_card" onclick="selectBizType('coffee')" style="border:2px solid <?php echo $bizType==='coffee'?'var(--pos-primary)':'var(--pos-border)'; ?>; border-radius:16px; padding:20px; text-align:center; transition:all 0.2s; background:<?php echo $bizType==='coffee'?'rgba(var(--pos-primary-rgb),0.06)':'#fff'; ?>;">
+                                        <div style="font-size:32px; margin-bottom:8px;">☕</div>
+                                        <div style="font-weight:800; font-size:14px; color:var(--pos-text);">Coffee / Cafe</div>
+                                        <div style="font-size:11px; color:var(--pos-text-muted); margin-top:4px;">Sizes, Ingredients, Full POS</div>
+                                    </div>
+                                </label>
+                                <label style="cursor:pointer;">
+                                    <input type="radio" name="business_type" value="mart" <?php echo $bizType === 'mart' ? 'checked' : ''; ?> style="display:none;" id="biz_mart">
+                                    <div class="biz-type-card" id="biz_mart_card" onclick="selectBizType('mart')" style="border:2px solid <?php echo $bizType==='mart'?'var(--pos-primary)':'var(--pos-border)'; ?>; border-radius:16px; padding:20px; text-align:center; transition:all 0.2s; background:<?php echo $bizType==='mart'?'rgba(var(--pos-primary-rgb),0.06)':'#fff'; ?>;">
+                                        <div style="font-size:32px; margin-bottom:8px;">🛒</div>
+                                        <div style="font-weight:800; font-size:14px; color:var(--pos-text);">Mart / Shop</div>
+                                        <div style="font-size:11px; color:var(--pos-text-muted); margin-top:4px;">Stock In-Out, No Sizes</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div id="biz_type_notice" style="margin-top:12px; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:700; <?php echo $bizType==='mart' ? 'background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.3);' : 'background:rgba(var(--pos-primary-rgb),0.07); color:var(--pos-primary); border:1px solid rgba(var(--pos-primary-rgb),0.2);'; ?>">
+                                <?php if ($bizType === 'mart'): ?>🛒 Mart Mode: Ingredients & Sizes columns ត្រូវបានលាក់ show only Stock In-Out
+                                <?php else: ?>☕ Coffee/Cafe Mode: មុខងារពេញលេញ — Ingredients, Sizes, Sessions, Reports
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="pos-form-group">
+                            <label class="pos-form-label"><i class="fas fa-image" style="color:var(--pos-primary);"></i> Logo អាជីវកម្ម / Business Logo</label>
+                            <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+                                <?php if (!empty($settings['business_logo_path'])): ?>
+                                    <img src="<?php echo htmlspecialchars($settings['business_logo_path']); ?>" alt="Business Logo" style="width:64px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--pos-border);">
+                                <?php else: ?>
+                                    <div style="width:64px;height:64px;border-radius:12px;border:1.5px dashed var(--pos-border);display:grid;place-items:center;color:var(--pos-text-muted);font-size:22px;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <input type="file" name="business_logo_upload" class="pos-form-control" accept="image/*" style="padding:8px; max-width:260px;">
+                            </div>
+                            <div class="pos-small">Recommended: PNG, max 200×200px, transparent background</div>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(99,102,241,0.04); border-radius:20px; padding:28px; border:1.5px dashed rgba(99,102,241,0.2);">
+                        <p class="pos-card-title" style="margin-bottom:16px;"><i class="fas fa-circle-info" style="color:var(--pos-primary);"></i> Business Type Guide</p>
+
+                        <div style="display:grid; gap:12px;">
+                            <div style="background:#fff; border-radius:14px; padding:16px; border:1px solid var(--pos-border);">
+                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                    <span style="font-size:20px;">☕</span>
+                                    <span style="font-weight:800; color:var(--pos-text);">Coffee / Cafe Mode</span>
+                                </div>
+                                <ul style="margin:0; padding-left:18px; font-size:12px; color:var(--pos-text-muted); line-height:1.8; font-weight:600;">
+                                    <li>Product Sizes (S/M/L)</li>
+                                    <li>Ingredients management</li>
+                                    <li>Full POS session features</li>
+                                    <li>Sales & session reports</li>
+                                    <li>Stock In/Out tracking</li>
+                                </ul>
+                            </div>
+                            <div style="background:#fff; border-radius:14px; padding:16px; border:1px solid var(--pos-border);">
+                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                    <span style="font-size:20px;">🛒</span>
+                                    <span style="font-weight:800; color:var(--pos-text);">Mart / Shop Mode</span>
+                                </div>
+                                <ul style="margin:0; padding-left:18px; font-size:12px; color:var(--pos-text-muted); line-height:1.8; font-weight:600;">
+                                    <li>Stock In/Out control only</li>
+                                    <li>Pic, Product, Status columns</li>
+                                    <li>Cost & Price columns</li>
+                                    <li>No Sizes / Ingredients shown</li>
+                                    <li>Simplified product table</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- User Control Tab -->
-            <div id="tab-users" class="tab-content active">
+            <div id="tab-users" class="tab-content">
                 <div class="pos-grid cols-2">
                     <div>
                         <p class="pos-card-title">Authorized Users</p>
@@ -853,6 +951,32 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
         if(settings.phone) settings.phone.addEventListener('input', updateContact);
         if(settings.email) settings.email.addEventListener('input', updateContact);
         if(settings.address) settings.address.addEventListener('input', updateContact);
+
+        // Business Type Card Selector
+        function selectBizType(type) {
+            document.getElementById('biz_coffee').checked = (type === 'coffee');
+            document.getElementById('biz_mart').checked = (type === 'mart');
+
+            const coffeeCard = document.getElementById('biz_coffee_card');
+            const martCard   = document.getElementById('biz_mart_card');
+            const notice     = document.getElementById('biz_type_notice');
+
+            if (!coffeeCard || !martCard || !notice) return;
+
+            const activeStyle  = 'border:2px solid var(--pos-primary); border-radius:16px; padding:20px; text-align:center; transition:all 0.2s; background:rgba(var(--pos-primary-rgb),0.06);';
+            const inactiveStyle= 'border:2px solid var(--pos-border); border-radius:16px; padding:20px; text-align:center; transition:all 0.2s; background:#fff;';
+
+            coffeeCard.style.cssText = (type === 'coffee') ? activeStyle : inactiveStyle;
+            martCard.style.cssText   = (type === 'mart')   ? activeStyle : inactiveStyle;
+
+            if (type === 'mart') {
+                notice.style.cssText = 'margin-top:12px; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:700; background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.3);';
+                notice.innerHTML = '🛒 Mart Mode: Ingredients & Sizes columns ត្រូវបានលាក់ — show only Stock In-Out';
+            } else {
+                notice.style.cssText = 'margin-top:12px; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:700; background:rgba(var(--pos-primary-rgb),0.07); color:var(--pos-primary); border:1px solid rgba(var(--pos-primary-rgb),0.2);';
+                notice.innerHTML = '☕ Coffee/Cafe Mode: មុខងារពេញលេញ — Ingredients, Sizes, Sessions, Reports';
+            }
+        }
 
     </script>
     

@@ -20,6 +20,12 @@ if (!function_exists('mc_base_path')) {
     throw new RuntimeException('Unable to load core/helpers/url.php');
 }
 
+// Load Settings class if not already loaded
+$__settingsClassPath = dirname(__DIR__, 4) . '/core/classes/Settings.php';
+if (is_file($__settingsClassPath) && !class_exists('Settings')) {
+    require_once $__settingsClassPath;
+}
+
 // Load Store class for store switcher
 $storeClassPath = dirname(__DIR__, 4) . '/core/classes/Store.php';
 if (is_file($storeClassPath) && !class_exists('Store')) {
@@ -84,6 +90,7 @@ $navLabel = function (string $key): string {
         'digital_menu' => __('qr_menu'),
         'stores'       => __('manage_stores'),
         'gps'          => __('gps_tracking'),
+        'stock_report' => 'Stock In-Out',
     ];
 
     return $labels[$key] ?? __($key);
@@ -153,9 +160,17 @@ $navLabel = function (string $key): string {
                 <?php endif; ?>
 
                 <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
+                <?php 
+                // Load business type from settings
+                $__bizType = 'coffee';
+                if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
+                    $__bizType = Settings::get('business_type', Tenant::getId(), 'coffee');
+                }
+                if ($__bizType !== 'mart'): ?>
                 <a class="pos-side-link <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
                     <i class="fas fa-carrot"></i><span><?php echo $navLabel('ingredients'); ?></span>
                 </a>
+                <?php endif; ?>
                 <?php endif; ?>
 
                 <a class="pos-side-link <?php echo $activeClass('customers'); ?>" href="<?php echo htmlspecialchars($posUrl('customers')); ?>">
@@ -165,6 +180,9 @@ $navLabel = function (string $key): string {
                 <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
                     <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
+                </a>
+                <a class="pos-side-link <?php echo $activeClass('stock_report'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>">
+                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('stock_report'); ?></span>
                 </a>
                 <?php endif; ?>
 
