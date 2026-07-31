@@ -191,7 +191,7 @@
                                 <select name="recipe_sizes[]" class="pos-form-control pos-form-select recipe-size-select">
                                     <option value="">គ្រប់ទំហំ / All Sizes</option>
                                     <?php foreach ($existingSizes as $sz): ?>
-                                        <option value="<?php echo $sz['id']; ?>">
+                                        <option value="<?php echo htmlspecialchars($sz['size_name']); ?>">
                                             <?php echo htmlspecialchars($sz['size_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -223,7 +223,7 @@
                                 <select name="recipe_sizes[]" class="pos-form-control pos-form-select recipe-size-select">
                                     <option value="">គ្រប់ទំហំ / All Sizes</option>
                                     <?php foreach ($existingSizes as $sz): ?>
-                                        <option value="<?php echo $sz['id']; ?>" <?php echo $r['product_size_id'] == $sz['id'] ? 'selected' : ''; ?>>
+                                        <option value="<?php echo htmlspecialchars($sz['size_name']); ?>" <?php echo $r['product_size_id'] == $sz['id'] ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($sz['size_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -427,11 +427,12 @@
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">គ្រប់ទំហំ / All Sizes</option>';
                 
+                let optDb;
                 <?php foreach ($existingSizes as $sz): ?>
-                    const optDb = document.createElement('option');
-                    optDb.value = "<?php echo $sz['id']; ?>";
+                    optDb = document.createElement('option');
+                    optDb.value = "<?php echo htmlspecialchars(addslashes($sz['size_name'])); ?>";
                     optDb.textContent = "<?php echo htmlspecialchars(addslashes($sz['size_name'])); ?>";
-                    if (currentValue == "<?php echo $sz['id']; ?>") {
+                    if (currentValue == "<?php echo $sz['id']; ?>" || currentValue === "<?php echo htmlspecialchars(addslashes($sz['size_name'])); ?>") {
                         optDb.selected = true;
                     }
                     select.appendChild(optDb);

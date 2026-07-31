@@ -340,10 +340,13 @@ class ProductController {
 
                 $sizeId = null;
                 if ($sizeNameOrId !== '') {
-                    if (is_numeric($sizeNameOrId)) {
-                        $sizeId = (int)$sizeNameOrId;
-                    } elseif (isset($sizeMap[$sizeNameOrId])) {
+                    if (isset($sizeMap[$sizeNameOrId])) {
                         $sizeId = $sizeMap[$sizeNameOrId];
+                    } else if (is_numeric($sizeNameOrId)) {
+                        $exists = $db->fetch("SELECT id FROM product_sizes WHERE id = ? AND product_id = ?", [$sizeNameOrId, $productId]);
+                        if ($exists) {
+                            $sizeId = (int)$sizeNameOrId;
+                        }
                     }
                 }
 
