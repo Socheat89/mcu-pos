@@ -7,26 +7,11 @@ class TelegramBot {
     private $tenantId;
 
     public static function getSystemConfig() {
-        // Priority 1: read plain token from git-ignored local config file set via Admin Panel
-        $token = null;
-        $localFile = __DIR__ . '/../../config/telegram.local.php';
-        if (is_file($localFile)) {
-            $val = require $localFile;
-            if (!empty($val)) {
-                $token = (string) $val;
-            }
-        }
-
-        // Priority 2: fall back to environment variable (MC_TELEGRAM_BOT_TOKEN)
         $config = require __DIR__ . '/../../config/telegram.php';
-        $chatId = $config['chat_id'] ?? '';
-
-        if (empty($token)) {
-            // telegram.php already returns the decrypted/plain value
-            $token = $config['bot_token'] ?? '';
-        }
-
-        return ['bot_token' => $token, 'chat_id' => $chatId];
+        return [
+            'bot_token' => $config['bot_token'] ?? '',
+            'chat_id'   => $config['chat_id'] ?? '',
+        ];
     }
 
     public function __construct($tenantId = null) {
