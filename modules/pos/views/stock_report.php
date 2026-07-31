@@ -29,11 +29,15 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
         .stock-badge.no-stock  { background: rgba(239,68,68,0.1);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
 
         /* ── Print styles ── */
+        @media screen {
+            .print-only-container { display: none !important; }
+        }
         @media print {
-            .pos-sidebar, .pos-topbar, .no-print { display: none !important; }
-            .pos-main { margin: 0 !important; padding: 0 !important; }
+            .pos-sidebar, .pos-topbar, .no-print, .pos-title, .pos-grid, .pos-card, .stock-adjust-modal { display: none !important; }
+            .pos-main { margin: 0 !important; padding: 0 !important; background: #fff !important; }
             .pos-page { padding: 0 !important; }
-            .print-area { page-break-inside: avoid; }
+            .print-only-container { display: block !important; }
+            @page { size: portrait; margin: 10mm; }
         }
 
         /* ── Adjust Modal ── */
@@ -110,7 +114,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                     <i class="fas fa-plus"></i> Stock In / Out
                 </button>
                 <button class="btn btn-outline" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print Report
+                    <i class="fas fa-print"></i> Print Details
                 </button>
                 <a href="<?php echo htmlspecialchars($posUrl('reports')); ?>" class="btn btn-outline">
                     <i class="fas fa-chart-line"></i> Analytics
@@ -149,30 +153,72 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
             </div>
         </div>
 
-        <!-- Print Header (only visible when printing) -->
-        <div class="print-area" style="display:none;" id="printHeader">
-            <div style="text-align:center; margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:12px;">
-                <h2 style="font-size:20px; font-weight:900; margin:0;"><?php echo htmlspecialchars($tenantName); ?></h2>
-                <h3 style="font-size:14px; font-weight:700; margin:6px 0;">STOCK IN AND OUT REPORT</h3>
-                <p style="font-size:12px; margin:0;">Printed: <?php echo date('d/m/Y H:i'); ?></p>
+        <!-- Print Details Area (Active on window.print()) -->
+        <div class="print-only-container" id="printStockDetails">
+            <div style="text-align:center; margin-bottom:20px; border-bottom:2px solid #000; padding-bottom:12px;">
+                <h2 style="font-size:22px; font-weight:900; margin:0; text-transform:uppercase;"><?php echo htmlspecialchars($tenantName); ?></h2>
+                <h3 style="font-size:16px; font-weight:900; margin:6px 0; letter-spacing:1px;">III. STOCK IN AND OUT</h3>
+                <p style="font-size:12px; margin:0; color:#444;">កាលបរិច្ឆេទ / Date: <?php echo date('d/m/Y H:i'); ?></p>
             </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px;" class="official-print-table">
+                <thead>
+                    <tr style="background:#eef2f6; border-top:2px solid #000; border-bottom:2px solid #000;">
+                        <th style="width:40px; padding:8px; border:1px solid #000; text-align:center;">ល.រ</th>
+                        <th style="padding:8px; border:1px solid #000; text-align:left;">ផលិតផល ឬទំនិញ</th>
+                        <th style="padding:8px; border:1px solid #000; text-align:center;">ចំនួនដើម</th>
+                        <th style="padding:8px; border:1px solid #000; text-align:center;">ចំនួនបានប្រើ</th>
+                        <th style="padding:8px; border:1px solid #000; text-align:center;">ចំនួនសល់</th>
+                        <th style="padding:8px; border:1px solid #000; text-align:center;">សរុប</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($products)): ?>
+                        <tr><td colspan="6" style="padding:20px; text-align:center; border:1px solid #000;">គ្មានទិន្នន័យផលិតផល</td></tr>
+                    <?php else: $k = 0; $sumOp = 0; $sumUsed = 0; $sumRem = 0;
+                        foreach ($products as $p): $k++;
+                            $used = (int)($p['qty_sold'] ?? 0);
+                            $remaining = (int)$p['stock_quantity'];
+                            $opening = $remaining + $used;
+                            $sumOp += $opening;
+                            $sumUsed += $used;
+                            $sumRem += $remaining;
+                    ?>
+                        <tr>
+                            <td style="padding:7px; border:1px solid #000; text-align:center; font-weight:700;"><?php echo $k; ?></td>
+                            <td style="padding:7px; border:1px solid #000; font-weight:700;"><?php echo htmlspecialchars($p['name']); ?></td>
+                            <td style="padding:7px; border:1px solid #000; text-align:center;"><?php echo number_format($opening); ?></td>
+                            <td style="padding:7px; border:1px solid #000; text-align:center; font-weight:700;"><?php echo number_format($used); ?></td>
+                            <td style="padding:7px; border:1px solid #000; text-align:center; font-weight:700;"><?php echo number_format($remaining); ?></td>
+                            <td style="padding:7px; border:1px solid #000; text-align:center;"><?php echo number_format($opening); ?></td>
+                        </tr>
+                    <?php endforeach; endif; ?>
+                    <tr style="border-top:2px solid #000; font-weight:700;">
+                        <td colspan="2" style="padding:8px; border:1px solid #000; text-align:center; font-weight:800;">សរុបរួម / Total</td>
+                        <td style="padding:8px; border:1px solid #000; text-align:center; font-weight:800;"><?php echo number_format($sumOp ?? 0); ?></td>
+                        <td style="padding:8px; border:1px solid #000; text-align:center; font-weight:800;"><?php echo number_format($sumUsed ?? 0); ?></td>
+                        <td style="padding:8px; border:1px solid #000; text-align:center; font-weight:800;"><?php echo number_format($sumRem ?? 0); ?></td>
+                        <td style="padding:8px; border:1px solid #000; text-align:center; font-weight:800;"><?php echo number_format($sumOp ?? 0); ?></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- Stock Table -->
+        <!-- Stock Table (On Screen) -->
         <div class="pos-card" style="margin-bottom:28px; overflow:hidden;">
             <div style="padding:20px 24px; border-bottom:1px solid var(--pos-border); display:flex; align-items:center; justify-content:space-between;">
                 <h3 class="pos-card-title" style="margin:0;"><i class="fas fa-warehouse" style="color:var(--pos-primary);margin-right:8px;"></i>Current Stock Status</h3>
                 <input type="text" id="stockSearch" placeholder="Search product..." oninput="filterStockTable()" style="padding:8px 14px; border-radius:10px; border:1.5px solid var(--pos-border); font-size:13px; font-weight:600; outline:none; width:220px;" class="no-print">
             </div>
-            <div class="pos-table-container print-area">
+            <div class="pos-table-container">
                 <table class="pos-table" id="stockTable">
                     <thead>
                         <tr>
-                            <th style="width:48px;">Num</th>
+                            <th style="width:48px;">ល.រ</th>
                             <th>ឈ្មោះផលិតផល / Product</th>
-                            <th>ចំនួនដើម / Opening</th>
-                            <th>ចំនួនបានជ្រើស / Stock In</th>
-                            <th>ចំនួនសល់ / Current</th>
+                            <th style="text-align:center;">ចំនួនដើម / Opening</th>
+                            <th style="text-align:center;">ចំនួនបានប្រើ / Used</th>
+                            <th style="text-align:center;">ចំនួនសល់ / Current</th>
                             <th style="text-align:center;" class="no-print">Actions</th>
                         </tr>
                     </thead>
@@ -187,6 +233,8 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                         <?php else: ?>
                         <?php $rowNum = 1; foreach ($products as $p):
                             $stock = (int)$p['stock_quantity'];
+                            $used = (int)($p['qty_sold'] ?? 0);
+                            $opening = $stock + $used;
                             $badgeClass = $stock > 10 ? 'in-stock' : ($stock > 0 ? 'low-stock' : 'no-stock');
                         ?>
                         <tr class="stock-row">
@@ -206,11 +254,13 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                     </div>
                                 </div>
                             </td>
-                            <td style="text-align:center;">
-                                <span style="font-size:14px; font-weight:700; color:var(--pos-text-muted);">—</span>
+                            <td style="text-align:center; font-weight:700; color:var(--pos-text);">
+                                <?php echo number_format($opening); ?>
                             </td>
                             <td style="text-align:center;">
-                                <span style="font-size:14px; font-weight:700; color:var(--pos-text-muted);">—</span>
+                                <span style="display:inline-block; background:rgba(244,63,94,0.08); color:var(--pos-danger); padding:2px 10px; border-radius:8px; font-weight:800; font-size:13px;">
+                                    <?php echo number_format($used); ?>
+                                </span>
                             </td>
                             <td style="text-align:center;">
                                 <span class="stock-badge <?php echo $badgeClass; ?>" id="stock-qty-<?php echo $p['id']; ?>">

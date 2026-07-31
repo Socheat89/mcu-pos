@@ -243,7 +243,7 @@ class SessionController {
 
             $_SESSION['success_msg'] = __('session_closed_success');
             $prefix = mc_base_path();
-            header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/" . $activeSession['id'] . "/printReport?autoprint=1");
+            header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions");
             exit;
         }
 

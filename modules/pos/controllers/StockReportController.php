@@ -73,15 +73,23 @@ class StockReportController {
             exit;
         }
 
-        // Load all products with stock
+        // Load all products with current stock and total qty sold
         $products = $db->fetchAll(
             "SELECT p.id, p.name, p.sku, p.stock_quantity, p.image, p.price, p.cost_price,
-                    c.name AS category_name
+                    c.name AS category_name,
+                    COALESCE(s.qty_sold, 0) AS qty_sold
              FROM products p
              LEFT JOIN categories c ON c.id = p.category_id
+             LEFT JOIN (
+                 SELECT oi.product_id, SUM(oi.quantity) as qty_sold
+                 FROM order_items oi
+                 JOIN orders o ON oi.order_id = o.id
+                 WHERE o.tenant_id = ? AND o.status = 'completed'
+                 GROUP BY oi.product_id
+             ) s ON p.id = s.product_id
              WHERE p.tenant_id = ?
              ORDER BY p.name ASC",
-            [$tenantId]
+            [$tenantId, $tenantId]
         );
 
         // Load recent stock log entries (last 50)
