@@ -173,6 +173,11 @@ $isClosed        = $session['status'] === 'closed';
                 </button>
             <?php endforeach; ?>
 
+            <button class="sd-tab-btn" data-tab="tab-stock" role="tab">
+                <i class="fas fa-boxes-stacked"></i> Stock In-Out
+                <span class="tab-badge"><?php echo count($stockProducts ?? []); ?></span>
+            </button>
+
             <button class="sd-tab-btn" data-tab="tab-orders" role="tab">
                 <i class="fas fa-receipt"></i> Orders
                 <span class="tab-badge"><?php echo count($orders); ?></span>
@@ -227,6 +232,59 @@ $isClosed        = $session['status'] === 'closed';
                                     </td>
                                 </tr>
                             </tfoot>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- ─── Tab: Stock In-Out ─── -->
+        <div class="sd-tab-pane" id="tab-stock">
+            <div class="pos-card pad">
+                <h3 class="pos-card-title" style="margin-bottom:20px;">
+                    <i class="fas fa-boxes-stacked"></i> Stock In-Out
+                    <span style="font-size:12px; font-weight:600; color:var(--pos-text-muted); margin-left:8px;">— របាយការណ៍ស្តុកដើម ប្រើប្រាស់ និងសល់</span>
+                </h3>
+                <?php if (empty($stockProducts)): ?>
+                    <div style="padding:60px; text-align:center; color:var(--pos-text-muted);">
+                        <i class="fas fa-box-open" style="font-size:36px; opacity:0.3; display:block; margin-bottom:12px;"></i>
+                        No stock records available.
+                    </div>
+                <?php else: ?>
+                    <div class="pos-table-container" style="border:none;">
+                        <table class="pos-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;">#</th>
+                                    <th>ផលិតផល ឬទំនិញ / Product</th>
+                                    <th style="text-align:center;">ចំនួនដើម / Opening</th>
+                                    <th style="text-align:center;">ចំនួនបានប្រើ / Used</th>
+                                    <th style="text-align:center;">ចំនួនសល់ / Remaining</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $k = 0; foreach ($stockProducts as $sp): $k++;
+                                    $used = (int)$sp['qty_sold'];
+                                    $remaining = (int)$sp['stock_quantity'];
+                                    $opening = $remaining + $used;
+                                ?>
+                                    <tr>
+                                        <td><?php echo $k; ?></td>
+                                        <td style="font-weight:700; color:var(--pos-text);"><?php echo htmlspecialchars($sp['name']); ?></td>
+                                        <td style="text-align:center; font-weight:700;"><?php echo number_format($opening); ?></td>
+                                        <td style="text-align:center;">
+                                            <span style="display:inline-block; background:rgba(244,63,94,0.1); color:var(--pos-danger); font-weight:800; border-radius:8px; padding:2px 12px; font-size:13px;">
+                                                <?php echo number_format($used); ?>
+                                            </span>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <span style="display:inline-block; background:rgba(16,185,129,0.1); color:#10b981; font-weight:800; border-radius:8px; padding:2px 12px; font-size:13px;">
+                                                <?php echo number_format($remaining); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
                         </table>
                     </div>
                 <?php endif; ?>

@@ -331,9 +331,51 @@ foreach ($paymentSummary as $method => $amt) {
             </tr>
         </tbody>
     </table>
-    <div class="rate-note">អត្រាប្តូរ: 1$ = <?php echo number_format($rate, 0); ?>៛</div>
+    <!-- Section 3: Stock In and Out -->
+    <div class="section-title">III. STOCK IN AND OUT</div>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th style="width:35px;">ល.រ</th>
+                <th>ផលិតផល ឬទំនិញ</th>
+                <th class="text-center">ចំនួនដើម</th>
+                <th class="text-center">ចំនួនបានប្រើ</th>
+                <th class="text-center">ចំនួនសល់</th>
+                <th class="text-center">សរុប</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($stockProducts)): ?>
+            <tr><td colspan="6" class="text-center" style="padding:15px;color:#999;">គ្មានទិន្នន័យស្តុក</td></tr>
+            <?php else: $k = 0; $sumOpening = 0; $sumUsed = 0; $sumRemaining = 0;
+                foreach ($stockProducts as $sp): $k++;
+                    $used = (int)$sp['qty_sold'];
+                    $remaining = (int)$sp['stock_quantity'];
+                    $opening = $remaining + $used;
+                    $sumOpening += $opening;
+                    $sumUsed += $used;
+                    $sumRemaining += $remaining;
+            ?>
+            <tr>
+                <td><?php echo $k; ?></td>
+                <td class="bold"><?php echo htmlspecialchars($sp['name']); ?></td>
+                <td class="text-center"><?php echo number_format($opening); ?></td>
+                <td class="text-center bold"><?php echo number_format($used); ?></td>
+                <td class="text-center bold"><?php echo number_format($remaining); ?></td>
+                <td class="text-center"><?php echo number_format($opening); ?></td>
+            </tr>
+            <?php endforeach; endif; ?>
+            <tr class="total-row">
+                <td colspan="2" class="bold">សរុបរួម / Total</td>
+                <td class="text-center bold"><?php echo number_format($sumOpening ?? 0); ?></td>
+                <td class="text-center bold"><?php echo number_format($sumUsed ?? 0); ?></td>
+                <td class="text-center bold"><?php echo number_format($sumRemaining ?? 0); ?></td>
+                <td class="text-center bold"><?php echo number_format($sumOpening ?? 0); ?></td>
+            </tr>
+        </tbody>
+    </table>
 
-    <!-- Section 3: Cash Balance -->
+    <!-- Section 4: Cash Balance -->
     <div class="section-title">សាច់ប្រាក់ / Cash Balance</div>
     <table class="report-table">
         <thead>

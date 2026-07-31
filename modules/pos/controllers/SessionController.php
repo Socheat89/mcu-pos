@@ -243,7 +243,7 @@ class SessionController {
 
             $_SESSION['success_msg'] = __('session_closed_success');
             $prefix = mc_base_path();
-            header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions");
+            header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/" . $activeSession['id'] . "/printReport?autoprint=1");
             exit;
         }
 
@@ -378,6 +378,23 @@ class SessionController {
             $orderPayments[$op['order_id']] = $op;
         }
 
+        // Load Stock In & Out data for this session
+        $stockProducts = $db->fetchAll(
+            "SELECT p.id, p.name, p.sku, p.stock_quantity,
+                    COALESCE(s.qty_sold, 0) as qty_sold
+             FROM products p
+             LEFT JOIN (
+                 SELECT oi.product_id, SUM(oi.quantity) as qty_sold
+                 FROM order_items oi
+                 JOIN orders o ON oi.order_id = o.id
+                 WHERE o.session_id = ? AND o.status = 'completed'
+                 GROUP BY oi.product_id
+             ) s ON p.id = s.product_id
+             WHERE p.tenant_id = ? AND p.status = 'active'
+             ORDER BY p.name ASC",
+            [$id, $tenantId]
+        );
+
         include __DIR__ . '/../views/session_detail.php';
     }
 
@@ -447,6 +464,23 @@ class SessionController {
              WHERE o.session_id = ? AND o.status = 'completed'
              GROUP BY p.id, p.name, p.sku ORDER BY qty_sold DESC",
             [$id]
+        );
+
+        // Load Stock In & Out data for this session
+        $stockProducts = $db->fetchAll(
+            "SELECT p.id, p.name, p.sku, p.stock_quantity,
+                    COALESCE(s.qty_sold, 0) as qty_sold
+             FROM products p
+             LEFT JOIN (
+                 SELECT oi.product_id, SUM(oi.quantity) as qty_sold
+                 FROM order_items oi
+                 JOIN orders o ON oi.order_id = o.id
+                 WHERE o.session_id = ? AND o.status = 'completed'
+                 GROUP BY oi.product_id
+             ) s ON p.id = s.product_id
+             WHERE p.tenant_id = ? AND p.status = 'active'
+             ORDER BY p.name ASC",
+            [$id, $tenantId]
         );
 
         include __DIR__ . '/../views/session_report_print.php';
