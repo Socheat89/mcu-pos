@@ -153,24 +153,32 @@ $navLabel = function (string $key): string {
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
-                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
-                <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
-                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
-                </a>
-                <?php endif; ?>
-
-                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
-                <?php 
-                // Load business type from settings
-                $__bizType = 'coffee';
-                if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
-                    $__bizType = Settings::get('business_type', Tenant::getId(), 'coffee');
-                }
-                if ($__bizType !== 'mart'): ?>
-                <a class="pos-side-link <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
-                    <i class="fas fa-carrot"></i><span><?php echo $navLabel('ingredients'); ?></span>
-                </a>
-                <?php endif; ?>
+                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): 
+                    $isInventoryActive = in_array($activeNav, ['products', 'stock_report', 'ingredients']);
+                    $__bizType = 'coffee';
+                    if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
+                        $__bizType = Settings::get('business_type', Tenant::getId(), 'coffee');
+                    }
+                ?>
+                <div class="pos-side-link pos-nav-parent <?php echo $isInventoryActive ? 'active open' : ''; ?>" onclick="toggleSubmenu('inv-submenu', this)">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <i class="fas fa-boxes-stacked"></i><span><?php echo __('inventory'); ?></span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron" style="margin-left:auto; font-size:10px; opacity:0.6;"></i>
+                </div>
+                <div class="pos-side-submenu" id="inv-submenu" style="<?php echo $isInventoryActive ? 'display:flex;' : 'display:none;'; ?>">
+                    <a class="pos-side-sublink <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
+                        <i class="fas fa-box"></i><span><?php echo __('products'); ?></span>
+                    </a>
+                    <a class="pos-side-sublink <?php echo $activeClass('stock_report'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>">
+                        <i class="fas fa-warehouse"></i><span>Stock In-Out</span>
+                    </a>
+                    <?php if ($__bizType !== 'mart'): ?>
+                    <a class="pos-side-sublink <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
+                        <i class="fas fa-carrot"></i><span><?php echo $navLabel('ingredients'); ?></span>
+                    </a>
+                    <?php endif; ?>
+                </div>
                 <?php endif; ?>
 
                 <a class="pos-side-link <?php echo $activeClass('customers'); ?>" href="<?php echo htmlspecialchars($posUrl('customers')); ?>">
@@ -180,9 +188,6 @@ $navLabel = function (string $key): string {
                 <?php if ($hasFeature('pos', 'reports') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('reports'); ?>" href="<?php echo htmlspecialchars($posUrl('reports')); ?>">
                     <i class="fas fa-chart-line"></i><span><?php echo $navLabel('reports'); ?></span>
-                </a>
-                <a class="pos-side-link <?php echo $activeClass('stock_report'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>">
-                    <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('stock_report'); ?></span>
                 </a>
                 <?php endif; ?>
 
@@ -247,8 +252,53 @@ $navLabel = function (string $key): string {
 
                 <div class="pos-header-divider"></div>
 
-                <!-- Language Switcher -->
+                <!-- Language Switcher & Sub-menu Styling -->
                 <style>
+                    .pos-side-submenu {
+                        padding-left: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 3px;
+                        margin-top: 4px;
+                        margin-bottom: 8px;
+                    }
+                    .pos-side-sublink {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 9px 14px;
+                        border-radius: 12px;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: var(--pos-text-muted);
+                        text-decoration: none;
+                        transition: all 0.2s;
+                    }
+                    .pos-side-sublink:hover {
+                        color: var(--pos-primary);
+                        background: rgba(var(--pos-primary-rgb), 0.08);
+                    }
+                    .pos-side-sublink.active {
+                        color: var(--pos-primary);
+                        background: rgba(var(--pos-primary-rgb), 0.15);
+                        font-weight: 800;
+                    }
+                    .pos-side-sublink i {
+                        font-size: 13px;
+                        width: 18px;
+                        text-align: center;
+                    }
+                    .pos-nav-parent {
+                        cursor: pointer;
+                        user-select: none;
+                    }
+                    .pos-nav-parent .chevron {
+                        transition: transform 0.25s ease;
+                    }
+                    .pos-nav-parent.open .chevron {
+                        transform: rotate(90deg);
+                    }
+
                     .pos-lang-switcher {
                         position: relative;
                         display: flex;
@@ -401,10 +451,14 @@ $navLabel = function (string $key): string {
         overlay.addEventListener('click', function() { setOpen(false); });
     }
 
-    // Close sidebar on resize up (desktop)
-    window.addEventListener('resize', function() {
-        if (window.innerWidth >= 980) setOpen(false);
-    });
+    // Submenu Toggle Function
+    window.toggleSubmenu = function(id, parentEl) {
+        var sub = document.getElementById(id);
+        if (!sub) return;
+        var isOpen = sub.style.display !== 'none';
+        sub.style.display = isOpen ? 'none' : 'flex';
+        if (parentEl) parentEl.classList.toggle('open', !isOpen);
+    };
 })();
 </script>
 
