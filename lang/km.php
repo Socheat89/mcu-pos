@@ -142,6 +142,7 @@ return [
     'live_preview' => 'ទិដ្ឋភាពជាក់ស្តែង',
     'on_hold' => 'ផ្អាកទុក',
     'inventory' => 'សារពើភ័ណ្ឌ',
+    'ingredients' => 'គ្រឿងផ្សំ',
 
     'analytics' => 'ការវិភាគ',
     'digital_menu' => 'ម៉ឺនុយឌីជីថល',

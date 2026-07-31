@@ -52,6 +52,9 @@ class ProductController {
             $this->store();
         } else {
             $categories = $this->getCategories();
+            require_once __DIR__ . '/../models/Ingredient.php';
+            $ingredientsList = Ingredient::getAll();
+            $productRecipe = [];
             include __DIR__ . '/../views/product_form.php';
         }
     }
@@ -74,6 +77,9 @@ class ProductController {
         } else {
             $categories = $this->getCategories();
             $productSizes = Product::getSizes($id);
+            require_once __DIR__ . '/../models/Ingredient.php';
+            $ingredientsList = Ingredient::getAll();
+            $productRecipe = Ingredient::getRecipesByProduct($id);
             include __DIR__ . '/../views/product_form.php';
         }
     }
@@ -274,6 +280,9 @@ class ProductController {
         // Save product sizes if provided
         $this->saveSizesFromPost($productId);
 
+        // Save product recipe if provided
+        $this->saveRecipeFromPost($productId);
+
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
         exit;
@@ -302,9 +311,54 @@ class ProductController {
         // Save product sizes if provided
         $this->saveSizesFromPost($id);
 
+        // Save product recipe if provided
+        $this->saveRecipeFromPost($id);
+
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/products');
         exit;
+    }
+
+    private function saveRecipeFromPost($productId) {
+        $ingredients = $_POST['recipe_ingredients'] ?? [];
+        $quantities = $_POST['recipe_quantities'] ?? [];
+        $sizes = $_POST['recipe_sizes'] ?? [];
+
+        $recipeItems = [];
+        if (is_array($ingredients) && is_array($quantities)) {
+            $db = Database::getInstance();
+            $dbSizes = $db->fetchAll("SELECT id, size_name FROM product_sizes WHERE product_id = ?", [$productId]);
+            $sizeMap = [];
+            foreach ($dbSizes as $ds) {
+                $sizeMap[$ds['size_name']] = $ds['id'];
+            }
+
+            foreach ($ingredients as $i => $ingId) {
+                $ingId = (int)$ingId;
+                $qty = (float)($quantities[$i] ?? 0);
+                $sizeNameOrId = $sizes[$i] ?? '';
+
+                $sizeId = null;
+                if ($sizeNameOrId !== '') {
+                    if (is_numeric($sizeNameOrId)) {
+                        $sizeId = (int)$sizeNameOrId;
+                    } elseif (isset($sizeMap[$sizeNameOrId])) {
+                        $sizeId = $sizeMap[$sizeNameOrId];
+                    }
+                }
+
+                if ($ingId > 0 && $qty > 0) {
+                    $recipeItems[] = [
+                        'ingredient_id' => $ingId,
+                        'quantity' => $qty,
+                        'product_size_id' => $sizeId
+                    ];
+                }
+            }
+        }
+
+        require_once __DIR__ . '/../models/Ingredient.php';
+        Ingredient::saveRecipe($productId, $recipeItems);
     }
 
     private function redirectToProducts() {

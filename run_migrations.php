@@ -388,6 +388,95 @@ try {
         $db->query("ALTER TABLE payments ADD INDEX idx_bank_name (bank_name)");
     }
 
+    // 14. Create 'ingredients' table
+    echo "Ensuring 'ingredients' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'ingredients'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE ingredients (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            stock_quantity DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            unit VARCHAR(50) NOT NULL,
+            min_stock_alert DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            INDEX idx_ingredients_tenant (tenant_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        echo "→ 'ingredients' table created.<br>";
+    } else {
+        echo "→ 'ingredients' table already exists.<br>";
+    }
+
+    // 15. Create 'product_recipes' table
+    echo "Ensuring 'product_recipes' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'product_recipes'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE product_recipes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            product_id INT NOT NULL,
+            product_size_id INT DEFAULT NULL,
+            ingredient_id INT NOT NULL,
+            quantity DECIMAL(10,2) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+            FOREIGN KEY (product_size_id) REFERENCES product_sizes(id) ON DELETE SET NULL,
+            FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE,
+            INDEX idx_recipes_product (product_id),
+            INDEX idx_recipes_size (product_size_id),
+            INDEX idx_recipes_ingredient (ingredient_id),
+            INDEX idx_recipes_tenant (tenant_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        echo "→ 'product_recipes' table created.<br>";
+    } else {
+        echo "→ 'product_recipes' table already exists.<br>";
+    }
+
+    // 16. Alter 'order_items' for size tracking
+    echo "Updating 'order_items' for size support...<br>";
+    $cols = $db->fetchAll("SHOW COLUMNS FROM order_items LIKE 'size_name'");
+    if (empty($cols)) {
+        $db->query("ALTER TABLE order_items ADD COLUMN size_name VARCHAR(50) DEFAULT NULL AFTER product_id");
+        echo "→ 'order_items.size_name' added.<br>";
+    } else {
+        echo "→ 'order_items' already has size_name.<br>";
+    }
+
+    $cols2 = $db->fetchAll("SHOW COLUMNS FROM order_items LIKE 'product_size_id'");
+    if (empty($cols2)) {
+        $db->query("ALTER TABLE order_items ADD COLUMN product_size_id INT DEFAULT NULL AFTER size_name");
+        $db->query("ALTER TABLE order_items ADD CONSTRAINT fk_order_items_size_id FOREIGN KEY (product_size_id) REFERENCES product_sizes(id) ON DELETE SET NULL");
+        echo "→ 'order_items.product_size_id' added.<br>";
+    } else {
+        echo "→ 'order_items' already has product_size_id.<br>";
+    }
+
+    // 17. Create 'ingredient_stock_logs' table
+    echo "Ensuring 'ingredient_stock_logs' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'ingredient_stock_logs'");
+    if (empty($tableExists)) {
+        $db->query("CREATE TABLE ingredient_stock_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL,
+            ingredient_id INT NOT NULL,
+            change_quantity DECIMAL(10,2) NOT NULL,
+            reason VARCHAR(100) NOT NULL COMMENT 'topup, adjust, sale',
+            order_id INT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+            FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE,
+            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL,
+            INDEX idx_ing_logs_ing (ingredient_id),
+            INDEX idx_ing_logs_tenant (tenant_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        echo "→ 'ingredient_stock_logs' table created.<br>";
+    } else {
+        echo "→ 'ingredient_stock_logs' table already exists.<br>";
+    }
 
     echo "Migrations completed successfully!";
 } catch (Exception $e) {

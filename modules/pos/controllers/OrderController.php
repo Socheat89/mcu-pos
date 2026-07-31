@@ -194,12 +194,16 @@ class OrderController {
                     }
 
                     $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+                    $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                    $sizeId = !empty($item['size_id']) ? (int)$item['size_id'] : null;
 
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
                         'order_id' => $resumeOrderId,
                         'product_id' => $item['product_id'],
+                        'size_name' => $sizeName,
+                        'product_size_id' => $sizeId,
                         'quantity' => $quantity,
                         'unit_price' => $unitPrice,
                         'total' => $itemTotal
@@ -208,15 +212,38 @@ class OrderController {
                     $total += $itemTotal;
 
                     if ($status === 'completed') {
-                        $newStock = (int)$product['stock_quantity'] - $quantity;
-                        $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
-                        $db->insert('stock_logs', [
-                            'tenant_id' => $tenantId,
-                            'product_id' => $item['product_id'],
-                            'change_quantity' => -$quantity,
-                            'reason' => 'sale',
-                            'order_id' => $resumeOrderId
-                        ]);
+                        // Check if a recipe is configured
+                        $recipe = [];
+                        if ($sizeId) {
+                            $recipe = $db->fetchAll(
+                                "SELECT * FROM product_recipes WHERE product_id = ? AND product_size_id = ? AND tenant_id = ?",
+                                [$item['product_id'], $sizeId, $tenantId]
+                            );
+                        }
+                        if (empty($recipe)) {
+                            $recipe = $db->fetchAll(
+                                "SELECT * FROM product_recipes WHERE product_id = ? AND product_size_id IS NULL AND tenant_id = ?",
+                                [$item['product_id'], $tenantId]
+                            );
+                        }
+
+                        if (!empty($recipe)) {
+                            require_once __DIR__ . '/../models/Ingredient.php';
+                            foreach ($recipe as $r) {
+                                $deductQty = (float)$r['quantity'] * $quantity;
+                                Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $resumeOrderId, $tenantId);
+                            }
+                        } else {
+                            $newStock = (int)$product['stock_quantity'] - $quantity;
+                            $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
+                            $db->insert('stock_logs', [
+                                'tenant_id' => $tenantId,
+                                'product_id' => $item['product_id'],
+                                'change_quantity' => -$quantity,
+                                'reason' => 'sale',
+                                'order_id' => $resumeOrderId
+                            ]);
+                        }
                     }
                 }
 
@@ -288,12 +315,16 @@ class OrderController {
                     }
                 }
                 $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+                $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                $sizeId = !empty($item['size_id']) ? (int)$item['size_id'] : null;
 
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [
                     'order_id' => $orderId,
                     'product_id' => $item['product_id'],
+                    'size_name' => $sizeName,
+                    'product_size_id' => $sizeId,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'total' => $itemTotal
@@ -304,18 +335,41 @@ class OrderController {
                 $total += $itemTotal;
 
                 if ($status === 'completed') {
-                    // Update stock
-                    $newStock = $product['stock_quantity'] - $quantity;
-                    $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
+                    // Check if a recipe is configured
+                    $recipe = [];
+                    if ($sizeId) {
+                        $recipe = $db->fetchAll(
+                            "SELECT * FROM product_recipes WHERE product_id = ? AND product_size_id = ? AND tenant_id = ?",
+                            [$item['product_id'], $sizeId, $tenantId]
+                        );
+                    }
+                    if (empty($recipe)) {
+                        $recipe = $db->fetchAll(
+                            "SELECT * FROM product_recipes WHERE product_id = ? AND product_size_id IS NULL AND tenant_id = ?",
+                            [$item['product_id'], $tenantId]
+                        );
+                    }
 
-                    // Log stock change
-                    $db->insert('stock_logs', [
-                        'tenant_id' => $tenantId,
-                        'product_id' => $item['product_id'],
-                        'change_quantity' => -$quantity,
-                        'reason' => 'sale',
-                        'order_id' => $orderId
-                    ]);
+                    if (!empty($recipe)) {
+                        require_once __DIR__ . '/../models/Ingredient.php';
+                        foreach ($recipe as $r) {
+                            $deductQty = (float)$r['quantity'] * $quantity;
+                            Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $orderId, $tenantId);
+                        }
+                    } else {
+                        // Update stock
+                        $newStock = $product['stock_quantity'] - $quantity;
+                        $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
+
+                        // Log stock change
+                        $db->insert('stock_logs', [
+                            'tenant_id' => $tenantId,
+                            'product_id' => $item['product_id'],
+                            'change_quantity' => -$quantity,
+                            'reason' => 'sale',
+                            'order_id' => $orderId
+                        ]);
+                    }
                 }
             }
 

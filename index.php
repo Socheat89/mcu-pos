@@ -159,6 +159,9 @@ try {
                 } elseif ($sub === 'settings') {
                     require_once $baseDir . '/modules/pos/controllers/SettingsController.php';
                     $controller = new SettingsController();
+                } elseif ($sub === 'ingredients') {
+                    require_once $baseDir . '/modules/pos/controllers/IngredientController.php';
+                    $controller = new IngredientController();
                 } elseif ($sub === 'menu') {
                     require_once $baseDir . '/modules/pos/controllers/MenuController.php';
                     $controller = new MenuController();

@@ -156,6 +156,91 @@
                     </button>
                 </section>
 
+                <section style="margin-bottom: 40px;">
+                    <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
+                        រូបមន្ត និងគ្រឿងផ្សំ / Recipe & Ingredients
+                    </h3>
+                    <p style="font-size: 13px; color: var(--pos-text-muted); margin-bottom: 16px; font-weight: 500;">
+                        កំណត់គ្រឿងផ្សំ និងបរិមាណសម្រាប់លក់ដកពីស្តុក (ឧ. កាហ្វេទឹកដោះគោដក គ្រាប់កាហ្វេ ទឹកដោះគោ...)។ / Map ingredients used in this product (or specific sizes).
+                    </p>
+                    
+                    <div id="recipe-container">
+                        <?php 
+                        $currentRecipe = $productRecipe ?? [];
+                        if (empty($currentRecipe)): 
+                        ?>
+                        <div class="recipe-row" style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">គ្រឿងផ្សំ / Ingredient</label>
+                                <select name="recipe_ingredients[]" class="pos-form-control pos-form-select">
+                                    <option value="">-- ជ្រើសរើសគ្រឿងផ្សំ / Select --</option>
+                                    <?php foreach ($ingredientsList as $ing): ?>
+                                        <option value="<?php echo $ing['id']; ?>">
+                                            <?php echo htmlspecialchars($ing['name']) . ' (' . htmlspecialchars($ing['unit']) . ')'; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">បរិមាណប្រើប្រាស់ / Quantity</label>
+                                <input type="number" step="0.01" name="recipe_quantities[]" class="pos-form-control" placeholder="0.00">
+                            </div>
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">សម្រាប់ទំហំ / For Size</label>
+                                <select name="recipe_sizes[]" class="pos-form-control pos-form-select recipe-size-select">
+                                    <option value="">គ្រប់ទំហំ / All Sizes</option>
+                                    <?php foreach ($existingSizes as $sz): ?>
+                                        <option value="<?php echo $sz['id']; ?>">
+                                            <?php echo htmlspecialchars($sz['size_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-remove-recipe-row" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                                <i class="fas fa-times" style="font-size: 12px;"></i>
+                            </button>
+                        </div>
+                        <?php else: foreach ($currentRecipe as $r): ?>
+                        <div class="recipe-row" style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">គ្រឿងផ្សំ / Ingredient</label>
+                                <select name="recipe_ingredients[]" class="pos-form-control pos-form-select">
+                                    <option value="">-- ជ្រើសរើសគ្រឿងផ្សំ / Select --</option>
+                                    <?php foreach ($ingredientsList as $ing): ?>
+                                        <option value="<?php echo $ing['id']; ?>" <?php echo $r['ingredient_id'] == $ing['id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($ing['name']) . ' (' . htmlspecialchars($ing['unit']) . ')'; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">បរិមាណប្រើប្រាស់ / Quantity</label>
+                                <input type="number" step="0.01" name="recipe_quantities[]" class="pos-form-control" value="<?php echo (float)$r['quantity']; ?>" placeholder="0.00">
+                            </div>
+                            <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="pos-form-label" style="font-size: 11px;">សម្រាប់ទំហំ / For Size</label>
+                                <select name="recipe_sizes[]" class="pos-form-control pos-form-select recipe-size-select">
+                                    <option value="">គ្រប់ទំហំ / All Sizes</option>
+                                    <?php foreach ($existingSizes as $sz): ?>
+                                        <option value="<?php echo $sz['id']; ?>" <?php echo $r['product_size_id'] == $sz['id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($sz['size_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-remove-recipe-row" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                                <i class="fas fa-times" style="font-size: 12px;"></i>
+                            </button>
+                        </div>
+                        <?php endforeach; endif; ?>
+                    </div>
+                    
+                    <button type="button" id="btn-add-recipe-row" class="btn btn-outline" style="margin-top: 8px; font-size: 13px; padding: 8px 20px;">
+                        <i class="fas fa-plus" style="margin-right: 6px;"></i> បន្ថែមជួរគ្រឿងផ្សំ / Add Ingredient Row
+                    </button>
+                </section>
+
                 <section>
                     <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
@@ -274,6 +359,106 @@
 
         // Bind existing remove buttons
         sizesContainer.querySelectorAll('.btn-remove-size').forEach(btn => bindRemoveButton(btn));
+
+        // ─── Recipe Rows Management ───────────────────────────
+        const recipeContainer = document.getElementById('recipe-container');
+        const btnAddRecipeRow = document.getElementById('btn-add-recipe-row');
+
+        function bindRemoveRecipeRow(btn) {
+            btn.addEventListener('click', () => {
+                btn.closest('.recipe-row').remove();
+            });
+        }
+
+        recipeContainer.querySelectorAll('.btn-remove-recipe-row').forEach(btn => bindRemoveRecipeRow(btn));
+
+        const ingredientsOptionsHtml = `
+            <option value="">-- ជ្រើសរើសគ្រឿងផ្សំ / Select --</option>
+            <?php foreach ($ingredientsList as $ing): ?>
+                <option value="<?php echo $ing['id']; ?>">
+                    <?php echo htmlspecialchars(addslashes($ing['name'])) . ' (' . htmlspecialchars(addslashes($ing['unit'])) . ')'; ?>
+                </option>
+            <?php endforeach; ?>
+        `;
+
+        btnAddRecipeRow.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'recipe-row';
+            row.style.cssText = 'display: flex; gap: 12px; align-items: center; margin-bottom: 12px;';
+            row.innerHTML = `
+                <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="pos-form-label" style="font-size: 11px;">គ្រឿងផ្សំ / Ingredient</label>
+                    <select name="recipe_ingredients[]" class="pos-form-control pos-form-select">
+                        ${ingredientsOptionsHtml}
+                    </select>
+                </div>
+                <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="pos-form-label" style="font-size: 11px;">បរិមាណប្រើប្រាស់ / Quantity</label>
+                    <input type="number" step="0.01" name="recipe_quantities[]" class="pos-form-control" placeholder="0.00">
+                </div>
+                <div class="pos-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label class="pos-form-label" style="font-size: 11px;">សម្រាប់ទំហំ / For Size</label>
+                    <select name="recipe_sizes[]" class="pos-form-control pos-form-select recipe-size-select">
+                        <option value="">គ្រប់ទំហំ / All Sizes</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-remove-recipe-row" style="margin-top: 22px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--pos-border); background: #fff; color: var(--pos-danger); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                    <i class="fas fa-times" style="font-size: 12px;"></i>
+                </button>
+            `;
+            recipeContainer.appendChild(row);
+            bindRemoveRecipeRow(row.querySelector('.btn-remove-recipe-row'));
+            syncRecipeSizeOptions();
+        });
+
+        function syncRecipeSizeOptions() {
+            const sizeInputs = Array.from(sizesContainer.querySelectorAll('input[name="size_name[]"]'));
+            const sizeList = [];
+            
+            sizeInputs.forEach(input => {
+                const name = input.value.trim();
+                if (name) {
+                    sizeList.push(name);
+                }
+            });
+
+            const selects = recipeContainer.querySelectorAll('.recipe-size-select');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">គ្រប់ទំហំ / All Sizes</option>';
+                
+                <?php foreach ($existingSizes as $sz): ?>
+                    const optDb = document.createElement('option');
+                    optDb.value = "<?php echo $sz['id']; ?>";
+                    optDb.textContent = "<?php echo htmlspecialchars(addslashes($sz['size_name'])); ?>";
+                    if (currentValue == "<?php echo $sz['id']; ?>") {
+                        optDb.selected = true;
+                    }
+                    select.appendChild(optDb);
+                <?php endforeach; ?>
+
+                sizeList.forEach(name => {
+                    const exists = Array.from(select.options).some(opt => opt.textContent === name);
+                    if (!exists) {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = name;
+                        if (currentValue === name) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    }
+                });
+            });
+        }
+
+        sizesContainer.addEventListener('input', (e) => {
+            if (e.target.name === 'size_name[]') {
+                syncRecipeSizeOptions();
+            }
+        });
+
+        syncRecipeSizeOptions();
 
         // ─── Quick Category Toggle & AJAX Save ─────────────────
         function toggleQuickCategory() {

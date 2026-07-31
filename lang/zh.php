@@ -142,6 +142,7 @@ return [
     'live_preview' => '实时预览',
     'on_hold' => '挂单',
     'inventory' => '库存',
+    'ingredients' => '配料',
 
     'analytics' => '分析',
     'digital_menu' => '数字菜单',

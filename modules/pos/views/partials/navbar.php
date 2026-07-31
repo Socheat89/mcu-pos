@@ -76,6 +76,7 @@ $navLabel = function (string $key): string {
         'holds'        => __('on_hold'),
         'orders'       => __('orders'),
         'products'     => __('inventory'),
+        'ingredients'  => __('ingredients'),
         'customers'    => __('customers'),
         'reports'      => __('analytics'),
         'settings'     => __('settings'),
@@ -148,6 +149,12 @@ $navLabel = function (string $key): string {
                 <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
                 <a class="pos-side-link <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
                     <i class="fas fa-boxes-stacked"></i><span><?php echo $navLabel('products'); ?></span>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): ?>
+                <a class="pos-side-link <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
+                    <i class="fas fa-carrot"></i><span><?php echo $navLabel('ingredients'); ?></span>
                 </a>
                 <?php endif; ?>
 

@@ -142,6 +142,7 @@ return [
     'live_preview' => 'Live Preview',
     'on_hold' => 'On Hold',
     'inventory' => 'Inventory',
+    'ingredients' => 'Ingredients',
 
     'analytics' => 'Analytics',
     'digital_menu' => 'Digital Menu',
