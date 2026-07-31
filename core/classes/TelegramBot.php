@@ -7,16 +7,25 @@ class TelegramBot {
     private $tenantId;
 
     public static function getSystemConfig() {
-        $db = Database::getInstance();
-        $globalToken = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_bot_token'");
-        
-        require_once __DIR__ . '/CookieCrypt.php';
-        $token = ($globalToken && !empty($globalToken['value'])) ? CookieCrypt::decrypt($globalToken['value']) : null;
+        $token = null;
+        $localFile = __DIR__ . '/../../config/telegram.local.php';
+        if (is_file($localFile)) {
+            $encrypted = require $localFile;
+            if (!empty($encrypted)) {
+                if (!class_exists('CookieCrypt')) {
+                    require_once __DIR__ . '/CookieCrypt.php';
+                }
+                $token = CookieCrypt::decrypt($encrypted);
+            }
+        }
 
         $config = require __DIR__ . '/../../config/telegram.php';
         $chatId = $config['chat_id'] ?? '';
 
         if (empty($token)) {
+            if (!class_exists('CookieCrypt')) {
+                require_once __DIR__ . '/CookieCrypt.php';
+            }
             $token = CookieCrypt::decrypt($config['bot_token'] ?? '');
         }
 
@@ -25,7 +34,9 @@ class TelegramBot {
 
     public function __construct($tenantId = null) {
         $this->tenantId = $tenantId;
-        require_once __DIR__ . '/CookieCrypt.php';
+        if (!class_exists('CookieCrypt')) {
+            require_once __DIR__ . '/CookieCrypt.php';
+        }
         
         // If tenant ID is provided, try to use tenant-specific config
         if ($tenantId) {

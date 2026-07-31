@@ -2,7 +2,9 @@
 // config/telegram.php
 
 require_once __DIR__ . '/env.php';
-require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+if (!class_exists('CookieCrypt')) {
+    require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+}
 
 $isLocal = mc_is_local_request();
 

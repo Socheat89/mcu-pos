@@ -3,12 +3,13 @@
 require_once __DIR__ . '/../middleware/SuperAdminMiddleware.php';
 SuperAdminMiddleware::handle();
 
-require_once __DIR__ . '/../core/classes/Database.php';
-require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+if (!class_exists('CookieCrypt')) {
+    require_once __DIR__ . '/../core/classes/CookieCrypt.php';
+}
 
-$db = Database::getInstance();
 $message = '';
 $error = '';
+$localFile = dirname(__DIR__) . '/config/telegram.local.php';
 
 // Handle save settings
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_settings') {
@@ -18,13 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $encryptedToken = CookieCrypt::encrypt($botToken);
 
     try {
-        // Save to global settings table (tenant_id = 0)
-        // Check if telegram_bot_token exists
-        $existToken = $db->fetchOne("SELECT id FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_bot_token'");
-        if ($existToken) {
-            $db->update('settings', ['value' => $encryptedToken, 'updated_at' => date('Y-m-d H:i:s')], 'id = ?', [$existToken['id']]);
-        } else {
-            $db->insert('settings', ['tenant_id' => 0, 'key_name' => 'telegram_bot_token', 'value' => $encryptedToken]);
+        // Save to config/telegram.local.php
+        $content = "<?php\n// Git-ignored local Telegram configuration\nreturn '" . addslashes($encryptedToken) . "';\n";
+        if (file_put_contents($localFile, $content) === false) {
+            throw new Exception('Failed to write to config/telegram.local.php. Please check file permissions.');
         }
 
         $message = 'System settings updated successfully!';
@@ -34,9 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // Fetch current values
-$currentEncryptedToken = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_bot_token'");
-
-$currentToken = $currentEncryptedToken ? CookieCrypt::decrypt($currentEncryptedToken['value']) : '';
+$currentToken = '';
+if (is_file($localFile)) {
+    $encrypted = require $localFile;
+    if (!empty($encrypted)) {
+        $currentToken = CookieCrypt::decrypt($encrypted);
+    }
+}
 
 include 'header.php';
 ?>
