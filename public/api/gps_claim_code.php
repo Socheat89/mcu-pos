@@ -64,11 +64,12 @@ $existingConfig = $db->fetchOne(
     [$tenantId]
 );
 
+require_once $root . '/core/classes/CookieCrypt.php';
 $configData = [
     'chat_id'    => $pending['chat_id'],
     'chat_title' => $pending['chat_title'],
     'setup_code' => $setupCode,
-    'bot_token'  => $botToken,
+    'bot_token'  => CookieCrypt::encrypt($botToken),
     'is_active'  => 1,
 ];
 

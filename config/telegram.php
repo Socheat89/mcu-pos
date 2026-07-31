@@ -2,11 +2,12 @@
 // config/telegram.php
 
 require_once __DIR__ . '/env.php';
+require_once __DIR__ . '/../core/classes/CookieCrypt.php';
 
 $isLocal = mc_is_local_request();
 
 return [
-    'bot_token'      => mc_env('MC_TELEGRAM_BOT_TOKEN', '8688625817:AAFWjjODBE05brt-iQWpHEXvPJv7hTg2KdY'),
+    'bot_token'      => CookieCrypt::decrypt(mc_env('MC_TELEGRAM_BOT_TOKEN', '8688625817:AAFWjjODBE05brt-iQWpHEXvPJv7hTg2KdY')),
     'chat_id'        => mc_env('MC_TELEGRAM_CHAT_ID', ''),
     'webhook_secret' => mc_env('MC_TELEGRAM_WEBHOOK_SECRET', 'mcu_tele_sec_99'),
     // Local = empty (use polling/sync_telegram.php), Live = webhook URL

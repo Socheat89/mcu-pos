@@ -8,6 +8,7 @@ class TelegramBot {
 
     public function __construct($tenantId = null) {
         $this->tenantId = $tenantId;
+        require_once __DIR__ . '/CookieCrypt.php';
         
         // If tenant ID is provided, try to use tenant-specific config
         if ($tenantId) {
@@ -17,7 +18,7 @@ class TelegramBot {
                 [$tenantId]
             );
             if ($tenantConfig && !empty($tenantConfig['bot_token']) && !empty($tenantConfig['chat_id'])) {
-                $this->token = $tenantConfig['bot_token'];
+                $this->token = CookieCrypt::decrypt($tenantConfig['bot_token']);
                 $this->chatId = $tenantConfig['chat_id'];
                 return;
             }
@@ -25,7 +26,7 @@ class TelegramBot {
         
         // Fallback to system config
         $config = require __DIR__ . '/../../config/telegram.php';
-        $this->token = $config['bot_token'];
+        $this->token = CookieCrypt::decrypt($config['bot_token']);
         $this->chatId = $config['chat_id'];
     }
 

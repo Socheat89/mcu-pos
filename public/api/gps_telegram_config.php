@@ -132,12 +132,15 @@ function sendTelegramTest(Database $db, int $tenantId, string $root): void {
         ];
     }
 
-    if (empty($config['bot_token']) || empty($config['chat_id'])) {
+    require_once $root . '/core/classes/CookieCrypt.php';
+    $botToken = CookieCrypt::decrypt($config['bot_token'] ?? '');
+
+    if (empty($botToken) || empty($config['chat_id'])) {
         mc_json_error('Telegram is not configured', 400);
     }
 
     $message = "MCU POS test notification\n\nYour Telegram connection is working.";
-    $response = telegramApiRequest($config['bot_token'], 'sendMessage', [
+    $response = telegramApiRequest($botToken, 'sendMessage', [
         'chat_id'    => $config['chat_id'],
         'text'       => $message,
         'parse_mode' => 'HTML',

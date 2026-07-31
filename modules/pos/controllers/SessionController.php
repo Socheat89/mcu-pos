@@ -474,6 +474,9 @@ class SessionController {
                 $chatId = $sysConfig['chat_id'] ?? null;
             }
 
+            require_once __DIR__ . '/../../core/classes/CookieCrypt.php';
+            $botToken = CookieCrypt::decrypt($botToken);
+
             if (!$botToken || !$chatId) return;
 
             $user = $db->fetchOne("SELECT username, email FROM users WHERE id = ?", [$userId]);

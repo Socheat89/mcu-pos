@@ -113,4 +113,25 @@ class CookieCrypt
             $cfg['cookie_hmac_key']
         );
     }
+
+    /** Helper to encrypt values dynamically */
+    public static function encrypt(string $plaintext): string
+    {
+        if ($plaintext === '') return '';
+        $crypt = self::fromConfig();
+        return $crypt->seal($plaintext);
+    }
+
+    /** Helper to decrypt values dynamically (with fallback to plaintext if decoding fails) */
+    public static function decrypt(?string $ciphertext): string
+    {
+        if ($ciphertext === null || $ciphertext === '') return '';
+        try {
+            $crypt = self::fromConfig();
+            $opened = $crypt->open($ciphertext);
+            return $opened !== null ? $opened : $ciphertext;
+        } catch (\Exception $e) {
+            return $ciphertext;
+        }
+    }
 }
