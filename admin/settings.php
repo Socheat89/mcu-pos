@@ -13,7 +13,6 @@ $error = '';
 // Handle save settings
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_settings') {
     $botToken = trim($_POST['telegram_bot_token'] ?? '');
-    $chatId = trim($_POST['telegram_chat_id'] ?? '');
 
     // Encrypt bot token
     $encryptedToken = CookieCrypt::encrypt($botToken);
@@ -28,14 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $db->insert('settings', ['tenant_id' => 0, 'key_name' => 'telegram_bot_token', 'value' => $encryptedToken]);
         }
 
-        // Check if telegram_chat_id exists
-        $existChatId = $db->fetchOne("SELECT id FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_chat_id'");
-        if ($existChatId) {
-            $db->update('settings', ['value' => $chatId, 'updated_at' => date('Y-m-d H:i:s')], 'id = ?', [$existChatId['id']]);
-        } else {
-            $db->insert('settings', ['tenant_id' => 0, 'key_name' => 'telegram_chat_id', 'value' => $chatId]);
-        }
-
         $message = 'System settings updated successfully!';
     } catch (Exception $e) {
         $error = 'Failed to save settings: ' . $e->getMessage();
@@ -44,10 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Fetch current values
 $currentEncryptedToken = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_bot_token'");
-$currentChatId = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_chat_id'");
 
 $currentToken = $currentEncryptedToken ? CookieCrypt::decrypt($currentEncryptedToken['value']) : '';
-$currentChatIdVal = $currentChatId ? $currentChatId['value'] : '';
 
 include 'header.php';
 ?>
@@ -76,16 +65,10 @@ include 'header.php';
     <form method="POST">
         <input type="hidden" name="action" value="save_settings">
         
-        <div class="form-group" style="margin-bottom: 1.25rem;">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
             <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Global Telegram Bot Token</label>
             <input type="text" name="telegram_bot_token" value="<?php echo htmlspecialchars($currentToken); ?>" placeholder="E.g., 123456789:ABCdef..." class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
             <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Your Telegram bot token from @BotFather. This value will be stored securely using AES-256 GCM encryption.</small>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Global System Chat ID</label>
-            <input type="text" name="telegram_chat_id" value="<?php echo htmlspecialchars($currentChatIdVal); ?>" placeholder="E.g., -100123456789" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;">
-            <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Default system chat ID where general system notifications or developer logs are routed.</small>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600;">

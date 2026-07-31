@@ -9,16 +9,15 @@ class TelegramBot {
     public static function getSystemConfig() {
         $db = Database::getInstance();
         $globalToken = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_bot_token'");
-        $globalChatId = $db->fetchOne("SELECT value FROM settings WHERE tenant_id = 0 AND key_name = 'telegram_chat_id'");
         
         require_once __DIR__ . '/CookieCrypt.php';
         $token = ($globalToken && !empty($globalToken['value'])) ? CookieCrypt::decrypt($globalToken['value']) : null;
-        $chatId = ($globalChatId && !empty($globalChatId['value'])) ? $globalChatId['value'] : null;
 
-        if (empty($token) || empty($chatId)) {
-            $config = require __DIR__ . '/../../config/telegram.php';
-            if (empty($token)) $token = CookieCrypt::decrypt($config['bot_token'] ?? '');
-            if (empty($chatId)) $chatId = $config['chat_id'] ?? '';
+        $config = require __DIR__ . '/../../config/telegram.php';
+        $chatId = $config['chat_id'] ?? '';
+
+        if (empty($token)) {
+            $token = CookieCrypt::decrypt($config['bot_token'] ?? '');
         }
 
         return ['bot_token' => $token, 'chat_id' => $chatId];
