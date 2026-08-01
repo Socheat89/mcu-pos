@@ -73,7 +73,9 @@ $dashboardUrl = $posBase . '/dashboard';
                 'stock' => (int)$p['stock_quantity'],
                 'category' => $p['category_name'] ?? 'No Category',
                 'image' => $image,
-                'sizes' => $sizes
+                'sizes' => $sizes,
+                'can_sell' => isset($p['can_sell']) ? (bool)$p['can_sell'] : true,
+                'stock_error' => $p['stock_error'] ?? ''
             ];
         }, $products)); ?>;
         

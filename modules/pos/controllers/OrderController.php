@@ -648,8 +648,65 @@ class OrderController {
     }
 
     private function showForm() {
-        // Load products for the form
+        $db = Database::getInstance();
+        $tenantId = Tenant::getId();
+
+        require_once __DIR__ . '/../../../core/classes/Store.php';
+        $businessType = Settings::get('business_type', 'coffee');
+        $currentStore = Store::getCurrent($tenantId);
+        $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
+
         $products  = Product::getAll();
+
+        $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId): float {
+            $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
+            return $r ? (float)$r['quantity'] : 0.0;
+        };
+
+        foreach ($products as &$p) {
+            $p['can_sell'] = true;
+            $p['stock_error'] = '';
+
+            if ($businessType === 'coffee') {
+                $recipes = $db->fetchAll(
+                    "SELECT pr.*, i.name as ingredient_name, i.unit
+                     FROM product_recipes pr
+                     JOIN ingredients i ON pr.ingredient_id = i.id
+                     WHERE pr.product_id = ? AND pr.tenant_id = ?",
+                    [$p['id'], $tenantId]
+                );
+
+                if (empty($recipes)) {
+                    $p['can_sell'] = false;
+                    $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ';
+                } else {
+                    foreach ($recipes as $r) {
+                        $needed = (float)$r['quantity'];
+                        $avail  = $currentStoreId ? $getIngQty($currentStoreId, (int)$r['ingredient_id']) : 0.0;
+                        if ($needed > $avail) {
+                            $p['can_sell'] = false;
+                            $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
+                            $p['stock_error'] = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $storeRow = null;
+                if ($currentStoreId) {
+                    try {
+                        $storeRow = $db->fetchOne("SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?", [$currentStoreId, $p['id']]);
+                    } catch (\Throwable $e) {}
+                }
+                $availStock = $storeRow ? (int)$storeRow['quantity'] : (int)($p['stock_quantity'] ?? 0);
+                if ($availStock <= 0) {
+                    $p['can_sell'] = false;
+                    $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" អស់ស្តុកហើយ';
+                }
+            }
+        }
+        unset($p);
+
         $customers = $this->getCustomers();
 
         include __DIR__ . '/../views/order_form.php';

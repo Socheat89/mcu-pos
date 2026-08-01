@@ -1139,6 +1139,11 @@ $decimal_places = Settings::getDecimalPlaces();
         }
 
         function addToCart(productId, name, price, stock) {
+            const product = allProducts.find(p => p.id == productId);
+            if (product && product.can_sell === false) {
+                showModal('error', 'មិនអាចបន្ថែមបានឡើយ / Blocked', product.stock_error || 'ផលិតផលនេះមិនអាចលក់បានឡើយ!', '⚠️');
+                return;
+            }
             const existing = cart.find(item => item.product_id == productId);
             if (existing) {
                 if (existing.quantity < stock) {
@@ -1148,10 +1153,10 @@ $decimal_places = Settings::getDecimalPlaces();
                     return;
                 }
             } else {
-                if (stock > 0) {
+                if (stock > 0 || (product && product.can_sell)) {
                     cart.push({ product_id: productId, name: name, price: parseFloat(price), quantity: 1, stock: stock });
                 } else {
-                    showModal('error', 'Out of Stock', 'This product is currently out of stock!', '🚫');
+                    showModal('error', 'Out of Stock', (product && product.stock_error) ? product.stock_error : 'This product is currently out of stock!', '🚫');
                     return;
                 }
             }
