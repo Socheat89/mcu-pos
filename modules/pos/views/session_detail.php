@@ -312,6 +312,9 @@ $isClosed        = $session['status'] === 'closed';
                         </table>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+
         <!-- ─── Tab: Ingredients Usage & Stock ─── -->
         <?php if (!empty($sessionIngredients)): ?>
         <div class="sd-tab-pane" id="tab-ingredients">
