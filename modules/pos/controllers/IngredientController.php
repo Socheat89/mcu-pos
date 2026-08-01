@@ -37,6 +37,8 @@ class IngredientController {
         try {
             $db->fetchAll("SELECT 1 FROM ingredient_store_stock LIMIT 1");
             $hasIngStoreStock = true;
+        } catch (\Throwable $e) {}
+
         $hasLogStoreId = false;
         try {
             $db->fetchOne("SELECT store_id FROM ingredient_stock_logs LIMIT 1");
