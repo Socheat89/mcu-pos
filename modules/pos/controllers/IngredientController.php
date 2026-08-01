@@ -32,12 +32,39 @@ class IngredientController {
         $allStores = Store::getAll($tenantId);
 
         $selectedStoreId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
+        $selectedStore   = null;
+        if ($selectedStoreId > 0) {
+            foreach ($allStores as $st) {
+                if ((int)$st['id'] === $selectedStoreId) { $selectedStore = $st; break; }
+            }
+        }
+        $isDefaultStore = $selectedStore ? (!empty($selectedStore['is_default'])) : false;
 
         $hasIngStoreStock = false;
         try {
             $db->fetchAll("SELECT 1 FROM ingredient_store_stock LIMIT 1");
             $hasIngStoreStock = true;
         } catch (\Throwable $e) {}
+
+        // Safe auto-cleanup: non-default stores without transfer_in or topup should start with 0 stock
+        if ($hasIngStoreStock) {
+            try {
+                $db->query(
+                    "UPDATE ingredient_store_stock iss
+                     JOIN stores s ON s.id = iss.store_id AND s.tenant_id = iss.tenant_id
+                     SET iss.quantity = 0
+                     WHERE iss.tenant_id = ?
+                       AND s.is_default = 0
+                       AND NOT EXISTS (
+                           SELECT 1 FROM ingredient_stock_logs isl 
+                           WHERE isl.store_id = iss.store_id 
+                             AND isl.ingredient_id = iss.ingredient_id
+                             AND isl.reason IN ('transfer_in', 'topup')
+                       )",
+                    [$tenantId]
+                );
+            } catch (\Throwable $e) {}
+        }
 
         $hasLogStoreId = false;
         try {
@@ -46,15 +73,27 @@ class IngredientController {
         } catch (\Throwable $e) {}
 
         if ($selectedStoreId > 0 && $hasIngStoreStock) {
-            $ingredients = $db->fetchAll(
-                "SELECT i.*, COALESCE(iss.quantity, 0) AS stock_quantity
-                 FROM ingredients i
-                 LEFT JOIN ingredient_store_stock iss 
-                       ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = i.tenant_id
-                 WHERE i.tenant_id = ?
-                 ORDER BY i.name ASC",
-                [$selectedStoreId, $tenantId]
-            );
+            if ($isDefaultStore) {
+                $ingredients = $db->fetchAll(
+                    "SELECT i.*, COALESCE(iss.quantity, i.stock_quantity, 0) AS stock_quantity
+                     FROM ingredients i
+                     LEFT JOIN ingredient_store_stock iss 
+                           ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = i.tenant_id
+                     WHERE i.tenant_id = ?
+                     ORDER BY i.name ASC",
+                    [$selectedStoreId, $tenantId]
+                );
+            } else {
+                $ingredients = $db->fetchAll(
+                    "SELECT i.*, COALESCE(iss.quantity, 0) AS stock_quantity
+                     FROM ingredients i
+                     LEFT JOIN ingredient_store_stock iss 
+                           ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = i.tenant_id
+                     WHERE i.tenant_id = ?
+                     ORDER BY i.name ASC",
+                    [$selectedStoreId, $tenantId]
+                );
+            }
         } else {
             $ingredients = Ingredient::getAll($tenantId);
         }
