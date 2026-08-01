@@ -34,7 +34,7 @@ class PosController {
 
 
         require_once __DIR__ . '/../../../core/classes/Store.php';
-        $businessType = Settings::get('business_type', 'coffee');
+        $businessType = Settings::get('business_type', $tenantId, 'coffee');
         $currentStore = Store::getCurrent($tenantId);
         $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
 

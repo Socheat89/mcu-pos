@@ -13,8 +13,13 @@ class Settings {
         return self::$db;
     }
 
-    public static function get($key, $tenantId = null, $default = null) {
-        if (!$tenantId) $tenantId = Tenant::getId();
+    public static function get($key, $tenantIdOrDefault = null, $default = null) {
+        if ($tenantIdOrDefault !== null && !is_numeric($tenantIdOrDefault)) {
+            $default = $tenantIdOrDefault;
+            $tenantId = Tenant::getId();
+        } else {
+            $tenantId = $tenantIdOrDefault ?: Tenant::getId();
+        }
         $setting = self::getDb()->fetchOne(
             "SELECT value FROM settings WHERE tenant_id = ? AND key_name = ?",
             [$tenantId, $key]
