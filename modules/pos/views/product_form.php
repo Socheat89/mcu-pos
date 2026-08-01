@@ -1,4 +1,9 @@
-<?php require_once __DIR__ . '/../../../core/helpers/url.php'; ?>
+<?php 
+require_once __DIR__ . '/../../../core/helpers/url.php'; 
+require_once __DIR__ . '/../../../core/classes/Settings.php';
+$businessType = Settings::get('business_type', 'coffee');
+$isCoffeeMode = ($businessType === 'coffee');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,8 +107,16 @@
                     </div>
                     <div class="pos-grid cols-2" style="margin-top: 24px;">
                         <div class="pos-form-group">
-                            <label class="pos-form-label"><?php echo __('opening_stock'); ?> <span style="color:red;">*</span></label>
-                            <input type="number" name="stock_quantity" class="pos-form-control" value="<?php echo $product['stock_quantity'] ?? 0; ?>" required placeholder="0">
+                            <label class="pos-form-label">
+                                <?php echo __('opening_stock'); ?>
+                                <?php if (!$isCoffeeMode): ?>
+                                    <span style="color:red;">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="number" name="stock_quantity" class="pos-form-control" value="<?php echo $product['stock_quantity'] ?? 0; ?>" <?php echo $isCoffeeMode ? '' : 'required'; ?> placeholder="0">
+                            <?php if ($isCoffeeMode): ?>
+                                <small style="display:block; color:var(--pos-text-muted); font-size:11px; margin-top:4px; font-weight:600;">(សម្រាប់ Coffee ស្តុកដកតាម Recipe/គ្រឿងផ្សំ មិនចាំបាច់បញ្ចូលទេ / Not required for Coffee)</small>
+                            <?php endif; ?>
                         </div>
                         <div class="pos-form-group">
                             <label class="pos-form-label"><?php echo __('sku_ref_id'); ?></label>
