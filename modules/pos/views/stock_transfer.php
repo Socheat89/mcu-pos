@@ -8,795 +8,814 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Transfer — <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
-
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
+    font-family: 'Space Grotesk','Battambang',sans-serif !important;
+}
 
-    <style>
-        body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, td, th {
-            font-family: 'Space Grotesk', 'Battambang', sans-serif !important;
-        }
+/* ── Document wrapper ─────────────────────────────────────────────────── */
+.doc-wrap {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    overflow: visible; /* IMPORTANT: let dropdown escape */
+    margin-bottom: 24px;
+}
 
-        /* ── Status Banner ─────────────────────────────────────────────────── */
-        .transfer-status {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 800;
-            letter-spacing: 0.3px; text-transform: uppercase;
-        }
-        .status-draft    { background: rgba(148,163,184,0.15); color: #64748b; border: 1px solid rgba(148,163,184,0.3); }
-        .status-done     { background: rgba(16,185,129,0.1);   color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
-        .status-waiting  { background: rgba(245,158,11,0.1);   color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+/* ── Document top bar: breadcrumb + status + actions ─────────────────── */
+.doc-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1.5px solid #f1f5f9;
+    background: linear-gradient(to right, rgba(99,102,241,0.04), transparent);
+    border-radius: 20px 20px 0 0;
+    flex-wrap: wrap; gap: 12px;
+}
+.doc-breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700;
+}
+.doc-breadcrumb a { color: #94a3b8; text-decoration: none; transition: color .15s; }
+.doc-breadcrumb a:hover { color: var(--pos-primary); }
+.doc-breadcrumb .sep { color: #cbd5e1; }
+.doc-breadcrumb .current { color: var(--pos-text); }
+.doc-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-        /* ── Transfer Form Header ──────────────────────────────────────────── */
-        .transfer-form-card {
-            background: #fff; border-radius: 20px; border: 1.5px solid var(--pos-border);
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 24px;
-        }
-        .transfer-form-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 28px; border-bottom: 1.5px solid var(--pos-border);
-            background: linear-gradient(135deg, rgba(99,102,241,0.04), rgba(168,85,247,0.03));
-        }
-        .transfer-form-header h2 {
-            margin: 0; font-size: 20px; font-weight: 900; color: var(--pos-text);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .transfer-form-body { padding: 28px; }
+/* Status pill */
+.doc-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.4px;
+}
+.status-draft { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+.status-done  { background: rgba(16,185,129,.12); color: #059669; border: 1px solid rgba(16,185,129,.25); }
 
-        /* ── Form Fields Grid ──────────────────────────────────────────────── */
-        .tf-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;
-        }
-        .tf-grid-3 {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px;
-        }
-        @media (max-width: 768px) {
-            .tf-grid, .tf-grid-3 { grid-template-columns: 1fr; }
-        }
-        .tf-field label {
-            display: block; font-size: 11px; font-weight: 800; color: var(--pos-text-muted);
-            text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px;
-        }
-        .tf-field select, .tf-field input[type="text"], .tf-field input[type="date"], .tf-field textarea {
-            width: 100%; padding: 10px 14px; border: 1.5px solid var(--pos-border);
-            border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--pos-text);
-            background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-            box-sizing: border-box;
-        }
-        .tf-field select:focus, .tf-field input:focus, .tf-field textarea:focus {
-            border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-        }
-        .tf-field textarea { resize: vertical; min-height: 60px; }
+/* Buttons */
+.btn-act {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 800;
+    cursor: pointer; transition: all .18s; border: none;
+}
+.btn-discard { background: #f8fafc; color: #64748b; border: 1.5px solid #e2e8f0; }
+.btn-discard:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.btn-validate {
+    background: linear-gradient(135deg,#10b981,#059669);
+    color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,.28);
+}
+.btn-validate:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,.38); }
+.btn-validate:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
-        /* ── Store Selector Cards ──────────────────────────────────────────── */
-        .store-flow {
-            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
-            background: rgba(99,102,241,0.04); border: 1.5px solid rgba(99,102,241,0.14);
-            border-radius: 16px; padding: 20px 24px;
-        }
-        .store-flow-item { flex: 1; }
-        .store-flow-arrow {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--pos-primary); font-size: 24px; flex-shrink: 0;
-        }
-        .store-flow-arrow span { font-size: 10px; font-weight: 700; color: var(--pos-text-muted); text-transform: uppercase; }
+/* ── Document body ─────────────────────────────────────────────────────── */
+.doc-body { padding: 28px 28px 0; }
 
-        /* ── Lines Table ───────────────────────────────────────────────────── */
-        .lines-card {
-            background: #fff; border-radius: 20px; border: 1.5px solid var(--pos-border);
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 24px;
-        }
-        .lines-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 24px; border-bottom: 1.5px solid var(--pos-border);
-            background: #fafafa;
-        }
-        .lines-header h3 { margin: 0; font-size: 14px; font-weight: 800; color: var(--pos-text); }
+/* ── Store selector row ────────────────────────────────────────────────── */
+.store-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: end;
+    gap: 16px; margin-bottom: 24px;
+    background: #fafbff; border: 1.5px solid rgba(99,102,241,.14);
+    border-radius: 14px; padding: 18px 22px;
+}
+@media(max-width:700px){ .store-row { grid-template-columns: 1fr; } }
+.store-lbl {
+    font-size: 10.5px; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px;
+    display: flex; align-items: center; gap: 5px;
+}
+.store-select {
+    width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+    border-radius: 10px; font-size: 14px; font-weight: 700; color: #1e293b;
+    background: #fff; outline: none; cursor: pointer; transition: border-color .2s;
+}
+.store-select:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.arrow-mid {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; padding-bottom: 4px;
+}
+.arrow-mid i { font-size: 22px; color: var(--pos-primary); }
+.arrow-mid span { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
 
-        .lines-table { width: 100%; border-collapse: collapse; }
-        .lines-table thead tr { background: #f8fafc; }
-        .lines-table th {
-            padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 800;
-            color: var(--pos-text-muted); text-transform: uppercase; letter-spacing: 0.5px;
-            border-bottom: 1.5px solid var(--pos-border);
-        }
-        .lines-table th.right { text-align: right; }
-        .lines-table th.center { text-align: center; }
-        .lines-table td {
-            padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle;
-        }
-        .lines-table tbody tr:last-child td { border-bottom: none; }
-        .lines-table tbody tr:hover { background: rgba(99,102,241,0.02); }
+/* ── Meta row (ref / date / note) ─────────────────────────────────────── */
+.meta-row {
+    display: grid; grid-template-columns: 1.5fr 1fr 1.5fr;
+    gap: 16px; margin-bottom: 0;
+}
+@media(max-width:700px){ .meta-row { grid-template-columns: 1fr; } }
+.meta-field label {
+    display: block; font-size: 10.5px; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px;
+}
+.meta-field input, .meta-field select {
+    width: 100%; padding: 9px 13px; border: 1.5px solid #e2e8f0;
+    border-radius: 10px; font-size: 13px; font-weight: 600; color: #1e293b;
+    background: #fff; outline: none; transition: border-color .2s;
+}
+.meta-field input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.meta-field input::placeholder { color: #cbd5e1; font-weight: 500; }
 
-        /* ── Product Search Input in table ─────────────────────────────────── */
-        .product-search-wrap { position: relative; min-width: 200px; }
-        .product-search-input {
-            width: 100%; padding: 8px 12px 8px 36px; border: 1.5px solid var(--pos-border);
-            border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--pos-text);
-            outline: none; transition: border-color 0.2s; box-sizing: border-box;
-        }
-        .product-search-input:focus { border-color: var(--pos-primary); }
-        .product-search-icon {
-            position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
-            color: var(--pos-text-muted); font-size: 12px; pointer-events: none;
-        }
-        .product-dropdown {
-            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 999;
-            background: #fff; border: 1.5px solid var(--pos-border); border-radius: 12px;
-            max-height: 240px; overflow-y: auto;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none;
-        }
-        .product-dropdown.open { display: block; }
-        .product-dropdown-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
-            transition: background 0.15s;
-        }
-        .product-dropdown-item:last-child { border-bottom: none; }
-        .product-dropdown-item:hover { background: rgba(99,102,241,0.06); }
-        .product-dropdown-item .item-img {
-            width: 32px; height: 32px; border-radius: 8px; object-fit: cover;
-            border: 1px solid var(--pos-border); flex-shrink: 0; background: #f1f5f9;
-            display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 12px;
-        }
-        .product-dropdown-item .item-info { flex: 1; min-width: 0; }
-        .product-dropdown-item .item-name { font-size: 13px; font-weight: 800; color: var(--pos-text); }
-        .product-dropdown-item .item-meta { font-size: 11px; color: var(--pos-text-muted); font-weight: 600; }
-        .product-dropdown-item .item-stock {
-            font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 8px; flex-shrink: 0;
-        }
-        .stock-ok  { background: rgba(16,185,129,0.1); color: #10b981; }
-        .stock-low { background: rgba(245,158,11,0.1); color: #f59e0b; }
-        .stock-nil { background: rgba(239,68,68,0.1);  color: #ef4444; }
+/* ── Divider ───────────────────────────────────────────────────────────── */
+.doc-divider {
+    margin: 24px 0 0; height: 1.5px;
+    background: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 40%, #f1f5f9 100%);
+}
 
-        /* ── Qty Input in table ─────────────────────────────────────────────── */
-        .qty-input {
-            width: 80px; padding: 7px 10px; border: 1.5px solid var(--pos-border);
-            border-radius: 8px; font-size: 14px; font-weight: 800; text-align: center;
-            outline: none; transition: border-color 0.2s;
-        }
-        .qty-input:focus { border-color: var(--pos-primary); }
+/* ── Lines section ─────────────────────────────────────────────────────── */
+.lines-section { padding: 0 28px 20px; }
+.lines-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0 12px;
+}
+.lines-head-title {
+    font-size: 13px; font-weight: 900; color: #1e293b;
+    display: flex; align-items: center; gap: 8px;
+}
+.lines-count {
+    font-size: 12px; font-weight: 700; color: #94a3b8;
+    background: #f1f5f9; padding: 3px 10px; border-radius: 20px;
+}
 
-        /* ── Available Badge ───────────────────────────────────────────────── */
-        .avail-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800;
-        }
+/* ── Lines table ───────────────────────────────────────────────────────── */
+.lines-tbl { width: 100%; border-collapse: collapse; }
+.lines-tbl thead tr { background: #f8fafc; }
+.lines-tbl th {
+    padding: 9px 14px; text-align: left; font-size: 10.5px; font-weight: 800;
+    color: #94a3b8; text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 1.5px solid #f1f5f9; border-top: 1.5px solid #f1f5f9;
+}
+.lines-tbl th.c { text-align: center; }
+.lines-tbl td {
+    padding: 10px 14px; border-bottom: 1px solid #f8fafc; vertical-align: middle;
+}
+.lines-tbl tbody tr:last-child td { border-bottom: none; }
+.lines-tbl tbody tr:hover { background: rgba(99,102,241,.018); }
 
-        /* ── Add Line Button ───────────────────────────────────────────────── */
-        .add-line-btn {
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 20px; border-radius: 10px; border: 1.5px dashed var(--pos-border);
-            background: transparent; color: var(--pos-text-muted); font-size: 13px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s; width: 100%; justify-content: center; margin-top: 8px;
-        }
-        .add-line-btn:hover {
-            border-color: var(--pos-primary); color: var(--pos-primary);
-            background: rgba(99,102,241,0.04);
-        }
+/* ── Product search ────────────────────────────────────────────────────── */
+.psearch-wrap { position: relative; }
+.psearch-inp {
+    width: 100%; min-width: 220px;
+    padding: 8px 12px 8px 34px; border: 1.5px solid #e2e8f0;
+    border-radius: 9px; font-size: 13px; font-weight: 600; color: #1e293b;
+    outline: none; transition: border-color .2s; background: #fff;
+}
+.psearch-inp:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.psearch-inp::placeholder { color: #cbd5e1; font-weight: 500; }
+.psearch-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #cbd5e1; font-size: 12px; pointer-events: none; }
 
-        /* ── Action Buttons ────────────────────────────────────────────────── */
-        .action-bar {
-            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-        }
-        .btn-validate {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff; font-size: 15px; font-weight: 900; border: none; cursor: pointer;
-            box-shadow: 0 4px 16px rgba(16,185,129,0.3); transition: all 0.2s;
-        }
-        .btn-validate:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
-        .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .btn-discard {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 12px; border: 1.5px solid var(--pos-border);
-            background: #fff; color: var(--pos-text); font-size: 14px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-discard:hover { background: #f8fafc; border-color: #cbd5e1; }
+/* Dropdown — positioned with JS to escape table overflow */
+.pdrop {
+    position: fixed; /* use fixed so it escapes any overflow:hidden parent */
+    z-index: 9998; background: #fff;
+    border: 1.5px solid #e2e8f0; border-radius: 14px;
+    max-height: 260px; overflow-y: auto;
+    box-shadow: 0 12px 36px rgba(0,0,0,.14);
+    display: none; min-width: 280px;
+}
+.pdrop.open { display: block; }
+.pdrop-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; cursor: pointer;
+    border-bottom: 1px solid #f8fafc; transition: background .12s;
+}
+.pdrop-item:last-child { border-bottom: none; }
+.pdrop-item:hover { background: rgba(99,102,241,.06); }
+.pdrop-thumb {
+    width: 34px; height: 34px; border-radius: 8px; object-fit: cover;
+    border: 1px solid #e2e8f0; flex-shrink: 0;
+    background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+    color: #cbd5e1; font-size: 12px; overflow: hidden;
+}
+.pdrop-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.pdrop-name { font-size: 13px; font-weight: 800; color: #1e293b; }
+.pdrop-meta { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 1px; }
+.pdrop-stock {
+    margin-left: auto; font-size: 12px; font-weight: 800; flex-shrink: 0;
+    padding: 3px 9px; border-radius: 8px;
+}
+.s-ok  { background: rgba(16,185,129,.1); color: #10b981; }
+.s-low { background: rgba(245,158,11,.1); color: #f59e0b; }
+.s-nil { background: rgba(239,68,68,.1);  color: #ef4444; }
 
-        /* ── Success / Error Toast ─────────────────────────────────────────── */
-        .transfer-toast {
-            position: fixed; bottom: 30px; right: 30px; z-index: 9999;
-            padding: 14px 22px; border-radius: 14px; font-size: 14px; font-weight: 800;
-            display: none; align-items: center; gap: 10px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.18); animation: slideUp 0.3s ease-out;
-        }
-        .transfer-toast.success { background: #10b981; color: #fff; }
-        .transfer-toast.error   { background: #ef4444; color: #fff; }
-        .transfer-toast.show    { display: flex; }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to   { transform: translateY(0);    opacity: 1; }
-        }
+/* ── Available badge ───────────────────────────────────────────────────── */
+.avail {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 9px; font-size: 13px; font-weight: 800;
+}
 
-        /* ── History Table ─────────────────────────────────────────────────── */
-        .history-pill {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800;
-        }
-        .pill-in  { background: rgba(16,185,129,0.1); color: #10b981; }
-        .pill-out { background: rgba(245,158,11,0.1); color: #f59e0b; }
+/* ── Qty input ─────────────────────────────────────────────────────────── */
+.qty-inp {
+    width: 76px; padding: 7px 10px; border: 1.5px solid #e2e8f0;
+    border-radius: 9px; font-size: 15px; font-weight: 800; text-align: center;
+    outline: none; transition: border-color .2s; color: #1e293b;
+}
+.qty-inp:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
 
-        /* ── Success card ──────────────────────────────────────────────────── */
-        .success-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center;
-        }
-        .success-overlay.open { display: flex; }
-        .success-card {
-            background: #fff; border-radius: 24px; padding: 40px; text-align: center;
-            max-width: 440px; width: 90%; box-shadow: 0 40px 80px rgba(0,0,0,0.25);
-            animation: scaleIn 0.3s ease-out;
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to   { transform: scale(1); opacity: 1; }
-        }
-        .success-icon {
-            width: 72px; height: 72px; border-radius: 50%; background: rgba(16,185,129,0.12);
-            border: 3px solid #10b981; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; font-size: 32px; color: #10b981;
-        }
-        .reference-code {
-            display: inline-block; background: #f8fafc; border: 1.5px solid var(--pos-border);
-            padding: 8px 20px; border-radius: 10px; font-size: 18px; font-weight: 900;
-            color: var(--pos-primary); letter-spacing: 1px; margin: 12px 0 20px;
-        }
-    </style>
+/* ── Remove btn ────────────────────────────────────────────────────────── */
+.rm-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1.5px solid rgba(239,68,68,.25); background: rgba(239,68,68,.07);
+    color: #ef4444; cursor: pointer; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.rm-btn:hover { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); }
+
+/* ── Add line button ───────────────────────────────────────────────────── */
+.add-line {
+    width: 100%; padding: 11px; border: 1.5px dashed #e2e8f0;
+    border-radius: 10px; background: transparent; cursor: pointer;
+    font-size: 13px; font-weight: 700; color: #94a3b8;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .18s; margin-top: 8px;
+}
+.add-line:hover { border-color: var(--pos-primary); color: var(--pos-primary); background: rgba(99,102,241,.04); }
+
+/* ── Bottom actions ────────────────────────────────────────────────────── */
+.doc-footer {
+    display: flex; justify-content: flex-end; gap: 10px; align-items: center;
+    padding: 18px 28px; border-top: 1.5px solid #f1f5f9;
+    background: #fafbfc; border-radius: 0 0 20px 20px;
+}
+
+/* ── Success overlay ───────────────────────────────────────────────────── */
+.success-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,.55);
+    backdrop-filter: blur(8px); z-index: 9999;
+    display: none; align-items: center; justify-content: center;
+}
+.success-overlay.open { display: flex; }
+.success-card {
+    background: #fff; border-radius: 24px; padding: 44px 40px; text-align: center;
+    max-width: 440px; width: 90%;
+    box-shadow: 0 40px 80px rgba(0,0,0,.22);
+    animation: popIn .3s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes popIn { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+.success-icon {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: rgba(16,185,129,.1); border: 2.5px solid #10b981;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 30px; color: #10b981;
+}
+.ref-pill {
+    display: inline-block; background: #f8fafc; border: 1.5px solid #e2e8f0;
+    padding: 8px 22px; border-radius: 10px; font-size: 17px; font-weight: 900;
+    color: var(--pos-primary); letter-spacing: 1.5px; font-family: monospace !important;
+    margin: 14px 0 22px;
+}
+
+/* ── Toast ─────────────────────────────────────────────────────────────── */
+.toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 10000;
+    padding: 13px 20px; border-radius: 12px; font-size: 13px; font-weight: 800;
+    display: none; align-items: center; gap: 9px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.18); animation: slideUp .25s ease-out;
+    max-width: 340px;
+}
+.toast.show { display: flex; }
+.toast.ok  { background: #10b981; color: #fff; }
+.toast.err { background: #ef4444; color: #fff; }
+@keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+/* ── History card ──────────────────────────────────────────────────────── */
+.hist-card {
+    background: #fff; border-radius: 20px; border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(0,0,0,.05); overflow: hidden; margin-bottom: 24px;
+}
+.hist-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1.5px solid #f1f5f9; background: #fafafa;
+}
+.hist-head h3 { margin: 0; font-size: 14px; font-weight: 900; color: #1e293b; }
+.hist-tbl { width: 100%; border-collapse: collapse; }
+.hist-tbl th {
+    padding: 9px 16px; font-size: 10.5px; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: .5px; text-align: left;
+    border-bottom: 1.5px solid #f1f5f9; background: #f8fafc;
+}
+.hist-tbl td { padding: 11px 16px; border-bottom: 1px solid #f8fafc; font-size: 13px; }
+.hist-tbl tbody tr:last-child td { border-bottom: none; }
+.hist-tbl tbody tr:hover { background: rgba(99,102,241,.018); }
+.hist-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800;
+}
+.hp-in  { background: rgba(16,185,129,.1); color: #10b981; }
+.hp-out { background: rgba(245,158,11,.1); color: #f59e0b; }
+.store-tag {
+    background: rgba(99,102,241,.1); color: var(--pos-primary);
+    padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media(max-width:640px){
+    .doc-topbar, .doc-body, .lines-section, .doc-footer { padding-left: 16px; padding-right: 16px; }
+    .store-row { padding: 14px 16px; gap: 12px; }
+    .lines-tbl th:nth-child(3), .lines-tbl td:nth-child(3) { display: none; }
+}
+</style>
 </head>
 <body class="pos-app">
-    <?php $activeNav = 'stock_report'; include __DIR__ . '/partials/navbar.php'; ?>
+<?php $activeNav = 'stock_report'; include __DIR__ . '/partials/navbar.php'; ?>
 
-    <div class="fade-in">
+<div class="fade-in">
 
-        <!-- ── Page Header ────────────────────────────────────────────────── -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px;">
-            <div>
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-                    <a href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>" style="color:var(--pos-text-muted); font-size:13px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:5px;">
-                        <i class="fas fa-arrow-left"></i> Stock Report
-                    </a>
-                    <span style="color:var(--pos-text-muted); font-size:13px;">/</span>
-                    <span style="font-size:13px; font-weight:700; color:var(--pos-text);">Internal Transfer</span>
-                </div>
-                <h1 class="pos-title" style="margin:0; font-size:26px; display:flex; align-items:center; gap:10px;">
-                    <i class="fas fa-arrows-left-right" style="color:var(--pos-primary);"></i>
-                    Stock Transfer
-                </h1>
-                <p style="margin:4px 0 0; color:var(--pos-text-muted); font-size:14px; font-weight:600;">
-                    Transfer stock between stores — ការផ្ទេរស្តុករវាង store
-                </p>
-            </div>
-            <div class="action-bar" id="topActionBar">
-                <button class="btn-discard" onclick="discardTransfer()">
+<!-- ════════════════════════════════════════════════════════════════════════
+     Main Document Card
+═════════════════════════════════════════════════════════════════════════ -->
+<div class="doc-wrap">
+
+    <!-- Top bar -->
+    <div class="doc-topbar">
+        <div class="doc-breadcrumb">
+            <a href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>">
+                <i class="fas fa-warehouse"></i> Stock
+            </a>
+            <span class="sep">/</span>
+            <span class="current">Internal Transfer</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span class="doc-status status-draft" id="statusBadge">
+                <i class="fas fa-circle" style="font-size:7px;"></i> Draft
+            </span>
+            <div class="doc-actions">
+                <button class="btn-act btn-discard" onclick="discardTransfer()">
                     <i class="fas fa-rotate-left"></i> Discard
                 </button>
-                <button class="btn-validate" id="validateBtn" onclick="validateTransfer()">
+                <button class="btn-act btn-validate" id="validateBtn" onclick="validateTransfer()">
                     <i class="fas fa-check-double"></i> Validate Transfer
                 </button>
             </div>
         </div>
-
-        <!-- ── Transfer Form Card ─────────────────────────────────────────── -->
-        <div class="transfer-form-card">
-            <div class="transfer-form-header">
-                <h2>
-                    <i class="fas fa-file-lines" style="color:var(--pos-primary); font-size:18px;"></i>
-                    New Internal Transfer
-                </h2>
-                <span class="transfer-status status-draft" id="statusBadge">
-                    <i class="fas fa-circle" style="font-size:8px;"></i> Draft
-                </span>
-            </div>
-            <div class="transfer-form-body">
-
-                <!-- Store Flow -->
-                <div class="store-flow">
-                    <div class="store-flow-item">
-                        <label style="font-size:11px; font-weight:800; color:var(--pos-text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                            <i class="fas fa-warehouse" style="margin-right:4px;"></i> From (Source)
-                        </label>
-                        <select id="fromStoreSelect" class="tf-field" style="width:100%; padding:10px 14px; border:1.5px solid var(--pos-border); border-radius:10px; font-size:14px; font-weight:700; color:var(--pos-text); outline:none; background:#fff; cursor:pointer;"
-                            onchange="onFromStoreChange()">
-                            <?php foreach ($allStores as $s): ?>
-                            <option value="<?php echo $s['id']; ?>" <?php echo ($currentStore && $s['id'] == $currentStore['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars(($s['code'] ? '[' . $s['code'] . '] ' : '') . $s['name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="store-flow-arrow">
-                        <i class="fas fa-arrow-right"></i>
-                        <span>Transfer</span>
-                    </div>
-                    <div class="store-flow-item">
-                        <label style="font-size:11px; font-weight:800; color:var(--pos-text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                            <i class="fas fa-store" style="margin-right:4px;"></i> To (Destination)
-                        </label>
-                        <select id="toStoreSelect" style="width:100%; padding:10px 14px; border:1.5px solid var(--pos-border); border-radius:10px; font-size:14px; font-weight:700; color:var(--pos-text); outline:none; background:#fff; cursor:pointer;"
-                            onchange="onToStoreChange()">
-                            <?php foreach ($allStores as $s): ?>
-                            <option value="<?php echo $s['id']; ?>" <?php echo ($currentStore && $s['id'] != $currentStore['id']) ? '' : ''; ?>>
-                                <?php echo htmlspecialchars(($s['code'] ? '[' . $s['code'] . '] ' : '') . $s['name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Ref / Date / Note row -->
-                <div class="tf-grid-3">
-                    <div class="tf-field">
-                        <label>Reference</label>
-                        <input type="text" id="refInput" placeholder="Auto-generated (e.g. TRF/20260801/A3F2)"
-                            style="font-family:monospace; letter-spacing:1px;">
-                    </div>
-                    <div class="tf-field">
-                        <label>Scheduled Date</label>
-                        <input type="date" id="dateInput" value="<?php echo date('Y-m-d'); ?>">
-                    </div>
-                    <div class="tf-field">
-                        <label>Note / Remarks</label>
-                        <input type="text" id="noteInput" placeholder="e.g. Weekly branch resupply">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ── Transfer Lines ─────────────────────────────────────────────── -->
-        <div class="lines-card">
-            <div class="lines-header">
-                <h3><i class="fas fa-list" style="color:var(--pos-primary); margin-right:6px;"></i>Transfer Lines</h3>
-                <span id="lineCountBadge" style="font-size:12px; color:var(--pos-text-muted); font-weight:700;">0 line(s)</span>
-            </div>
-
-            <div style="padding: 0 0 8px;">
-                <table class="lines-table" id="linesTable">
-                    <thead>
-                        <tr>
-                            <th style="width:40px;">#</th>
-                            <th>Product</th>
-                            <th class="center" style="width:130px;">Available (From)</th>
-                            <th class="center" style="width:110px;">Qty to Transfer</th>
-                            <th class="center" style="width:50px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="linesBody">
-                        <!-- dynamic rows -->
-                    </tbody>
-                </table>
-
-                <div style="padding: 0 16px 8px;">
-                    <button class="add-line-btn" onclick="addLine()">
-                        <i class="fas fa-plus"></i> Add a line
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── Bottom Action Bar ──────────────────────────────────────────── -->
-        <div style="display:flex; justify-content:flex-end; gap:12px; margin-bottom:32px;">
-            <button class="btn-discard" onclick="discardTransfer()">
-                <i class="fas fa-rotate-left"></i> Discard
-            </button>
-            <button class="btn-validate" id="validateBtnBottom" onclick="validateTransfer()">
-                <i class="fas fa-check-double"></i> Validate Transfer
-            </button>
-        </div>
-
-        <!-- ── Transfer History ───────────────────────────────────────────── -->
-        <?php if (!empty($transferHistory)): ?>
-        <div class="transfer-form-card">
-            <div class="transfer-form-header">
-                <h2 style="font-size:16px;"><i class="fas fa-clock-rotate-left" style="color:var(--pos-primary); font-size:16px;"></i> Transfer History</h2>
-                <span style="font-size:12px; color:var(--pos-text-muted); font-weight:700;"><?php echo count($transferHistory); ?> record(s)</span>
-            </div>
-            <div style="overflow-x:auto;">
-                <table class="lines-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Store</th>
-                            <th class="center">Type</th>
-                            <th class="center">Qty</th>
-                            <th>Reference / Note</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($transferHistory as $h):
-                            $isIn = ($h['reason'] === 'transfer_in');
-                        ?>
-                        <tr>
-                            <td style="font-weight:800; font-size:13px;"><?php echo htmlspecialchars($h['product_name'] ?? 'N/A'); ?></td>
-                            <td>
-                                <?php if (!empty($h['store_name'])): ?>
-                                <span style="background:rgba(99,102,241,0.1); color:var(--pos-primary); padding:3px 10px; border-radius:8px; font-size:12px; font-weight:800;">
-                                    <?php echo htmlspecialchars($h['store_name']); ?>
-                                </span>
-                                <?php else: ?>
-                                <span style="color:var(--pos-text-muted);">—</span>
-                                <?php endif; ?>
-                            </td>
-                            <td style="text-align:center;">
-                                <span class="history-pill <?php echo $isIn ? 'pill-in' : 'pill-out'; ?>">
-                                    <i class="fas <?php echo $isIn ? 'fa-arrow-down' : 'fa-arrow-up'; ?>"></i>
-                                    <?php echo $isIn ? 'Transfer In' : 'Transfer Out'; ?>
-                                </span>
-                            </td>
-                            <td style="text-align:center; font-weight:900; color:<?php echo $isIn ? '#10b981' : '#f59e0b'; ?>;">
-                                <?php echo ($isIn ? '+' : '-') . number_format(abs($h['change_quantity'])); ?>
-                            </td>
-                            <td style="font-size:12px; color:var(--pos-text-muted); font-weight:600; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                <?php echo htmlspecialchars($h['note'] ?? '—'); ?>
-                            </td>
-                            <td style="font-size:12px; color:var(--pos-text-muted); font-weight:600; white-space:nowrap;">
-                                <?php echo date('d/m/Y H:i', strtotime($h['created_at'])); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <?php endif; ?>
-
-    </div><!-- /.fade-in -->
-
-    <!-- ── Success Overlay ────────────────────────────────────────────────── -->
-    <div class="success-overlay" id="successOverlay">
-        <div class="success-card">
-            <div class="success-icon"><i class="fas fa-check"></i></div>
-            <h2 style="margin:0 0 4px; font-size:22px; font-weight:900; color:var(--pos-text);">Transfer Complete!</h2>
-            <p style="margin:0; color:var(--pos-text-muted); font-size:14px; font-weight:600;">Stock has been moved successfully</p>
-            <div class="reference-code" id="successRef">—</div>
-            <p id="successLines" style="margin:0 0 24px; color:var(--pos-text-muted); font-size:13px; font-weight:700;"></p>
-            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                <button onclick="newTransfer()" style="padding:11px 22px; border-radius:10px; background:var(--pos-primary); color:#fff; border:none; font-size:14px; font-weight:800; cursor:pointer;">
-                    <i class="fas fa-plus"></i> New Transfer
-                </button>
-                <a href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>" style="padding:11px 22px; border-radius:10px; border:1.5px solid var(--pos-border); background:#fff; color:var(--pos-text); font-size:14px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                    <i class="fas fa-warehouse"></i> Stock Report
-                </a>
-            </div>
-        </div>
     </div>
 
-    <!-- ── Toast ─────────────────────────────────────────────────────────── -->
-    <div class="transfer-toast" id="toastEl">
-        <i class="fas fa-circle-info"></i>
-        <span id="toastMsg"></span>
+    <!-- Title row inside body -->
+    <div class="doc-body">
+        <div style="margin-bottom:22px;">
+            <h2 style="margin:0 0 2px; font-size:21px; font-weight:900; color:#1e293b; display:flex; align-items:center; gap:9px;">
+                <i class="fas fa-arrows-left-right" style="color:var(--pos-primary); font-size:18px;"></i>
+                New Internal Transfer
+            </h2>
+            <p style="margin:0; font-size:13px; color:#94a3b8; font-weight:600;">Transfer stock between stores — ការផ្ទេរស្តុករវាង store</p>
+        </div>
+
+        <!-- Store From → To -->
+        <div class="store-row">
+            <div>
+                <div class="store-lbl"><i class="fas fa-warehouse"></i> From (Source)</div>
+                <select class="store-select" id="fromStoreSelect" onchange="onFromStoreChange()">
+                    <?php foreach ($allStores as $s): ?>
+                    <option value="<?php echo $s['id']; ?>" <?php echo ($currentStore && $s['id'] == $currentStore['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars('[' . ($s['code'] ?? '--') . '] ' . $s['name']); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="arrow-mid">
+                <i class="fas fa-arrow-right"></i>
+                <span>Transfer</span>
+            </div>
+            <div>
+                <div class="store-lbl"><i class="fas fa-store"></i> To (Destination)</div>
+                <select class="store-select" id="toStoreSelect" onchange="onToStoreChange()">
+                    <?php foreach ($allStores as $s): ?>
+                    <option value="<?php echo $s['id']; ?>">
+                        <?php echo htmlspecialchars('[' . ($s['code'] ?? '--') . '] ' . $s['name']); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <!-- Reference / Date / Note -->
+        <div class="meta-row">
+            <div class="meta-field">
+                <label>Reference</label>
+                <input type="text" id="refInput" placeholder="Auto-generated (e.g. TRF/20260801/A3F2)" style="font-family:monospace!important;">
+            </div>
+            <div class="meta-field">
+                <label>Scheduled Date</label>
+                <input type="date" id="dateInput" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+            <div class="meta-field">
+                <label>Note / Remarks</label>
+                <input type="text" id="noteInput" placeholder="e.g. Weekly branch resupply">
+            </div>
+        </div>
+    </div><!-- /.doc-body -->
+
+    <!-- Divider -->
+    <div class="doc-divider"></div>
+
+    <!-- Transfer Lines -->
+    <div class="lines-section">
+        <div class="lines-head">
+            <div class="lines-head-title">
+                <i class="fas fa-list-ul" style="color:var(--pos-primary);"></i>
+                Transfer Lines
+            </div>
+            <span class="lines-count" id="lineCountBadge">0 line(s)</span>
+        </div>
+
+        <table class="lines-tbl" id="linesTable">
+            <thead>
+                <tr>
+                    <th style="width:36px;">#</th>
+                    <th>Product</th>
+                    <th class="c" style="width:140px;">Available (From)</th>
+                    <th class="c" style="width:110px;">Qty to Transfer</th>
+                    <th class="c" style="width:44px;"></th>
+                </tr>
+            </thead>
+            <tbody id="linesBody"></tbody>
+        </table>
+
+        <button class="add-line" onclick="addLine()">
+            <i class="fas fa-plus"></i> Add a line
+        </button>
     </div>
 
-    <script>
-        const API_URL      = '<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>';
-        const STORES       = <?php echo json_encode(array_values($allStores)); ?>;
-        const IMG_BASE     = '<?php echo mc_base_path(); ?>/uploads/products/';
-        let   lineCounter  = 0;
+    <!-- Footer actions -->
+    <div class="doc-footer">
+        <button class="btn-act btn-discard" onclick="discardTransfer()">
+            <i class="fas fa-rotate-left"></i> Discard
+        </button>
+        <button class="btn-act btn-validate" id="validateBtnB" onclick="validateTransfer()">
+            <i class="fas fa-check-double"></i> Validate Transfer
+        </button>
+    </div>
 
-        // ── On page load: auto-select different "to" store ────────────────────
-        window.addEventListener('DOMContentLoaded', () => {
-            ensureDifferentToStore();
-            addLine(); // start with one blank line
+</div><!-- /.doc-wrap -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     Transfer History
+═════════════════════════════════════════════════════════════════════════ -->
+<?php if (!empty($transferHistory)): ?>
+<div class="hist-card">
+    <div class="hist-head">
+        <h3><i class="fas fa-clock-rotate-left" style="color:var(--pos-primary); margin-right:6px;"></i>Transfer History</h3>
+        <span style="font-size:12px; font-weight:700; color:#94a3b8; background:#f1f5f9; padding:3px 10px; border-radius:20px;"><?php echo count($transferHistory); ?> records</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="hist-tbl">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Store</th>
+                    <th style="text-align:center;">Type</th>
+                    <th style="text-align:center;">Qty</th>
+                    <th>Reference / Note</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($transferHistory as $h):
+                    $isIn = ($h['reason'] === 'transfer_in');
+                ?>
+                <tr>
+                    <td style="font-weight:800;"><?php echo htmlspecialchars($h['product_name'] ?? 'N/A'); ?></td>
+                    <td>
+                        <?php if (!empty($h['store_name'])): ?>
+                        <span class="store-tag"><?php echo htmlspecialchars($h['store_name']); ?></span>
+                        <?php else: ?><span style="color:#cbd5e1;">—</span><?php endif; ?>
+                    </td>
+                    <td style="text-align:center;">
+                        <span class="hist-pill <?php echo $isIn ? 'hp-in' : 'hp-out'; ?>">
+                            <i class="fas <?php echo $isIn ? 'fa-arrow-down-to-line' : 'fa-arrow-up-from-line'; ?>"></i>
+                            <?php echo $isIn ? 'Transfer In' : 'Transfer Out'; ?>
+                        </span>
+                    </td>
+                    <td style="text-align:center; font-weight:900; color:<?php echo $isIn ? '#10b981' : '#f59e0b'; ?>; font-size:14px;">
+                        <?php echo ($isIn ? '+' : '−') . number_format(abs($h['change_quantity'])); ?>
+                    </td>
+                    <td style="color:#94a3b8; font-size:12px; font-weight:600; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <?php echo htmlspecialchars($h['note'] ?? '—'); ?>
+                    </td>
+                    <td style="color:#94a3b8; font-size:12px; font-weight:600; white-space:nowrap;">
+                        <?php echo date('d/m/Y H:i', strtotime($h['created_at'])); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?>
+
+</div><!-- /.fade-in -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     Success Overlay
+═════════════════════════════════════════════════════════════════════════ -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <h2 style="margin:0 0 4px; font-size:22px; font-weight:900; color:#1e293b;">Transfer Complete!</h2>
+        <p style="margin:0; color:#94a3b8; font-size:13px; font-weight:600;">Stock moved successfully between stores</p>
+        <div class="ref-pill" id="successRef">—</div>
+        <p id="successLines" style="margin:0 0 24px; color:#64748b; font-size:13px; font-weight:700;"></p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button onclick="newTransfer()" class="btn-act btn-validate" style="font-size:13px;">
+                <i class="fas fa-plus"></i> New Transfer
+            </button>
+            <a href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>"
+               class="btn-act btn-discard" style="font-size:13px; text-decoration:none;">
+                <i class="fas fa-warehouse"></i> Stock Report
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toastEl"><i class="fas fa-circle-info"></i><span id="toastMsg"></span></div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     JavaScript
+═════════════════════════════════════════════════════════════════════════ -->
+<script>
+const API_URL    = '<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>';
+const IMG_BASE   = '<?php echo mc_base_path(); ?>/uploads/products/';
+let lineCounter  = 0;
+let openDropId   = null;
+
+// ── Init ─────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    ensureDiffTo();
+    addLine();
+
+    // close dropdown on outside click
+    document.addEventListener('click', e => {
+        if (openDropId !== null && !e.target.closest('.psearch-wrap') && !e.target.closest('.pdrop')) {
+            closeDrop(openDropId);
+        }
+    });
+
+    // close on Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (openDropId !== null) closeDrop(openDropId); } });
+});
+
+function gFrom() { return parseInt(document.getElementById('fromStoreSelect').value); }
+function gTo()   { return parseInt(document.getElementById('toStoreSelect').value); }
+
+function onFromStoreChange() { ensureDiffTo(); refreshLines(); }
+function onToStoreChange()   {
+    if (gTo() === gFrom()) {
+        const sel = document.getElementById('toStoreSelect');
+        for (let o of sel.options) { if (parseInt(o.value) !== gFrom()) { sel.value = o.value; break; } }
+    }
+}
+function ensureDiffTo() {
+    const sel = document.getElementById('toStoreSelect');
+    if (parseInt(sel.value) === gFrom()) {
+        for (let o of sel.options) { if (parseInt(o.value) !== gFrom()) { sel.value = o.value; break; } }
+    }
+}
+
+// ── Lines ──────────────────────────────────────────────────────────────────
+function addLine() {
+    lineCounter++;
+    const id = lineCounter;
+    const tbody = document.getElementById('linesBody');
+    const tr = document.createElement('tr');
+    tr.id = 'ln-' + id;
+    tr.dataset.productId = '';
+    tr.dataset.avail     = '0';
+    tr.innerHTML = `
+        <td style="color:#94a3b8;font-weight:700;font-size:13px;" id="lnum-${id}">${tbody.children.length+1}</td>
+        <td>
+            <div class="psearch-wrap" id="pwrap-${id}">
+                <i class="fas fa-search psearch-icon"></i>
+                <input type="text" class="psearch-inp" id="pinp-${id}"
+                    placeholder="Search product name or SKU…"
+                    autocomplete="off"
+                    oninput="doSearch(${id},this.value)"
+                    onfocus="doSearch(${id},this.value)"
+                >
+                <div class="pdrop" id="pdrop-${id}"></div>
+            </div>
+            <div id="psku-${id}" style="font-size:10.5px;color:var(--pos-primary);font-weight:700;margin-top:2px;display:none;"></div>
+        </td>
+        <td style="text-align:center;">
+            <span class="avail s-nil" id="pavail-${id}">— units</span>
+        </td>
+        <td style="text-align:center;">
+            <input type="number" class="qty-inp" id="pqty-${id}" min="1" value="1" onchange="clampQty(${id})">
+        </td>
+        <td style="text-align:center;">
+            <button class="rm-btn" onclick="removeLine(${id})" title="Remove"><i class="fas fa-times"></i></button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    renum(); countLines();
+    document.getElementById('pinp-'+id).focus();
+}
+
+function removeLine(id) {
+    const el = document.getElementById('ln-'+id);
+    if (el) el.remove();
+    renum(); countLines();
+}
+function renum() {
+    document.querySelectorAll('#linesBody tr').forEach((tr,i) => {
+        const n = tr.querySelector('[id^="lnum-"]');
+        if (n) n.textContent = i+1;
+    });
+}
+function countLines() {
+    const n = document.querySelectorAll('#linesBody tr').length;
+    document.getElementById('lineCountBadge').textContent = n + ' line(s)';
+}
+function refreshLines() {
+    document.querySelectorAll('#linesBody tr').forEach(tr => {
+        const id = tr.id.replace('ln-','');
+        tr.dataset.productId = '';
+        tr.dataset.avail = '0';
+        const inp = document.getElementById('pinp-'+id);
+        if (inp) inp.value = '';
+        const avail = document.getElementById('pavail-'+id);
+        if (avail) { avail.className='avail s-nil'; avail.textContent='— units'; }
+        const sku = document.getElementById('psku-'+id);
+        if (sku) sku.style.display='none';
+    });
+}
+
+// ── Product search with fixed-positioned dropdown ─────────────────────────
+let timers = {};
+function doSearch(id, q) {
+    clearTimeout(timers[id]);
+    timers[id] = setTimeout(() => {
+        fetch(`${API_URL}?ajax_products=1&store_id=${gFrom()}&q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(items => showDrop(id, items))
+            .catch(() => {});
+    }, 200);
+}
+
+function showDrop(id, items) {
+    const drop = document.getElementById('pdrop-'+id);
+    const wrap = document.getElementById('pwrap-'+id);
+    if (!drop || !wrap) return;
+
+    // Position dropdown using getBoundingClientRect (fixed positioning)
+    const rect = wrap.getBoundingClientRect();
+    drop.style.top    = (rect.bottom + 4) + 'px';
+    drop.style.left   = rect.left + 'px';
+    drop.style.width  = Math.max(rect.width, 300) + 'px';
+
+    drop.innerHTML = '';
+    if (!items.length) {
+        drop.innerHTML = '<div style="padding:14px 16px;color:#94a3b8;font-size:13px;font-weight:600;text-align:center;">No products found</div>';
+        drop.classList.add('open');
+        openDropId = id;
+        return;
+    }
+
+    items.forEach(p => {
+        const av  = parseInt(p.available ?? 0);
+        const cls = av > 10 ? 's-ok' : (av > 0 ? 's-low' : 's-nil');
+        const div = document.createElement('div');
+        div.className = 'pdrop-item';
+        div.innerHTML = `
+            <div class="pdrop-thumb">
+                ${p.image ? `<img src="${IMG_BASE}${esc(p.image)}">` : '<i class="fas fa-box"></i>'}
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div class="pdrop-name">${esc(p.name)}</div>
+                <div class="pdrop-meta">${p.sku ? 'SKU: '+esc(p.sku) : ''}${p.category_name ? ' · '+esc(p.category_name) : ''}</div>
+            </div>
+            <span class="pdrop-stock ${cls}">${av} units</span>
+        `;
+        div.addEventListener('mousedown', e => { e.preventDefault(); pickProduct(id, p); });
+        drop.appendChild(div);
+    });
+    drop.classList.add('open');
+    openDropId = id;
+}
+
+function closeDrop(id) {
+    const drop = document.getElementById('pdrop-'+id);
+    if (drop) drop.classList.remove('open');
+    if (openDropId === id) openDropId = null;
+}
+
+function pickProduct(id, p) {
+    const av = parseInt(p.available ?? 0);
+    const tr = document.getElementById('ln-'+id);
+    tr.dataset.productId = p.id;
+    tr.dataset.avail     = av;
+
+    const inp = document.getElementById('pinp-'+id);
+    if (inp) inp.value = p.name;
+
+    const sku = document.getElementById('psku-'+id);
+    if (sku) { sku.textContent = p.sku ? 'SKU: '+p.sku : ''; sku.style.display = p.sku ? 'block' : 'none'; }
+
+    const avBadge = document.getElementById('pavail-'+id);
+    if (avBadge) {
+        avBadge.className = 'avail ' + (av > 10 ? 's-ok' : av > 0 ? 's-low' : 's-nil');
+        avBadge.textContent = av + ' units';
+    }
+
+    const qInp = document.getElementById('pqty-'+id);
+    if (qInp) { qInp.max = av; if (parseInt(qInp.value) > av) qInp.value = av || 1; }
+
+    closeDrop(id);
+}
+
+function clampQty(id) {
+    const tr   = document.getElementById('ln-'+id);
+    const av   = parseInt(tr?.dataset.avail ?? 0);
+    const inp  = document.getElementById('pqty-'+id);
+    if (!inp) return;
+    let v = parseInt(inp.value)||1;
+    if (v < 1) v = 1;
+    if (av > 0 && v > av) v = av;
+    inp.value = v;
+}
+
+// ── Validate ──────────────────────────────────────────────────────────────
+function validateTransfer() {
+    const fromId = gFrom(), toId = gTo();
+    if (fromId === toId) { toast('Source and destination must be different.','err'); return; }
+
+    const lines = []; let err = false;
+    document.querySelectorAll('#linesBody tr').forEach(tr => {
+        const id  = tr.id.replace('ln-','');
+        const pid = tr.dataset.productId;
+        if (!pid) return;
+        const qty  = parseInt(document.getElementById('pqty-'+id)?.value)||0;
+        const av   = parseInt(tr.dataset.avail??0);
+        if (qty <= 0)  { toast('Quantity must be ≥ 1.','err'); err=true; return; }
+        if (qty > av)  { toast(`Not enough stock (available: ${av}).`,'err'); err=true; return; }
+        lines.push({product_id:pid, qty});
+    });
+    if (err) return;
+    if (!lines.length) { toast('Add at least one product line.','err'); return; }
+
+    const btns = [document.getElementById('validateBtn'), document.getElementById('validateBtnB')];
+    btns.forEach(b=>{ if(b){b.disabled=true; b.innerHTML='<i class="fas fa-spinner fa-spin"></i> Validating…';} });
+
+    const fd = new FormData();
+    fd.append('ajax_validate_transfer','1');
+    fd.append('from_store_id', fromId);
+    fd.append('to_store_id',   toId);
+    fd.append('reference',     document.getElementById('refInput').value.trim());
+    fd.append('note',          document.getElementById('noteInput').value.trim());
+    lines.forEach((l,i)=>{ fd.append(`lines[${i}][product_id]`,l.product_id); fd.append(`lines[${i}][qty]`,l.qty); });
+
+    fetch(API_URL,{method:'POST',body:fd})
+        .then(r=>r.json())
+        .then(data=>{
+            if (data.success) {
+                document.getElementById('successRef').textContent   = data.reference;
+                document.getElementById('successLines').textContent = data.lines + ' product line(s) transferred';
+                document.getElementById('statusBadge').className    = 'doc-status status-done';
+                document.getElementById('statusBadge').innerHTML    = '<i class="fas fa-circle" style="font-size:7px;"></i> Done';
+                document.getElementById('successOverlay').classList.add('open');
+            } else {
+                toast(data.error||'Transfer failed','err');
+                btns.forEach(b=>{ if(b){b.disabled=false; b.innerHTML='<i class="fas fa-check-double"></i> Validate Transfer';} });
+            }
+        })
+        .catch(()=>{
+            toast('Network error. Please try again.','err');
+            btns.forEach(b=>{ if(b){b.disabled=false; b.innerHTML='<i class="fas fa-check-double"></i> Validate Transfer';} });
         });
+}
 
-        function getFromStoreId() { return parseInt(document.getElementById('fromStoreSelect').value); }
-        function getToStoreId()   { return parseInt(document.getElementById('toStoreSelect').value); }
+function discardTransfer() {
+    if (!confirm('Discard and clear all lines?')) return;
+    document.getElementById('linesBody').innerHTML = '';
+    lineCounter = 0; countLines();
+    document.getElementById('refInput').value='';
+    document.getElementById('noteInput').value='';
+    document.getElementById('statusBadge').className='doc-status status-draft';
+    document.getElementById('statusBadge').innerHTML='<i class="fas fa-circle" style="font-size:7px;"></i> Draft';
+    addLine();
+}
+function newTransfer() {
+    document.getElementById('successOverlay').classList.remove('open');
+    setTimeout(()=>location.reload(),150);
+}
 
-        function onFromStoreChange() {
-            ensureDifferentToStore();
-            refreshAllLines();
-        }
-        function onToStoreChange() {
-            const fromId = getFromStoreId();
-            const toId   = getToStoreId();
-            if (fromId === toId) {
-                // pick next different
-                const toSel = document.getElementById('toStoreSelect');
-                for (let opt of toSel.options) {
-                    if (parseInt(opt.value) !== fromId) { toSel.value = opt.value; break; }
-                }
-            }
-        }
+// ── Toast ─────────────────────────────────────────────────────────────────
+let tTimer;
+function toast(msg, type='err') {
+    const el = document.getElementById('toastEl');
+    el.className = 'toast show '+type;
+    document.getElementById('toastMsg').textContent = msg;
+    clearTimeout(tTimer);
+    tTimer = setTimeout(()=>el.classList.remove('show'), 4000);
+}
 
-        function ensureDifferentToStore() {
-            const fromId = getFromStoreId();
-            const toSel  = document.getElementById('toStoreSelect');
-            if (parseInt(toSel.value) === fromId) {
-                for (let opt of toSel.options) {
-                    if (parseInt(opt.value) !== fromId) { toSel.value = opt.value; break; }
-                }
-            }
-        }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
 
-        // ── Add a new product line ────────────────────────────────────────────
-        function addLine() {
-            lineCounter++;
-            const id   = lineCounter;
-            const tbody = document.getElementById('linesBody');
-
-            const tr = document.createElement('tr');
-            tr.id = 'line-' + id;
-            tr.dataset.productId   = '';
-            tr.dataset.productName = '';
-            tr.dataset.available   = '0';
-            tr.innerHTML = `
-                <td style="color:var(--pos-text-muted); font-weight:700; font-size:13px;" id="linenum-${id}">${tbody.children.length + 1}</td>
-                <td>
-                    <div class="product-search-wrap">
-                        <i class="fas fa-search product-search-icon"></i>
-                        <input type="text" class="product-search-input" id="psearch-${id}"
-                            placeholder="Search product name or SKU…"
-                            autocomplete="off"
-                            oninput="searchProducts(${id}, this.value)"
-                            onfocus="openDropdown(${id})"
-                        >
-                        <div class="product-dropdown" id="pdrop-${id}"></div>
-                    </div>
-                    <div id="selected-name-${id}" style="font-size:11px; color:var(--pos-primary); font-weight:700; margin-top:3px; display:none;"></div>
-                </td>
-                <td style="text-align:center;">
-                    <span class="avail-badge stock-nil" id="avail-${id}">— units</span>
-                </td>
-                <td style="text-align:center;">
-                    <input type="number" class="qty-input" id="qty-${id}" min="1" value="1"
-                        onchange="validateLineQty(${id})">
-                </td>
-                <td style="text-align:center;">
-                    <button onclick="removeLine(${id})" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-            updateLineNumbers();
-            updateLineCount();
-            document.getElementById('psearch-' + id).focus();
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('#line-' + id)) closeDropdown(id);
-            }, { once: false });
-        }
-
-        function removeLine(id) {
-            const el = document.getElementById('line-' + id);
-            if (el) el.remove();
-            updateLineNumbers();
-            updateLineCount();
-        }
-
-        function updateLineNumbers() {
-            document.querySelectorAll('#linesBody tr').forEach((tr, i) => {
-                const numEl = tr.querySelector('[id^="linenum-"]');
-                if (numEl) numEl.textContent = i + 1;
-            });
-        }
-        function updateLineCount() {
-            const n = document.querySelectorAll('#linesBody tr').length;
-            document.getElementById('lineCountBadge').textContent = n + ' line(s)';
-        }
-
-        // ── Product search ────────────────────────────────────────────────────
-        let searchTimers = {};
-        function searchProducts(lineId, q) {
-            clearTimeout(searchTimers[lineId]);
-            const fromId = getFromStoreId();
-            searchTimers[lineId] = setTimeout(() => {
-                fetch(`${API_URL}?ajax_products=1&store_id=${fromId}&q=${encodeURIComponent(q)}`)
-                    .then(r => r.json())
-                    .then(products => renderDropdown(lineId, products))
-                    .catch(() => {});
-            }, 220);
-        }
-
-        function openDropdown(lineId) {
-            searchProducts(lineId, document.getElementById('psearch-' + lineId)?.value || '');
-        }
-
-        function closeDropdown(lineId) {
-            const drop = document.getElementById('pdrop-' + lineId);
-            if (drop) drop.classList.remove('open');
-        }
-
-        function renderDropdown(lineId, products) {
-            const drop = document.getElementById('pdrop-' + lineId);
-            if (!drop) return;
-            drop.innerHTML = '';
-
-            if (!products.length) {
-                drop.innerHTML = '<div style="padding:14px 16px; color:var(--pos-text-muted); font-size:13px; font-weight:600; text-align:center;">No products found</div>';
-                drop.classList.add('open');
-                return;
-            }
-
-            products.forEach(p => {
-                const avail   = parseInt(p.available ?? 0);
-                const stockCls = avail > 10 ? 'stock-ok' : (avail > 0 ? 'stock-low' : 'stock-nil');
-                const imgHtml = p.image
-                    ? `<img src="${IMG_BASE}${p.image}" class="item-img" style="width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid #e2e8f0;">`
-                    : `<div class="item-img"><i class="fas fa-box"></i></div>`;
-
-                const item = document.createElement('div');
-                item.className = 'product-dropdown-item';
-                item.innerHTML = `
-                    ${imgHtml}
-                    <div class="item-info">
-                        <div class="item-name">${escHtml(p.name)}</div>
-                        <div class="item-meta">${p.sku ? 'SKU: ' + escHtml(p.sku) : ''} ${p.category_name ? '· ' + escHtml(p.category_name) : ''}</div>
-                    </div>
-                    <span class="item-stock ${stockCls}">${avail} units</span>
-                `;
-                item.addEventListener('click', () => selectProduct(lineId, p));
-                drop.appendChild(item);
-            });
-            drop.classList.add('open');
-        }
-
-        function selectProduct(lineId, p) {
-            const avail = parseInt(p.available ?? 0);
-            const tr    = document.getElementById('line-' + lineId);
-            tr.dataset.productId   = p.id;
-            tr.dataset.productName = p.name;
-            tr.dataset.available   = avail;
-
-            // Update search input
-            const inp = document.getElementById('psearch-' + lineId);
-            if (inp) inp.value = p.name;
-
-            // Show selected name tag
-            const nameTag = document.getElementById('selected-name-' + lineId);
-            if (nameTag) {
-                nameTag.textContent = p.sku ? 'SKU: ' + p.sku : '';
-                nameTag.style.display = p.sku ? 'block' : 'none';
-            }
-
-            // Update available badge
-            const badge = document.getElementById('avail-' + lineId);
-            if (badge) {
-                const cls = avail > 10 ? 'stock-ok' : (avail > 0 ? 'stock-low' : 'stock-nil');
-                badge.className = 'avail-badge ' + cls;
-                badge.textContent = avail + ' units';
-            }
-
-            // Set max on qty input
-            const qtyInp = document.getElementById('qty-' + lineId);
-            if (qtyInp) {
-                qtyInp.max   = avail;
-                qtyInp.value = Math.min(parseInt(qtyInp.value) || 1, avail || 1);
-            }
-
-            closeDropdown(lineId);
-        }
-
-        function validateLineQty(lineId) {
-            const tr    = document.getElementById('line-' + lineId);
-            const avail = parseInt(tr?.dataset.available ?? 0);
-            const inp   = document.getElementById('qty-' + lineId);
-            if (!inp) return;
-            let v = parseInt(inp.value) || 1;
-            if (v < 1) v = 1;
-            if (avail > 0 && v > avail) v = avail;
-            inp.value = v;
-        }
-
-        // ── Refresh all lines when from-store changes ─────────────────────────
-        function refreshAllLines() {
-            // Clear all selected products since available qty may change
-            document.querySelectorAll('#linesBody tr').forEach(tr => {
-                const id = tr.id.replace('line-', '');
-                tr.dataset.productId   = '';
-                tr.dataset.productName = '';
-                tr.dataset.available   = '0';
-                const inp = document.getElementById('psearch-' + id);
-                if (inp) inp.value = '';
-                const badge = document.getElementById('avail-' + id);
-                if (badge) { badge.className = 'avail-badge stock-nil'; badge.textContent = '— units'; }
-                const nameTag = document.getElementById('selected-name-' + id);
-                if (nameTag) nameTag.style.display = 'none';
-            });
-        }
-
-        // ── Validate Transfer ─────────────────────────────────────────────────
-        function validateTransfer() {
-            const fromId = getFromStoreId();
-            const toId   = getToStoreId();
-
-            if (fromId === toId) {
-                showToast('Source and destination stores must be different.', 'error');
-                return;
-            }
-
-            // Build lines
-            const lines = [];
-            let hasError = false;
-            document.querySelectorAll('#linesBody tr').forEach(tr => {
-                const id = tr.id.replace('line-', '');
-                const productId = tr.dataset.productId;
-                const qty       = parseInt(document.getElementById('qty-' + id)?.value) || 0;
-                const avail     = parseInt(tr.dataset.available ?? 0);
-
-                if (!productId) return; // skip unselected
-                if (qty <= 0) { showToast('Quantity must be at least 1.', 'error'); hasError = true; return; }
-                if (qty > avail) { showToast(`Not enough stock. Available: ${avail}`, 'error'); hasError = true; return; }
-                lines.push({ product_id: productId, qty });
-            });
-
-            if (hasError) return;
-            if (!lines.length) { showToast('Add at least one product line.', 'error'); return; }
-
-            const btnT = document.getElementById('validateBtn');
-            const btnB = document.getElementById('validateBtnBottom');
-            [btnT, btnB].forEach(b => { if(b) { b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating…'; }});
-
-            const formData = new FormData();
-            formData.append('ajax_validate_transfer', '1');
-            formData.append('from_store_id', fromId);
-            formData.append('to_store_id',   toId);
-            formData.append('reference',     document.getElementById('refInput').value.trim());
-            formData.append('note',          document.getElementById('noteInput').value.trim());
-            lines.forEach((l, i) => {
-                formData.append(`lines[${i}][product_id]`, l.product_id);
-                formData.append(`lines[${i}][qty]`,        l.qty);
-            });
-
-            fetch(API_URL, { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('successRef').textContent   = data.reference;
-                        document.getElementById('successLines').textContent = data.lines + ' product line(s) transferred';
-                        document.getElementById('statusBadge').className    = 'transfer-status status-done';
-                        document.getElementById('statusBadge').innerHTML    = '<i class="fas fa-circle" style="font-size:8px;"></i> Done';
-                        document.getElementById('successOverlay').classList.add('open');
-                    } else {
-                        showToast(data.error || 'Transfer failed', 'error');
-                        [btnT, btnB].forEach(b => { if(b) { b.disabled = false; b.innerHTML = '<i class="fas fa-check-double"></i> Validate Transfer'; }});
-                    }
-                })
-                .catch(() => {
-                    showToast('Network error. Please try again.', 'error');
-                    [btnT, btnB].forEach(b => { if(b) { b.disabled = false; b.innerHTML = '<i class="fas fa-check-double"></i> Validate Transfer'; }});
-                });
-        }
-
-        // ── Reset form ────────────────────────────────────────────────────────
-        function discardTransfer() {
-            if (!confirm('Discard this transfer and clear all lines?')) return;
-            document.getElementById('linesBody').innerHTML = '';
-            lineCounter = 0;
-            updateLineCount();
-            document.getElementById('refInput').value  = '';
-            document.getElementById('noteInput').value = '';
-            document.getElementById('statusBadge').className = 'transfer-status status-draft';
-            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-circle" style="font-size:8px;"></i> Draft';
-            addLine();
-        }
-
-        function newTransfer() {
-            document.getElementById('successOverlay').classList.remove('open');
-            setTimeout(() => location.reload(), 200);
-        }
-
-        // ── Toast ─────────────────────────────────────────────────────────────
-        let toastTimer;
-        function showToast(msg, type = 'error') {
-            const el = document.getElementById('toastEl');
-            el.className = 'transfer-toast show ' + type;
-            document.getElementById('toastMsg').textContent = msg;
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => { el.classList.remove('show'); }, 4000);
-        }
-
-        function escHtml(str) {
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        }
-    </script>
-
-    <?php include __DIR__ . '/partials/footer.php'; ?>
+<?php include __DIR__ . '/partials/footer.php'; ?>
 </body>
 </html>
