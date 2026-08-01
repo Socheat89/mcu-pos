@@ -583,5 +583,81 @@ class SessionController {
             // Silent fail - don't break session flow
         }
     }
+
+    private function getSessionIngredients(Database $db, int $sessionId, int $tenantId, ?int $storeId = null): array {
+        $ingredients = [];
+        try {
+            $mainStoreId = null;
+            if ($storeId) {
+                $allStores = Store::getAll($tenantId);
+                if (!empty($allStores)) {
+                    $sortedStores = $allStores;
+                    usort($sortedStores, function($a, $b) {
+                        $aDef = !empty($a['is_default']) ? 1 : 0;
+                        $bDef = !empty($b['is_default']) ? 1 : 0;
+                        if ($aDef !== $bDef) return $bDef - $aDef;
+                        return (int)$a['id'] - (int)$b['id'];
+                    });
+                    $mainStoreId = (int)$sortedStores[0]['id'];
+                }
+            }
+
+            if ($storeId && $storeId !== $mainStoreId) {
+                $rawIngredients = $db->fetchAll(
+                    "SELECT i.id, i.name, i.unit,
+                            COALESCE(iss.quantity, 0) AS remaining_stock
+                     FROM ingredients i
+                     LEFT JOIN ingredient_store_stock iss
+                           ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = ?
+                     WHERE i.tenant_id = ?
+                     ORDER BY i.name ASC",
+                    [$storeId, $tenantId, $tenantId]
+                );
+            } else {
+                $rawIngredients = $db->fetchAll(
+                    "SELECT i.id, i.name, i.unit,
+                            COALESCE(iss.quantity, i.stock_quantity, 0) AS remaining_stock
+                     FROM ingredients i
+                     LEFT JOIN ingredient_store_stock iss
+                           ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = ?
+                     WHERE i.tenant_id = ?
+                     ORDER BY i.name ASC",
+                    [$storeId ?: 0, $tenantId, $tenantId]
+                );
+            }
+
+            $usageMap = [];
+            try {
+                $usedRows = $db->fetchAll(
+                    "SELECT pr.ingredient_id, SUM(pr.quantity * oi.quantity) AS total_used
+                     FROM orders o
+                     JOIN order_items oi ON oi.order_id = o.id
+                     JOIN product_recipes pr ON pr.product_id = oi.product_id AND (pr.product_size_id = oi.size_id OR pr.product_size_id IS NULL)
+                     WHERE o.session_id = ? AND o.tenant_id = ? AND o.status = 'completed'
+                     GROUP BY pr.ingredient_id",
+                    [$sessionId, $tenantId]
+                );
+                foreach ($usedRows as $u) {
+                    $usageMap[(int)$u['ingredient_id']] = (float)$u['total_used'];
+                }
+            } catch (\Throwable $e) {}
+
+            foreach ($rawIngredients as $ing) {
+                $ingId = (int)$ing['id'];
+                $used = $usageMap[$ingId] ?? 0.0;
+                $rem  = (float)$ing['remaining_stock'];
+                $ingredients[] = [
+                    'id'              => $ingId,
+                    'name'            => $ing['name'],
+                    'unit'            => $ing['unit'],
+                    'used_qty'        => $used,
+                    'remaining_stock' => $rem,
+                ];
+            }
+        } catch (\Throwable $e) {
+            error_log('getSessionIngredients error: ' . $e->getMessage());
+        }
+        return $ingredients;
+    }
 }
 ?>
