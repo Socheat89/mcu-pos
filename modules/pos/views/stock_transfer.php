@@ -154,7 +154,11 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .lines-tbl tbody tr:last-child td { border-bottom: none; }
 .lines-tbl tbody tr:hover { background: rgba(99,102,241,.018); }
 
-.psearch-wrap { position: relative; }
+.lines-section, .lines-tbl, .lines-tbl td, .lines-tbl tr, .lines-tbl tbody {
+    overflow: visible !important;
+}
+
+.psearch-wrap { position: relative; width: 100%; }
 .psearch-inp {
     width: 100%; min-width: 220px;
     padding: 8px 12px 8px 34px; border: 1.5px solid #e2e8f0;
@@ -166,11 +170,14 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .psearch-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #cbd5e1; font-size: 12px; pointer-events: none; }
 
 .pdrop {
-    position: fixed;
-    z-index: 9998; background: #fff;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    z-index: 9999; background: #fff;
     border: 1.5px solid #e2e8f0; border-radius: 14px;
     max-height: 250px; overflow-y: auto;
-    box-shadow: 0 16px 40px rgba(15,23,42,.14);
+    box-shadow: 0 16px 40px rgba(15,23,42,.16);
     display: none;
 }
 .pdrop.open { display: block; }
@@ -805,10 +812,7 @@ function doSearch(id, q) {
 
 function showDrop(id, items) {
     const drop = document.getElementById('pdrop-'+id);
-    const wrap = document.getElementById('pwrap-'+id);
-    if (!drop || !wrap) return;
-
-    repositionDrop(id);
+    if (!drop) return;
 
     drop.innerHTML = '';
     if (!items.length) {
@@ -851,20 +855,6 @@ function showDrop(id, items) {
     drop.classList.add('open');
     openDropId = id;
 }
-
-function repositionDrop(id) {
-    const drop = document.getElementById('pdrop-'+id);
-    const wrap = document.getElementById('pwrap-'+id);
-    if (!drop || !wrap) return;
-    const rect = wrap.getBoundingClientRect();
-    drop.style.top   = (rect.bottom + 4) + 'px';
-    drop.style.left  = rect.left + 'px';
-    drop.style.width = rect.width + 'px';
-}
-
-// Reposition dropdown on scroll/resize
-window.addEventListener('scroll', () => { if (openDropId !== null) repositionDrop(openDropId); }, true);
-window.addEventListener('resize', () => { if (openDropId !== null) repositionDrop(openDropId); });
 
 function closeDrop(id) {
     const drop = document.getElementById('pdrop-'+id);
