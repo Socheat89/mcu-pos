@@ -211,6 +211,10 @@ class SessionController {
         $cashSales = $paymentSummary['cash'] ?? 0.0;
         $expectedCash = (float)$activeSession['opening_balance'] + $cashSales;
 
+        // Load Ingredients usage & remaining stock for close view
+        $sessionStoreId = !empty($activeSession['store_id']) ? (int)$activeSession['store_id'] : null;
+        $sessionIngredients = $this->getSessionIngredients($db, (int)$activeSession['id'], $tenantId, $sessionStoreId);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $closingBalance = isset($_POST['closing_balance']) ? (float)$_POST['closing_balance'] : 0.0;
 
@@ -395,6 +399,10 @@ class SessionController {
             [$id, $tenantId]
         );
 
+        // Load Ingredients usage & remaining stock for detail view
+        $sessionStoreId = !empty($session['store_id']) ? (int)$session['store_id'] : null;
+        $sessionIngredients = $this->getSessionIngredients($db, (int)$session['id'], $tenantId, $sessionStoreId);
+
         include __DIR__ . '/../views/session_detail.php';
     }
 
@@ -482,6 +490,10 @@ class SessionController {
              ORDER BY p.name ASC",
             [$id, $tenantId]
         );
+
+        // Load Ingredients usage & remaining stock for print report
+        $sessionStoreId = !empty($session['store_id']) ? (int)$session['store_id'] : null;
+        $sessionIngredients = $this->getSessionIngredients($db, (int)$session['id'], $tenantId, $sessionStoreId);
 
         include __DIR__ . '/../views/session_report_print.php';
     }

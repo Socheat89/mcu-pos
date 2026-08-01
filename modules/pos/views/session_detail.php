@@ -177,6 +177,13 @@ $isClosed        = $session['status'] === 'closed';
                 <i class="fas fa-receipt"></i> Orders
                 <span class="tab-badge"><?php echo count($orders); ?></span>
             </button>
+
+            <?php if (!empty($sessionIngredients)): ?>
+            <button class="sd-tab-btn" data-tab="tab-ingredients" role="tab">
+                <i class="fas fa-flask"></i> គ្រឿងផ្សំ (Ingredients)
+                <span class="tab-badge"><?php echo count($sessionIngredients); ?></span>
+            </button>
+            <?php endif; ?>
         </div>
         <?php foreach ($paymentSummary as $method => $totalAmount): ?>
             <div class="sd-tab-pane" id="tab-pm-<?php echo htmlspecialchars($method); ?>">
@@ -305,8 +312,51 @@ $isClosed        = $session['status'] === 'closed';
                         </table>
                     </div>
                 <?php endif; ?>
+        <!-- ─── Tab: Ingredients Usage & Stock ─── -->
+        <?php if (!empty($sessionIngredients)): ?>
+        <div class="sd-tab-pane" id="tab-ingredients">
+            <div class="pos-card pad">
+                <h3 class="pos-card-title" style="margin-bottom:20px;">
+                    <i class="fas fa-flask" style="color:var(--pos-primary); margin-right:8px;"></i>
+                    គ្រឿងផ្សំប្រើប្រាស់ & ស្តុកនៅសល់ / Ingredients Usage & Stock
+                </h3>
+                <div class="pos-table-container">
+                    <table class="pos-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>គ្រឿងផ្សំ (Ingredient)</th>
+                                <th style="text-align:center;">ប្រើប្រាស់ក្នុង Session (Used)</th>
+                                <th style="text-align:right;">ស្តុកនៅសល់ក្នុង Store (Remaining Stock)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $k = 0; foreach ($sessionIngredients as $ing): $k++;
+                                $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
+                                $used = (float)$ing['qty_used'];
+                                $rem  = (float)$ing['remaining_stock'];
+                            ?>
+                            <tr>
+                                <td style="color:var(--pos-text-muted);"><?php echo $k; ?></td>
+                                <td style="font-weight:800; color:var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></td>
+                                <td style="text-align:center;">
+                                    <span style="display:inline-block; background:rgba(245,158,11,0.12); color:#f59e0b; font-weight:800; border-radius:8px; padding:3px 12px; font-size:13px;">
+                                        <?php echo $used > 0 ? ('-' . (number_format($used, 3) + 0) . $unitStr) : '0'; ?>
+                                    </span>
+                                </td>
+                                <td style="text-align:right;">
+                                    <span style="font-weight:900; font-size:14px; color:<?php echo $rem > 10 ? '#10b981' : ($rem > 0 ? '#f59e0b' : '#ef4444'); ?>;">
+                                        <?php echo (number_format($rem, 3) + 0) . $unitStr; ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+        <?php endif; ?>
 
     </div><!-- /fade-in -->
 

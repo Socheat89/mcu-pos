@@ -367,6 +367,39 @@ foreach ($paymentSummary as $method => $amt) {
         </tbody>
     </table>
 
+    <!-- Section 5: Ingredients Usage & Stock -->
+    <?php if (!empty($sessionIngredients)): ?>
+    <div class="section-title">របាយការណ៍គ្រឿងផ្សំ / Ingredients Usage & Stock</div>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th style="width:30px;">#</th>
+                <th>Ingredient / គ្រឿងផ្សំ</th>
+                <th class="text-center">Used / ប្រើអស់</th>
+                <th class="text-right">Remaining Stock / ស្តុកនៅសល់</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $j = 0; foreach ($sessionIngredients as $ing): $j++;
+                $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
+                $used = (float)$ing['qty_used'];
+                $rem  = (float)$ing['remaining_stock'];
+            ?>
+            <tr>
+                <td><?php echo $j; ?></td>
+                <td class="bold"><?php echo htmlspecialchars($ing['name']); ?></td>
+                <td class="text-center bold" style="color:<?php echo $used > 0 ? '#b45309' : '#000'; ?>;">
+                    <?php echo $used > 0 ? ('-' . (number_format($used, 3) + 0) . $unitStr) : '0'; ?>
+                </td>
+                <td class="text-right bold" style="color:<?php echo $rem > 10 ? '#047857' : ($rem > 0 ? '#b45309' : '#b91c1c'); ?>;">
+                    <?php echo (number_format($rem, 3) + 0) . $unitStr; ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endif; ?>
+
     <div class="footer">
         <p>Printed on <?php echo date('d M Y H:i'); ?> — Powered by Mekong POS</p>
     </div>

@@ -65,6 +65,43 @@
                     </div>
                 </section>
 
+                <?php if (!empty($sessionIngredients)): ?>
+                <section style="margin-bottom: 32px;">
+                    <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>
+                        <i class="fas fa-flask" style="margin-right: 4px;"></i> គ្រឿងផ្សំប្រើប្រាស់ & ស្តុកនៅសល់ / Ingredients Usage & Stock
+                    </h3>
+                    <div style="background: var(--pos-card); border: 1px solid var(--pos-border); border-radius: 16px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.03); border-bottom: 1.5px solid var(--pos-border);">
+                                    <th style="padding: 10px 14px; text-align: left; color: var(--pos-text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase;">គ្រឿងផ្សំ (Ingredient)</th>
+                                    <th style="padding: 10px 14px; text-align: center; color: var(--pos-text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase;">ប្រើអស់ (Used)</th>
+                                    <th style="padding: 10px 14px; text-align: right; color: var(--pos-text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase;">ស្តុកសល់ (Remaining)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($sessionIngredients as $ing): 
+                                    $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
+                                    $used = (float)$ing['qty_used'];
+                                    $rem  = (float)$ing['remaining_stock'];
+                                ?>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                                    <td style="padding: 10px 14px; font-weight: 800; color: var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></td>
+                                    <td style="padding: 10px 14px; text-align: center; font-weight: 900; color: <?php echo $used > 0 ? '#f59e0b' : 'var(--pos-text-muted)'; ?>;">
+                                        <?php echo $used > 0 ? ('-' . number_format($used, 3) + 0 . $unitStr) : '0'; ?>
+                                    </td>
+                                    <td style="padding: 10px 14px; text-align: right; font-weight: 900; color: <?php echo $rem > 10 ? '#10b981' : ($rem > 0 ? '#f59e0b' : '#ef4444'); ?>;">
+                                        <?php echo number_format($rem, 3) + 0 . $unitStr; ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <?php endif; ?>
+
                 <section style="margin-bottom: 24px;">
                     <h3 style="font-size: 14px; font-weight: 900; color: var(--pos-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
                         <span style="width: 24px; height: 1.5px; background: var(--pos-primary);"></span>

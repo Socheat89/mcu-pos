@@ -341,18 +341,55 @@ class OrderController {
                     if ($quantity <= 0) continue;
 
                     if ($status === 'completed') {
-                        // Stock check: use store_stock if available
-                        if ($this->hasStoreStockTable($db) && $currentStoreId) {
-                            $storeRow = $db->fetchOne(
-                                "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
-                                [$currentStoreId, $item['product_id']]
-                            );
-                            $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                        if ($businessType === 'coffee') {
+                            // ── Coffee Mode: Check Recipe & Ingredient Stock ──────────
+                            $recipe = [];
+                            if ($sizeId) {
+                                $recipe = $db->fetchAll(
+                                    "SELECT pr.*, i.name as ingredient_name, i.unit
+                                     FROM product_recipes pr
+                                     JOIN ingredients i ON pr.ingredient_id = i.id
+                                     WHERE pr.product_id = ? AND pr.product_size_id = ? AND pr.tenant_id = ?",
+                                    [$item['product_id'], $sizeId, $tenantId]
+                                );
+                            }
+                            if (empty($recipe)) {
+                                $recipe = $db->fetchAll(
+                                    "SELECT pr.*, i.name as ingredient_name, i.unit
+                                     FROM product_recipes pr
+                                     JOIN ingredients i ON pr.ingredient_id = i.id
+                                     WHERE pr.product_id = ? AND pr.product_size_id IS NULL AND pr.tenant_id = ?",
+                                    [$item['product_id'], $tenantId]
+                                );
+                            }
+
+                            if (empty($recipe)) {
+                                throw new Exception('ផលិតផល "' . ($product['name'] ?? 'product') . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ (Please set up a recipe for this product).');
+                            }
+
+                            // Check availability of each ingredient in current store
+                            foreach ($recipe as $r) {
+                                $neededQty = (float)$r['quantity'] * $quantity;
+                                $availableQty = $this->getIngStoreQty($db, (int)$currentStoreId, (int)$r['ingredient_id'], $tenantId);
+                                if ($neededQty > $availableQty) {
+                                    $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
+                                    throw new Exception('គ្រឿងផ្សំមិនគ្រាន់គ្រាន់សម្រាប់លក់ឡើយ! / Insufficient ingredient "' . $r['ingredient_name'] . '" for ' . ($product['name'] ?? '') . ' (Required: ' . $neededQty . $unitStr . ', Available in store: ' . $availableQty . $unitStr . ').');
+                                }
+                            }
                         } else {
-                            $availableStock = (int)($product['stock_quantity'] ?? 0);
-                        }
-                        if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
-                            throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
+                            // ── Mart Mode: Check Product Stock ────────────────────────
+                            if ($this->hasStoreStockTable($db) && $currentStoreId) {
+                                $storeRow = $db->fetchOne(
+                                    "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
+                                    [$currentStoreId, $item['product_id']]
+                                );
+                                $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                            } else {
+                                $availableStock = (int)($product['stock_quantity'] ?? 0);
+                            }
+                            if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
+                                throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
+                            }
                         }
                     }
 
@@ -468,18 +505,55 @@ class OrderController {
                 if ($quantity <= 0) continue;
 
                 if ($status === 'completed') {
-                    // Stock check: use store_stock if available
-                    if ($this->hasStoreStockTable($db) && $currentStoreId) {
-                        $storeRow = $db->fetchOne(
-                            "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
-                            [$currentStoreId, $item['product_id']]
-                        );
-                        $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                    if ($businessType === 'coffee') {
+                        // ── Coffee Mode: Check Recipe & Ingredient Stock ──────────
+                        $recipe = [];
+                        if ($sizeId) {
+                            $recipe = $db->fetchAll(
+                                "SELECT pr.*, i.name as ingredient_name, i.unit
+                                 FROM product_recipes pr
+                                 JOIN ingredients i ON pr.ingredient_id = i.id
+                                 WHERE pr.product_id = ? AND pr.product_size_id = ? AND pr.tenant_id = ?",
+                                [$item['product_id'], $sizeId, $tenantId]
+                            );
+                        }
+                        if (empty($recipe)) {
+                            $recipe = $db->fetchAll(
+                                "SELECT pr.*, i.name as ingredient_name, i.unit
+                                 FROM product_recipes pr
+                                 JOIN ingredients i ON pr.ingredient_id = i.id
+                                 WHERE pr.product_id = ? AND pr.product_size_id IS NULL AND pr.tenant_id = ?",
+                                [$item['product_id'], $tenantId]
+                            );
+                        }
+
+                        if (empty($recipe)) {
+                            throw new Exception('ផលិតផល "' . ($product['name'] ?? 'product') . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ (Please set up a recipe for this product).');
+                        }
+
+                        // Check availability of each ingredient in current store
+                        foreach ($recipe as $r) {
+                            $neededQty = (float)$r['quantity'] * $quantity;
+                            $availableQty = $this->getIngStoreQty($db, (int)$currentStoreId, (int)$r['ingredient_id'], $tenantId);
+                            if ($neededQty > $availableQty) {
+                                $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
+                                throw new Exception('គ្រឿងផ្សំមិនគ្រាន់គ្រាន់សម្រាប់លក់ឡើយ! / Insufficient ingredient "' . $r['ingredient_name'] . '" for ' . ($product['name'] ?? '') . ' (Required: ' . $neededQty . $unitStr . ', Available in store: ' . $availableQty . $unitStr . ').');
+                            }
+                        }
                     } else {
-                        $availableStock = (int)($product['stock_quantity'] ?? 0);
-                    }
-                    if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
-                        throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
+                        // ── Mart Mode: Check Product Stock ────────────────────────
+                        if ($this->hasStoreStockTable($db) && $currentStoreId) {
+                            $storeRow = $db->fetchOne(
+                                "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
+                                [$currentStoreId, $item['product_id']]
+                            );
+                            $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                        } else {
+                            $availableStock = (int)($product['stock_quantity'] ?? 0);
+                        }
+                        if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
+                            throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
+                        }
                     }
                 }
 
