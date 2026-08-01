@@ -298,9 +298,14 @@ class OrderController {
         $tenantId = Tenant::getId();
 
         // Enforce active session check
-        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
         if (!$activeSession) {
             die('Order creation failed: No active POS session. Please open a session first.');
+        }
+
+        require_once __DIR__ . '/../../../core/classes/Store.php';
+        if (!empty($activeSession['store_id'])) {
+            Store::setCurrent((int)$activeSession['store_id'], $tenantId);
         }
 
         // Get current store for per-store stock deduction
@@ -681,25 +686,44 @@ class OrderController {
         $tenantId = Tenant::getId();
 
         require_once __DIR__ . '/../../../core/classes/Store.php';
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        if ($activeSession && !empty($activeSession['store_id'])) {
+            Store::setCurrent((int)$activeSession['store_id'], $tenantId);
+        }
+
+        $allStores = Store::getAll($tenantId);
+        $mainStoreId = null;
+        if (!empty($allStores)) {
+            $sortedStores = $allStores;
+            usort($sortedStores, function($a, $b) {
+                $aDef = !empty($a['is_default']) ? 1 : 0;
+                $bDef = !empty($b['is_default']) ? 1 : 0;
+                if ($aDef !== $bDef) return $bDef - $aDef;
+                return (int)$a['id'] - (int)$b['id'];
+            });
+            $mainStoreId = (int)$sortedStores[0]['id'];
+        }
+
         $businessType = Settings::get('business_type', $tenantId, 'coffee');
         $currentStore = Store::getCurrent($tenantId);
         $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
 
         $products  = Product::getAll();
 
-        $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId): float {
+        $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId, $mainStoreId): float {
             if ($storeId > 0) {
                 try {
                     $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
                     if ($r !== false && $r !== null) return (float)$r['quantity'];
                 } catch (\Throwable $e) {}
             }
-            try {
-                $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
-                return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
-            } catch (\Throwable $e) {
-                return 0.0;
+            if ($mainStoreId === null || $storeId === $mainStoreId) {
+                try {
+                    $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
+                    return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+                } catch (\Throwable $e) {}
             }
+            return 0.0;
         };
 
         foreach ($products as &$p) {

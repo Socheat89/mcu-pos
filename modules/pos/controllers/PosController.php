@@ -25,15 +25,18 @@ class PosController {
 
         $tenantId = Tenant::getId();
         $db = Database::getInstance();
-        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
         if (!$activeSession) {
             $prefix = mc_base_path();
             header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/open");
             exit;
         }
 
-
         require_once __DIR__ . '/../../../core/classes/Store.php';
+        if (!empty($activeSession['store_id'])) {
+            Store::setCurrent((int)$activeSession['store_id'], $tenantId);
+        }
+
         $businessType = Settings::get('business_type', $tenantId, 'coffee');
         $currentStore = Store::getCurrent($tenantId);
         $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
