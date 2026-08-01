@@ -112,16 +112,28 @@ class IngredientController {
 
             if ($data['name'] !== '' && $data['unit'] !== '') {
                 $ingredientId = Ingredient::create($data);
-                
-                // Add initial stock log
-                if ($data['stock_quantity'] > 0) {
+                $tenantId = Tenant::getId();
+
+                require_once __DIR__ . '/../../../core/classes/Store.php';
+                $defaultStore = Store::getDefault($tenantId) ?? Store::getCurrent($tenantId);
+                $storeId = $defaultStore ? (int)$defaultStore['id'] : null;
+
+                // Add initial stock log & seed default store only
+                if ($data['stock_quantity'] > 0 && $storeId) {
                     $db = Database::getInstance();
                     try {
+                        $db->query(
+                            "INSERT INTO ingredient_store_stock (tenant_id, store_id, ingredient_id, quantity)
+                             VALUES (?, ?, ?, ?)
+                             ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)",
+                            [$tenantId, $storeId, $ingredientId, $data['stock_quantity']]
+                        );
                         $db->insert('ingredient_stock_logs', [
-                            'tenant_id' => Tenant::getId(),
-                            'ingredient_id' => $ingredientId,
+                            'tenant_id'       => $tenantId,
+                            'store_id'        => $storeId,
+                            'ingredient_id'   => $ingredientId,
                             'change_quantity' => $data['stock_quantity'],
-                            'reason' => 'adjust'
+                            'reason'          => 'adjust'
                         ]);
                     } catch (\Throwable $e) {}
                 }
