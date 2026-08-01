@@ -37,6 +37,10 @@ class IngredientController {
         try {
             $db->fetchAll("SELECT 1 FROM ingredient_store_stock LIMIT 1");
             $hasIngStoreStock = true;
+        $hasLogStoreId = false;
+        try {
+            $db->fetchOne("SELECT store_id FROM ingredient_stock_logs LIMIT 1");
+            $hasLogStoreId = true;
         } catch (\Throwable $e) {}
 
         if ($selectedStoreId > 0 && $hasIngStoreStock) {
@@ -49,24 +53,40 @@ class IngredientController {
                  ORDER BY i.name ASC",
                 [$selectedStoreId, $tenantId]
             );
-            $logs = $db->fetchAll(
-                "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
-                 FROM ingredient_stock_logs isl 
-                 JOIN ingredients i ON isl.ingredient_id = i.id 
-                 LEFT JOIN orders o ON isl.order_id = o.id 
-                 LEFT JOIN stores s ON isl.store_id = s.id
-                 WHERE isl.tenant_id = ? AND isl.store_id = ?
-                 ORDER BY isl.created_at DESC LIMIT 100",
-                [$tenantId, $selectedStoreId]
-            );
         } else {
             $ingredients = Ingredient::getAll($tenantId);
+        }
+
+        if ($hasLogStoreId) {
+            if ($selectedStoreId > 0) {
+                $logs = $db->fetchAll(
+                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
+                     FROM ingredient_stock_logs isl 
+                     JOIN ingredients i ON isl.ingredient_id = i.id 
+                     LEFT JOIN orders o ON isl.order_id = o.id 
+                     LEFT JOIN stores s ON isl.store_id = s.id
+                     WHERE isl.tenant_id = ? AND isl.store_id = ?
+                     ORDER BY isl.created_at DESC LIMIT 100",
+                    [$tenantId, $selectedStoreId]
+                );
+            } else {
+                $logs = $db->fetchAll(
+                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
+                     FROM ingredient_stock_logs isl 
+                     JOIN ingredients i ON isl.ingredient_id = i.id 
+                     LEFT JOIN orders o ON isl.order_id = o.id 
+                     LEFT JOIN stores s ON isl.store_id = s.id
+                     WHERE isl.tenant_id = ? 
+                     ORDER BY isl.created_at DESC LIMIT 100",
+                    [$tenantId]
+                );
+            }
+        } else {
             $logs = $db->fetchAll(
-                "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
+                "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, '' as store_name
                  FROM ingredient_stock_logs isl 
                  JOIN ingredients i ON isl.ingredient_id = i.id 
                  LEFT JOIN orders o ON isl.order_id = o.id 
-                 LEFT JOIN stores s ON isl.store_id = s.id
                  WHERE isl.tenant_id = ? 
                  ORDER BY isl.created_at DESC LIMIT 100",
                 [$tenantId]
