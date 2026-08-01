@@ -68,10 +68,29 @@ $subdomain = Tenant::getCurrent()['subdomain'];
         <div class="pos-grid cols-3" style="align-items: start; gap: 24px;">
             <!-- Left Side: Ingredients List -->
             <div class="report-card" style="grid-column: span 2; padding: 24px;">
-                <h3 style="margin: 0 0 20px; font-size: 16px; font-weight: 800; color: var(--pos-text); display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-cubes" style="color: var(--pos-primary);"></i>
-                    ស្តុកគ្រឿងផ្សំ / Ingredient Stock levels
-                </h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--pos-text); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-cubes" style="color: var(--pos-primary);"></i>
+                        ស្តុកគ្រឿងផ្សំ / Ingredient Stock levels
+                        <span id="ingCountBadge" style="font-size: 12px; font-weight: 700; background: rgba(99,102,241,0.1); color: var(--pos-primary); padding: 2px 10px; border-radius: 20px;"><?php echo count($ingredients); ?></span>
+                    </h3>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <div style="position: relative;">
+                            <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--pos-text-muted); font-size: 12px;"></i>
+                            <input type="text" id="ingSearch" placeholder="ស្វែងរកគ្រឿងផ្សំ... / Search..." 
+                                style="padding: 7px 12px 7px 34px; border: 1.5px solid var(--pos-border); border-radius: 10px; font-size: 13px; font-weight: 600; outline: none; background: var(--pos-card); color: var(--pos-text); min-width: 190px;"
+                                onkeyup="filterIngredients()">
+                        </div>
+                        
+                        <select id="ingStatusFilter" onchange="filterIngredients()" 
+                            style="padding: 7px 12px; border: 1.5px solid var(--pos-border); border-radius: 10px; font-size: 13px; font-weight: 700; background: var(--pos-card); color: var(--pos-text); outline: none; cursor: pointer;">
+                            <option value="all">ទាំងអស់ / All Status</option>
+                            <option value="low">⚠️ ស្តុកតិច / Low Stock</option>
+                            <option value="ok">✅ គ្រប់គ្រាន់ / In Stock</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <div class="pos-table-container">
                     <table class="pos-table">
@@ -85,7 +104,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                 <th style="text-align: right;">សកម្មភាព / Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="ingTableBody">
                             <?php if (empty($ingredients)): ?>
                             <tr>
                                 <td colspan="6" style="text-align: center; padding: 48px; color: var(--pos-text-muted);">
@@ -95,8 +114,9 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             </tr>
                             <?php else: foreach ($ingredients as $ing): 
                                 $isLow = (float)$ing['stock_quantity'] <= (float)$ing['min_stock_alert'];
+                                $statusKey = $isLow ? 'low' : 'ok';
                             ?>
-                            <tr>
+                            <tr class="ing-row" data-name="<?php echo htmlspecialchars(mb_strtolower($ing['name'])); ?>" data-unit="<?php echo htmlspecialchars(mb_strtolower($ing['unit'])); ?>" data-status="<?php echo $statusKey; ?>">
                                 <td>
                                     <strong style="color: var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></strong>
                                 </td>
@@ -318,6 +338,31 @@ $subdomain = Tenant::getCurrent()['subdomain'];
             if (event.target === document.getElementById(id)) {
                 closeModal(id);
             }
+        }
+        function filterIngredients() {
+            const q = document.getElementById('ingSearch').value.toLowerCase().trim();
+            const st = document.getElementById('ingStatusFilter').value;
+            const rows = document.querySelectorAll('.ing-row');
+            let visibleCount = 0;
+
+            rows.forEach(tr => {
+                const name = tr.dataset.name || '';
+                const unit = tr.dataset.unit || '';
+                const status = tr.dataset.status || '';
+
+                const matchesSearch = !q || name.includes(q) || unit.includes(q);
+                const matchesStatus = (st === 'all') || (status === st);
+
+                if (matchesSearch && matchesStatus) {
+                    tr.style.display = '';
+                    visibleCount++;
+                } else {
+                    tr.style.display = 'none';
+                }
+            });
+
+            const badge = document.getElementById('ingCountBadge');
+            if (badge) badge.textContent = visibleCount;
         }
     </script>
 </body>
