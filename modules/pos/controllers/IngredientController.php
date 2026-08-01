@@ -45,7 +45,18 @@ class IngredientController {
             $mainStoreId = (int)$sortedStores[0]['id'];
         }
 
-        $selectedStoreId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
+        // Auto-detect active store from session / user store if not explicitly provided in URL
+        $activeSession = $db->fetchOne("SELECT store_id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        if ($activeSession && !empty($activeSession['store_id'])) {
+            Store::setCurrent((int)$activeSession['store_id'], $tenantId);
+        }
+        $currentStore = Store::getCurrent($tenantId);
+
+        if (isset($_GET['store_id'])) {
+            $selectedStoreId = (int)$_GET['store_id'];
+        } else {
+            $selectedStoreId = $currentStore ? (int)$currentStore['id'] : 0;
+        }
 
         $hasIngStoreStock = false;
         try {
