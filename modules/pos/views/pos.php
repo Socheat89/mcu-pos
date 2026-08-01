@@ -207,6 +207,110 @@ $dashboardUrl = $posBase . '/dashboard';
         }
     </script>
 
+    <!-- Pre-sale Recipe & Stock Validation Interceptor for POS Terminal Screen -->
+    <script>
+    (function() {
+        // Create custom alert modal
+        function showPosAlert(message) {
+            const existing = document.getElementById('pos-block-modal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'pos-block-modal';
+            modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:99999; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease-out; font-family:"Battambang","Sora",sans-serif;';
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:20px; width:90%; max-width:440px; box-shadow:0 25px 50px rgba(0,0,0,0.3); overflow:hidden; border:2px solid #fecaca; text-align:center; padding:28px 24px;">
+                    <div style="width:60px; height:60px; background:#fee2e2; color:#ef4444; border-radius:50%; display:grid; place-items:center; margin:0 auto 16px; font-size:28px; font-weight:bold;">⚠️</div>
+                    <h3 style="margin:0 0 10px; font-size:18px; font-weight:800; color:#991b1b;">មិនអាចបន្ថែមបានឡើយ! / Blocked Sale</h3>
+                    <p style="margin:0 0 24px; font-size:14px; color:#4b5563; font-weight:600; line-height:1.6;">${message}</p>
+                    <button onclick="document.getElementById('pos-block-modal').remove()" style="background:#ef4444; color:#fff; border:none; padding:12px 28px; border-radius:12px; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 4px 12px rgba(239,68,68,0.3); width:100%;">
+                        យល់ព្រម / OK
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Helper to find unsellable product from text
+        function getUnsellableProductFromElement(el) {
+            if (!window.PRODUCTS || !Array.isArray(window.PRODUCTS)) return null;
+            
+            // Traverse up to find card container
+            let curr = el;
+            let depth = 0;
+            while (curr && curr !== document.body && depth < 8) {
+                const text = (curr.innerText || '').trim();
+                if (text) {
+                    for (const p of window.PRODUCTS) {
+                        if (p.can_sell === false && p.name) {
+                            if (text.includes(p.name)) {
+                                return p;
+                            }
+                        }
+                    }
+                }
+                curr = curr.parentElement;
+                depth++;
+            }
+            return null;
+        }
+
+        // Intercept clicks in capturing phase before React handles synthetic event
+        document.addEventListener('click', function(e) {
+            const unsellable = getUnsellableProductFromElement(e.target);
+            if (unsellable) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                showPosAlert(unsellable.stock_error || ('ផលិតផល "' + unsellable.name + '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ឬខ្វះគ្រឿងផ្សំក្នុង Store!'));
+                return false;
+            }
+        }, true);
+
+        // Auto-tag unsellable products visually on the product grid
+        function highlightUnsellableCards() {
+            if (!window.PRODUCTS || !Array.isArray(window.PRODUCTS)) return;
+            const unsellableMap = {};
+            window.PRODUCTS.forEach(p => {
+                if (p.can_sell === false && p.name) {
+                    unsellableMap[p.name.toLowerCase().trim()] = p;
+                }
+            });
+
+            const root = document.getElementById('root');
+            if (!root) return;
+            const allElements = root.querySelectorAll('div, button');
+            allElements.forEach(el => {
+                if (el.children.length <= 4 && el.innerText) {
+                    const textLower = el.innerText.toLowerCase().trim();
+                    for (const [pName, pObj] of Object.entries(unsellableMap)) {
+                        if (textLower.includes(pName) && !el.dataset.unsellableTagged) {
+                            el.dataset.unsellableTagged = "true";
+                            el.style.position = 'relative';
+                            el.style.opacity = '0.55';
+                            el.style.filter = 'grayscale(0.5)';
+                            el.title = pObj.stock_error;
+                            
+                            const badge = document.createElement('span');
+                            badge.style.cssText = 'position:absolute; top:6px; right:6px; background:#ef4444; color:#fff; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; z-index:10; pointer-events:none; box-shadow:0 2px 6px rgba(239,68,68,0.4);';
+                            badge.innerText = '⚠️ គ្មាន Recipe';
+                            el.appendChild(badge);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Run highlight on DOM changes
+        const observer = new MutationObserver(highlightUnsellableCards);
+        const rootNode = document.getElementById('root');
+        if (rootNode) {
+            observer.observe(rootNode, { childList: true, subtree: true });
+        }
+        setTimeout(highlightUnsellableCards, 800);
+        setTimeout(highlightUnsellableCards, 2000);
+    })();
+    </script>
+
     <?php include __DIR__ . '/gps_tracker.php'; ?>
 
 </body>
