@@ -26,11 +26,11 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
     border-radius: 20px;
     border: 1.5px solid #e2e8f0;
     box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-    overflow: visible; /* IMPORTANT: let dropdown escape */
+    overflow: visible;
     margin-bottom: 24px;
 }
 
-/* ── Document top bar: breadcrumb + status + actions ─────────────────── */
+/* ── Document top bar ─────────────────────────────────────────────────── */
 .doc-topbar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 28px;
@@ -76,7 +76,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 /* ── Document body ─────────────────────────────────────────────────────── */
 .doc-body { padding: 28px 28px 0; }
 
-/* ── Store selector row ────────────────────────────────────────────────── */
+/* Store row */
 .store-row {
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: end;
     gap: 16px; margin-bottom: 24px;
@@ -102,7 +102,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .arrow-mid i { font-size: 22px; color: var(--pos-primary); }
 .arrow-mid span { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
 
-/* ── Meta row (ref / date / note) ─────────────────────────────────────── */
+/* Meta row */
 .meta-row {
     display: grid; grid-template-columns: 1.5fr 1fr 1.5fr;
     gap: 16px; margin-bottom: 0;
@@ -120,13 +120,12 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .meta-field input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
 .meta-field input::placeholder { color: #cbd5e1; font-weight: 500; }
 
-/* ── Divider ───────────────────────────────────────────────────────────── */
 .doc-divider {
     margin: 24px 0 0; height: 1.5px;
     background: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 40%, #f1f5f9 100%);
 }
 
-/* ── Lines section ─────────────────────────────────────────────────────── */
+/* Lines section */
 .lines-section { padding: 0 28px 20px; }
 .lines-head {
     display: flex; align-items: center; justify-content: space-between;
@@ -141,7 +140,6 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
     background: #f1f5f9; padding: 3px 10px; border-radius: 20px;
 }
 
-/* ── Lines table ───────────────────────────────────────────────────────── */
 .lines-tbl { width: 100%; border-collapse: collapse; }
 .lines-tbl thead tr { background: #f8fafc; }
 .lines-tbl th {
@@ -156,7 +154,6 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .lines-tbl tbody tr:last-child td { border-bottom: none; }
 .lines-tbl tbody tr:hover { background: rgba(99,102,241,.018); }
 
-/* ── Product search ────────────────────────────────────────────────────── */
 .psearch-wrap { position: relative; }
 .psearch-inp {
     width: 100%; min-width: 220px;
@@ -168,9 +165,8 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .psearch-inp::placeholder { color: #cbd5e1; font-weight: 500; }
 .psearch-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #cbd5e1; font-size: 12px; pointer-events: none; }
 
-/* Dropdown — positioned with JS to escape table overflow */
 .pdrop {
-    position: fixed; /* use fixed so it escapes any overflow:hidden parent */
+    position: fixed;
     z-index: 9998; background: #fff;
     border: 1.5px solid #e2e8f0; border-radius: 14px;
     max-height: 260px; overflow-y: auto;
@@ -202,21 +198,17 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .s-low { background: rgba(245,158,11,.1); color: #f59e0b; }
 .s-nil { background: rgba(239,68,68,.1);  color: #ef4444; }
 
-/* ── Available badge ───────────────────────────────────────────────────── */
 .avail {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 5px 12px; border-radius: 9px; font-size: 13px; font-weight: 800;
 }
-
-/* ── Qty input ─────────────────────────────────────────────────────────── */
 .qty-inp {
-    width: 76px; padding: 7px 10px; border: 1.5px solid #e2e8f0;
+    width: 86px; padding: 7px 10px; border: 1.5px solid #e2e8f0;
     border-radius: 9px; font-size: 15px; font-weight: 800; text-align: center;
     outline: none; transition: border-color .2s; color: #1e293b;
 }
 .qty-inp:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
 
-/* ── Remove btn ────────────────────────────────────────────────────────── */
 .rm-btn {
     width: 28px; height: 28px; border-radius: 50%;
     border: 1.5px solid rgba(239,68,68,.25); background: rgba(239,68,68,.07);
@@ -225,7 +217,6 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 }
 .rm-btn:hover { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); }
 
-/* ── Add line button ───────────────────────────────────────────────────── */
 .add-line {
     width: 100%; padding: 11px; border: 1.5px dashed #e2e8f0;
     border-radius: 10px; background: transparent; cursor: pointer;
@@ -235,11 +226,30 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 }
 .add-line:hover { border-color: var(--pos-primary); color: var(--pos-primary); background: rgba(99,102,241,.04); }
 
-/* ── Bottom actions ────────────────────────────────────────────────────── */
 .doc-footer {
     display: flex; justify-content: flex-end; gap: 10px; align-items: center;
     padding: 18px 28px; border-top: 1.5px solid #f1f5f9;
     background: #fafbfc; border-radius: 0 0 20px 20px;
+}
+
+/* ── Discard Modal ─────────────────────────────────────────────────────── */
+.custom-modal {
+    position: fixed; inset: 0; background: rgba(15,23,42,.55);
+    backdrop-filter: blur(6px); z-index: 9999;
+    display: none; align-items: center; justify-content: center;
+}
+.custom-modal.open { display: flex; }
+.custom-modal-card {
+    background: #fff; border-radius: 24px; padding: 36px 32px; text-align: center;
+    max-width: 400px; width: 90%;
+    box-shadow: 0 30px 60px rgba(0,0,0,.2);
+    animation: popIn .25s ease-out;
+}
+.discard-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(239,68,68,.1); border: 2px solid #ef4444;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; font-size: 26px; color: #ef4444;
 }
 
 /* ── Success overlay ───────────────────────────────────────────────────── */
@@ -251,7 +261,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 .success-overlay.open { display: flex; }
 .success-card {
     background: #fff; border-radius: 24px; padding: 44px 40px; text-align: center;
-    max-width: 440px; width: 90%;
+    max-width: 460px; width: 90%;
     box-shadow: 0 40px 80px rgba(0,0,0,.22);
     animation: popIn .3s cubic-bezier(.175,.885,.32,1.275);
 }
@@ -312,16 +322,43 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
     padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;
 }
 
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media(max-width:640px){
-    .doc-topbar, .doc-body, .lines-section, .doc-footer { padding-left: 16px; padding-right: 16px; }
-    .store-row { padding: 14px 16px; gap: 12px; }
-    .lines-tbl th:nth-child(3), .lines-tbl td:nth-child(3) { display: none; }
+/* ── Print area styling ───────────────────────────────────────────────── */
+#printTransferArea { display: none; }
+@media print {
+    body * { visibility: hidden !important; }
+    #printTransferArea, #printTransferArea * { visibility: visible !important; }
+    #printTransferArea {
+        position: absolute; left: 0; top: 0; width: 100%; display: block !important;
+        background: #fff; padding: 20px; font-family: 'Space Grotesk','Battambang',sans-serif;
+    }
+    .print-voucher {
+        border: 2px solid #000; padding: 24px; border-radius: 8px; color: #000;
+    }
+    .print-voucher-header {
+        text-align: center; border-bottom: 2px dashed #000; padding-bottom: 14px; margin-bottom: 16px;
+    }
+    .print-voucher-header h2 { margin: 0 0 4px; font-size: 22px; font-weight: 900; text-transform: uppercase; }
+    .print-voucher-header h3 { margin: 0 0 6px; font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+    .print-meta-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; margin-bottom: 18px;
+        border-bottom: 1px solid #000; padding-bottom: 12px;
+    }
+    .print-table {
+        width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 13px;
+    }
+    .print-table th, .print-table td {
+        border: 1px solid #000; padding: 8px 12px; text-align: left;
+    }
+    .print-table th { background: #f0f0f0; font-weight: 800; }
+    .print-signatures {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center; margin-top: 40px; font-size: 12px; font-weight: 700;
+    }
+    .print-sig-line { margin-top: 50px; border-top: 1px solid #000; padding-top: 6px; }
 }
 </style>
 </head>
 <body class="pos-app">
-<?php $activeNav = 'stock_report'; include __DIR__ . '/partials/navbar.php'; ?>
+<?php $activeNav = 'stock_transfer'; include __DIR__ . '/partials/navbar.php'; ?>
 
 <div class="fade-in">
 
@@ -475,20 +512,22 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
         <table class="hist-tbl">
             <thead>
                 <tr>
-                    <th>Product</th>
+                    <th>Item / Name</th>
                     <th>Store</th>
                     <th style="text-align:center;">Type</th>
                     <th style="text-align:center;">Qty</th>
                     <th>Reference / Note</th>
                     <th>Date</th>
+                    <th style="text-align:center;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($transferHistory as $h):
                     $isIn = ($h['reason'] === 'transfer_in');
+                    $qtyDisplay = ($isIn ? '+' : '−') . abs($h['change_quantity']) . ($h['unit'] ? ' ' . $h['unit'] : '');
                 ?>
                 <tr>
-                    <td style="font-weight:800;"><?php echo htmlspecialchars($h['product_name'] ?? 'N/A'); ?></td>
+                    <td style="font-weight:800;"><?php echo htmlspecialchars($h['item_name'] ?? 'N/A'); ?></td>
                     <td>
                         <?php if (!empty($h['store_name'])): ?>
                         <span class="store-tag"><?php echo htmlspecialchars($h['store_name']); ?></span>
@@ -501,13 +540,20 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
                         </span>
                     </td>
                     <td style="text-align:center; font-weight:900; color:<?php echo $isIn ? '#10b981' : '#f59e0b'; ?>; font-size:14px;">
-                        <?php echo ($isIn ? '+' : '−') . number_format(abs($h['change_quantity'])); ?>
+                        <?php echo $qtyDisplay; ?>
                     </td>
                     <td style="color:#94a3b8; font-size:12px; font-weight:600; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         <?php echo htmlspecialchars($h['note'] ?? '—'); ?>
                     </td>
                     <td style="color:#94a3b8; font-size:12px; font-weight:600; white-space:nowrap;">
                         <?php echo date('d/m/Y H:i', strtotime($h['created_at'])); ?>
+                    </td>
+                    <td style="text-align:center;">
+                        <button class="btn-act btn-discard" style="padding:4px 10px; font-size:11px;"
+                            onclick="printHistoryRecord('<?php echo htmlspecialchars(addslashes($h['item_name'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($h['store_name'] ?? '')); ?>', '<?php echo $isIn ? 'Transfer In' : 'Transfer Out'; ?>', '<?php echo htmlspecialchars(addslashes($qtyDisplay)); ?>', '<?php echo htmlspecialchars(addslashes($h['note'] ?? '')); ?>', '<?php echo date('d/m/Y H:i', strtotime($h['created_at'])); ?>')"
+                            title="Print Voucher">
+                            <i class="fas fa-print"></i> Print
+                        </button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -521,6 +567,26 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 
 
 <!-- ════════════════════════════════════════════════════════════════════════
+     Discard Modal
+═════════════════════════════════════════════════════════════════════════ -->
+<div class="custom-modal" id="discardModal">
+    <div class="custom-modal-card">
+        <div class="discard-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        <h3 style="margin:0 0 6px; font-size:18px; font-weight:900; color:#1e293b;">Discard Transfer?</h3>
+        <p style="margin:0 0 20px; color:#64748b; font-size:13px; font-weight:600;">
+            Are you sure you want to discard this transfer? All unsaved lines will be cleared.
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button onclick="closeDiscardModal()" class="btn-act btn-discard">Cancel</button>
+            <button onclick="confirmDiscardTransfer()" class="btn-act" style="background:#ef4444; color:#fff; border:none; box-shadow: 0 4px 14px rgba(239,68,68,0.3);">
+                <i class="fas fa-trash"></i> Yes, Discard
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
      Success Overlay
 ═════════════════════════════════════════════════════════════════════════ -->
 <div class="success-overlay" id="successOverlay">
@@ -531,6 +597,9 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
         <div class="ref-pill" id="successRef">—</div>
         <p id="successLines" style="margin:0 0 24px; color:#64748b; font-size:13px; font-weight:700;"></p>
         <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button onclick="printTransferReceipt()" class="btn-act btn-discard" style="font-size:13px; background:#f1f5f9; color:#1e293b;">
+                <i class="fas fa-print"></i> Print Voucher
+            </button>
             <button onclick="newTransfer()" class="btn-act btn-validate" style="font-size:13px;">
                 <i class="fas fa-plus"></i> New Transfer
             </button>
@@ -538,6 +607,51 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
                class="btn-act btn-discard" style="font-size:13px; text-decoration:none;">
                 <i class="fas fa-warehouse"></i> Stock Report
             </a>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     Printable Area for Transfer Voucher
+═════════════════════════════════════════════════════════════════════════ -->
+<div id="printTransferArea">
+    <div class="print-voucher">
+        <div class="print-voucher-header">
+            <h2><?php echo htmlspecialchars($tenantName ?? 'POS'); ?></h2>
+            <h3>STOCK TRANSFER VOUCHER</h3>
+            <p id="printVoucherDate" style="margin:0; font-size:12px;">Date: <?php echo date('d/m/Y H:i'); ?></p>
+        </div>
+        <div class="print-meta-grid">
+            <div><strong>Reference:</strong> <span id="printVoucherRef">—</span></div>
+            <div><strong>Type:</strong> <span id="printVoucherType">Internal Transfer</span></div>
+            <div><strong>From Store:</strong> <span id="printVoucherFrom">—</span></div>
+            <div><strong>To Store:</strong> <span id="printVoucherTo">—</span></div>
+            <div style="grid-column: span 2;"><strong>Note:</strong> <span id="printVoucherNote">—</span></div>
+        </div>
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Item / Description</th>
+                    <th style="text-align:center; width:140px;">Transferred Qty</th>
+                </tr>
+            </thead>
+            <tbody id="printVoucherBody"></tbody>
+        </table>
+        <div class="print-signatures">
+            <div>
+                <div>Issued By</div>
+                <div class="print-sig-line">( Handover Staff )</div>
+            </div>
+            <div>
+                <div>Received By</div>
+                <div class="print-sig-line">( Receiving Staff )</div>
+            </div>
+            <div>
+                <div>Approved By</div>
+                <div class="print-sig-line">( Manager / Admin )</div>
+            </div>
         </div>
     </div>
 </div>
@@ -550,12 +664,20 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
      JavaScript
 ═════════════════════════════════════════════════════════════════════════ -->
 <script>
-const API_URL    = '<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>';
-const IMG_BASE   = '<?php echo mc_base_path(); ?>/uploads/products/';
-const IS_COFFEE  = <?php echo $__isCoffee ? 'true' : 'false'; ?>;
-const ITEM_LABEL = '<?php echo $__itemLabel; ?>';
-let lineCounter  = 0;
-let openDropId   = null;
+const API_URL      = '<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>';
+const IMG_BASE     = '<?php echo mc_base_path(); ?>/uploads/products/';
+const IS_COFFEE    = <?php echo $__isCoffee ? 'true' : 'false'; ?>;
+const ITEM_LABEL   = '<?php echo $__itemLabel; ?>';
+const TENANT_NAME  = <?php echo json_encode($tenantName ?? 'POS'); ?>;
+const STORES_MAP   = <?php
+    $map = [];
+    foreach ($allStores as $s) { $map[$s['id']] = '[' . ($s['code'] ?? '--') . '] ' . $s['name']; }
+    echo json_encode($map);
+?>;
+
+let lineCounter      = 0;
+let openDropId       = null;
+let lastTransferData = null;
 
 // ── Init ─────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -570,7 +692,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // close on Escape
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (openDropId !== null) closeDrop(openDropId); } });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            if (openDropId !== null) closeDrop(openDropId);
+            closeDiscardModal();
+        }
+    });
 });
 
 function gFrom() { return parseInt(document.getElementById('fromStoreSelect').value); }
@@ -599,6 +726,7 @@ function addLine() {
     const tr = document.createElement('tr');
     tr.id = 'ln-' + id;
     tr.dataset.itemId = '';
+    tr.dataset.itemName = '';
     tr.dataset.avail  = '0';
     tr.dataset.unit   = '';
     tr.innerHTML = `
@@ -650,6 +778,7 @@ function refreshLines() {
     document.querySelectorAll('#linesBody tr').forEach(tr => {
         const id = tr.id.replace('ln-','');
         tr.dataset.itemId = '';
+        tr.dataset.itemName = '';
         tr.dataset.avail  = '0';
         tr.dataset.unit   = '';
         const inp = document.getElementById('pinp-'+id);
@@ -661,7 +790,7 @@ function refreshLines() {
     });
 }
 
-// ── Product search with fixed-positioned dropdown ─────────────────────────
+// ── Search & Select ───────────────────────────────────────────────────────
 let timers = {};
 function doSearch(id, q) {
     clearTimeout(timers[id]);
@@ -678,7 +807,6 @@ function showDrop(id, items) {
     const wrap = document.getElementById('pwrap-'+id);
     if (!drop || !wrap) return;
 
-    // Position dropdown using getBoundingClientRect (fixed positioning)
     const rect = wrap.getBoundingClientRect();
     drop.style.top    = (rect.bottom + 4) + 'px';
     drop.style.left   = rect.left + 'px';
@@ -699,7 +827,6 @@ function showDrop(id, items) {
         const div = document.createElement('div');
         div.className = 'pdrop-item';
         if (IS_COFFEE) {
-            // Ingredient row
             div.innerHTML = `
                 <div class="pdrop-thumb"><i class="fas fa-flask"></i></div>
                 <div style="flex:1;min-width:0;">
@@ -709,7 +836,6 @@ function showDrop(id, items) {
                 <span class="pdrop-stock ${cls}">${av} ${esc(unit)}</span>
             `;
         } else {
-            // Product row
             div.innerHTML = `
                 <div class="pdrop-thumb">
                     ${p.image ? `<img src="${IMG_BASE}${esc(p.image)}">` : '<i class="fas fa-box"></i>'}
@@ -738,9 +864,10 @@ function pickItem(id, p) {
     const av   = parseFloat(p.available ?? 0);
     const unit = p.unit || 'units';
     const tr   = document.getElementById('ln-'+id);
-    tr.dataset.itemId = p.id;
-    tr.dataset.avail  = av;
-    tr.dataset.unit   = unit;
+    tr.dataset.itemId   = p.id;
+    tr.dataset.itemName = p.name;
+    tr.dataset.avail    = av;
+    tr.dataset.unit     = unit;
 
     const inp = document.getElementById('pinp-'+id);
     if (inp) inp.value = p.name;
@@ -778,22 +905,23 @@ function clampQty(id) {
     inp.value = IS_COFFEE ? parseFloat(v.toFixed(3)) : Math.round(v);
 }
 
-// ── Validate ──────────────────────────────────────────────────────────────
+// ── Validate Transfer ──────────────────────────────────────────────────────
 function validateTransfer() {
     const fromId = gFrom(), toId = gTo();
     if (fromId === toId) { toast('Source and destination must be different.','err'); return; }
 
     const lines = []; let err = false;
     document.querySelectorAll('#linesBody tr').forEach(tr => {
-        const id   = tr.id.replace('ln-','');
+        const id     = tr.id.replace('ln-','');
         const itemId = tr.dataset.itemId;
         if (!itemId) return;
-        const qty  = parseFloat(document.getElementById('pqty-'+id)?.value)||0;
-        const av   = parseFloat(tr.dataset.avail??0);
-        const unit = tr.dataset.unit || 'units';
+        const itemName = tr.dataset.itemName || document.getElementById('pinp-'+id)?.value || '';
+        const qty      = parseFloat(document.getElementById('pqty-'+id)?.value)||0;
+        const av       = parseFloat(tr.dataset.avail??0);
+        const unit     = tr.dataset.unit || 'units';
         if (qty <= 0)  { toast('Quantity must be > 0.','err'); err=true; return; }
         if (qty > av)  { toast(`Not enough stock (available: ${av} ${unit}).`,'err'); err=true; return; }
-        lines.push({item_id: itemId, qty});
+        lines.push({item_id: itemId, item_name: itemName, qty, unit});
     });
     if (err) return;
     if (!lines.length) { toast('Add at least one ' + ITEM_LABEL.toLowerCase() + ' line.','err'); return; }
@@ -801,20 +929,32 @@ function validateTransfer() {
     const btns = [document.getElementById('validateBtn'), document.getElementById('validateBtnB')];
     btns.forEach(b=>{ if(b){b.disabled=true; b.innerHTML='<i class="fas fa-spinner fa-spin"></i> Validating…';} });
 
+    const ref = document.getElementById('refInput').value.trim();
+    const note = document.getElementById('noteInput').value.trim();
+
     const fd = new FormData();
     fd.append('ajax_validate_transfer','1');
     fd.append('from_store_id', fromId);
     fd.append('to_store_id',   toId);
-    fd.append('reference',     document.getElementById('refInput').value.trim());
-    fd.append('note',          document.getElementById('noteInput').value.trim());
+    fd.append('reference',     ref);
+    fd.append('note',          note);
     lines.forEach((l,i)=>{ fd.append(`lines[${i}][item_id]`,l.item_id); fd.append(`lines[${i}][qty]`,l.qty); });
 
     fetch(API_URL,{method:'POST',body:fd})
         .then(r=>r.json())
         .then(data=>{
             if (data.success) {
+                lastTransferData = {
+                    ref:       data.reference,
+                    fromName:  STORES_MAP[fromId] || 'Source Store',
+                    toName:    STORES_MAP[toId]   || 'Destination Store',
+                    date:      new Date().toLocaleString(),
+                    note:      note || 'Internal Stock Transfer',
+                    lines:     lines
+                };
+
                 document.getElementById('successRef').textContent   = data.reference;
-                document.getElementById('successLines').textContent = data.lines + ' product line(s) transferred';
+                document.getElementById('successLines').textContent = data.lines + ' line(s) transferred';
                 document.getElementById('statusBadge').className    = 'doc-status status-done';
                 document.getElementById('statusBadge').innerHTML    = '<i class="fas fa-circle" style="font-size:7px;"></i> Done';
                 document.getElementById('successOverlay').classList.add('open');
@@ -829,8 +969,15 @@ function validateTransfer() {
         });
 }
 
+// ── Discard Modal ─────────────────────────────────────────────────────────
 function discardTransfer() {
-    if (!confirm('Discard and clear all lines?')) return;
+    document.getElementById('discardModal').classList.add('open');
+}
+function closeDiscardModal() {
+    document.getElementById('discardModal').classList.remove('open');
+}
+function confirmDiscardTransfer() {
+    closeDiscardModal();
     document.getElementById('linesBody').innerHTML = '';
     lineCounter = 0; countLines();
     document.getElementById('refInput').value='';
@@ -838,10 +985,59 @@ function discardTransfer() {
     document.getElementById('statusBadge').className='doc-status status-draft';
     document.getElementById('statusBadge').innerHTML='<i class="fas fa-circle" style="font-size:7px;"></i> Draft';
     addLine();
+    toast('Transfer form reset','ok');
 }
+
 function newTransfer() {
     document.getElementById('successOverlay').classList.remove('open');
     setTimeout(()=>location.reload(),150);
+}
+
+// ── Print Transfer Voucher ────────────────────────────────────────────────
+function printTransferReceipt() {
+    if (!lastTransferData) return;
+    fillAndPrintVoucher(
+        lastTransferData.ref,
+        lastTransferData.fromName,
+        lastTransferData.toName,
+        lastTransferData.note,
+        lastTransferData.date,
+        lastTransferData.lines
+    );
+}
+
+function printHistoryRecord(itemName, storeName, type, qtyDisplay, note, date) {
+    fillAndPrintVoucher(
+        'TRF-HIST',
+        type === 'Transfer In' ? 'External / Source' : storeName,
+        type === 'Transfer In' ? storeName : 'Destination Store',
+        note,
+        date,
+        [{ item_name: itemName, qtyDisplay: qtyDisplay }]
+    );
+}
+
+function fillAndPrintVoucher(ref, fromName, toName, note, date, lines) {
+    document.getElementById('printVoucherRef').textContent  = ref;
+    document.getElementById('printVoucherFrom').textContent = fromName;
+    document.getElementById('printVoucherTo').textContent   = toName;
+    document.getElementById('printVoucherNote').textContent = note || '—';
+    document.getElementById('printVoucherDate').textContent = 'Date: ' + date;
+
+    const tbody = document.getElementById('printVoucherBody');
+    tbody.innerHTML = '';
+    lines.forEach((l, i) => {
+        const qtyTxt = l.qtyDisplay ? l.qtyDisplay : (l.qty + ' ' + (l.unit || ''));
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center;">${i+1}</td>
+            <td style="font-weight:700;">${esc(l.item_name || 'Item')}</td>
+            <td style="text-align:center; font-weight:800;">${esc(qtyTxt)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    window.print();
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────

@@ -154,7 +154,7 @@ $navLabel = function (string $key): string {
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
                 <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): 
-                    $isInventoryActive = in_array($activeNav, ['products', 'stock_report', 'ingredients']);
+                    $isInventoryActive = in_array($activeNav, ['products', 'stock_report', 'ingredients', 'stock_transfer']);
                     $__bizType = 'coffee';
                     if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
                         $__bizType = Settings::get('business_type', Tenant::getId(), 'coffee');
@@ -172,6 +172,9 @@ $navLabel = function (string $key): string {
                     </a>
                     <a class="pos-side-sublink <?php echo $activeClass('stock_report'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-report')); ?>">
                         <i class="fas fa-warehouse"></i><span>Stock In-Out</span>
+                    </a>
+                    <a class="pos-side-sublink <?php echo $activeClass('stock_transfer'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>">
+                        <i class="fas fa-arrows-left-right"></i><span>Stock Transfer</span>
                     </a>
                     <?php if ($__bizType !== 'mart'): ?>
                     <a class="pos-side-sublink <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
