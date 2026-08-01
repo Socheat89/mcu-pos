@@ -153,7 +153,7 @@ $navLabel = function (string $key): string {
             ?>
                 <div class="pos-nav-header"><?php echo __('management'); ?></div>
                 
-                <?php if ($hasFeature('pos', 'inventory') && $isTenantAdmin): 
+                <?php if ($hasFeature('pos', 'inventory')): 
                     $isInventoryActive = in_array($activeNav, ['products', 'stock_report', 'ingredients', 'stock_transfer']);
                     $__bizType = 'coffee';
                     if (class_exists('Settings') && class_exists('Tenant') && Tenant::getId()) {
@@ -167,6 +167,7 @@ $navLabel = function (string $key): string {
                     <i class="fas fa-chevron-right chevron" style="margin-left:auto; font-size:10px; opacity:0.6;"></i>
                 </div>
                 <div class="pos-side-submenu" id="inv-submenu" style="<?php echo $isInventoryActive ? 'display:flex;' : 'display:none;'; ?>">
+                    <?php if ($isTenantAdmin): ?>
                     <a class="pos-side-sublink <?php echo $activeClass('products'); ?>" href="<?php echo htmlspecialchars($posUrl('products')); ?>">
                         <i class="fas fa-box"></i><span><?php echo __('products'); ?></span>
                     </a>
@@ -176,6 +177,7 @@ $navLabel = function (string $key): string {
                     <a class="pos-side-sublink <?php echo $activeClass('stock_transfer'); ?>" href="<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>">
                         <i class="fas fa-arrows-left-right"></i><span>Stock Transfer</span>
                     </a>
+                    <?php endif; ?>
                     <?php if ($__bizType !== 'mart'): ?>
                     <a class="pos-side-sublink <?php echo $activeClass('ingredients'); ?>" href="<?php echo htmlspecialchars($posUrl('ingredients')); ?>">
                         <i class="fas fa-carrot"></i><span><?php echo $navLabel('ingredients'); ?></span>

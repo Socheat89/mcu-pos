@@ -22,9 +22,10 @@ class IngredientController {
             die('Upgrade to POS Starter or higher to manage inventory.');
         }
 
-        if (!Auth::isTenantAdmin()) {
+        if (!Auth::isTenantAdmin() && !Auth::hasPermission('pos', 'read')) {
             die('No permission to view ingredients');
         }
+        $isAdmin = Auth::isTenantAdmin();
 
         require_once __DIR__ . '/../../../core/classes/Store.php';
         $db = Database::getInstance();
@@ -160,6 +161,10 @@ class IngredientController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+        if (!Auth::isTenantAdmin()) {
+            die('No permission to modify ingredients');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'name' => trim($_POST['name']),
@@ -239,6 +244,10 @@ class IngredientController {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+        if (!Auth::isTenantAdmin()) {
+            die('No permission to modify ingredients');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'name' => trim($_POST['name']),
@@ -257,6 +266,10 @@ class IngredientController {
     public function topup($id) {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
+
+        if (!Auth::isTenantAdmin()) {
+            die('No permission to modify ingredients');
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $qty = (float)($_POST['quantity'] ?? 0);

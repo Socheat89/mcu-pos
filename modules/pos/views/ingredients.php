@@ -48,6 +48,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
 <body class="pos-app">
     <?php $activeNav = 'ingredients'; include __DIR__ . '/partials/navbar.php'; ?>
     
+    <?php $isAdmin = class_exists('Auth') && Auth::isTenantAdmin(); ?>
     <div class="fade-in">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div>
@@ -59,10 +60,16 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                 </p>
             </div>
             
+            <?php if ($isAdmin): ?>
             <button class="btn" onclick="openAddModal()" style="display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(99,102,241,0.25);">
                 <i class="fas fa-plus"></i>
                 <span>បន្ថែមគ្រឿងផ្សំ / Add Ingredient</span>
             </button>
+            <?php else: ?>
+            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(99,102,241,0.08); color: var(--pos-primary); border-radius: 20px; font-weight: 700; font-size: 13px;">
+                <i class="fas fa-eye"></i> មើលព័ត៌មានគ្រឿងផ្សំ (Read-only)
+            </span>
+            <?php endif; ?>
         </div>
 
         <div class="pos-grid cols-3" style="align-items: start; gap: 24px;">
@@ -115,13 +122,15 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                 <th>ឯកតា / Unit</th>
                                 <th>ព្រមានស្តុកតិច / Alert Qty</th>
                                 <th>ស្ថានភាព / Status</th>
+                                <?php if ($isAdmin): ?>
                                 <th style="text-align: right;">សកម្មភាព / Actions</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody id="ingTableBody">
                             <?php if (empty($ingredients)): ?>
                             <tr>
-                                <td colspan="6" style="text-align: center; padding: 48px; color: var(--pos-text-muted);">
+                                <td colspan="<?php echo $isAdmin ? 6 : 5; ?>" style="text-align: center; padding: 48px; color: var(--pos-text-muted);">
                                     <i class="fas fa-box-open" style="font-size: 32px; opacity: 0.3; display: block; margin-bottom: 8px;"></i>
                                     មិនទាន់មានគ្រឿងផ្សំនៅឡើយទេ / No ingredients added yet.
                                 </td>
@@ -158,6 +167,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                     </span>
                                     <?php endif; ?>
                                 </td>
+                                <?php if ($isAdmin): ?>
                                 <td style="text-align: right;">
                                     <div style="display: inline-flex; gap: 8px;">
                                         <button class="pos-icon-btn" onclick="openTopupModal(<?php echo $ing['id']; ?>, '<?php echo htmlspecialchars(addslashes($ing['name'])); ?>', '<?php echo htmlspecialchars(addslashes($ing['unit'])); ?>')" title="បំពេញស្តុក / Top Up" style="color: #0284c7; background: #e0f2fe; border: none;">
@@ -171,6 +181,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                         </a>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                             <?php endforeach; endif; ?>
                         </tbody>
