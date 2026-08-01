@@ -143,9 +143,9 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                     <i class="fas fa-plus"></i> Stock In / Out
                 </button>
                 <?php if (!empty($allStores) && count($allStores) > 1): ?>
-                <button class="btn btn-outline" onclick="openTransferModal()" style="border-color:rgba(99,102,241,0.4); color:var(--pos-primary);">
+                <a href="<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>" class="btn btn-outline" style="border-color:rgba(99,102,241,0.4); color:var(--pos-primary); text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                     <i class="fas fa-arrows-left-right"></i> Transfer Stock
-                </button>
+                </a>
                 <?php endif; ?>
                 <button class="btn btn-outline" onclick="window.print()">
                     <i class="fas fa-print"></i> Print Details
@@ -339,10 +339,10 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                         <i class="fas fa-arrow-down"></i> Out
                                     </button>
                                     <?php if (!empty($allStores) && count($allStores) > 1): ?>
-                                    <button type="button" class="btn btn-sm" onclick="openTransferModal(<?php echo $p['id']; ?>, '<?php echo htmlspecialchars(addslashes($p['name'])); ?>', <?php echo $stock; ?>)"
-                                        style="background:rgba(99,102,241,0.1); color:var(--pos-primary); border:1px solid rgba(99,102,241,0.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
+                                    <a href="<?php echo htmlspecialchars($posUrl('stock-transfer') . '?product_id=' . $p['id']); ?>"
+                                        style="background:rgba(99,102,241,0.1); color:var(--pos-primary); border:1px solid rgba(99,102,241,0.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
                                         <i class="fas fa-arrows-left-right"></i>
-                                    </button>
+                                    </a>
                                     <?php endif; ?>
                                 </div>
                             </td>

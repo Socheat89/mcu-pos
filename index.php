@@ -191,6 +191,10 @@ try {
                 } elseif ($sub === 'stock-report') {
                     require_once $baseDir . '/modules/pos/controllers/StockReportController.php';
                     $controller = new StockReportController();
+                } elseif ($sub === 'stock-transfer') {
+                    require_once $baseDir . '/core/classes/Store.php';
+                    require_once $baseDir . '/modules/pos/controllers/StockTransferController.php';
+                    $controller = new StockTransferController();
                 }
 
                 if ($controller) {
