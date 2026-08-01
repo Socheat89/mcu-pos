@@ -340,6 +340,9 @@ class OrderController {
                     $quantity = (int)$item['quantity'];
                     if ($quantity <= 0) continue;
 
+                    $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                    $sizeId   = !empty($item['size_id']) ? (int)$item['size_id'] : null;
+
                     if ($status === 'completed') {
                         if ($businessType === 'coffee') {
                             // ── Coffee Mode: Check Recipe & Ingredient Stock ──────────
@@ -394,8 +397,6 @@ class OrderController {
                     }
 
                     $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
-                    $sizeName  = !empty($item['size_name']) ? trim($item['size_name']) : null;
-                    $sizeId    = !empty($item['size_id']) ? (int)$item['size_id'] : null;
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
@@ -504,6 +505,9 @@ class OrderController {
                 $quantity = (int)$item['quantity'];
                 if ($quantity <= 0) continue;
 
+                $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                $sizeId   = !empty($item['size_id']) ? (int)$item['size_id'] : null;
+
                 if ($status === 'completed') {
                     if ($businessType === 'coffee') {
                         // ── Coffee Mode: Check Recipe & Ingredient Stock ──────────
@@ -558,8 +562,6 @@ class OrderController {
                 }
 
                 $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
-                $sizeName  = !empty($item['size_name']) ? trim($item['size_name']) : null;
-                $sizeId    = !empty($item['size_id']) ? (int)$item['size_id'] : null;
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [
