@@ -188,11 +188,21 @@ class OrderController {
     }
 
     private function getIngStoreQty(Database $db, int $storeId, int $ingredientId, int $tenantId): float {
-        $row = $db->fetchOne(
-            "SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?",
-            [$storeId, $ingredientId, $tenantId]
-        );
-        return $row ? (float)$row['quantity'] : 0.0;
+        if ($storeId > 0) {
+            try {
+                $row = $db->fetchOne(
+                    "SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?",
+                    [$storeId, $ingredientId, $tenantId]
+                );
+                if ($row !== false && $row !== null) return (float)$row['quantity'];
+            } catch (\Throwable $e) {}
+        }
+        try {
+            $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingredientId, $tenantId]);
+            return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+        } catch (\Throwable $e) {
+            return 0.0;
+        }
     }
 
     /**
@@ -659,8 +669,18 @@ class OrderController {
         $products  = Product::getAll();
 
         $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId): float {
-            $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
-            return $r ? (float)$r['quantity'] : 0.0;
+            if ($storeId > 0) {
+                try {
+                    $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
+                    if ($r !== false && $r !== null) return (float)$r['quantity'];
+                } catch (\Throwable $e) {}
+            }
+            try {
+                $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
+                return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+            } catch (\Throwable $e) {
+                return 0.0;
+            }
         };
 
         foreach ($products as &$p) {

@@ -38,12 +38,41 @@ class PosController {
         $currentStore = Store::getCurrent($tenantId);
         $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
 
+        // Auto-ensure ingredient_store_stock table exists
+        try {
+            $db->query("
+                CREATE TABLE IF NOT EXISTS ingredient_store_stock (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    tenant_id INT NOT NULL,
+                    store_id INT NOT NULL,
+                    ingredient_id INT NOT NULL,
+                    quantity DECIMAL(10,3) NOT NULL DEFAULT 0,
+                    unit VARCHAR(50) DEFAULT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    UNIQUE KEY uq_store_ing (store_id, ingredient_id),
+                    INDEX idx_tenant_store (tenant_id, store_id),
+                    INDEX idx_ingredient (ingredient_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ");
+        } catch (\Throwable $e) {}
+
         $products = Product::getAll();
 
-        // Helper to check ingredient store stock
+        // Helper to check ingredient store stock (safely falls back to global stock)
         $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId): float {
-            $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
-            return $r ? (float)$r['quantity'] : 0.0;
+            if ($storeId > 0) {
+                try {
+                    $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
+                    if ($r !== false && $r !== null) return (float)$r['quantity'];
+                } catch (\Throwable $e) {}
+            }
+            try {
+                $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
+                return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+            } catch (\Throwable $e) {
+                return 0.0;
+            }
         };
 
         // Attach sizes & ingredient validation to each product
