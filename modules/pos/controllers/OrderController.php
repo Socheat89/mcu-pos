@@ -197,12 +197,31 @@ class OrderController {
                 if ($row !== false && $row !== null) return (float)$row['quantity'];
             } catch (\Throwable $e) {}
         }
-        try {
-            $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingredientId, $tenantId]);
-            return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
-        } catch (\Throwable $e) {
-            return 0.0;
+
+        // Determine main store ID
+        require_once __DIR__ . '/../../../core/classes/Store.php';
+        $allStores = Store::getAll($tenantId);
+        $mainStoreId = null;
+        if (!empty($allStores)) {
+            $sortedStores = $allStores;
+            usort($sortedStores, function($a, $b) {
+                $aDef = !empty($a['is_default']) ? 1 : 0;
+                $bDef = !empty($b['is_default']) ? 1 : 0;
+                if ($aDef !== $bDef) return $bDef - $aDef;
+                return (int)$a['id'] - (int)$b['id'];
+            });
+            $mainStoreId = (int)$sortedStores[0]['id'];
         }
+
+        // Only fall back to global stock_quantity for Main Store
+        if ($mainStoreId === null || $storeId === $mainStoreId) {
+            try {
+                $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingredientId, $tenantId]);
+                return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+            } catch (\Throwable $e) {}
+        }
+
+        return 0.0;
     }
 
     /**
