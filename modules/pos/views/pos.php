@@ -234,22 +234,34 @@ $dashboardUrl = $posBase . '/dashboard';
             document.body.appendChild(modal);
         }
 
-        // Helper to find unsellable product from text
+        // Helper to find unsellable product from clicked element with exact single-card scoping
         function getUnsellableProductFromElement(el) {
             if (!window.PRODUCTS || !Array.isArray(window.PRODUCTS)) return null;
             
-            // Traverse up to find card container
             let curr = el;
             let depth = 0;
-            while (curr && curr !== document.body && depth < 8) {
+            while (curr && curr !== document.body && depth < 5) {
                 const text = (curr.innerText || '').trim();
                 if (text) {
+                    let matchCount = 0;
+                    let matchedUnsellable = null;
+
                     for (const p of window.PRODUCTS) {
-                        if (p.can_sell === false && p.name) {
-                            if (text.includes(p.name)) {
-                                return p;
+                        if (p.name && text.includes(p.name)) {
+                            matchCount++;
+                            if (p.can_sell === false) {
+                                matchedUnsellable = p;
                             }
                         }
+                    }
+
+                    // If more than 1 product matches, we traversed into parent container! Stop!
+                    if (matchCount > 1) {
+                        return null;
+                    }
+
+                    if (matchCount === 1) {
+                        return matchedUnsellable;
                     }
                 }
                 curr = curr.parentElement;
