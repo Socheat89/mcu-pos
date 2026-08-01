@@ -83,8 +83,8 @@
                             <tbody>
                                 <?php foreach ($sessionIngredients as $ing): 
                                     $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
-                                    $used = (float)$ing['qty_used'];
-                                    $rem  = (float)$ing['remaining_stock'];
+                                    $used = (float)($ing['qty_used'] ?? $ing['used_qty'] ?? 0);
+                                    $rem  = (float)($ing['remaining_stock'] ?? $ing['stock_remaining'] ?? 0);
                                 ?>
                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
                                     <td style="padding: 10px 14px; font-weight: 800; color: var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></td>

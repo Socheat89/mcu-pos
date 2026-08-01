@@ -650,8 +650,10 @@ class SessionController {
                     'id'              => $ingId,
                     'name'            => $ing['name'],
                     'unit'            => $ing['unit'],
+                    'qty_used'        => $used,
                     'used_qty'        => $used,
                     'remaining_stock' => $rem,
+                    'stock_remaining' => $rem,
                 ];
             }
         } catch (\Throwable $e) {
