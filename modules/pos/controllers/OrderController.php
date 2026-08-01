@@ -639,7 +639,11 @@ class OrderController {
         } catch (Exception $e) {
             $db->getConnection()->rollBack();
             error_log('Order creation failed for tenant ' . $tenantId . ': ' . $e->getMessage());
-            die('Order creation failed. Please review the order and try again.');
+            die('<div style="font-family: sans-serif; padding: 30px; max-width: 600px; margin: 50px auto; border-radius: 16px; background: #fff5f5; border: 2px solid #feb2b2; color: #9b2c2c;">
+                <h3 style="margin-top:0;">⚠️ មិនអាចបង្កើត Order បានឡើយ / Order Creation Blocked</h3>
+                <p style="font-size: 16px; font-weight: bold; line-height: 1.5;">' . htmlspecialchars($e->getMessage()) . '</p>
+                <a href="javascript:history.back()" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #e53e3e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold;">← ត្រឡប់ក្រោយ / Go Back</a>
+            </div>');
         }
     }
 
