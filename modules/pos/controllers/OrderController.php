@@ -134,6 +134,68 @@ class OrderController {
     }
 
     /**
+     * Check if ingredient_store_stock table exists (cached per request)
+     */
+    private static $hasIngStoreStock = null;
+    private function hasIngStoreStockTable(Database $db): bool {
+        if (self::$hasIngStoreStock !== null) return self::$hasIngStoreStock;
+        try {
+            $db->fetchAll("SELECT 1 FROM ingredient_store_stock LIMIT 1");
+            self::$hasIngStoreStock = true;
+        } catch (\Throwable $e) {
+            self::$hasIngStoreStock = false;
+        }
+        return self::$hasIngStoreStock;
+    }
+
+    /**
+     * Deduct ingredient from global stock AND per-store stock if available.
+     */
+    private function deductIngredient(
+        Database $db,
+        int $ingredientId,
+        float $qty,
+        string $reason,
+        int $orderId,
+        int $tenantId,
+        ?int $storeId
+    ): void {
+        require_once __DIR__ . '/../models/Ingredient.php';
+
+        // Global deduction (existing logic)
+        Ingredient::deductStock($ingredientId, $qty, $reason, $orderId, $tenantId);
+
+        // Per-store deduction if table exists
+        if ($storeId && $this->hasIngStoreStockTable($db)) {
+            try {
+                $db->query(
+                    "INSERT INTO ingredient_store_stock (tenant_id, store_id, ingredient_id, quantity)
+                     VALUES (?, ?, ?, GREATEST(0, ? - ?))
+                     ON DUPLICATE KEY UPDATE quantity = GREATEST(0, quantity - ?)",
+                    [$tenantId, $storeId, $ingredientId,
+                     $this->getIngStoreQty($db, $storeId, $ingredientId, $tenantId), $qty, $qty]
+                );
+                // Also log with store context
+                $db->query(
+                    "INSERT INTO ingredient_stock_logs (tenant_id, store_id, ingredient_id, change_quantity, reason, order_id)
+                     VALUES (?, ?, ?, ?, ?, ?)",
+                    [$tenantId, $storeId, $ingredientId, -$qty, $reason, $orderId]
+                );
+            } catch (\Throwable $e) {
+                error_log('Ingredient store stock log error: ' . $e->getMessage());
+            }
+        }
+    }
+
+    private function getIngStoreQty(Database $db, int $storeId, int $ingredientId, int $tenantId): float {
+        $row = $db->fetchOne(
+            "SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?",
+            [$storeId, $ingredientId, $tenantId]
+        );
+        return $row ? (float)$row['quantity'] : 0.0;
+    }
+
+    /**
      * Deduct stock from the active store's store_stock (and globally from products).
      * Falls back to global-only deduction if store_stock table doesn't exist.
      */
@@ -215,6 +277,10 @@ class OrderController {
         // Get current store for per-store stock deduction
         $currentStore   = Store::getCurrent($tenantId);
         $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
+
+        // Detect business type (coffee = ingredient-based; mart = product stock-based)
+        require_once __DIR__ . '/../../../core/classes/Settings.php';
+        $businessType = Settings::get('business_type', $tenantId, 'coffee');
 
         // Start transaction
         $db->getConnection()->beginTransaction();
@@ -324,14 +390,16 @@ class OrderController {
                         }
 
                         if (!empty($recipe)) {
-                            require_once __DIR__ . '/../models/Ingredient.php';
+                            // Coffee mode: deduct ingredients (per-store + global)
                             foreach ($recipe as $r) {
                                 $deductQty = (float)$r['quantity'] * $quantity;
-                                Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $resumeOrderId, $tenantId);
+                                $this->deductIngredient($db, (int)$r['ingredient_id'], $deductQty, 'sale', $resumeOrderId, $tenantId, $currentStoreId);
                             }
-                        } else {
+                        } elseif ($businessType !== 'coffee') {
+                            // Mart mode only: deduct product stock when no recipe
                             $this->deductStock($db, $tenantId, (int)$item['product_id'], $quantity, $currentStoreId, $resumeOrderId, $product);
                         }
+                        // Coffee mode with no recipe = skip (no stock deduction)
                     }
                 }
 
@@ -450,14 +518,16 @@ class OrderController {
                     }
 
                     if (!empty($recipe)) {
-                        require_once __DIR__ . '/../models/Ingredient.php';
+                        // Coffee mode: deduct ingredients (per-store + global)
                         foreach ($recipe as $r) {
                             $deductQty = (float)$r['quantity'] * $quantity;
-                            Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $orderId, $tenantId);
+                            $this->deductIngredient($db, (int)$r['ingredient_id'], $deductQty, 'sale', $orderId, $tenantId, $currentStoreId);
                         }
-                    } else {
+                    } elseif ($businessType !== 'coffee') {
+                        // Mart mode only: deduct product stock when no recipe
                         $this->deductStock($db, $tenantId, (int)$item['product_id'], $quantity, $currentStoreId, $orderId, $product);
                     }
+                    // Coffee mode with no recipe = skip (no stock deduction)
                 }
             }
 

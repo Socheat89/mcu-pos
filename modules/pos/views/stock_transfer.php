@@ -1,13 +1,16 @@
 <?php
 require_once __DIR__ . '/../../../core/helpers/url.php';
 require_once __DIR__ . '/../../../core/classes/Settings.php';
+$__isCoffee   = ($businessType === 'coffee');
+$__itemLabel  = $__isCoffee ? 'Ingredient' : 'Product';
+$__itemsLabel = $__isCoffee ? 'Ingredients' : 'Products';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Transfer — <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
+    <title>Stock Transfer<?php echo $__isCoffee ? ' (Ingredients)' : ''; ?> — <?php echo htmlspecialchars($tenantName ?? 'POS'); ?></title>
     <link href="<?php echo mc_base_path(); ?>/public/css/pos_template.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -357,8 +360,17 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
             <h2 style="margin:0 0 2px; font-size:21px; font-weight:900; color:#1e293b; display:flex; align-items:center; gap:9px;">
                 <i class="fas fa-arrows-left-right" style="color:var(--pos-primary); font-size:18px;"></i>
                 New Internal Transfer
+                <?php if ($__isCoffee): ?>
+                <span style="font-size:12px; font-weight:700; background:rgba(99,102,241,0.1); color:var(--pos-primary); padding:3px 10px; border-radius:20px;"><i class="fas fa-flask" style="margin-right:4px;"></i>Ingredients</span>
+                <?php endif; ?>
             </h2>
-            <p style="margin:0; font-size:13px; color:#94a3b8; font-weight:600;">Transfer stock between stores — ការផ្ទេរស្តុករវាង store</p>
+            <p style="margin:0; font-size:13px; color:#94a3b8; font-weight:600;">
+                <?php if ($__isCoffee): ?>
+                    Transfer ingredients between stores — ការផ្ទេរ Ingredients រវាង store
+                <?php else: ?>
+                    Transfer stock between stores — ការផ្ទេរស្តុករវាង store
+                <?php endif; ?>
+            </p>
         </div>
 
         <!-- Store From → To -->
@@ -414,7 +426,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
         <div class="lines-head">
             <div class="lines-head-title">
                 <i class="fas fa-list-ul" style="color:var(--pos-primary);"></i>
-                Transfer Lines
+                <?php echo $__itemsLabel; ?> to Transfer
             </div>
             <span class="lines-count" id="lineCountBadge">0 line(s)</span>
         </div>
@@ -423,9 +435,9 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
             <thead>
                 <tr>
                     <th style="width:36px;">#</th>
-                    <th>Product</th>
-                    <th class="c" style="width:140px;">Available (From)</th>
-                    <th class="c" style="width:110px;">Qty to Transfer</th>
+                    <th><?php echo $__itemLabel; ?></th>
+                    <th class="c" style="width:150px;">Available (From)</th>
+                    <th class="c" style="width:120px;">Qty to Transfer</th>
                     <th class="c" style="width:44px;"></th>
                 </tr>
             </thead>
@@ -540,6 +552,8 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 <script>
 const API_URL    = '<?php echo htmlspecialchars($posUrl('stock-transfer')); ?>';
 const IMG_BASE   = '<?php echo mc_base_path(); ?>/uploads/products/';
+const IS_COFFEE  = <?php echo $__isCoffee ? 'true' : 'false'; ?>;
+const ITEM_LABEL = '<?php echo $__itemLabel; ?>';
 let lineCounter  = 0;
 let openDropId   = null;
 
@@ -581,17 +595,19 @@ function addLine() {
     lineCounter++;
     const id = lineCounter;
     const tbody = document.getElementById('linesBody');
+    const qtyStep = IS_COFFEE ? '0.001' : '1';
     const tr = document.createElement('tr');
     tr.id = 'ln-' + id;
-    tr.dataset.productId = '';
-    tr.dataset.avail     = '0';
+    tr.dataset.itemId = '';
+    tr.dataset.avail  = '0';
+    tr.dataset.unit   = '';
     tr.innerHTML = `
         <td style="color:#94a3b8;font-weight:700;font-size:13px;" id="lnum-${id}">${tbody.children.length+1}</td>
         <td>
             <div class="psearch-wrap" id="pwrap-${id}">
                 <i class="fas fa-search psearch-icon"></i>
                 <input type="text" class="psearch-inp" id="pinp-${id}"
-                    placeholder="Search product name or SKU…"
+                    placeholder="Search ${ITEM_LABEL} name…"
                     autocomplete="off"
                     oninput="doSearch(${id},this.value)"
                     onfocus="doSearch(${id},this.value)"
@@ -601,10 +617,10 @@ function addLine() {
             <div id="psku-${id}" style="font-size:10.5px;color:var(--pos-primary);font-weight:700;margin-top:2px;display:none;"></div>
         </td>
         <td style="text-align:center;">
-            <span class="avail s-nil" id="pavail-${id}">— units</span>
+            <span class="avail s-nil" id="pavail-${id}">—</span>
         </td>
         <td style="text-align:center;">
-            <input type="number" class="qty-inp" id="pqty-${id}" min="1" value="1" onchange="clampQty(${id})">
+            <input type="number" class="qty-inp" id="pqty-${id}" min="0.001" step="${qtyStep}" value="1" onchange="clampQty(${id})">
         </td>
         <td style="text-align:center;">
             <button class="rm-btn" onclick="removeLine(${id})" title="Remove"><i class="fas fa-times"></i></button>
@@ -633,12 +649,13 @@ function countLines() {
 function refreshLines() {
     document.querySelectorAll('#linesBody tr').forEach(tr => {
         const id = tr.id.replace('ln-','');
-        tr.dataset.productId = '';
-        tr.dataset.avail = '0';
+        tr.dataset.itemId = '';
+        tr.dataset.avail  = '0';
+        tr.dataset.unit   = '';
         const inp = document.getElementById('pinp-'+id);
         if (inp) inp.value = '';
         const avail = document.getElementById('pavail-'+id);
-        if (avail) { avail.className='avail s-nil'; avail.textContent='— units'; }
+        if (avail) { avail.className='avail s-nil'; avail.textContent='—'; }
         const sku = document.getElementById('psku-'+id);
         if (sku) sku.style.display='none';
     });
@@ -649,7 +666,7 @@ let timers = {};
 function doSearch(id, q) {
     clearTimeout(timers[id]);
     timers[id] = setTimeout(() => {
-        fetch(`${API_URL}?ajax_products=1&store_id=${gFrom()}&q=${encodeURIComponent(q)}`)
+        fetch(`${API_URL}?ajax_items=1&store_id=${gFrom()}&q=${encodeURIComponent(q)}`)
             .then(r => r.json())
             .then(items => showDrop(id, items))
             .catch(() => {});
@@ -669,28 +686,42 @@ function showDrop(id, items) {
 
     drop.innerHTML = '';
     if (!items.length) {
-        drop.innerHTML = '<div style="padding:14px 16px;color:#94a3b8;font-size:13px;font-weight:600;text-align:center;">No products found</div>';
+        drop.innerHTML = '<div style="padding:14px 16px;color:#94a3b8;font-size:13px;font-weight:600;text-align:center;">No items found</div>';
         drop.classList.add('open');
         openDropId = id;
         return;
     }
 
     items.forEach(p => {
-        const av  = parseInt(p.available ?? 0);
+        const av  = parseFloat(p.available ?? 0);
         const cls = av > 10 ? 's-ok' : (av > 0 ? 's-low' : 's-nil');
+        const unit = p.unit || 'units';
         const div = document.createElement('div');
         div.className = 'pdrop-item';
-        div.innerHTML = `
-            <div class="pdrop-thumb">
-                ${p.image ? `<img src="${IMG_BASE}${esc(p.image)}">` : '<i class="fas fa-box"></i>'}
-            </div>
-            <div style="flex:1;min-width:0;">
-                <div class="pdrop-name">${esc(p.name)}</div>
-                <div class="pdrop-meta">${p.sku ? 'SKU: '+esc(p.sku) : ''}${p.category_name ? ' · '+esc(p.category_name) : ''}</div>
-            </div>
-            <span class="pdrop-stock ${cls}">${av} units</span>
-        `;
-        div.addEventListener('mousedown', e => { e.preventDefault(); pickProduct(id, p); });
+        if (IS_COFFEE) {
+            // Ingredient row
+            div.innerHTML = `
+                <div class="pdrop-thumb"><i class="fas fa-flask"></i></div>
+                <div style="flex:1;min-width:0;">
+                    <div class="pdrop-name">${esc(p.name)}</div>
+                    <div class="pdrop-meta">${unit}</div>
+                </div>
+                <span class="pdrop-stock ${cls}">${av} ${esc(unit)}</span>
+            `;
+        } else {
+            // Product row
+            div.innerHTML = `
+                <div class="pdrop-thumb">
+                    ${p.image ? `<img src="${IMG_BASE}${esc(p.image)}">` : '<i class="fas fa-box"></i>'}
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div class="pdrop-name">${esc(p.name)}</div>
+                    <div class="pdrop-meta">${p.sku ? 'SKU: '+esc(p.sku) : ''}${p.category_name ? ' · '+esc(p.category_name) : ''}</div>
+                </div>
+                <span class="pdrop-stock ${cls}">${av} units</span>
+            `;
+        }
+        div.addEventListener('mousedown', e => { e.preventDefault(); pickItem(id, p); });
         drop.appendChild(div);
     });
     drop.classList.add('open');
@@ -703,39 +734,48 @@ function closeDrop(id) {
     if (openDropId === id) openDropId = null;
 }
 
-function pickProduct(id, p) {
-    const av = parseInt(p.available ?? 0);
-    const tr = document.getElementById('ln-'+id);
-    tr.dataset.productId = p.id;
-    tr.dataset.avail     = av;
+function pickItem(id, p) {
+    const av   = parseFloat(p.available ?? 0);
+    const unit = p.unit || 'units';
+    const tr   = document.getElementById('ln-'+id);
+    tr.dataset.itemId = p.id;
+    tr.dataset.avail  = av;
+    tr.dataset.unit   = unit;
 
     const inp = document.getElementById('pinp-'+id);
     if (inp) inp.value = p.name;
 
     const sku = document.getElementById('psku-'+id);
-    if (sku) { sku.textContent = p.sku ? 'SKU: '+p.sku : ''; sku.style.display = p.sku ? 'block' : 'none'; }
+    if (sku) {
+        const meta = IS_COFFEE ? unit : (p.sku ? 'SKU: '+p.sku : '');
+        sku.textContent = meta; sku.style.display = meta ? 'block' : 'none';
+    }
 
     const avBadge = document.getElementById('pavail-'+id);
     if (avBadge) {
         avBadge.className = 'avail ' + (av > 10 ? 's-ok' : av > 0 ? 's-low' : 's-nil');
-        avBadge.textContent = av + ' units';
+        avBadge.textContent = av + ' ' + unit;
     }
 
     const qInp = document.getElementById('pqty-'+id);
-    if (qInp) { qInp.max = av; if (parseInt(qInp.value) > av) qInp.value = av || 1; }
+    if (qInp) {
+        const minStep = IS_COFFEE ? 0.001 : 1;
+        qInp.step = IS_COFFEE ? '0.001' : '1';
+        if (parseFloat(qInp.value) > av) qInp.value = av > 0 ? av : minStep;
+    }
 
     closeDrop(id);
 }
 
 function clampQty(id) {
     const tr   = document.getElementById('ln-'+id);
-    const av   = parseInt(tr?.dataset.avail ?? 0);
+    const av   = parseFloat(tr?.dataset.avail ?? 0);
     const inp  = document.getElementById('pqty-'+id);
     if (!inp) return;
-    let v = parseInt(inp.value)||1;
-    if (v < 1) v = 1;
+    let v = parseFloat(inp.value)||0.001;
+    if (v <= 0) v = IS_COFFEE ? 0.001 : 1;
     if (av > 0 && v > av) v = av;
-    inp.value = v;
+    inp.value = IS_COFFEE ? parseFloat(v.toFixed(3)) : Math.round(v);
 }
 
 // ── Validate ──────────────────────────────────────────────────────────────
@@ -745,17 +785,18 @@ function validateTransfer() {
 
     const lines = []; let err = false;
     document.querySelectorAll('#linesBody tr').forEach(tr => {
-        const id  = tr.id.replace('ln-','');
-        const pid = tr.dataset.productId;
-        if (!pid) return;
-        const qty  = parseInt(document.getElementById('pqty-'+id)?.value)||0;
-        const av   = parseInt(tr.dataset.avail??0);
-        if (qty <= 0)  { toast('Quantity must be ≥ 1.','err'); err=true; return; }
-        if (qty > av)  { toast(`Not enough stock (available: ${av}).`,'err'); err=true; return; }
-        lines.push({product_id:pid, qty});
+        const id   = tr.id.replace('ln-','');
+        const itemId = tr.dataset.itemId;
+        if (!itemId) return;
+        const qty  = parseFloat(document.getElementById('pqty-'+id)?.value)||0;
+        const av   = parseFloat(tr.dataset.avail??0);
+        const unit = tr.dataset.unit || 'units';
+        if (qty <= 0)  { toast('Quantity must be > 0.','err'); err=true; return; }
+        if (qty > av)  { toast(`Not enough stock (available: ${av} ${unit}).`,'err'); err=true; return; }
+        lines.push({item_id: itemId, qty});
     });
     if (err) return;
-    if (!lines.length) { toast('Add at least one product line.','err'); return; }
+    if (!lines.length) { toast('Add at least one ' + ITEM_LABEL.toLowerCase() + ' line.','err'); return; }
 
     const btns = [document.getElementById('validateBtn'), document.getElementById('validateBtnB')];
     btns.forEach(b=>{ if(b){b.disabled=true; b.innerHTML='<i class="fas fa-spinner fa-spin"></i> Validating…';} });
@@ -766,7 +807,7 @@ function validateTransfer() {
     fd.append('to_store_id',   toId);
     fd.append('reference',     document.getElementById('refInput').value.trim());
     fd.append('note',          document.getElementById('noteInput').value.trim());
-    lines.forEach((l,i)=>{ fd.append(`lines[${i}][product_id]`,l.product_id); fd.append(`lines[${i}][qty]`,l.qty); });
+    lines.forEach((l,i)=>{ fd.append(`lines[${i}][item_id]`,l.item_id); fd.append(`lines[${i}][qty]`,l.qty); });
 
     fetch(API_URL,{method:'POST',body:fd})
         .then(r=>r.json())
