@@ -31,14 +31,20 @@ class IngredientController {
         $tenantId = Tenant::getId();
         $allStores = Store::getAll($tenantId);
 
-        $selectedStoreId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
-        $selectedStore   = null;
-        if ($selectedStoreId > 0) {
-            foreach ($allStores as $st) {
-                if ((int)$st['id'] === $selectedStoreId) { $selectedStore = $st; break; }
-            }
+        // Identify Main Store (default store or lowest ID store)
+        $mainStoreId = null;
+        if (!empty($allStores)) {
+            $sortedStores = $allStores;
+            usort($sortedStores, function($a, $b) {
+                $aDef = !empty($a['is_default']) ? 1 : 0;
+                $bDef = !empty($b['is_default']) ? 1 : 0;
+                if ($aDef !== $bDef) return $bDef - $aDef;
+                return (int)$a['id'] - (int)$b['id'];
+            });
+            $mainStoreId = (int)$sortedStores[0]['id'];
         }
-        $isDefaultStore = $selectedStore ? (!empty($selectedStore['is_default'])) : false;
+
+        $selectedStoreId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
 
         $hasIngStoreStock = false;
         try {
@@ -46,22 +52,22 @@ class IngredientController {
             $hasIngStoreStock = true;
         } catch (\Throwable $e) {}
 
-        // Safe auto-cleanup: non-default stores without transfer_in or topup should start with 0 stock
-        if ($hasIngStoreStock) {
+        // Enforce per-store stock isolation:
+        // All secondary stores (store_id != mainStoreId) without transfer_in or topup logs MUST BE 0 stock!
+        if ($hasIngStoreStock && $mainStoreId) {
             try {
                 $db->query(
                     "UPDATE ingredient_store_stock iss
-                     JOIN stores s ON s.id = iss.store_id AND s.tenant_id = iss.tenant_id
                      SET iss.quantity = 0
                      WHERE iss.tenant_id = ?
-                       AND s.is_default = 0
+                       AND iss.store_id != ?
                        AND NOT EXISTS (
                            SELECT 1 FROM ingredient_stock_logs isl 
                            WHERE isl.store_id = iss.store_id 
                              AND isl.ingredient_id = iss.ingredient_id
                              AND isl.reason IN ('transfer_in', 'topup')
                        )",
-                    [$tenantId]
+                    [$tenantId, $mainStoreId]
                 );
             } catch (\Throwable $e) {}
         }
@@ -73,7 +79,7 @@ class IngredientController {
         } catch (\Throwable $e) {}
 
         if ($selectedStoreId > 0 && $hasIngStoreStock) {
-            if ($isDefaultStore) {
+            if ($selectedStoreId === $mainStoreId) {
                 $ingredients = $db->fetchAll(
                     "SELECT i.*, COALESCE(iss.quantity, i.stock_quantity, 0) AS stock_quantity
                      FROM ingredients i
@@ -95,7 +101,20 @@ class IngredientController {
                 );
             }
         } else {
-            $ingredients = Ingredient::getAll($tenantId);
+            // Default view (All Stores or store_id = 0): show Main Store stock
+            if ($mainStoreId && $hasIngStoreStock) {
+                $ingredients = $db->fetchAll(
+                    "SELECT i.*, COALESCE(iss.quantity, i.stock_quantity, 0) AS stock_quantity
+                     FROM ingredients i
+                     LEFT JOIN ingredient_store_stock iss 
+                           ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = i.tenant_id
+                     WHERE i.tenant_id = ?
+                     ORDER BY i.name ASC",
+                    [$mainStoreId, $tenantId]
+                );
+            } else {
+                $ingredients = Ingredient::getAll($tenantId);
+            }
         }
 
         if ($hasLogStoreId) {
@@ -154,27 +173,59 @@ class IngredientController {
                 $tenantId = Tenant::getId();
 
                 require_once __DIR__ . '/../../../core/classes/Store.php';
-                $defaultStore = Store::getDefault($tenantId) ?? Store::getCurrent($tenantId);
-                $storeId = $defaultStore ? (int)$defaultStore['id'] : null;
+                $allStores = Store::getAll($tenantId);
+                $db = Database::getInstance();
 
-                // Add initial stock log & seed default store only
-                if ($data['stock_quantity'] > 0 && $storeId) {
-                    $db = Database::getInstance();
+                $mainStoreId = null;
+                if (!empty($allStores)) {
+                    $sortedStores = $allStores;
+                    usort($sortedStores, function($a, $b) {
+                        $aDef = !empty($a['is_default']) ? 1 : 0;
+                        $bDef = !empty($b['is_default']) ? 1 : 0;
+                        if ($aDef !== $bDef) return $bDef - $aDef;
+                        return (int)$a['id'] - (int)$b['id'];
+                    });
+                    $mainStoreId = (int)$sortedStores[0]['id'];
+                }
+
+                if ($mainStoreId) {
+                    // Seed Main Store with initial quantity
                     try {
                         $db->query(
                             "INSERT INTO ingredient_store_stock (tenant_id, store_id, ingredient_id, quantity)
                              VALUES (?, ?, ?, ?)
-                             ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)",
-                            [$tenantId, $storeId, $ingredientId, $data['stock_quantity']]
+                             ON DUPLICATE KEY UPDATE quantity = ?",
+                            [$tenantId, $mainStoreId, $ingredientId, $data['stock_quantity'], $data['stock_quantity']]
                         );
-                        $db->insert('ingredient_stock_logs', [
-                            'tenant_id'       => $tenantId,
-                            'store_id'        => $storeId,
-                            'ingredient_id'   => $ingredientId,
-                            'change_quantity' => $data['stock_quantity'],
-                            'reason'          => 'adjust'
-                        ]);
                     } catch (\Throwable $e) {}
+
+                    // Seed ALL Secondary Stores with ZERO stock explicitly
+                    foreach ($allStores as $st) {
+                        $stId = (int)$st['id'];
+                        if ($stId !== $mainStoreId) {
+                            try {
+                                $db->query(
+                                    "INSERT INTO ingredient_store_stock (tenant_id, store_id, ingredient_id, quantity)
+                                     VALUES (?, ?, ?, 0)
+                                     ON DUPLICATE KEY UPDATE quantity = 0",
+                                    [$tenantId, $stId, $ingredientId]
+                                );
+                            } catch (\Throwable $e) {}
+                        }
+                    }
+
+                    // Add initial stock log for Main Store
+                    if ($data['stock_quantity'] > 0) {
+                        try {
+                            $db->insert('ingredient_stock_logs', [
+                                'tenant_id'       => $tenantId,
+                                'store_id'        => $mainStoreId,
+                                'ingredient_id'   => $ingredientId,
+                                'change_quantity' => $data['stock_quantity'],
+                                'reason'          => 'adjust'
+                            ]);
+                        } catch (\Throwable $e) {}
+                    }
                 }
             }
         }
