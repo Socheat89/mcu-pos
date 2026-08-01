@@ -258,7 +258,7 @@ $dashboardUrl = $posBase . '/dashboard';
             return null;
         }
 
-        // Intercept clicks in capturing phase before React handles synthetic event
+        // Clean click listener for unsellable items
         document.addEventListener('click', function(e) {
             const unsellable = getUnsellableProductFromElement(e.target);
             if (unsellable) {
@@ -268,49 +268,6 @@ $dashboardUrl = $posBase . '/dashboard';
                 return false;
             }
         }, true);
-
-        // Auto-tag unsellable products visually on the product grid
-        function highlightUnsellableCards() {
-            if (!window.PRODUCTS || !Array.isArray(window.PRODUCTS)) return;
-            const unsellableMap = {};
-            window.PRODUCTS.forEach(p => {
-                if (p.can_sell === false && p.name) {
-                    unsellableMap[p.name.toLowerCase().trim()] = p;
-                }
-            });
-
-            const root = document.getElementById('root');
-            if (!root) return;
-            const allElements = root.querySelectorAll('div, button');
-            allElements.forEach(el => {
-                if (el.children.length <= 4 && el.innerText) {
-                    const textLower = el.innerText.toLowerCase().trim();
-                    for (const [pName, pObj] of Object.entries(unsellableMap)) {
-                        if (textLower.includes(pName) && !el.dataset.unsellableTagged) {
-                            el.dataset.unsellableTagged = "true";
-                            el.style.position = 'relative';
-                            el.style.opacity = '0.55';
-                            el.style.filter = 'grayscale(0.5)';
-                            el.title = pObj.stock_error;
-                            
-                            const badge = document.createElement('span');
-                            badge.style.cssText = 'position:absolute; top:6px; right:6px; background:#ef4444; color:#fff; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; z-index:10; pointer-events:none; box-shadow:0 2px 6px rgba(239,68,68,0.4);';
-                            badge.innerText = '⚠️ គ្មាន Recipe';
-                            el.appendChild(badge);
-                        }
-                    }
-                }
-            });
-        }
-
-        // Run highlight on DOM changes
-        const observer = new MutationObserver(highlightUnsellableCards);
-        const rootNode = document.getElementById('root');
-        if (rootNode) {
-            observer.observe(rootNode, { childList: true, subtree: true });
-        }
-        setTimeout(highlightUnsellableCards, 800);
-        setTimeout(highlightUnsellableCards, 2000);
     })();
     </script>
 

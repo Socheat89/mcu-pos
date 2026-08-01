@@ -57,22 +57,36 @@ class PosController {
             ");
         } catch (\Throwable $e) {}
 
+        $allStores = Store::getAll($tenantId);
+        $mainStoreId = null;
+        if (!empty($allStores)) {
+            $sortedStores = $allStores;
+            usort($sortedStores, function($a, $b) {
+                $aDef = !empty($a['is_default']) ? 1 : 0;
+                $bDef = !empty($b['is_default']) ? 1 : 0;
+                if ($aDef !== $bDef) return $bDef - $aDef;
+                return (int)$a['id'] - (int)$b['id'];
+            });
+            $mainStoreId = (int)$sortedStores[0]['id'];
+        }
+
         $products = Product::getAll();
 
-        // Helper to check ingredient store stock (safely falls back to global stock)
-        $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId): float {
+        // Helper to check ingredient store stock (safely falls back to global stock for main store)
+        $getIngQty = function(int $storeId, int $ingId) use ($db, $tenantId, $mainStoreId): float {
             if ($storeId > 0) {
                 try {
                     $r = $db->fetchOne("SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?", [$storeId, $ingId, $tenantId]);
                     if ($r !== false && $r !== null) return (float)$r['quantity'];
                 } catch (\Throwable $e) {}
             }
-            try {
-                $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
-                return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
-            } catch (\Throwable $e) {
-                return 0.0;
+            if ($mainStoreId === null || $storeId === $mainStoreId) {
+                try {
+                    $ingRow = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
+                    return $ingRow ? (float)$ingRow['stock_quantity'] : 0.0;
+                } catch (\Throwable $e) {}
             }
+            return 0.0;
         };
 
         // Attach sizes & ingredient validation to each product
