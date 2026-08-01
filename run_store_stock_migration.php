@@ -22,16 +22,18 @@ try {
 
     $sql = file_get_contents(__DIR__ . '/database/migrations/2026_08_01_store_stock.sql');
 
-    // Split into statements
+    // Strip all -- line comments FIRST (so semicolons inside comments don't break splitting)
+    $sql = preg_replace('/--[^\n]*/', '', $sql);
+    // Strip /* */ block comments
+    $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+
+    // Now split on semicolons
     $statements = array_filter(array_map('trim', explode(';', $sql)));
     foreach ($statements as $s) {
         if (empty($s)) continue;
-        $clean = preg_replace('/--[^\n]*\n?/', '', $s);
-        $clean = trim($clean);
-        if (empty($clean)) continue;
         try {
             $pdo->exec($s);
-            echo "✅ OK: " . substr(trim($s), 0, 100) . "\n";
+            echo "✅ OK: " . substr($s, 0, 100) . "\n";
         } catch (PDOException $e) {
             echo "⚠️  WARN: " . $e->getMessage() . "\n";
         }

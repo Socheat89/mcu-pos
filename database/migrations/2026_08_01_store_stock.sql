@@ -22,8 +22,8 @@ ALTER TABLE stock_logs
     ADD COLUMN IF NOT EXISTS store_id INT DEFAULT NULL AFTER tenant_id,
     ADD COLUMN IF NOT EXISTS note VARCHAR(255) DEFAULT NULL AFTER reason;
 
--- Seed: Copy existing global stock_quantity into the default (main) store's store_stock
--- This will run once; existing products will start with their current stock under the main store
+-- Seed: Copy existing global stock_quantity into the default (main) store store_stock
+-- This runs once. Existing products start with their current stock under the main store
 INSERT INTO store_stock (tenant_id, store_id, product_id, quantity)
 SELECT
     p.tenant_id,
