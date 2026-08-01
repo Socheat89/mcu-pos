@@ -97,6 +97,35 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
         }
         .stock-search-item:hover { background: rgba(99,102,241,0.06); }
         .stock-search-item:last-child { border-bottom: none; }
+
+        /* ── Transfer Modal ── */
+        .transfer-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+        }
+        .transfer-modal.open { display: flex; }
+        .transfer-box {
+            background: #fff; border-radius: 24px; width: 90%; max-width: 500px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            overflow: hidden; animation: scaleIn 0.25s ease-out;
+        }
+        .transfer-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px; border-bottom: 1px solid var(--pos-border);
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.06));
+        }
+        .transfer-header h3 { margin: 0; font-size: 17px; font-weight: 900; color: var(--pos-text); }
+        .transfer-body   { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+        .transfer-footer {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 16px 24px; border-top: 1px solid var(--pos-border); background: #f9fafb;
+        }
+        .store-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+            background: rgba(99,102,241,0.1); color: var(--pos-primary); border: 1px solid rgba(99,102,241,0.2);
+        }
     </style>
 </head>
 <body class="pos-app">
@@ -113,6 +142,11 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                 <button class="btn btn-primary" onclick="openStockModal()">
                     <i class="fas fa-plus"></i> Stock In / Out
                 </button>
+                <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                <button class="btn btn-outline" onclick="openTransferModal()" style="border-color:rgba(99,102,241,0.4); color:var(--pos-primary);">
+                    <i class="fas fa-arrows-left-right"></i> Transfer Stock
+                </button>
+                <?php endif; ?>
                 <button class="btn btn-outline" onclick="window.print()">
                     <i class="fas fa-print"></i> Print Details
                 </button>
@@ -122,13 +156,35 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
             </div>
         </div>
 
+        <!-- Current Store Banner -->
+        <?php if (!empty($currentStore)): ?>
+        <div class="no-print" style="display:flex; align-items:center; gap:12px; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.18); border-radius:14px; padding:12px 18px; margin-bottom:20px;">
+            <i class="fas fa-store" style="color:var(--pos-primary); font-size:18px;"></i>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:var(--pos-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Stock shown for active store</div>
+                <div style="font-size:15px; font-weight:900; color:var(--pos-text);"><?php echo htmlspecialchars($currentStore['name']); ?> <span style="font-size:12px; color:var(--pos-text-muted); font-weight:600;">(<?php echo htmlspecialchars($currentStore['code'] ?? ''); ?>)</span></div>
+            </div>
+            <?php if (!empty($allStores) && count($allStores) > 1): ?>
+            <div style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;">
+                <?php foreach ($allStores as $s): ?>
+                <a href="<?php echo htmlspecialchars($posUrl('stores/switch') . '?store_id=' . $s['id'] . '&redirect=' . urlencode($posUrl('stock-report'))); ?>"
+                   style="display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:800; text-decoration:none;
+                   <?php echo $s['id'] == $currentStore['id'] ? 'background:var(--pos-primary); color:#fff;' : 'background:#f1f5f9; color:var(--pos-text); border:1px solid var(--pos-border);'; ?>">
+                    <?php echo htmlspecialchars($s['code'] ?? $s['name']); ?>
+                </a>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
         <!-- Summary Cards -->
         <?php
         $totalProducts  = count($products);
-        $inStockCount   = count(array_filter($products, fn($p) => $p['stock_quantity'] > 10));
-        $lowStockCount  = count(array_filter($products, fn($p) => $p['stock_quantity'] > 0 && $p['stock_quantity'] <= 10));
-        $noStockCount   = count(array_filter($products, fn($p) => $p['stock_quantity'] <= 0));
-        $totalUnits     = array_sum(array_column($products, 'stock_quantity'));
+        $inStockCount   = count(array_filter($products, fn($p) => ($p['display_stock'] ?? 0) > 10));
+        $lowStockCount  = count(array_filter($products, fn($p) => ($p['display_stock'] ?? 0) > 0 && ($p['display_stock'] ?? 0) <= 10));
+        $noStockCount   = count(array_filter($products, fn($p) => ($p['display_stock'] ?? 0) <= 0));
+        $totalUnits     = array_sum(array_column($products, 'display_stock'));
         ?>
         <div class="pos-grid cols-4" style="margin-bottom:28px;">
             <div class="pos-stat">
@@ -232,8 +288,8 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                         </tr>
                         <?php else: ?>
                         <?php $rowNum = 1; foreach ($products as $p):
-                            $stock = (int)$p['stock_quantity'];
-                            $used = (int)($p['qty_sold'] ?? 0);
+                            $stock   = (int)($p['display_stock'] ?? $p['store_stock_qty'] ?? $p['stock_quantity'] ?? 0);
+                            $used    = (int)($p['qty_sold'] ?? 0);
                             $opening = $stock + $used;
                             $badgeClass = $stock > 10 ? 'in-stock' : ($stock > 0 ? 'low-stock' : 'no-stock');
                         ?>
@@ -273,7 +329,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                 </span>
                             </td>
                             <td style="text-align:center;" class="no-print">
-                                <div style="display:flex; justify-content:center; gap:6px;">
+                                <div style="display:flex; justify-content:center; gap:6px; flex-wrap:wrap;">
                                     <button type="button" class="btn btn-sm" onclick="openStockModal(<?php echo $p['id']; ?>, '<?php echo htmlspecialchars(addslashes($p['name'])); ?>', <?php echo $stock; ?>, 'in')"
                                         style="background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
                                         <i class="fas fa-arrow-up"></i> In
@@ -282,6 +338,12 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                         style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
                                         <i class="fas fa-arrow-down"></i> Out
                                     </button>
+                                    <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                                    <button type="button" class="btn btn-sm" onclick="openTransferModal(<?php echo $p['id']; ?>, '<?php echo htmlspecialchars(addslashes($p['name'])); ?>', <?php echo $stock; ?>)"
+                                        style="background:rgba(99,102,241,0.1); color:var(--pos-primary); border:1px solid rgba(99,102,241,0.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
+                                        <i class="fas fa-arrows-left-right"></i>
+                                    </button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
@@ -296,13 +358,14 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
         <?php if (!empty($stockLogs)): ?>
         <div class="pos-card" style="margin-bottom:28px; overflow:hidden;">
             <div style="padding:20px 24px; border-bottom:1px solid var(--pos-border);">
-                <h3 class="pos-card-title" style="margin:0;"><i class="fas fa-history" style="color:var(--pos-primary);margin-right:8px;"></i>Recent Movements (Last 50)</h3>
+                <h3 class="pos-card-title" style="margin:0;"><i class="fas fa-history" style="color:var(--pos-primary);margin-right:8px;"></i>Recent Movements (Last 80)</h3>
             </div>
             <div class="pos-table-container">
                 <table class="pos-table">
                     <thead>
                         <tr>
                             <th>ផលិតផល / Product</th>
+                            <th>Store</th>
                             <th style="text-align:center;">ប្រភេទ / Type</th>
                             <th style="text-align:center;">ចំនួន / Qty</th>
                             <th style="text-align:center;">មូលហេតុ / Reason</th>
@@ -310,13 +373,27 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($stockLogs as $log): 
+                        <?php foreach ($stockLogs as $log):
                             $isIn = $log['change_quantity'] > 0;
+                            $reason = $log['reason'] ?? '';
+                            $isTransferIn  = ($reason === 'transfer_in');
+                            $isTransferOut = ($reason === 'transfer_out');
                         ?>
                         <tr>
                             <td style="font-weight:700;"><?php echo htmlspecialchars($log['product_name'] ?? 'N/A'); ?></td>
+                            <td>
+                                <?php if (!empty($log['store_name'])): ?>
+                                <span class="store-badge"><?php echo htmlspecialchars($log['store_name']); ?></span>
+                                <?php else: ?>
+                                <span style="color:var(--pos-text-muted); font-size:12px;">—</span>
+                                <?php endif; ?>
+                            </td>
                             <td style="text-align:center;">
-                                <?php if ($isIn): ?>
+                                <?php if ($isTransferIn): ?>
+                                    <span class="stock-badge in-stock"><i class="fas fa-arrows-left-right"></i> Transfer In</span>
+                                <?php elseif ($isTransferOut): ?>
+                                    <span class="stock-badge low-stock"><i class="fas fa-arrows-left-right"></i> Transfer Out</span>
+                                <?php elseif ($isIn): ?>
                                     <span class="stock-badge in-stock"><i class="fas fa-arrow-up"></i> Stock In</span>
                                 <?php else: ?>
                                     <span class="stock-badge no-stock"><i class="fas fa-arrow-down"></i> Stock Out</span>
@@ -326,7 +403,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                 <?php echo ($isIn ? '+' : '') . number_format($log['change_quantity']); ?>
                             </td>
                             <td style="text-align:center;">
-                                <span style="font-size:12px; font-weight:600; color:var(--pos-text-muted);"><?php echo htmlspecialchars(ucfirst($log['reason'] ?? '')); ?></span>
+                                <span style="font-size:12px; font-weight:600; color:var(--pos-text-muted);"><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $reason))); ?></span>
                             </td>
                             <td style="font-size:12px; color:var(--pos-text-muted); font-weight:600;">
                                 <?php echo date('d/m/Y H:i', strtotime($log['created_at'])); ?>
@@ -389,9 +466,85 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
         </div>
     </div>
 
+    <!-- ──────────────────────────────────────────────────────────────────── -->
+    <!-- Transfer Stock Modal                                                  -->
+    <!-- ──────────────────────────────────────────────────────────────────── -->
+    <?php if (!empty($allStores) && count($allStores) > 1): ?>
+    <div class="transfer-modal" id="transferModal">
+        <div class="transfer-box">
+            <div class="transfer-header">
+                <h3><i class="fas fa-arrows-left-right" style="color:var(--pos-primary);margin-right:8px;"></i>Transfer Stock Between Stores</h3>
+                <button type="button" onclick="closeTransferModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--pos-border);background:#fff;cursor:pointer;font-size:18px;color:var(--pos-text-muted);display:flex;align-items:center;justify-content:center;">&times;</button>
+            </div>
+            <div class="transfer-body">
+                <input type="hidden" id="tr_product_id" value="">
+
+                <!-- Product Info -->
+                <div style="background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.15); border-radius:12px; padding:12px 16px;">
+                    <div style="font-size:11px; font-weight:700; color:var(--pos-text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Product</div>
+                    <div id="tr_product_name" style="font-size:15px; font-weight:900; color:var(--pos-text);">—</div>
+                    <div id="tr_avail_line" style="font-size:12px; color:var(--pos-text-muted); font-weight:600; margin-top:2px;">Available in source: —</div>
+                </div>
+
+                <!-- From Store -->
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--pos-text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">From Store (Source)</label>
+                    <select id="tr_from_store" class="pos-form-control" onchange="onTransferStoreChange()" style="font-weight:700;">
+                        <?php foreach ($allStores as $s): ?>
+                        <option value="<?php echo $s['id']; ?>" <?php echo ($currentStore && $s['id'] == $currentStore['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars(($s['code'] ?? '') . ' — ' . $s['name']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Arrow -->
+                <div style="text-align:center; color:var(--pos-primary); font-size:20px;">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+
+                <!-- To Store -->
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--pos-text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">To Store (Destination)</label>
+                    <select id="tr_to_store" class="pos-form-control" style="font-weight:700;">
+                        <?php foreach ($allStores as $s): ?>
+                        <option value="<?php echo $s['id']; ?>" <?php echo ($currentStore && $s['id'] != $currentStore['id']) ? '' : ''; ?>>
+                            <?php echo htmlspecialchars(($s['code'] ?? '') . ' — ' . $s['name']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--pos-text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Quantity to Transfer</label>
+                    <input type="number" id="tr_quantity" min="1" value="1" class="pos-form-control" style="max-width:180px; font-size:20px; font-weight:900; text-align:center;" placeholder="0">
+                </div>
+
+                <!-- Note -->
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--pos-text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Note (optional)</label>
+                    <input type="text" id="tr_note" class="pos-form-control" placeholder="e.g. Weekly resupply" style="font-weight:600;">
+                </div>
+
+                <div id="tr_result_msg" style="font-size:13px; font-weight:700; min-height:20px;"></div>
+            </div>
+            <div class="transfer-footer">
+                <button type="button" onclick="closeTransferModal()" style="padding:10px 20px; border-radius:10px; border:1px solid var(--pos-border); background:#fff; font-weight:700; cursor:pointer; color:var(--pos-text);">Cancel</button>
+                <button type="button" onclick="submitTransfer()" id="tr_submit_btn"
+                    style="padding:10px 24px; border-radius:10px; background:var(--pos-primary); color:#fff; border:none; font-weight:800; cursor:pointer;">
+                    <i class="fas fa-arrows-left-right"></i> Transfer
+                </button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <script>
         const API_URL = '<?php echo htmlspecialchars($posUrl('stock-report')); ?>';
+        const CURRENT_STORE_ID = <?php echo json_encode($currentStoreId ?? null); ?>;
 
+        // ── Stock Adjust Modal ────────────────────────────────────────────────
         function openStockModal(productId, productName, currentStock, defaultType) {
             document.getElementById('modal_product_id').value = productId || '';
             document.getElementById('modal_product_name').textContent = productName || '— Select product above —';
@@ -434,20 +587,16 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
             formData.append('product_id', productId);
             formData.append('quantity', qty);
             formData.append('movement_type', type);
+            if (CURRENT_STORE_ID) formData.append('store_id', CURRENT_STORE_ID);
 
             fetch(API_URL, { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
                         msgEl.innerHTML = '<span style="color:#10b981;">✅ Stock updated! New qty: <strong>' + data.new_stock + '</strong></span>';
-                        // Update badge in table
-                        const badge = document.getElementById('stock-qty-' + productId);
-                        if (badge) {
-                            badge.textContent = data.new_stock;
-                            badge.className = 'stock-badge ' + (data.new_stock > 10 ? 'in-stock' : (data.new_stock > 0 ? 'low-stock' : 'no-stock'));
-                        }
+                        updateStockBadge(productId, data.new_stock);
                         document.getElementById('modal_current_stock_line').textContent = 'Current: ' + data.new_stock + ' units';
-                        setTimeout(() => closeStockModal(), 1200);
+                        setTimeout(() => { closeStockModal(); location.reload(); }, 1200);
                     } else {
                         msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + (data.error || 'Error') + '</span>';
                     }
@@ -461,13 +610,111 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                 });
         }
 
+        function updateStockBadge(productId, newQty) {
+            const badge = document.getElementById('stock-qty-' + productId);
+            if (!badge) return;
+            const icon = newQty > 0 ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+            badge.innerHTML = icon + ' ' + newQty;
+            badge.className = 'stock-badge ' + (newQty > 10 ? 'in-stock' : (newQty > 0 ? 'low-stock' : 'no-stock'));
+        }
+
         // Close modal on backdrop click
         document.getElementById('stockAdjustModal').addEventListener('click', function(e) {
             if (e.target === this) closeStockModal();
         });
 
-        // Close on Escape
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStockModal(); });
+        // ── Transfer Modal ────────────────────────────────────────────────────
+        function openTransferModal(productId, productName, currentStock) {
+            const modal = document.getElementById('transferModal');
+            if (!modal) return;
+            document.getElementById('tr_product_id').value = productId || '';
+            document.getElementById('tr_product_name').textContent = productName || '—';
+            document.getElementById('tr_avail_line').textContent = 'Available in source: ' + (currentStock ?? '—') + ' units';
+            document.getElementById('tr_quantity').value = 1;
+            document.getElementById('tr_note').value = '';
+            document.getElementById('tr_result_msg').innerHTML = '';
+            // Reset from/to to avoid same store selected
+            onTransferStoreChange();
+            modal.classList.add('open');
+            setTimeout(() => document.getElementById('tr_quantity').focus(), 100);
+        }
+
+        function closeTransferModal() {
+            const modal = document.getElementById('transferModal');
+            if (modal) modal.classList.remove('open');
+        }
+
+        function onTransferStoreChange() {
+            const fromSel = document.getElementById('tr_from_store');
+            const toSel   = document.getElementById('tr_to_store');
+            if (!fromSel || !toSel) return;
+            const fromVal = fromSel.value;
+            // Auto-select first different store for "to"
+            for (let opt of toSel.options) {
+                if (opt.value !== fromVal) {
+                    toSel.value = opt.value;
+                    break;
+                }
+            }
+        }
+
+        function submitTransfer() {
+            const productId   = document.getElementById('tr_product_id').value;
+            const fromStoreId = document.getElementById('tr_from_store')?.value;
+            const toStoreId   = document.getElementById('tr_to_store')?.value;
+            const qty         = parseInt(document.getElementById('tr_quantity').value, 10);
+            const note        = document.getElementById('tr_note').value;
+            const msgEl       = document.getElementById('tr_result_msg');
+
+            if (!productId)   { msgEl.innerHTML = '<span style="color:#ef4444;">No product selected.</span>'; return; }
+            if (!fromStoreId || !toStoreId) { msgEl.innerHTML = '<span style="color:#ef4444;">Select both stores.</span>'; return; }
+            if (fromStoreId === toStoreId)  { msgEl.innerHTML = '<span style="color:#ef4444;">Source and destination must be different.</span>'; return; }
+            if (!qty || qty <= 0) { msgEl.innerHTML = '<span style="color:#ef4444;">Quantity must be at least 1.</span>'; return; }
+
+            const btn = document.getElementById('tr_submit_btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transferring...';
+            msgEl.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('ajax_stock_transfer', '1');
+            formData.append('product_id',   productId);
+            formData.append('from_store_id', fromStoreId);
+            formData.append('to_store_id',   toStoreId);
+            formData.append('quantity',      qty);
+            formData.append('note',          note);
+
+            fetch(API_URL, { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        msgEl.innerHTML = '<span style="color:#10b981;">✅ Transferred ' + data.qty + ' units successfully!</span>';
+                        // Update source badge if visible
+                        if (data.from_store_id == CURRENT_STORE_ID) {
+                            updateStockBadge(productId, data.new_from);
+                            document.getElementById('tr_avail_line').textContent = 'Available in source: ' + data.new_from + ' units';
+                        }
+                        setTimeout(() => { closeTransferModal(); location.reload(); }, 1400);
+                    } else {
+                        msgEl.innerHTML = '<span style="color:#ef4444;">❌ ' + (data.error || 'Transfer failed') + '</span>';
+                    }
+                })
+                .catch(() => {
+                    msgEl.innerHTML = '<span style="color:#ef4444;">❌ Network error.</span>';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-arrows-left-right"></i> Transfer';
+                });
+        }
+
+        // Close modals on backdrop click / Escape
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'transferModal') closeTransferModal();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeStockModal(); closeTransferModal(); }
+        });
 
         // Table filter
         function filterStockTable() {
@@ -477,12 +724,14 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
             });
         }
 
-        // Print: show print header
+        // Print
         window.addEventListener('beforeprint', () => {
-            document.getElementById('printHeader').style.display = 'block';
+            const h = document.getElementById('printHeader');
+            if (h) h.style.display = 'block';
         });
         window.addEventListener('afterprint', () => {
-            document.getElementById('printHeader').style.display = 'none';
+            const h = document.getElementById('printHeader');
+            if (h) h.style.display = 'none';
         });
     </script>
 

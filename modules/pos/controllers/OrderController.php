@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../../core/classes/Database.php';
 require_once __DIR__ . '/../../../core/classes/Tenant.php';
 require_once __DIR__ . '/../../../core/classes/Settings.php';
+require_once __DIR__ . '/../../../core/classes/Store.php';
 require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../../middleware/TenantMiddleware.php';
 require_once __DIR__ . '/../models/Order.php';
@@ -108,13 +109,96 @@ class OrderController {
         // Update order status to completed and set session_id
         $result = $db->update('orders', ['status' => 'completed', 'session_id' => $activeSession['id']], 'id = ? AND tenant_id = ? AND status = ?', [$id, $tenantId, 'pending']);
 
-
         if ($result) {
             $prefix = mc_base_path();
             header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/orders");
             exit;
         } else {
             die('Order not found or already completed');
+        }
+    }
+
+    /**
+     * Check if store_stock table exists (cached per request)
+     */
+    private static $hasStoreStock = null;
+    private function hasStoreStockTable(Database $db): bool {
+        if (self::$hasStoreStock !== null) return self::$hasStoreStock;
+        try {
+            $db->fetchAll("SELECT 1 FROM store_stock LIMIT 1");
+            self::$hasStoreStock = true;
+        } catch (\Throwable $e) {
+            self::$hasStoreStock = false;
+        }
+        return self::$hasStoreStock;
+    }
+
+    /**
+     * Deduct stock from the active store's store_stock (and globally from products).
+     * Falls back to global-only deduction if store_stock table doesn't exist.
+     */
+    private function deductStock(
+        Database $db,
+        int $tenantId,
+        int $productId,
+        int $quantity,
+        ?int $storeId,
+        int $orderId,
+        array $product
+    ): void {
+        if ($this->hasStoreStockTable($db) && $storeId) {
+            // ── Per-store deduction ──────────────────────────────────────────
+            $storeRow = $db->fetchOne(
+                "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ? AND tenant_id = ?",
+                [$storeId, $productId, $tenantId]
+            );
+            $currentStoreQty = $storeRow ? (int)$storeRow['quantity'] : 0;
+            $newStoreQty     = max(0, $currentStoreQty - $quantity);
+
+            $db->query(
+                "INSERT INTO store_stock (tenant_id, store_id, product_id, quantity)
+                 VALUES (?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE quantity = GREATEST(0, quantity - ?)",
+                [$tenantId, $storeId, $productId, $newStoreQty, $quantity]
+            );
+
+            // Also keep global stock_quantity in sync (sum of all stores not easily maintained,
+            // so we deduct from global too to keep it as a reference)
+            $newGlobal = max(0, (int)($product['stock_quantity'] ?? 0) - $quantity);
+            $db->update('products', ['stock_quantity' => $newGlobal], 'id = ? AND tenant_id = ?', [$productId, $tenantId]);
+
+            // Log with store context
+            try {
+                $db->query(
+                    "INSERT INTO stock_logs (tenant_id, store_id, product_id, change_quantity, reason, order_id, created_at)
+                     VALUES (?, ?, ?, ?, 'sale', ?, NOW())",
+                    [$tenantId, $storeId, $productId, -$quantity, $orderId]
+                );
+            } catch (\Throwable $e) {
+                // Fallback log without store_id
+                try {
+                    $db->insert('stock_logs', [
+                        'tenant_id'       => $tenantId,
+                        'product_id'      => $productId,
+                        'change_quantity' => -$quantity,
+                        'reason'          => 'sale',
+                        'order_id'        => $orderId,
+                    ]);
+                } catch (\Throwable $e2) { /* ignore */ }
+            }
+        } else {
+            // ── Fallback: global-only deduction ─────────────────────────────
+            $newStock = (int)($product['stock_quantity'] ?? 0) - $quantity;
+            $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$productId, $tenantId]);
+            try {
+                $db->insert('stock_logs', [
+                    'tenant_id'       => $tenantId,
+                    'product_id'      => $productId,
+                    'change_quantity' => -$quantity,
+                    'reason'          => 'sale',
+                    'order_id'        => $orderId,
+                ]);
+            } catch (\Throwable $e) { /* ignore */ }
         }
     }
 
@@ -128,6 +212,9 @@ class OrderController {
             die('Order creation failed: No active POS session. Please open a session first.');
         }
 
+        // Get current store for per-store stock deduction
+        $currentStore   = Store::getCurrent($tenantId);
+        $currentStoreId = $currentStore ? (int)$currentStore['id'] : null;
 
         // Start transaction
         $db->getConnection()->beginTransaction();
@@ -159,6 +246,7 @@ class OrderController {
                 throw new Exception('No items in order');
             }
 
+            // ── Resume (Held) Order ──────────────────────────────────────────
             if ($resumeOrderId > 0) {
                 $existing = $db->fetchOne(
                     "SELECT id, status FROM orders WHERE id = ? AND tenant_id = ?",
@@ -187,32 +275,40 @@ class OrderController {
                     if ($quantity <= 0) continue;
 
                     if ($status === 'completed') {
-                        $stock = (int)($product['stock_quantity'] ?? 0);
-                        if ($quantity > $stock && Tenant::getPosLevel() >= 2) {
-                            throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . '. Upgrade to Standard ($50) for inventory management.');
+                        // Stock check: use store_stock if available
+                        if ($this->hasStoreStockTable($db) && $currentStoreId) {
+                            $storeRow = $db->fetchOne(
+                                "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
+                                [$currentStoreId, $item['product_id']]
+                            );
+                            $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                        } else {
+                            $availableStock = (int)($product['stock_quantity'] ?? 0);
+                        }
+                        if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
+                            throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
                         }
                     }
 
                     $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
-                    $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
-                    $sizeId = !empty($item['size_id']) ? (int)$item['size_id'] : null;
-
+                    $sizeName  = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                    $sizeId    = !empty($item['size_id']) ? (int)$item['size_id'] : null;
                     $itemTotal = $quantity * $unitPrice;
 
                     $db->insert('order_items', [
-                        'order_id' => $resumeOrderId,
-                        'product_id' => $item['product_id'],
-                        'size_name' => $sizeName,
+                        'order_id'        => $resumeOrderId,
+                        'product_id'      => $item['product_id'],
+                        'size_name'       => $sizeName,
                         'product_size_id' => $sizeId,
-                        'quantity' => $quantity,
-                        'unit_price' => $unitPrice,
-                        'total' => $itemTotal
+                        'quantity'        => $quantity,
+                        'unit_price'      => $unitPrice,
+                        'total'           => $itemTotal
                     ]);
 
                     $total += $itemTotal;
 
                     if ($status === 'completed') {
-                        // Check if a recipe is configured
+                        // Check recipe
                         $recipe = [];
                         if ($sizeId) {
                             $recipe = $db->fetchAll(
@@ -234,25 +330,16 @@ class OrderController {
                                 Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $resumeOrderId, $tenantId);
                             }
                         } else {
-                            $newStock = (int)$product['stock_quantity'] - $quantity;
-                            $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
-                            $db->insert('stock_logs', [
-                                'tenant_id' => $tenantId,
-                                'product_id' => $item['product_id'],
-                                'change_quantity' => -$quantity,
-                                'reason' => 'sale',
-                                'order_id' => $resumeOrderId
-                            ]);
+                            $this->deductStock($db, $tenantId, (int)$item['product_id'], $quantity, $currentStoreId, $resumeOrderId, $product);
                         }
                     }
                 }
 
                 $db->update('orders', [
                     'customer_id' => $customerId,
-                    'total' => $total,
-                    'status' => $status,
-                    'session_id' => $activeSession['id']
-
+                    'total'       => $total,
+                    'status'      => $status,
+                    'session_id'  => $activeSession['id']
                 ], 'id = ? AND tenant_id = ?', [$resumeOrderId, $tenantId]);
 
                 // Keep payments clean
@@ -260,20 +347,19 @@ class OrderController {
 
                 if ($status === 'completed') {
                     $paymentMethod = $_POST['payment_method'] ?? 'cash';
-                    $bankName = $_POST['bank_name'] ?? null;
-                    $currency  = $_POST['currency'] ?? 'USD';
+                    $bankName      = $_POST['bank_name'] ?? null;
+                    $currency      = $_POST['currency'] ?? 'USD';
                     $db->insert('payments', [
-                        'order_id' => $resumeOrderId,
-                        'amount' => $total,
-                        'currency' => $currency,
-                        'method' => $paymentMethod,
+                        'order_id'  => $resumeOrderId,
+                        'amount'    => $total,
+                        'currency'  => $currency,
+                        'method'    => $paymentMethod,
                         'bank_name' => $bankName,
-                        'status' => 'completed'
+                        'status'    => 'completed'
                     ]);
                 }
 
                 $db->getConnection()->commit();
-
                 $prefix = mc_base_path();
 
                 if ($status === 'completed') {
@@ -284,17 +370,22 @@ class OrderController {
                 exit;
             }
 
+            // ── New Order ────────────────────────────────────────────────────
             $orderData = [
-                'tenant_id' => $tenantId,
+                'tenant_id'   => $tenantId,
                 'customer_id' => $customerId,
-                'total' => 0, // Calculate later
-                'status' => $status,
-                'session_id' => $activeSession['id']
-
+                'total'       => 0,
+                'status'      => $status,
+                'session_id'  => $activeSession['id']
             ];
 
+            // Attach store_id to order if available
+            if ($currentStoreId) {
+                $orderData['store_id'] = $currentStoreId;
+            }
+
             $orderId = $db->insert('orders', $orderData);
-            $total = 0;
+            $total   = 0;
 
             // Add order items
             foreach ($_POST['items'] as $item) {
@@ -309,33 +400,41 @@ class OrderController {
                 if ($quantity <= 0) continue;
 
                 if ($status === 'completed') {
-                    $stock = (int)($product['stock_quantity'] ?? 0);
-                    if ($quantity > $stock && Tenant::getPosLevel() >= 2) {
-                        throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . '. Upgrade to Standard ($50) for inventory management.');
+                    // Stock check: use store_stock if available
+                    if ($this->hasStoreStockTable($db) && $currentStoreId) {
+                        $storeRow = $db->fetchOne(
+                            "SELECT quantity FROM store_stock WHERE store_id = ? AND product_id = ?",
+                            [$currentStoreId, $item['product_id']]
+                        );
+                        $availableStock = $storeRow ? (int)$storeRow['quantity'] : 0;
+                    } else {
+                        $availableStock = (int)($product['stock_quantity'] ?? 0);
+                    }
+                    if ($quantity > $availableStock && Tenant::getPosLevel() >= 2) {
+                        throw new Exception('Insufficient stock for: ' . ($product['name'] ?? 'product') . " (available: {$availableStock}).");
                     }
                 }
-                $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
-                $sizeName = !empty($item['size_name']) ? trim($item['size_name']) : null;
-                $sizeId = !empty($item['size_id']) ? (int)$item['size_id'] : null;
 
+                $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : (float)$product['price'];
+                $sizeName  = !empty($item['size_name']) ? trim($item['size_name']) : null;
+                $sizeId    = !empty($item['size_id']) ? (int)$item['size_id'] : null;
                 $itemTotal = $quantity * $unitPrice;
 
                 $orderItemData = [
-                    'order_id' => $orderId,
-                    'product_id' => $item['product_id'],
-                    'size_name' => $sizeName,
+                    'order_id'        => $orderId,
+                    'product_id'      => $item['product_id'],
+                    'size_name'       => $sizeName,
                     'product_size_id' => $sizeId,
-                    'quantity' => $quantity,
-                    'unit_price' => $unitPrice,
-                    'total' => $itemTotal
+                    'quantity'        => $quantity,
+                    'unit_price'      => $unitPrice,
+                    'total'           => $itemTotal
                 ];
 
                 $db->insert('order_items', $orderItemData);
-
                 $total += $itemTotal;
 
                 if ($status === 'completed') {
-                    // Check if a recipe is configured
+                    // Check recipe
                     $recipe = [];
                     if ($sizeId) {
                         $recipe = $db->fetchAll(
@@ -357,18 +456,7 @@ class OrderController {
                             Ingredient::deductStock($r['ingredient_id'], $deductQty, 'sale', $orderId, $tenantId);
                         }
                     } else {
-                        // Update stock
-                        $newStock = $product['stock_quantity'] - $quantity;
-                        $db->update('products', ['stock_quantity' => $newStock], 'id = ? AND tenant_id = ?', [$item['product_id'], $tenantId]);
-
-                        // Log stock change
-                        $db->insert('stock_logs', [
-                            'tenant_id' => $tenantId,
-                            'product_id' => $item['product_id'],
-                            'change_quantity' => -$quantity,
-                            'reason' => 'sale',
-                            'order_id' => $orderId
-                        ]);
+                        $this->deductStock($db, $tenantId, (int)$item['product_id'], $quantity, $currentStoreId, $orderId, $product);
                     }
                 }
             }
@@ -377,24 +465,21 @@ class OrderController {
             $db->update('orders', ['total' => $total], 'id = ? AND tenant_id = ?', [$orderId, $tenantId]);
 
             if ($status === 'completed') {
-                // Process payment
                 $paymentMethod = $_POST['payment_method'] ?? 'cash';
-                $bankName = $_POST['bank_name'] ?? null;
-                $currency  = $_POST['currency'] ?? 'USD';
-                $paymentData = [
-                    'order_id' => $orderId,
-                    'amount' => $total,
-                    'currency' => $currency,
-                    'method' => $paymentMethod,
+                $bankName      = $_POST['bank_name'] ?? null;
+                $currency      = $_POST['currency'] ?? 'USD';
+                $paymentData   = [
+                    'order_id'  => $orderId,
+                    'amount'    => $total,
+                    'currency'  => $currency,
+                    'method'    => $paymentMethod,
                     'bank_name' => $bankName,
-                    'status' => 'completed'
+                    'status'    => 'completed'
                 ];
-
                 $db->insert('payments', $paymentData);
             }
 
             $db->getConnection()->commit();
-
             $prefix = mc_base_path();
 
             // Redirect to receipt if completed, else to orders
@@ -414,7 +499,7 @@ class OrderController {
 
     private function showForm() {
         // Load products for the form
-        $products = Product::getAll();
+        $products  = Product::getAll();
         $customers = $this->getCustomers();
 
         include __DIR__ . '/../views/order_form.php';
