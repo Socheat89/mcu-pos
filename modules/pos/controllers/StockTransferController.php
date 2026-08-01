@@ -49,20 +49,48 @@ class StockTransferController
             $like    = '%' . $search . '%';
 
             if ($isCoffee) {
+                $mainStoreId = null;
+                if (!empty($allStores)) {
+                    $sortedStores = $allStores;
+                    usort($sortedStores, function($a, $b) {
+                        $aDef = !empty($a['is_default']) ? 1 : 0;
+                        $bDef = !empty($b['is_default']) ? 1 : 0;
+                        if ($aDef !== $bDef) return $bDef - $aDef;
+                        return (int)$a['id'] - (int)$b['id'];
+                    });
+                    $mainStoreId = (int)$sortedStores[0]['id'];
+                }
+                $isFromMainStore = ($storeId === $mainStoreId);
+
                 // Search Ingredients with per-store qty
                 if ($hasIngStoreStock) {
-                    $rows = $db->fetchAll(
-                        "SELECT i.id, i.name, i.unit, i.min_stock_alert,
-                                COALESCE(iss.quantity, 0) AS available
-                         FROM ingredients i
-                         LEFT JOIN ingredient_store_stock iss
-                               ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = ?
-                         WHERE i.tenant_id = ?
-                           AND i.name LIKE ?
-                         ORDER BY i.name
-                         LIMIT 80",
-                        [$storeId, $tenantId, $tenantId, $like]
-                    );
+                    if ($isFromMainStore) {
+                        $rows = $db->fetchAll(
+                            "SELECT i.id, i.name, i.unit, i.min_stock_alert,
+                                    COALESCE(iss.quantity, i.stock_quantity, 0) AS available
+                             FROM ingredients i
+                             LEFT JOIN ingredient_store_stock iss
+                                   ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = ?
+                             WHERE i.tenant_id = ?
+                               AND i.name LIKE ?
+                             ORDER BY i.name
+                             LIMIT 80",
+                            [$storeId, $tenantId, $tenantId, $like]
+                        );
+                    } else {
+                        $rows = $db->fetchAll(
+                            "SELECT i.id, i.name, i.unit, i.min_stock_alert,
+                                    COALESCE(iss.quantity, 0) AS available
+                             FROM ingredients i
+                             LEFT JOIN ingredient_store_stock iss
+                                   ON iss.ingredient_id = i.id AND iss.store_id = ? AND iss.tenant_id = ?
+                             WHERE i.tenant_id = ?
+                               AND i.name LIKE ?
+                             ORDER BY i.name
+                             LIMIT 80",
+                            [$storeId, $tenantId, $tenantId, $like]
+                        );
+                    }
                 } else {
                     $rows = $db->fetchAll(
                         "SELECT i.id, i.name, i.unit, i.min_stock_alert,
@@ -237,15 +265,33 @@ class StockTransferController
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private function getIngStoreQty(Database $db, int $storeId, int $ingId, int $tenantId, bool $hasTable): float {
-        if ($hasTable) {
+        if ($hasTable && $storeId > 0) {
             $row = $db->fetchOne(
                 "SELECT quantity FROM ingredient_store_stock WHERE store_id = ? AND ingredient_id = ? AND tenant_id = ?",
                 [$storeId, $ingId, $tenantId]
             );
-            return $row ? (float)$row['quantity'] : 0.0;
+            if ($row !== false && $row !== null) return (float)$row['quantity'];
         }
-        $row = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
-        return $row ? (float)$row['stock_quantity'] : 0.0;
+
+        $allStores = Store::getAll($tenantId);
+        $mainStoreId = null;
+        if (!empty($allStores)) {
+            $sortedStores = $allStores;
+            usort($sortedStores, function($a, $b) {
+                $aDef = !empty($a['is_default']) ? 1 : 0;
+                $bDef = !empty($b['is_default']) ? 1 : 0;
+                if ($aDef !== $bDef) return $bDef - $aDef;
+                return (int)$a['id'] - (int)$b['id'];
+            });
+            $mainStoreId = (int)$sortedStores[0]['id'];
+        }
+
+        if ($mainStoreId === null || $storeId === $mainStoreId || !$hasTable) {
+            $row = $db->fetchOne("SELECT stock_quantity FROM ingredients WHERE id = ? AND tenant_id = ?", [$ingId, $tenantId]);
+            return $row ? (float)$row['stock_quantity'] : 0.0;
+        }
+
+        return 0.0;
     }
 
     private function getProductStoreQty(Database $db, int $storeId, int $productId, int $tenantId, bool $hasTable): int {
