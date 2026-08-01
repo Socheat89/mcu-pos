@@ -628,19 +628,35 @@ class SessionController {
 
             $usageMap = [];
             try {
-                $usedRows = $db->fetchAll(
-                    "SELECT pr.ingredient_id, SUM(pr.quantity * oi.quantity) AS total_used
-                     FROM orders o
-                     JOIN order_items oi ON oi.order_id = o.id
-                     JOIN product_recipes pr ON pr.product_id = oi.product_id AND (pr.product_size_id = oi.size_id OR pr.product_size_id IS NULL)
-                     WHERE o.session_id = ? AND o.tenant_id = ? AND o.status = 'completed'
-                     GROUP BY pr.ingredient_id",
+                $usedLogs = $db->fetchAll(
+                    "SELECT isl.ingredient_id, SUM(ABS(isl.change_quantity)) AS total_used
+                     FROM ingredient_stock_logs isl
+                     JOIN orders o ON o.id = isl.order_id
+                     WHERE o.session_id = ? AND isl.tenant_id = ? AND isl.reason = 'sale'
+                     GROUP BY isl.ingredient_id",
                     [$sessionId, $tenantId]
                 );
-                foreach ($usedRows as $u) {
+                foreach ($usedLogs as $u) {
                     $usageMap[(int)$u['ingredient_id']] = (float)$u['total_used'];
                 }
             } catch (\Throwable $e) {}
+
+            if (empty($usageMap)) {
+                try {
+                    $usedRows = $db->fetchAll(
+                        "SELECT pr.ingredient_id, SUM(pr.quantity * oi.quantity) AS total_used
+                         FROM orders o
+                         JOIN order_items oi ON oi.order_id = o.id
+                         JOIN product_recipes pr ON pr.product_id = oi.product_id
+                         WHERE o.session_id = ? AND o.tenant_id = ? AND o.status = 'completed'
+                         GROUP BY pr.ingredient_id",
+                        [$sessionId, $tenantId]
+                    );
+                    foreach ($usedRows as $u) {
+                        $usageMap[(int)$u['ingredient_id']] = (float)$u['total_used'];
+                    }
+                } catch (\Throwable $e) {}
+            }
 
             foreach ($rawIngredients as $ing) {
                 $ingId = (int)$ing['id'];
