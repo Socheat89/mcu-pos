@@ -664,9 +664,6 @@ class OrderController {
         };
 
         foreach ($products as &$p) {
-            $p['can_sell'] = true;
-            $p['stock_error'] = '';
-
             if ($businessType === 'coffee') {
                 $recipes = $db->fetchAll(
                     "SELECT pr.*, i.name as ingredient_name, i.unit
@@ -678,17 +675,29 @@ class OrderController {
 
                 if (empty($recipes)) {
                     $p['can_sell'] = false;
+                    $p['stock_quantity'] = 0;
                     $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ';
                 } else {
+                    $canSell = true;
+                    $err = '';
                     foreach ($recipes as $r) {
                         $needed = (float)$r['quantity'];
                         $avail  = $currentStoreId ? $getIngQty($currentStoreId, (int)$r['ingredient_id']) : 0.0;
                         if ($needed > $avail) {
-                            $p['can_sell'] = false;
+                            $canSell = false;
                             $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
-                            $p['stock_error'] = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
+                            $err = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
                             break;
                         }
+                    }
+                    if ($canSell) {
+                        $p['can_sell'] = true;
+                        $p['stock_quantity'] = 9999;
+                        $p['stock_error'] = '';
+                    } else {
+                        $p['can_sell'] = false;
+                        $p['stock_quantity'] = 0;
+                        $p['stock_error'] = $err;
                     }
                 }
             } else {
@@ -701,7 +710,12 @@ class OrderController {
                 $availStock = $storeRow ? (int)$storeRow['quantity'] : (int)($p['stock_quantity'] ?? 0);
                 if ($availStock <= 0) {
                     $p['can_sell'] = false;
+                    $p['stock_quantity'] = 0;
                     $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" អស់ស្តុកហើយ';
+                } else {
+                    $p['can_sell'] = true;
+                    $p['stock_quantity'] = $availStock;
+                    $p['stock_error'] = '';
                 }
             }
         }

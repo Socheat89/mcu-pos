@@ -49,8 +49,6 @@ class PosController {
         // Attach sizes & ingredient validation to each product
         foreach ($products as &$p) {
             $p['sizes'] = Product::getSizes($p['id'], $tenantId);
-            $p['can_sell'] = true;
-            $p['stock_error'] = '';
 
             if ($businessType === 'coffee') {
                 $recipes = $db->fetchAll(
@@ -63,19 +61,29 @@ class PosController {
 
                 if (empty($recipes)) {
                     $p['can_sell'] = false;
-                    $p['stock_quantity'] = 0;
-                    $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ';
+                    $p['effective_stock'] = 0;
+                    $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ (Please set up a recipe)';
                 } else {
+                    $canSell = true;
+                    $err = '';
                     foreach ($recipes as $r) {
                         $needed = (float)$r['quantity'];
                         $avail  = $currentStoreId ? $getIngQty($currentStoreId, (int)$r['ingredient_id']) : 0.0;
                         if ($needed > $avail) {
-                            $p['can_sell'] = false;
-                            $p['stock_quantity'] = 0;
+                            $canSell = false;
                             $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
-                            $p['stock_error'] = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
+                            $err = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
                             break;
                         }
+                    }
+                    if ($canSell) {
+                        $p['can_sell'] = true;
+                        $p['effective_stock'] = 9999; // Stock determined strictly by ingredients availability
+                        $p['stock_error'] = '';
+                    } else {
+                        $p['can_sell'] = false;
+                        $p['effective_stock'] = 0;
+                        $p['stock_error'] = $err;
                     }
                 }
             } else {
@@ -88,8 +96,12 @@ class PosController {
                 $availStock = $storeRow ? (int)$storeRow['quantity'] : (int)($p['stock_quantity'] ?? 0);
                 if ($availStock <= 0) {
                     $p['can_sell'] = false;
-                    $p['stock_quantity'] = 0;
+                    $p['effective_stock'] = 0;
                     $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" អស់ស្តុកហើយ';
+                } else {
+                    $p['can_sell'] = true;
+                    $p['effective_stock'] = $availStock;
+                    $p['stock_error'] = '';
                 }
             }
         }

@@ -64,7 +64,7 @@ $dashboardUrl = $posBase . '/dashboard';
                 }
             }
 
-            $effectiveStock = (!isset($p['can_sell']) || $p['can_sell']) ? (int)$p['stock_quantity'] : 0;
+            $effectiveStock = isset($p['effective_stock']) ? (int)$p['effective_stock'] : ((!isset($p['can_sell']) || $p['can_sell']) ? 9999 : 0);
 
             return [
                 'id' => (int)$p['id'],
