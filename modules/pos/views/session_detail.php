@@ -333,8 +333,8 @@ $isClosed        = $session['status'] === 'closed';
                         <tbody>
                             <?php $k = 0; foreach ($sessionIngredients as $ing): $k++;
                                 $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
-                                $used = (float)$ing['qty_used'];
-                                $rem  = (float)$ing['remaining_stock'];
+                                $used = (float)($ing['qty_used'] ?? $ing['used_qty'] ?? 0);
+                                $rem  = (float)($ing['remaining_stock'] ?? $ing['stock_remaining'] ?? 0);
                             ?>
                             <tr>
                                 <td style="color:var(--pos-text-muted);"><?php echo $k; ?></td>
