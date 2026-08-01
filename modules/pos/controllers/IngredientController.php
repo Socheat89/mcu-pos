@@ -9,6 +9,7 @@ require_once __DIR__ . '/../models/Ingredient.php';
 require_once __DIR__ . '/../models/Product.php';
 require_once dirname(__DIR__, 3) . '/core/helpers/url.php';
 
+class IngredientController {
     public function index() {
         TenantMiddleware::handle();
         AuthMiddleware::handle();
@@ -150,54 +151,14 @@ require_once dirname(__DIR__, 3) . '/core/helpers/url.php';
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+        if (!Auth::isTenantAdmin()) {
+            die('No permission');
+        }
+
         Ingredient::delete((int)$id);
 
         $prefix = mc_base_path();
         header('Location: ' . $prefix . '/' . Tenant::getCurrent()['subdomain'] . '/pos/ingredients');
-        exit;
-    }
-
-    // Ajax endpoint to save/update recipe for a specific product
-    public function saveRecipe() {
-        TenantMiddleware::handle();
-        AuthMiddleware::handle();
-
-        header('Content-Type: application/json');
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'error' => 'Invalid method']);
-            exit;
-        }
-
-        $productId = (int)($_POST['product_id'] ?? 0);
-        if ($productId <= 0) {
-            echo json_encode(['success' => false, 'error' => 'Invalid product']);
-            exit;
-        }
-
-        $recipeItems = [];
-        $ingredients = $_POST['recipe_ingredients'] ?? [];
-        $quantities = $_POST['recipe_quantities'] ?? [];
-        $sizes = $_POST['recipe_sizes'] ?? []; // Product size ids or empty for base product
-
-        if (is_array($ingredients) && is_array($quantities)) {
-            foreach ($ingredients as $i => $ingId) {
-                $ingId = (int)$ingId;
-                $qty = (float)($quantities[$i] ?? 0);
-                $sizeId = isset($sizes[$i]) && $sizes[$i] !== '' ? (int)$sizes[$i] : null;
-
-                if ($ingId > 0 && $qty > 0) {
-                    $recipeItems[] = [
-                        'ingredient_id' => $ingId,
-                        'quantity' => $qty,
-                        'product_size_id' => $sizeId
-                    ];
-                }
-            }
-        }
-
-        Ingredient::saveRecipe($productId, $recipeItems);
-        echo json_encode(['success' => true]);
         exit;
     }
 }
