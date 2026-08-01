@@ -63,6 +63,7 @@ class PosController {
 
                 if (empty($recipes)) {
                     $p['can_sell'] = false;
+                    $p['stock_quantity'] = 0;
                     $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" មិនទាន់មាន Recipe/គ្រឿងផ្សំ ទេ មិនអាចលក់បានឡើយ';
                 } else {
                     foreach ($recipes as $r) {
@@ -70,6 +71,7 @@ class PosController {
                         $avail  = $currentStoreId ? $getIngQty($currentStoreId, (int)$r['ingredient_id']) : 0.0;
                         if ($needed > $avail) {
                             $p['can_sell'] = false;
+                            $p['stock_quantity'] = 0;
                             $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
                             $p['stock_error'] = 'ខ្វះគ្រឿងផ្សំ "' . $r['ingredient_name'] . '" ក្នុង Store (ត្រូវការ ' . $needed . $unitStr . ' ប៉ុន្តែមាន ' . $avail . $unitStr . ')';
                             break;
@@ -86,6 +88,7 @@ class PosController {
                 $availStock = $storeRow ? (int)$storeRow['quantity'] : (int)($p['stock_quantity'] ?? 0);
                 if ($availStock <= 0) {
                     $p['can_sell'] = false;
+                    $p['stock_quantity'] = 0;
                     $p['stock_error'] = 'ផលិតផល "' . $p['name'] . '" អស់ស្តុកហើយ';
                 }
             }

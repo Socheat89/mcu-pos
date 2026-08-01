@@ -64,13 +64,16 @@ $dashboardUrl = $posBase . '/dashboard';
                 }
             }
 
+            $effectiveStock = (!isset($p['can_sell']) || $p['can_sell']) ? (int)$p['stock_quantity'] : 0;
+
             return [
                 'id' => (int)$p['id'],
                 'name' => $p['name'],
                 'sku' => $p['sku'] ?? '',
                 'barcode' => $p['barcode'] ?? '',
                 'price' => (float)$p['price'],
-                'stock' => (int)$p['stock_quantity'],
+                'stock' => $effectiveStock,
+                'stock_quantity' => $effectiveStock,
                 'category' => $p['category_name'] ?? 'No Category',
                 'image' => $image,
                 'sizes' => $sizes,
