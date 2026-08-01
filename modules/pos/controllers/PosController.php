@@ -112,9 +112,16 @@ class PosController {
                 } else {
                     $canSell = true;
                     $err = '';
+                    $maxPossibleQty = 999999;
                     foreach ($recipes as $r) {
                         $needed = (float)$r['quantity'];
                         $avail  = $currentStoreId ? $getIngQty($currentStoreId, (int)$r['ingredient_id']) : 0.0;
+                        if ($needed > 0) {
+                            $possible = (int)floor($avail / $needed);
+                            if ($possible < $maxPossibleQty) {
+                                $maxPossibleQty = $possible;
+                            }
+                        }
                         if ($needed > $avail) {
                             $canSell = false;
                             $unitStr = !empty($r['unit']) ? ' ' . $r['unit'] : '';
@@ -122,14 +129,14 @@ class PosController {
                             break;
                         }
                     }
-                    if ($canSell) {
+                    if ($canSell && $maxPossibleQty > 0) {
                         $p['can_sell'] = true;
-                        $p['effective_stock'] = 9999; // Stock determined strictly by ingredients availability
+                        $p['effective_stock'] = $maxPossibleQty;
                         $p['stock_error'] = '';
                     } else {
                         $p['can_sell'] = false;
                         $p['effective_stock'] = 0;
-                        $p['stock_error'] = $err;
+                        $p['stock_error'] = $err ?: ('គ្រឿងផ្សំមិនគ្រាន់គ្រាន់សម្រាប់លក់ "' . $p['name'] . '" ឡើយ');
                     }
                 }
             } else {
