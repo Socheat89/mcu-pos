@@ -89,6 +89,20 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             <option value="low">⚠️ ស្តុកតិច / Low Stock</option>
                             <option value="ok">✅ គ្រប់គ្រាន់ / In Stock</option>
                         </select>
+
+                        <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                        <form method="GET" action="" style="margin:0; display:inline-flex;">
+                            <select name="store_id" onchange="this.form.submit()" 
+                                style="padding: 7px 14px; border: 1.5px solid rgba(99,102,241,0.3); border-radius: 10px; font-size: 13px; font-weight: 800; background: rgba(99,102,241,0.08); color: var(--pos-primary); outline: none; cursor: pointer;">
+                                <option value="0">🏪 All Stores (ហាងទាំងអស់)</option>
+                                <?php foreach ($allStores as $s): ?>
+                                <option value="<?php echo $s['id']; ?>" <?php echo ($selectedStoreId == $s['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars('[' . ($s['code'] ?? '--') . '] ' . $s['name']); ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </form>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -182,6 +196,9 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             <strong style="display: block; font-size: 13px; color: var(--pos-text);"><?php echo htmlspecialchars($log['ingredient_name']); ?></strong>
                             <span style="font-size: 11px; color: var(--pos-text-muted); font-weight: 600; display: block; margin-top: 4px;">
                                 <?php echo date('d M h:i A', strtotime($log['created_at'])); ?>
+                                <?php if (!empty($log['store_name'])): ?>
+                                    · <span style="color:var(--pos-primary); font-weight:800;"><?php echo htmlspecialchars($log['store_name']); ?></span>
+                                <?php endif; ?>
                                 <?php if (!empty($log['order_id'])): ?>
                                     · Order #<?php echo $log['order_id']; ?>
                                 <?php endif; ?>
@@ -292,6 +309,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                 </button>
             </div>
             <form id="topupForm" method="POST">
+                <input type="hidden" name="store_id" value="<?php echo (int)$selectedStoreId; ?>">
                 <div style="padding: 24px;">
                     <p style="margin: 0 0 16px; font-size: 14px; font-weight: 600; color: var(--pos-text);">
                         គ្រឿងផ្សំ: <span id="topup_ing_name" style="color: var(--pos-primary);"></span>

@@ -99,7 +99,7 @@ class Ingredient {
         return true;
     }
 
-    public static function logTopup($ingredientId, $quantity, $tenantId = null) {
+    public static function logTopup($ingredientId, $quantity, $storeId = null, $tenantId = null) {
         if (!$tenantId) $tenantId = Tenant::getId();
         
         $ingredient = self::getById($ingredientId, $tenantId);
@@ -108,12 +108,33 @@ class Ingredient {
         $newQty = (float)$ingredient['stock_quantity'] + (float)$quantity;
         self::$db->update('ingredients', ['stock_quantity' => $newQty], 'id = ? AND tenant_id = ?', [$ingredientId, $tenantId]);
 
-        self::$db->insert('ingredient_stock_logs', [
-            'tenant_id' => $tenantId,
-            'ingredient_id' => $ingredientId,
-            'change_quantity' => (float)$quantity,
-            'reason' => 'topup'
-        ]);
+        if ($storeId) {
+            try {
+                self::$db->query(
+                    "INSERT INTO ingredient_store_stock (tenant_id, store_id, ingredient_id, quantity)
+                     VALUES (?, ?, ?, ?)
+                     ON DUPLICATE KEY UPDATE quantity = quantity + ?",
+                    [$tenantId, $storeId, $ingredientId, (float)$quantity, (float)$quantity]
+                );
+            } catch (\Throwable $e) {}
+        }
+
+        try {
+            self::$db->insert('ingredient_stock_logs', [
+                'tenant_id' => $tenantId,
+                'store_id'  => $storeId,
+                'ingredient_id' => $ingredientId,
+                'change_quantity' => (float)$quantity,
+                'reason' => 'topup'
+            ]);
+        } catch (\Throwable $e) {
+            self::$db->insert('ingredient_stock_logs', [
+                'tenant_id' => $tenantId,
+                'ingredient_id' => $ingredientId,
+                'change_quantity' => (float)$quantity,
+                'reason' => 'topup'
+            ]);
+        }
 
         return true;
     }
