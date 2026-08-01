@@ -169,30 +169,31 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
     position: fixed;
     z-index: 9998; background: #fff;
     border: 1.5px solid #e2e8f0; border-radius: 14px;
-    max-height: 260px; overflow-y: auto;
-    box-shadow: 0 12px 36px rgba(0,0,0,.14);
-    display: none; min-width: 280px;
+    max-height: 250px; overflow-y: auto;
+    box-shadow: 0 16px 40px rgba(15,23,42,.14);
+    display: none;
 }
 .pdrop.open { display: block; }
 .pdrop-item {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 12px;
     padding: 10px 14px; cursor: pointer;
-    border-bottom: 1px solid #f8fafc; transition: background .12s;
+    border-bottom: 1px solid #f8fafc; transition: all .15s ease;
 }
 .pdrop-item:last-child { border-bottom: none; }
 .pdrop-item:hover { background: rgba(99,102,241,.06); }
 .pdrop-thumb {
-    width: 34px; height: 34px; border-radius: 8px; object-fit: cover;
+    width: 36px; height: 36px; border-radius: 10px; object-fit: cover;
     border: 1px solid #e2e8f0; flex-shrink: 0;
-    background: #f1f5f9; display: flex; align-items: center; justify-content: center;
-    color: #cbd5e1; font-size: 12px; overflow: hidden;
+    background: rgba(99,102,241,.08); color: var(--pos-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; overflow: hidden;
 }
 .pdrop-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.pdrop-name { font-size: 13px; font-weight: 800; color: #1e293b; }
-.pdrop-meta { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 1px; }
+.pdrop-name { font-size: 13.5px; font-weight: 800; color: #1e293b; line-height: 1.3; }
+.pdrop-meta { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
 .pdrop-stock {
     margin-left: auto; font-size: 12px; font-weight: 800; flex-shrink: 0;
-    padding: 3px 9px; border-radius: 8px;
+    padding: 4px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;
 }
 .s-ok  { background: rgba(16,185,129,.1); color: #10b981; }
 .s-low { background: rgba(245,158,11,.1); color: #f59e0b; }
@@ -807,33 +808,30 @@ function showDrop(id, items) {
     const wrap = document.getElementById('pwrap-'+id);
     if (!drop || !wrap) return;
 
-    const rect = wrap.getBoundingClientRect();
-    drop.style.top    = (rect.bottom + 4) + 'px';
-    drop.style.left   = rect.left + 'px';
-    drop.style.width  = Math.max(rect.width, 300) + 'px';
+    repositionDrop(id);
 
     drop.innerHTML = '';
     if (!items.length) {
-        drop.innerHTML = '<div style="padding:14px 16px;color:#94a3b8;font-size:13px;font-weight:600;text-align:center;">No items found</div>';
+        drop.innerHTML = '<div style="padding:14px 16px;color:#94a3b8;font-size:13px;font-weight:600;text-align:center;"><i class="fas fa-search-minus" style="margin-right:6px;opacity:0.5;"></i>No items found</div>';
         drop.classList.add('open');
         openDropId = id;
         return;
     }
 
     items.forEach(p => {
-        const av  = parseFloat(p.available ?? 0);
-        const cls = av > 10 ? 's-ok' : (av > 0 ? 's-low' : 's-nil');
+        const av   = parseFloat(p.available ?? 0);
+        const cls  = av > 10 ? 's-ok' : (av > 0 ? 's-low' : 's-nil');
         const unit = p.unit || 'units';
-        const div = document.createElement('div');
+        const div  = document.createElement('div');
         div.className = 'pdrop-item';
+
         if (IS_COFFEE) {
             div.innerHTML = `
                 <div class="pdrop-thumb"><i class="fas fa-flask"></i></div>
                 <div style="flex:1;min-width:0;">
                     <div class="pdrop-name">${esc(p.name)}</div>
-                    <div class="pdrop-meta">${unit}</div>
                 </div>
-                <span class="pdrop-stock ${cls}">${av} ${esc(unit)}</span>
+                <span class="pdrop-stock ${cls}"><i class="fas fa-cubes" style="font-size:10px;"></i> ${av} ${esc(unit)}</span>
             `;
         } else {
             div.innerHTML = `
@@ -842,7 +840,7 @@ function showDrop(id, items) {
                 </div>
                 <div style="flex:1;min-width:0;">
                     <div class="pdrop-name">${esc(p.name)}</div>
-                    <div class="pdrop-meta">${p.sku ? 'SKU: '+esc(p.sku) : ''}${p.category_name ? ' · '+esc(p.category_name) : ''}</div>
+                    ${p.sku || p.category_name ? `<div class="pdrop-meta">${p.sku ? 'SKU: '+esc(p.sku) : ''}${p.category_name ? ' · '+esc(p.category_name) : ''}</div>` : ''}
                 </div>
                 <span class="pdrop-stock ${cls}">${av} units</span>
             `;
@@ -853,6 +851,20 @@ function showDrop(id, items) {
     drop.classList.add('open');
     openDropId = id;
 }
+
+function repositionDrop(id) {
+    const drop = document.getElementById('pdrop-'+id);
+    const wrap = document.getElementById('pwrap-'+id);
+    if (!drop || !wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    drop.style.top   = (rect.bottom + 4) + 'px';
+    drop.style.left  = rect.left + 'px';
+    drop.style.width = rect.width + 'px';
+}
+
+// Reposition dropdown on scroll/resize
+window.addEventListener('scroll', () => { if (openDropId !== null) repositionDrop(openDropId); }, true);
+window.addEventListener('resize', () => { if (openDropId !== null) repositionDrop(openDropId); });
 
 function closeDrop(id) {
     const drop = document.getElementById('pdrop-'+id);
@@ -874,8 +886,9 @@ function pickItem(id, p) {
 
     const sku = document.getElementById('psku-'+id);
     if (sku) {
-        const meta = IS_COFFEE ? unit : (p.sku ? 'SKU: '+p.sku : '');
-        sku.textContent = meta; sku.style.display = meta ? 'block' : 'none';
+        const meta = (!IS_COFFEE && p.sku) ? 'SKU: ' + p.sku : '';
+        sku.textContent = meta;
+        sku.style.display = meta ? 'block' : 'none';
     }
 
     const avBadge = document.getElementById('pavail-'+id);
