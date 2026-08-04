@@ -25,7 +25,10 @@ class PosController {
 
         $tenantId = Tenant::getId();
         $db = Database::getInstance();
-        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne(
+            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?",
+            [$tenantId, Auth::user()['id']]
+        );
         if (!$activeSession) {
             $prefix = mc_base_path();
             header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/open");

@@ -55,8 +55,8 @@ class SessionController {
             );
 
             $activeSession = $db->fetchOne(
-                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'" . $storeFilter,
-                $storeParams
+                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?" . $storeFilter,
+                array_merge([$tenantId, Auth::user()['id']], array_slice($storeParams, 1))
             );
         } catch (Exception $e) {
             // Fallback: store_id column doesn't exist yet, query without store filter
@@ -70,8 +70,8 @@ class SessionController {
             );
 
             $activeSession = $db->fetchOne(
-                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'",
-                [$tenantId]
+                "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?",
+                [$tenantId, Auth::user()['id']]
             );
         }
 
@@ -98,19 +98,11 @@ class SessionController {
         $currentStore = Store::getCurrent($tenantId);
         $autoStoreId = $currentStore ? $currentStore['id'] : null;
 
-        // Check if there is already an active session (for this user or globally)
-        try {
-            $activeSession = $db->fetchOne(
-                "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?",
-                [$tenantId, Auth::user()['id']]
-            );
-        } catch (Exception $e) {
-            // Fallback without user_id filter
-            $activeSession = $db->fetchOne(
-                "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'",
-                [$tenantId]
-            );
-        }
+        // Check if this user already has an active session
+        $activeSession = $db->fetchOne(
+            "SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?",
+            [$tenantId, Auth::user()['id']]
+        );
 
         if ($activeSession) {
             $prefix = mc_base_path();
@@ -186,10 +178,10 @@ class SessionController {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
 
-        // Find active session
+        // Find active session for THIS user only
         $activeSession = $db->fetchOne(
-            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", 
-            [$tenantId]
+            "SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?", 
+            [$tenantId, Auth::user()['id']]
         );
 
         if (!$activeSession) {

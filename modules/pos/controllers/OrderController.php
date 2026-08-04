@@ -101,7 +101,7 @@ class OrderController {
         $db = Database::getInstance();
         $tenantId = Tenant::getId();
 
-        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT id FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?", [$tenantId, Auth::user()['id']]);
         if (!$activeSession) {
             die('No active POS session. Please open a session first.');
         }
@@ -298,7 +298,7 @@ class OrderController {
         $tenantId = Tenant::getId();
 
         // Enforce active session check
-        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?", [$tenantId, Auth::user()['id']]);
         if (!$activeSession) {
             die('Order creation failed: No active POS session. Please open a session first.');
         }
@@ -686,7 +686,7 @@ class OrderController {
         $tenantId = Tenant::getId();
 
         require_once __DIR__ . '/../../../core/classes/Store.php';
-        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT * FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?", [$tenantId, Auth::user()['id']]);
         if ($activeSession && !empty($activeSession['store_id'])) {
             Store::setCurrent((int)$activeSession['store_id'], $tenantId);
         }

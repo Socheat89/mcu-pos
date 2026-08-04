@@ -46,7 +46,7 @@ class IngredientController {
         }
 
         // Auto-detect active store from session / user store if not explicitly provided in URL
-        $activeSession = $db->fetchOne("SELECT store_id FROM pos_sessions WHERE tenant_id = ? AND status = 'open'", [$tenantId]);
+        $activeSession = $db->fetchOne("SELECT store_id FROM pos_sessions WHERE tenant_id = ? AND status = 'open' AND user_id = ?", [$tenantId, Auth::user()['id']]);
         if ($activeSession && !empty($activeSession['store_id'])) {
             Store::setCurrent((int)$activeSession['store_id'], $tenantId);
         }
