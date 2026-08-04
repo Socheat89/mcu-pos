@@ -205,7 +205,10 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                     <p style="text-align: center; color: var(--pos-text-muted); padding: 32px; font-size: 13px;">
                         មិនទាន់មានចលនាស្តុកនៅឡើយទេ / No logs found.
                     </p>
-                    <?php else: foreach ($logs as $log): ?>
+                    <?php else: foreach ($logs as $log): 
+                        $logReason = $log['reason'] ?? '';
+                        $counterName = $log['counterpart_store_name'] ?? null;
+                    ?>
                     <div style="background: var(--pos-bg-body); border: 1.5px solid var(--pos-border); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <strong style="display: block; font-size: 13px; color: var(--pos-text);"><?php echo htmlspecialchars($log['ingredient_name']); ?></strong>
@@ -213,6 +216,13 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                 <?php echo date('d M h:i A', strtotime($log['created_at'])); ?>
                                 <?php if (!empty($log['store_name'])): ?>
                                     · <span style="color:var(--pos-primary); font-weight:800;"><?php echo htmlspecialchars($log['store_name']); ?></span>
+                                <?php endif; ?>
+                                <?php if ($counterName): ?>
+                                    <?php if ($logReason === 'transfer_in'): ?>
+                                    · <span style="color:#6366f1; font-weight:700;"><i class="fas fa-arrow-right" style="font-size:9px;"></i> From <?php echo htmlspecialchars($counterName); ?></span>
+                                    <?php elseif ($logReason === 'transfer_out'): ?>
+                                    · <span style="color:#f59e0b; font-weight:700;"><i class="fas fa-arrow-right" style="font-size:9px;"></i> To <?php echo htmlspecialchars($counterName); ?></span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <?php if (!empty($log['order_id'])): ?>
                                     · Order #<?php echo $log['order_id']; ?>
@@ -223,8 +233,8 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             <strong style="font-size: 14px; display: block; color: <?php echo $log['change_quantity'] > 0 ? '#10b981' : '#ef4444'; ?>;">
                                 <?php echo ($log['change_quantity'] > 0 ? '+' : '') . (float)$log['change_quantity'] . ' ' . htmlspecialchars($log['unit']); ?>
                             </strong>
-                            <span class="log-badge log-<?php echo htmlspecialchars($log['reason']); ?>" style="margin-top: 4px; display: inline-block;">
-                                <?php echo htmlspecialchars($log['reason']); ?>
+                            <span class="log-badge log-<?php echo htmlspecialchars($logReason); ?>" style="margin-top: 4px; display: inline-block;">
+                                <?php echo htmlspecialchars($logReason); ?>
                             </span>
                         </div>
                     </div>

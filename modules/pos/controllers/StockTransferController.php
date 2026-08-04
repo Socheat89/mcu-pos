@@ -226,10 +226,18 @@ class StockTransferController
                 $transferHistory = $db->fetchAll(
                     "SELECT isl.change_quantity, isl.reason, isl.note, isl.created_at,
                             i.name AS item_name, i.unit,
-                            s.name AS store_name
+                            s.name AS store_name,
+                            s2.name AS counterpart_store_name
                      FROM ingredient_stock_logs isl
                      LEFT JOIN ingredients i ON i.id = isl.ingredient_id
                      LEFT JOIN stores s ON s.id = isl.store_id
+                     LEFT JOIN ingredient_stock_logs isl2 ON isl2.ingredient_id = isl.ingredient_id
+                         AND isl2.note = isl.note
+                         AND isl2.reason = CASE WHEN isl.reason = 'transfer_out' THEN 'transfer_in'
+                                                WHEN isl.reason = 'transfer_in' THEN 'transfer_out'
+                                                ELSE '' END
+                         AND isl2.id != isl.id
+                     LEFT JOIN stores s2 ON s2.id = isl2.store_id
                      WHERE isl.tenant_id = ?
                        AND isl.reason IN ('transfer_in','transfer_out')
                      ORDER BY isl.created_at DESC
@@ -240,10 +248,18 @@ class StockTransferController
                 $transferHistory = $db->fetchAll(
                     "SELECT sl.change_quantity, sl.reason, sl.note, sl.created_at,
                             p.name AS item_name, '' AS unit,
-                            s.name AS store_name
+                            s.name AS store_name,
+                            s2.name AS counterpart_store_name
                      FROM stock_logs sl
                      LEFT JOIN products p ON p.id = sl.product_id
                      LEFT JOIN stores s ON s.id = sl.store_id
+                     LEFT JOIN stock_logs sl2 ON sl2.product_id = sl.product_id
+                         AND sl2.note = sl.note
+                         AND sl2.reason = CASE WHEN sl.reason = 'transfer_out' THEN 'transfer_in'
+                                               WHEN sl.reason = 'transfer_in' THEN 'transfer_out'
+                                               ELSE '' END
+                         AND sl2.id != sl.id
+                     LEFT JOIN stores s2 ON s2.id = sl2.store_id
                      WHERE sl.tenant_id = ?
                        AND sl.reason IN ('transfer_in','transfer_out')
                      ORDER BY sl.created_at DESC

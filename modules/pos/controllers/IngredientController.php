@@ -135,22 +135,38 @@ class IngredientController {
         if ($hasLogStoreId) {
             if ($selectedStoreId > 0) {
                 $logs = $db->fetchAll(
-                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
+                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name,
+                            s2.name AS counterpart_store_name
                      FROM ingredient_stock_logs isl 
                      JOIN ingredients i ON isl.ingredient_id = i.id 
                      LEFT JOIN orders o ON isl.order_id = o.id 
                      LEFT JOIN stores s ON isl.store_id = s.id
+                     LEFT JOIN ingredient_stock_logs isl2 ON isl2.ingredient_id = isl.ingredient_id
+                         AND isl2.note = isl.note
+                         AND isl2.reason = CASE WHEN isl.reason = 'transfer_out' THEN 'transfer_in'
+                                                WHEN isl.reason = 'transfer_in' THEN 'transfer_out'
+                                                ELSE '' END
+                         AND isl2.id != isl.id
+                     LEFT JOIN stores s2 ON s2.id = isl2.store_id
                      WHERE isl.tenant_id = ? AND isl.store_id = ?
                      ORDER BY isl.created_at DESC LIMIT 100",
                     [$tenantId, $selectedStoreId]
                 );
             } else {
                 $logs = $db->fetchAll(
-                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name
+                    "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, s.name as store_name,
+                            s2.name AS counterpart_store_name
                      FROM ingredient_stock_logs isl 
                      JOIN ingredients i ON isl.ingredient_id = i.id 
                      LEFT JOIN orders o ON isl.order_id = o.id 
                      LEFT JOIN stores s ON isl.store_id = s.id
+                     LEFT JOIN ingredient_stock_logs isl2 ON isl2.ingredient_id = isl.ingredient_id
+                         AND isl2.note = isl.note
+                         AND isl2.reason = CASE WHEN isl.reason = 'transfer_out' THEN 'transfer_in'
+                                                WHEN isl.reason = 'transfer_in' THEN 'transfer_out'
+                                                ELSE '' END
+                         AND isl2.id != isl.id
+                     LEFT JOIN stores s2 ON s2.id = isl2.store_id
                      WHERE isl.tenant_id = ? 
                      ORDER BY isl.created_at DESC LIMIT 100",
                     [$tenantId]
@@ -158,7 +174,8 @@ class IngredientController {
             }
         } else {
             $logs = $db->fetchAll(
-                "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, '' as store_name
+                "SELECT isl.*, i.name as ingredient_name, i.unit, o.id as order_number, '' as store_name,
+                        '' AS counterpart_store_name
                  FROM ingredient_stock_logs isl 
                  JOIN ingredients i ON isl.ingredient_id = i.id 
                  LEFT JOIN orders o ON isl.order_id = o.id 

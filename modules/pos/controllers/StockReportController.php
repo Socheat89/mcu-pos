@@ -265,10 +265,18 @@ class StockReportController {
         try {
             $stockLogs = $db->fetchAll(
                 "SELECT sl.*, p.name AS product_name,
-                        st.name AS store_name
+                        st.name AS store_name,
+                        st2.name AS counterpart_store_name
                  FROM stock_logs sl
                  LEFT JOIN products p ON p.id = sl.product_id
                  LEFT JOIN stores st ON st.id = sl.store_id
+                 LEFT JOIN stock_logs sl2 ON sl2.product_id = sl.product_id
+                     AND sl2.note = sl.note
+                     AND sl2.reason = CASE WHEN sl.reason = 'transfer_out' THEN 'transfer_in'
+                                           WHEN sl.reason = 'transfer_in' THEN 'transfer_out'
+                                           ELSE '' END
+                     AND sl2.id != sl.id
+                 LEFT JOIN stores st2 ON st2.id = sl2.store_id
                  WHERE sl.tenant_id = ?
                  ORDER BY sl.created_at DESC
                  LIMIT 80",

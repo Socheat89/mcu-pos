@@ -371,6 +371,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                         <tr>
                             <th>ផលិតផល / Product</th>
                             <th>Store</th>
+                            <th>ពី/ទៅ / From→To</th>
                             <th style="text-align:center;">ប្រភេទ / Type</th>
                             <th style="text-align:center;">ចំនួន / Qty</th>
                             <th style="text-align:center;">មូលហេតុ / Reason</th>
@@ -383,6 +384,7 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                             $reason = $log['reason'] ?? '';
                             $isTransferIn  = ($reason === 'transfer_in');
                             $isTransferOut = ($reason === 'transfer_out');
+                            $counterpartName = $log['counterpart_store_name'] ?? null;
                         ?>
                         <tr>
                             <td style="font-weight:700;"><?php echo htmlspecialchars($log['product_name'] ?? 'N/A'); ?></td>
@@ -391,6 +393,19 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                                 <span class="store-badge"><?php echo htmlspecialchars($log['store_name']); ?></span>
                                 <?php else: ?>
                                 <span style="color:var(--pos-text-muted); font-size:12px;">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($isTransferIn && $counterpartName): ?>
+                                    <span style="font-size:11px; font-weight:700; color:#6366f1;">
+                                        <i class="fas fa-arrow-right" style="font-size:9px;"></i> From <?php echo htmlspecialchars($counterpartName); ?>
+                                    </span>
+                                <?php elseif ($isTransferOut && $counterpartName): ?>
+                                    <span style="font-size:11px; font-weight:700; color:#f59e0b;">
+                                        <i class="fas fa-arrow-right" style="font-size:9px;"></i> To <?php echo htmlspecialchars($counterpartName); ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span style="color:var(--pos-text-muted); font-size:11px;">—</span>
                                 <?php endif; ?>
                             </td>
                             <td style="text-align:center;">

@@ -522,6 +522,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
                 <tr>
                     <th>Item / Name</th>
                     <th>Store</th>
+                    <th>ពី → ទៅ / From → To</th>
                     <th style="text-align:center;">Type</th>
                     <th style="text-align:center;">Qty</th>
                     <th>Reference / Note</th>
@@ -533,6 +534,7 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
                 <?php foreach ($transferHistory as $h):
                     $isIn = ($h['reason'] === 'transfer_in');
                     $qtyDisplay = ($isIn ? '+' : '−') . abs($h['change_quantity']) . ($h['unit'] ? ' ' . $h['unit'] : '');
+                    $counterName = $h['counterpart_store_name'] ?? null;
                 ?>
                 <tr>
                     <td style="font-weight:800;"><?php echo htmlspecialchars($h['item_name'] ?? 'N/A'); ?></td>
@@ -540,6 +542,21 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
                         <?php if (!empty($h['store_name'])): ?>
                         <span class="store-tag"><?php echo htmlspecialchars($h['store_name']); ?></span>
                         <?php else: ?><span style="color:#cbd5e1;">—</span><?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if ($counterName): ?>
+                            <?php if ($isIn): ?>
+                            <span style="font-size:11px; font-weight:700; color:#6366f1;">
+                                <i class="fas fa-arrow-right" style="font-size:9px;"></i> From <?php echo htmlspecialchars($counterName); ?>
+                            </span>
+                            <?php else: ?>
+                            <span style="font-size:11px; font-weight:700; color:#f59e0b;">
+                                <i class="fas fa-arrow-right" style="font-size:9px;"></i> To <?php echo htmlspecialchars($counterName); ?>
+                            </span>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <span style="color:#cbd5e1;">—</span>
+                        <?php endif; ?>
                     </td>
                     <td style="text-align:center;">
                         <span class="hist-pill <?php echo $isIn ? 'hp-in' : 'hp-out'; ?>">
