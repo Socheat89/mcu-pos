@@ -11,7 +11,7 @@ WHERE TABLE_SCHEMA = DATABASE()
   AND COLUMN_NAME = 'locked_store_id';
 
 SET @sql = IF(@col_exists = 0,
-    'ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT ''User locked to this store (NULL=can switch freely)'' AFTER current_store_id',
+    'ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT ''User locked to this store (NULL=can switch freely)''',
     'SELECT ''locked_store_id already exists, skipping.'' AS msg'
 );
 

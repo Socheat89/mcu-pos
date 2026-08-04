@@ -490,7 +490,7 @@ try {
     echo "Checking 'users.locked_store_id'...<br>";
     $columns = $db->fetchAll("SHOW COLUMNS FROM users LIKE 'locked_store_id'");
     if (empty($columns)) {
-        $db->query("ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT 'User is locked to this store (NULL=can switch freely)' AFTER current_store_id");
+        $db->query("ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT 'User is locked to this store (NULL=can switch freely)'");
         echo "→ 'users.locked_store_id' added.<br>";
     } else {
         echo "→ 'users.locked_store_id' already exists.<br>";
