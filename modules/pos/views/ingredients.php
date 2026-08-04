@@ -251,47 +251,90 @@ $subdomain = Tenant::getCurrent()['subdomain'];
 
     <!-- Modal 1: Add Ingredient -->
     <div id="addModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'addModal')">
-        <div class="modal-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1.5px solid var(--pos-border);">
-                <h3 style="margin: 0; font-size: 16px; font-weight: 900; color: var(--pos-text);">
-                    បន្ថែមគ្រឿងផ្សំថ្មី / Add New Ingredient
-                </h3>
-                <button class="pos-icon-btn" onclick="closeModal('addModal')" style="border: 1px solid var(--pos-border); background: #fff; width:32px; height:32px; border-radius:50%; display:grid; place-items:center;">
-                    <i class="fas fa-times" style="color: var(--pos-text-muted);"></i>
+        <div class="modal-card" style="max-width: 520px;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; gap: 14px; padding: 24px 28px 0;">
+                <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08)); display: grid; place-items: center; font-size: 20px; color: var(--pos-primary); flex-shrink: 0;">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div style="flex:1; min-width:0;">
+                    <h3 style="margin:0; font-size:17px; font-weight:900; color:var(--pos-text);">បន្ថែមគ្រឿងផ្សំថ្មី</h3>
+                    <p style="margin:2px 0 0; font-size:12px; color:var(--pos-text-muted);">Add New Ingredient</p>
+                </div>
+                <button onclick="closeModal('addModal')" style="width:34px; height:34px; border-radius:50%; border:1px solid var(--pos-border); background:#fff; cursor:pointer; font-size:16px; color:var(--pos-text-muted); display:grid; place-items:center; flex-shrink:0; transition:all 0.15s;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444';this.style.borderColor='#fecaca'" onmouseout="this.style.background='#fff';this.style.color='var(--pos-text-muted)';this.style.borderColor='var(--pos-border)'">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
+
             <form action="<?php echo htmlspecialchars($posUrl('ingredients/create')); ?>" method="POST">
-                <div style="padding: 24px;">
-                    <div class="pos-form-group">
-                        <label class="pos-form-label">ឈ្មោះគ្រឿងផ្សំ / Ingredient Name <span style="color:red;">*</span></label>
-                        <input type="text" name="name" class="pos-form-control" placeholder="ឧ. ទឹកដោះគោខាប់, គ្រាប់កាហ្វេ" required>
+                <div style="padding: 24px 28px;">
+                    <!-- Name -->
+                    <div class="pos-form-group" style="margin-bottom:18px;">
+                        <label class="pos-form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                            <i class="fas fa-tag" style="color:var(--pos-primary); font-size:11px;"></i>
+                            ឈ្មោះ / Name <span style="color:#ef4444;">*</span>
+                        </label>
+                        <input type="text" name="name" class="pos-form-control" placeholder="ឧ. ទឹកដោះគោខាប់, គ្រាប់កាហ្វេ..." required
+                            style="padding:11px 15px; border-radius:12px; font-size:14px; font-weight:700;">
                     </div>
-                    
-                    <div class="pos-grid cols-2" style="gap: 16px;">
-                        <div class="pos-form-group">
-                            <label class="pos-form-label">ស្តុកដើមគ្រា / Opening Stock <span style="color:red;">*</span></label>
-                            <input type="number" step="0.01" name="stock_quantity" class="pos-form-control" value="0.00" min="0" required>
+
+                    <!-- Stock & Unit row -->
+                    <div style="display:grid; grid-template-columns:1fr 120px; gap:14px; margin-bottom:18px;">
+                        <div class="pos-form-group" style="margin-bottom:0;">
+                            <label class="pos-form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                                <i class="fas fa-cubes" style="color:#10b981; font-size:11px;"></i>
+                                ស្តុកដើម / Opening Stock <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="stock_quantity" value="0.00" min="0" required
+                                style="width:100%; padding:11px 15px; border:1.5px solid var(--pos-border); border-radius:12px; font-size:15px; font-weight:800; text-align:center; outline:none; color:var(--pos-text); background:#fff; transition:border-color 0.2s;"
+                                onfocus="this.style.borderColor='var(--pos-primary)'" onblur="this.style.borderColor='var(--pos-border)'">
                         </div>
-                        <div class="pos-form-group">
-                            <label class="pos-form-label">ឯកតា / Unit <span style="color:red;">*</span></label>
-                            <input type="text" name="unit" class="pos-form-control" placeholder="g, ml, pcs, kg, box" required>
+                        <div class="pos-form-group" style="margin-bottom:0;">
+                            <label class="pos-form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                                <i class="fas fa-weight-scale" style="color:#f59e0b; font-size:11px;"></i>
+                                ឯកតា / Unit <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="text" name="unit" placeholder="g, ml, kg..." required
+                                style="width:100%; padding:11px 12px; border:1.5px solid var(--pos-border); border-radius:12px; font-size:14px; font-weight:700; text-align:center; outline:none; color:var(--pos-text); background:#fff; transition:border-color 0.2s;"
+                                onfocus="this.style.borderColor='var(--pos-primary)'" onblur="this.style.borderColor='var(--pos-border)'">
                         </div>
                     </div>
-                    
-                    <div class="pos-grid cols-2" style="gap: 16px;">
-                        <div class="pos-form-group">
-                            <label class="pos-form-label">ព្រមានពេលស្តុកតិចជាង / Low Stock Alert Threshold</label>
-                            <input type="number" step="0.01" name="min_stock_alert" class="pos-form-control" value="0.00" min="0">
+
+                    <!-- Alert & Cost row -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:6px;">
+                        <div class="pos-form-group" style="margin-bottom:0;">
+                            <label class="pos-form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                                <i class="fas fa-bell" style="color:#ef4444; font-size:11px;"></i>
+                                ព្រមានស្តុកតិច / Alert Qty
+                            </label>
+                            <input type="number" step="0.01" name="min_stock_alert" value="0.00" min="0"
+                                style="width:100%; padding:11px 15px; border:1.5px solid var(--pos-border); border-radius:12px; font-size:14px; font-weight:700; text-align:center; outline:none; color:var(--pos-text); background:#fff; transition:border-color 0.2s;"
+                                onfocus="this.style.borderColor='var(--pos-primary)'" onblur="this.style.borderColor='var(--pos-border)'">
                         </div>
-                        <div class="pos-form-group">
-                            <label class="pos-form-label">តម្លៃដើម / Cost Price ($) <span style="font-size:10px;color:var(--pos-text-muted);">សម្រាប់តាមដានចំណេញខាត</span></label>
-                            <input type="number" step="0.001" name="cost_price" class="pos-form-control" value="0.000" min="0" placeholder="0.000">
+                        <div class="pos-form-group" style="margin-bottom:0;">
+                            <label class="pos-form-label" style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                                <i class="fas fa-dollar-sign" style="color:#10b981; font-size:11px;"></i>
+                                តម្លៃដើម / Cost Price ($)
+                            </label>
+                            <input type="number" step="0.001" name="cost_price" value="0.000" min="0" placeholder="0.000"
+                                style="width:100%; padding:11px 15px; border:1.5px solid var(--pos-border); border-radius:12px; font-size:14px; font-weight:700; text-align:center; outline:none; color:var(--pos-text); background:#fff; transition:border-color 0.2s; font-family:monospace;"
+                                onfocus="this.style.borderColor='var(--pos-primary)'" onblur="this.style.borderColor='var(--pos-border)'">
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1.5px solid var(--pos-border); background: #f9fafb;">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('addModal')">បោះបង់ / Cancel</button>
-                    <button type="submit" class="btn">រក្សាទុក / Save</button>
+
+                <!-- Footer -->
+                <div style="display:flex; justify-content:flex-end; gap:10px; padding:16px 28px; border-top:1px solid #f1f5f9; background:#fafbfc; border-radius:0 0 20px 20px;">
+                    <button type="button" onclick="closeModal('addModal')"
+                        style="padding:10px 22px; border:1.5px solid #e2e8f0; border-radius:12px; background:#fff; color:#64748b; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#fff'">
+                        <i class="fas fa-times" style="margin-right:5px;"></i>បោះបង់ / Cancel
+                    </button>
+                    <button type="submit"
+                        style="padding:10px 28px; border:none; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3); transition:all 0.15s;"
+                        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(99,102,241,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(99,102,241,0.3)'">
+                        <i class="fas fa-plus-circle" style="margin-right:6px;"></i>រក្សាទុក / Save
+                    </button>
                 </div>
             </form>
         </div>
