@@ -360,11 +360,11 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
         </div>
 
         <!-- Recent Stock Movements -->
-        <?php if (!empty($stockLogs)): ?>
         <div class="pos-card" style="margin-bottom:28px; overflow:hidden;">
             <div style="padding:20px 24px; border-bottom:1px solid var(--pos-border);">
                 <h3 class="pos-card-title" style="margin:0;"><i class="fas fa-history" style="color:var(--pos-primary);margin-right:8px;"></i>Recent Movements (Last 80)</h3>
             </div>
+            <?php if (!empty($stockLogs)): ?>
             <div class="pos-table-container">
                 <table class="pos-table">
                     <thead>
@@ -433,8 +433,14 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                     </tbody>
                 </table>
             </div>
+            <?php else: ?>
+            <div style="text-align:center; padding:48px 24px; color:#94a3b8;">
+                <i class="fas fa-inbox" style="font-size:40px; opacity:0.3; display:block; margin-bottom:12px;"></i>
+                <p style="font-weight:700; font-size:14px; margin:0;">មិនទាន់មានចលនាស្តុកនៅឡើយទេ / No stock movements yet.</p>
+                <p style="font-size:12px; margin-top:4px;">Stock adjustments, transfers and sales will appear here.</p>
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
 
     </div>
 

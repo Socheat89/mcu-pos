@@ -500,4 +500,35 @@ try {
 } catch (Exception $e) {
     echo "Addon migration failed: " . $e->getMessage();
 }
+
+// ── Price precision migration (support 3 decimal places) ──
+try {
+    echo "<br>Running price precision migration...<br>";
+
+    $priceColumns = [
+        ['products', 'price', 'DECIMAL(10,3)'],
+        ['products', 'cost_price', 'DECIMAL(10,3)'],
+        ['product_sizes', 'price', 'DECIMAL(10,3)'],
+        ['orders', 'total', 'DECIMAL(12,3)'],
+        ['orders', 'tax', 'DECIMAL(10,3)'],
+        ['orders', 'discount', 'DECIMAL(10,3)'],
+        ['order_items', 'unit_price', 'DECIMAL(10,3)'],
+        ['order_items', 'total', 'DECIMAL(10,3)'],
+        ['payments', 'amount', 'DECIMAL(10,3)'],
+    ];
+
+    foreach ($priceColumns as [$table, $column, $newType]) {
+        echo "Updating {$table}.{$column} → {$newType}...<br>";
+        try {
+            $db->query("ALTER TABLE `{$table}` MODIFY COLUMN `{$column}` {$newType} NOT NULL DEFAULT 0");
+            echo "→ Done.<br>";
+        } catch (Exception $e) {
+            echo "→ Skipped (may already be updated or table/column missing): " . $e->getMessage() . "<br>";
+        }
+    }
+
+    echo "Price precision migration completed!";
+} catch (Exception $e) {
+    echo "Price precision migration failed: " . $e->getMessage();
+}
 ?>

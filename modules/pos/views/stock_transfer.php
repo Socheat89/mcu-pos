@@ -510,12 +510,12 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
 <!-- ════════════════════════════════════════════════════════════════════════
      Transfer History
 ═════════════════════════════════════════════════════════════════════════ -->
-<?php if (!empty($transferHistory)): ?>
 <div class="hist-card">
     <div class="hist-head">
         <h3><i class="fas fa-clock-rotate-left" style="color:var(--pos-primary); margin-right:6px;"></i>Transfer History</h3>
         <span style="font-size:12px; font-weight:700; color:#94a3b8; background:#f1f5f9; padding:3px 10px; border-radius:20px;"><?php echo count($transferHistory); ?> records</span>
     </div>
+    <?php if (!empty($transferHistory)): ?>
     <div style="overflow-x:auto;">
         <table class="hist-tbl">
             <thead>
@@ -585,8 +585,14 @@ body, h1,h2,h3,h4,h5,h6,p,span,a,button,input,select,textarea,td,th {
             </tbody>
         </table>
     </div>
+    <?php else: ?>
+    <div style="text-align:center; padding:48px 24px; color:#94a3b8;">
+        <i class="fas fa-inbox" style="font-size:40px; opacity:0.3; display:block; margin-bottom:12px;"></i>
+        <p style="font-weight:700; font-size:14px; margin:0;">មិនទាន់មានប្រវត្តិផ្ទេរនៅឡើយទេ / No transfer history yet.</p>
+        <p style="font-size:12px; margin-top:4px;">Complete a transfer above to see history here.</p>
+    </div>
+    <?php endif; ?>
 </div>
-<?php endif; ?>
 
 </div><!-- /.fade-in -->
 
