@@ -85,14 +85,16 @@
                                     $unitStr = !empty($ing['unit']) ? ' ' . htmlspecialchars($ing['unit']) : '';
                                     $used = (float)($ing['qty_used'] ?? $ing['used_qty'] ?? 0);
                                     $rem  = (float)($ing['remaining_stock'] ?? $ing['stock_remaining'] ?? 0);
+                                    $usedDisplay = $used > 0 ? ('-' . rtrim(rtrim(number_format($used, 3), '0'), '.')) : '0';
+                                    $remDisplay  = rtrim(rtrim(number_format($rem, 3), '0'), '.');
                                 ?>
                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
                                     <td style="padding: 10px 14px; font-weight: 800; color: var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></td>
                                     <td style="padding: 10px 14px; text-align: center; font-weight: 900; color: <?php echo $used > 0 ? '#f59e0b' : 'var(--pos-text-muted)'; ?>;">
-                                        <?php echo $used > 0 ? ('-' . number_format($used, 3) + 0 . $unitStr) : '0'; ?>
+                                        <?php echo $usedDisplay . $unitStr; ?>
                                     </td>
                                     <td style="padding: 10px 14px; text-align: right; font-weight: 900; color: <?php echo $rem > 10 ? '#10b981' : ($rem > 0 ? '#f59e0b' : '#ef4444'); ?>;">
-                                        <?php echo number_format($rem, 3) + 0 . $unitStr; ?>
+                                        <?php echo $remDisplay . $unitStr; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
