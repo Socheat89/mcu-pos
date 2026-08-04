@@ -1,4 +1,4 @@
-ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT 'User is locked to this store (NULL=can switch freely)' AFTER current_store_id;<?php
+<?php
 return [
     'welcome' => 'Welcome',
     'dashboard' => 'Dashboard',
