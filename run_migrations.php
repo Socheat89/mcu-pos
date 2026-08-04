@@ -531,4 +531,20 @@ try {
 } catch (Exception $e) {
     echo "Price precision migration failed: " . $e->getMessage();
 }
+
+// ── Ingredient cost_price migration ──
+try {
+    echo "<br>Running ingredient cost_price migration...<br>";
+    echo "Checking 'ingredients.cost_price'...<br>";
+    $columns = $db->fetchAll("SHOW COLUMNS FROM ingredients LIKE 'cost_price'");
+    if (empty($columns)) {
+        $db->query("ALTER TABLE ingredients ADD COLUMN cost_price DECIMAL(10,3) DEFAULT 0.000 COMMENT 'Cost price per unit for profit tracking' AFTER min_stock_alert");
+        echo "→ 'ingredients.cost_price' added.<br>";
+    } else {
+        echo "→ 'ingredients.cost_price' already exists.<br>";
+    }
+    echo "Ingredient cost_price migration completed!";
+} catch (Exception $e) {
+    echo "Ingredient cost_price migration failed: " . $e->getMessage();
+}
 ?>

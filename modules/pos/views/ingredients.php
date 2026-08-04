@@ -122,6 +122,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                         <thead>
                             <tr>
                                 <th>ឈ្មោះគ្រឿងផ្សំ / Name</th>
+                                <th style="text-align: right;">តម្លៃដើម / Cost</th>
                                 <th style="text-align: right;">ចំនួនស្តុក / In Stock</th>
                                 <th>ឯកតា / Unit</th>
                                 <th>ព្រមានស្តុកតិច / Alert Qty</th>
@@ -134,7 +135,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                         <tbody id="ingTableBody">
                             <?php if (empty($ingredients)): ?>
                             <tr>
-                                <td colspan="<?php echo $isAdmin ? 6 : 5; ?>" style="text-align: center; padding: 48px; color: var(--pos-text-muted);">
+                                <td colspan="<?php echo $isAdmin ? 7 : 6; ?>" style="text-align: center; padding: 48px; color: var(--pos-text-muted);">
                                     <i class="fas fa-box-open" style="font-size: 32px; opacity: 0.3; display: block; margin-bottom: 8px;"></i>
                                     មិនទាន់មានគ្រឿងផ្សំនៅឡើយទេ / No ingredients added yet.
                                 </td>
@@ -146,6 +147,10 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             <tr class="ing-row" data-name="<?php echo htmlspecialchars(mb_strtolower($ing['name'])); ?>" data-unit="<?php echo htmlspecialchars(mb_strtolower($ing['unit'])); ?>" data-status="<?php echo $statusKey; ?>">
                                 <td>
                                     <strong style="color: var(--pos-text);"><?php echo htmlspecialchars($ing['name']); ?></strong>
+                                </td>
+                                <td style="text-align: right; font-weight: 700; color: var(--pos-text-muted);">
+                                    <?php $cost = (float)($ing['cost_price'] ?? 0); ?>
+                                    <?php echo $cost > 0 ? '$' . number_format($cost, 3) : '<span style="color:#cbd5e1;">—</span>'; ?>
                                 </td>
                                 <td style="text-align: right; font-weight: 800; color: <?php echo $isLow ? '#ef4444' : 'var(--pos-text)'; ?>;">
                                     <?php echo (float)$ing['stock_quantity']; ?>
@@ -177,7 +182,7 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                                         <button class="pos-icon-btn" onclick="openTopupModal(<?php echo $ing['id']; ?>, '<?php echo htmlspecialchars(addslashes($ing['name'])); ?>', '<?php echo htmlspecialchars(addslashes($ing['unit'])); ?>')" title="បំពេញស្តុក / Top Up" style="color: #0284c7; background: #e0f2fe; border: none;">
                                             <i class="fas fa-plus-circle"></i>
                                         </button>
-                                        <button class="pos-icon-btn" onclick="openEditModal(<?php echo $ing['id']; ?>, '<?php echo htmlspecialchars(addslashes($ing['name'])); ?>', '<?php echo htmlspecialchars(addslashes($ing['unit'])); ?>', <?php echo (float)$ing['min_stock_alert']; ?>)" title="កែប្រែ / Edit" style="color: var(--pos-primary); background: rgba(99,102,241,0.06); border: none;">
+                                        <button class="pos-icon-btn" onclick="openEditModal(<?php echo $ing['id']; ?>, '<?php echo htmlspecialchars(addslashes($ing['name'])); ?>', '<?php echo htmlspecialchars(addslashes($ing['unit'])); ?>', <?php echo (float)$ing['min_stock_alert']; ?>, <?php echo (float)($ing['cost_price'] ?? 0); ?>)" title="កែប្រែ / Edit" style="color: var(--pos-primary); background: rgba(99,102,241,0.06); border: none;">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <a href="<?php echo htmlspecialchars($posUrl('ingredients/delete/' . $ing['id'])); ?>" class="pos-icon-btn" title="លុប / Delete" onclick="return confirm('តើអ្នកប្រាកដជាចង់លុបគ្រឿងផ្សំនេះមែនទេ? Delete this ingredient?');" style="color: #ef4444; background: #fee2e2; border: none; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
@@ -273,9 +278,15 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                         </div>
                     </div>
                     
-                    <div class="pos-form-group">
-                        <label class="pos-form-label">ព្រមានពេលស្តុកតិចជាង / Low Stock Alert Threshold</label>
-                        <input type="number" step="0.01" name="min_stock_alert" class="pos-form-control" value="0.00" min="0">
+                    <div class="pos-grid cols-2" style="gap: 16px;">
+                        <div class="pos-form-group">
+                            <label class="pos-form-label">ព្រមានពេលស្តុកតិចជាង / Low Stock Alert Threshold</label>
+                            <input type="number" step="0.01" name="min_stock_alert" class="pos-form-control" value="0.00" min="0">
+                        </div>
+                        <div class="pos-form-group">
+                            <label class="pos-form-label">តម្លៃដើម / Cost Price ($) <span style="font-size:10px;color:var(--pos-text-muted);">សម្រាប់តាមដានចំណេញខាត</span></label>
+                            <input type="number" step="0.001" name="cost_price" class="pos-form-control" value="0.000" min="0" placeholder="0.000">
+                        </div>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1.5px solid var(--pos-border); background: #f9fafb;">
@@ -312,6 +323,10 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                     <div class="pos-form-group">
                         <label class="pos-form-label">ព្រមានពេលស្តុកតិចជាង / Low Stock Alert Threshold</label>
                         <input type="number" step="0.01" name="min_stock_alert" id="edit_min_stock" class="pos-form-control" min="0">
+                    </div>
+                    <div class="pos-form-group">
+                        <label class="pos-form-label">តម្លៃដើម / Cost Price ($) <span style="font-size:10px;color:var(--pos-text-muted);">សម្រាប់តាមដានចំណេញខាត</span></label>
+                        <input type="number" step="0.001" name="cost_price" id="edit_cost_price" class="pos-form-control" value="0.000" min="0" placeholder="0.000">
                     </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1.5px solid var(--pos-border); background: #f9fafb;">
@@ -359,12 +374,13 @@ $subdomain = Tenant::getCurrent()['subdomain'];
         function openAddModal() {
             document.getElementById('addModal').style.display = 'flex';
         }
-        function openEditModal(id, name, unit, minStock) {
+        function openEditModal(id, name, unit, minStock, costPrice) {
             const form = document.getElementById('editForm');
             form.action = '<?php echo htmlspecialchars($posUrl("ingredients/update/")); ?>' + id;
             document.getElementById('edit_name').value = name;
             document.getElementById('edit_unit').value = unit;
             document.getElementById('edit_min_stock').value = minStock;
+            document.getElementById('edit_cost_price').value = costPrice || '0.000';
             document.getElementById('editModal').style.display = 'flex';
         }
         function openTopupModal(id, name, unit) {

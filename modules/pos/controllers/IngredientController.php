@@ -201,7 +201,8 @@ class IngredientController {
                 'name' => trim($_POST['name']),
                 'stock_quantity' => (float)$_POST['stock_quantity'],
                 'unit' => trim($_POST['unit']),
-                'min_stock_alert' => (float)($_POST['min_stock_alert'] ?? 0.00)
+                'min_stock_alert' => (float)($_POST['min_stock_alert'] ?? 0.00),
+                'cost_price' => (float)($_POST['cost_price'] ?? 0.00),
             ];
 
             if ($data['name'] !== '' && $data['unit'] !== '') {
@@ -283,7 +284,8 @@ class IngredientController {
             $data = [
                 'name' => trim($_POST['name']),
                 'unit' => trim($_POST['unit']),
-                'min_stock_alert' => (float)($_POST['min_stock_alert'] ?? 0.00)
+                'min_stock_alert' => (float)($_POST['min_stock_alert'] ?? 0.00),
+                'cost_price' => (float)($_POST['cost_price'] ?? 0.00),
             ];
 
             Ingredient::update((int)$id, $data);
