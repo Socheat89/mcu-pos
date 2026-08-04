@@ -323,7 +323,7 @@
                                             'id' => (int)$c['id'],
                                             'username' => $c['username'],
                                             'email' => $c['email'],
-                                            'current_store_id' => $c['current_store_id'] ?? null,
+                                            'locked_store_id' => $c['locked_store_id'] ?? null,
                                             'status' => $c['status'],
                                         ]); ?>)'>
                                         <i class="fas fa-edit" style="margin-right:4px;"></i>Edit
@@ -458,7 +458,7 @@
             document.getElementById('editEmail').value = cashier.email || '';
             var storeSelect = document.getElementById('editStoreId');
             if (storeSelect) {
-                storeSelect.value = cashier.current_store_id || '';
+                storeSelect.value = cashier.locked_store_id || '';
             }
             document.getElementById('editStatus').value = cashier.status || 'active';
             document.getElementById('editModal').classList.add('open');

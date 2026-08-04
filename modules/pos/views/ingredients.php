@@ -97,12 +97,16 @@ $subdomain = Tenant::getCurrent()['subdomain'];
                             <option value="ok">✅ គ្រប់គ្រាន់ / In Stock</option>
                         </select>
 
-                        <?php if (!empty($allStores) && count($allStores) > 1): ?>
+                        <?php
+                        $isUserLocked = class_exists('Store') && Store::isUserLocked();
+                        $displayStores = class_exists('Store') ? Store::getAllowedStores() : $allStores;
+                        if (!$isUserLocked && !empty($displayStores) && count($displayStores) > 1):
+                        ?>
                         <form method="GET" action="" style="margin:0; display:inline-flex;">
                             <select name="store_id" onchange="this.form.submit()" 
                                 style="padding: 7px 14px; border: 1.5px solid rgba(99,102,241,0.3); border-radius: 10px; font-size: 13px; font-weight: 800; background: rgba(99,102,241,0.08); color: var(--pos-primary); outline: none; cursor: pointer;">
                                 <option value="0">🏪 All Stores (ហាងទាំងអស់)</option>
-                                <?php foreach ($allStores as $s): ?>
+                                <?php foreach ($displayStores as $s): ?>
                                 <option value="<?php echo $s['id']; ?>" <?php echo ($selectedStoreId == $s['id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars('[' . ($s['code'] ?? '--') . '] ' . $s['name']); ?>
                                 </option>

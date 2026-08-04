@@ -34,7 +34,16 @@ class PosController {
 
         require_once __DIR__ . '/../../../core/classes/Store.php';
         if (!empty($activeSession['store_id'])) {
-            Store::setCurrent((int)$activeSession['store_id'], $tenantId);
+            $switched = Store::setCurrent((int)$activeSession['store_id'], $tenantId);
+            // If user is locked to a different store, close the mismatched session
+            if (!$switched && Store::isUserLocked()) {
+                // Active session is for a different store — close it and redirect to open new one
+                $db->update('pos_sessions', ['status' => 'closed', 'closed_at' => date('Y-m-d H:i:s')],
+                    'id = ? AND tenant_id = ?', [$activeSession['id'], $tenantId]);
+                $prefix = mc_base_path();
+                header("Location: " . $prefix . "/" . Tenant::getCurrent()['subdomain'] . "/pos/sessions/open");
+                exit;
+            }
         }
 
         $businessType = Settings::get('business_type', $tenantId, 'coffee');

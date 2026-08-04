@@ -34,6 +34,12 @@ class ReportsController {
         // Selected store filter (0 = all stores)
         $storeId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
 
+        // Enforce store lock: if user is locked, only show their store
+        if (class_exists('Store') && Store::isUserLocked()) {
+            $lockedStoreId = Store::getUserLockedStoreId();
+            $storeId = $lockedStoreId ?: 0;
+        }
+
         try {
             $storeFilter = '';
             $storeParams = [$tenantId];

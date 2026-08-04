@@ -27,6 +27,13 @@ class SessionController {
         // Load stores for filter
         $allStores = Store::getAll($tenantId);
         $storeId = isset($_GET['store_id']) ? (int)$_GET['store_id'] : 0;
+
+        // Enforce store lock: if user is locked, only show their store
+        if (Store::isUserLocked()) {
+            $lockedStoreId = Store::getUserLockedStoreId();
+            $storeId = $lockedStoreId ?: 0;
+        }
+
         $storeFilter = '';
         $storeParams = [$tenantId];
 

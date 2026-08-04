@@ -62,13 +62,17 @@
         </div>
 
         <!-- 🔽 Store Filter -->
-        <?php if (!empty($allStores) && count($allStores) > 1): ?>
+        <?php
+        $isUserLocked = class_exists('Store') && Store::isUserLocked();
+        $displayStores = class_exists('Store') ? Store::getAllowedStores() : $allStores;
+        if (!$isUserLocked && !empty($displayStores) && count($displayStores) > 1):
+        ?>
         <div class="store-filter-bar">
             <i class="fas fa-store-alt" style="color:var(--pos-primary);"></i>
             <span style="font-weight:700;font-size:13px;color:var(--pos-text-muted);"><?php echo __('filter_by_store'); ?>:</span>
             <select onchange="filterStore(this.value)">
                 <option value="0" <?php echo $storeId == 0 ? 'selected' : ''; ?>><?php echo __('all_stores'); ?></option>
-                <?php foreach ($allStores as $st): ?>
+                <?php foreach ($displayStores as $st): ?>
                     <option value="<?php echo $st['id']; ?>" <?php echo $storeId == $st['id'] ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
                     </option>

@@ -43,6 +43,13 @@ class StoreController
         TenantMiddleware::handle();
         AuthMiddleware::handle();
 
+        // If user is locked to a store, deny switching
+        if (Store::isUserLocked()) {
+            $lockedStore = Store::getCurrent();
+            $lockedName = $lockedStore ? $lockedStore['name'] : 'Unknown';
+            die(__('store_locked_error'));
+        }
+
         $storeId = $_GET['store_id'] ?? $_POST['store_id'] ?? null;
 
         if ($storeId && Store::setCurrent($storeId)) {

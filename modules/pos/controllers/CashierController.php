@@ -147,6 +147,7 @@ class CashierController {
                                 'role_id'           => $cashierRoleId,
                                 'status'            => 'active',
                                 'current_store_id'  => $storeId,
+                                'locked_store_id'   => $storeId, // Lock user to assigned store
                             ], $tenantId);
 
                             // Auto-assign selected permissions (or default pos read+write)
@@ -238,6 +239,7 @@ class CashierController {
                             'username'         => $username,
                             'email'            => $email,
                             'current_store_id' => $storeId,
+                            'locked_store_id'  => $storeId, // Lock user to assigned store
                             'status'           => $status,
                         ], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
                         $message = "Cashier \"$username\" updated successfully!";
@@ -252,7 +254,7 @@ class CashierController {
                     s.name as store_name, s.code as store_code
              FROM users u
              JOIN roles r ON u.role_id = r.id
-             LEFT JOIN stores s ON u.current_store_id = s.id
+             LEFT JOIN stores s ON u.locked_store_id = s.id
              WHERE u.tenant_id = ? AND r.level = 1
              ORDER BY u.created_at DESC",
             [$tenantId]

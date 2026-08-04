@@ -164,9 +164,14 @@ require_once __DIR__ . '/../../../core/classes/Settings.php';
                 <div style="font-size:11px; font-weight:700; color:var(--pos-text-muted); text-transform:uppercase; letter-spacing:0.5px;">Stock shown for active store</div>
                 <div style="font-size:15px; font-weight:900; color:var(--pos-text);"><?php echo htmlspecialchars($currentStore['name']); ?> <span style="font-size:12px; color:var(--pos-text-muted); font-weight:600;">(<?php echo htmlspecialchars($currentStore['code'] ?? ''); ?>)</span></div>
             </div>
-            <?php if (!empty($allStores) && count($allStores) > 1): ?>
+            <?php
+            // Use allowed stores (respects store lock)
+            $displayStores = class_exists('Store') ? Store::getAllowedStores() : $allStores;
+            $isUserLocked = class_exists('Store') && Store::isUserLocked();
+            if (!$isUserLocked && !empty($displayStores) && count($displayStores) > 1):
+            ?>
             <div style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;">
-                <?php foreach ($allStores as $s): ?>
+                <?php foreach ($displayStores as $s): ?>
                 <a href="<?php echo htmlspecialchars($posUrl('stores/switch') . '?store_id=' . $s['id'] . '&redirect=' . urlencode($posUrl('stock-report'))); ?>"
                    style="display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:800; text-decoration:none;
                    <?php echo $s['id'] == $currentStore['id'] ? 'background:var(--pos-primary); color:#fff;' : 'background:#f1f5f9; color:var(--pos-text); border:1px solid var(--pos-border);'; ?>">

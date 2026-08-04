@@ -52,7 +52,10 @@ class IngredientController {
         }
         $currentStore = Store::getCurrent($tenantId);
 
-        if (isset($_GET['store_id'])) {
+        // Enforce store lock: if user is locked, ignore any store_id override
+        if (Store::isUserLocked()) {
+            $selectedStoreId = $currentStore ? (int)$currentStore['id'] : 0;
+        } elseif (isset($_GET['store_id'])) {
             $selectedStoreId = (int)$_GET['store_id'];
         } else {
             $selectedStoreId = $currentStore ? (int)$currentStore['id'] : 0;

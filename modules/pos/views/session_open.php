@@ -55,12 +55,16 @@
                         <?php echo __('cash_control'); ?>
                     </h3>
 
-                    <?php if (!empty($allStores) && count($allStores) > 1): ?>
-                    <!-- Multiple stores: show dropdown to override -->
+                    <?php
+                    $isUserLocked = class_exists('Store') && Store::isUserLocked();
+                    $displayStores = class_exists('Store') ? Store::getAllowedStores() : $allStores;
+                    if (!$isUserLocked && !empty($displayStores) && count($displayStores) > 1):
+                    ?>
+                    <!-- Multiple stores: show dropdown to override (only for non-locked users) -->
                     <div class="pos-form-group">
                         <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i><?php echo __('store'); ?></label>
                         <select name="store_id" class="pos-form-control" onchange="document.querySelector('input[name=store_id]').value=this.value">
-                            <?php foreach ($allStores as $st): ?>
+                            <?php foreach ($displayStores as $st): ?>
                                 <option value="<?php echo $st['id']; ?>" <?php echo ($currentStore && $currentStore['id'] == $st['id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
                                 </option>
@@ -68,13 +72,13 @@
                         </select>
                     </div>
                     <?php elseif ($currentStore): ?>
-                    <!-- Single store: show it as a badge -->
+                    <!-- Single store or locked user: show it as a badge -->
                     <div class="pos-form-group">
                         <label class="pos-form-label"><i class="fas fa-store-alt" style="margin-right:6px; color:var(--pos-primary);"></i><?php echo __('store'); ?></label>
                         <div style="padding:14px 18px;background:rgba(var(--pos-primary-rgb),0.05);border:1.5px solid rgba(var(--pos-primary-rgb),0.15);border-radius:14px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;color:var(--pos-text);">
                             <span style="background:var(--pos-primary-light);color:var(--pos-primary);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;"><?php echo htmlspecialchars($currentStore['code'] ?: 'ST'); ?></span>
                             <?php echo htmlspecialchars($currentStore['name']); ?>
-                            <span style="margin-left:auto;font-size:11px;color:var(--pos-text-muted);"><i class="fas fa-check-circle" style="color:var(--pos-success);"></i> <?php echo __('auto_detected'); ?></span>
+                            <span style="margin-left:auto;font-size:11px;color:var(--pos-text-muted);"><i class="fas fa-check-circle" style="color:var(--pos-success);"></i> <?php echo $isUserLocked ? __('store_locked_badge', ['default' => 'Locked']) : __('auto_detected'); ?></span>
                         </div>
                     </div>
                     <?php endif; ?>

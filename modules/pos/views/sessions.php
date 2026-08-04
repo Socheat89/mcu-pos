@@ -50,13 +50,17 @@
         <?php endif; ?>
 
         <!-- 🔽 Store Filter -->
-        <?php if (!empty($allStores) && count($allStores) > 1): ?>
+        <?php
+        $isUserLocked = class_exists('Store') && Store::isUserLocked();
+        $displayStores = class_exists('Store') ? Store::getAllowedStores() : $allStores;
+        if (!$isUserLocked && !empty($displayStores) && count($displayStores) > 1):
+        ?>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:8px 16px;background:var(--pos-card);border:1px solid var(--pos-border);border-radius:14px;">
             <i class="fas fa-store-alt" style="color:var(--pos-primary);"></i>
             <span style="font-weight:700;font-size:13px;color:var(--pos-text-muted);"><?php echo __('filter_by_store'); ?>:</span>
             <select onchange="filterStore(this.value)" style="padding:10px 14px;border-radius:10px;border:1px solid var(--pos-border);background:#fff;font-weight:700;font-size:13px;color:var(--pos-text);outline:none;cursor:pointer;">
                 <option value="0" <?php echo ($storeId ?? 0) == 0 ? 'selected' : ''; ?>><?php echo __('all_stores'); ?></option>
-                <?php foreach ($allStores as $st): ?>
+                <?php foreach ($displayStores as $st): ?>
                     <option value="<?php echo $st['id']; ?>" <?php echo ($storeId ?? 0) == $st['id'] ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($st['code'] ? '[' . $st['code'] . '] ' : '') . htmlspecialchars($st['name']); ?>
                     </option>

@@ -29,14 +29,24 @@ class User {
         }
 
         $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-        return self::getDb()->insert('users', [
+        $userData = [
             'tenant_id' => $tenantId,
             'username' => $data['username'],
             'email' => $data['email'],
             'password_hash' => $passwordHash,
             'role_id' => $data['role_id'],
             'status' => $data['status'] ?? 'active'
-        ]);
+        ];
+
+        // Optional: store assignment
+        if (isset($data['current_store_id'])) {
+            $userData['current_store_id'] = $data['current_store_id'] ?: null;
+        }
+        if (isset($data['locked_store_id'])) {
+            $userData['locked_store_id'] = $data['locked_store_id'] ?: null;
+        }
+
+        return self::getDb()->insert('users', $userData);
     }
 
     public static function getUserLimit($tenantId = null) {

@@ -126,10 +126,17 @@ class Store
         $store = self::getById($storeId, $tenantId);
 
         if ($store) {
+            // Check if user is locked to a specific store
+            $lockedStoreId = self::getUserLockedStoreId();
+            if ($lockedStoreId !== null && (int)$lockedStoreId !== (int)$storeId) {
+                // User is locked to a different store — deny the switch
+                return false;
+            }
+
             $_SESSION['current_store_id'] = $storeId;
             self::$currentStore = $store;
 
-            // Also update user's current_store_id
+            // Also update user's current_store_id (not locked_store_id)
             if (class_exists('Auth') && Auth::user()) {
                 $userId = Auth::user()['id'];
                 $db = Database::getInstance();
@@ -151,6 +158,17 @@ class Store
         }
 
         if (!$tenantId) $tenantId = Tenant::getId();
+
+        // If user is locked to a specific store, ALWAYS use that store
+        $lockedStoreId = self::getUserLockedStoreId();
+        if ($lockedStoreId !== null) {
+            $store = self::getById($lockedStoreId, $tenantId);
+            if ($store) {
+                self::$currentStore = $store;
+                $_SESSION['current_store_id'] = $store['id'];
+                return $store;
+            }
+        }
 
         // Try session
         if (isset($_SESSION['current_store_id'])) {
@@ -203,5 +221,69 @@ class Store
             return substr($words[0], 0, 2) . substr(end($words), 0, 1);
         }
         return strtoupper(substr($name, 0, 4));
+    }
+
+    /**
+     * Get the locked store ID for the current user (if any)
+     * Returns store ID if user is locked, null if user can switch freely
+     */
+    public static function getUserLockedStoreId()
+    {
+        if (class_exists('Auth') && Auth::user()) {
+            $user = Auth::user();
+            if (!empty($user['locked_store_id'])) {
+                return (int)$user['locked_store_id'];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check if the current user is locked to a specific store
+     */
+    public static function isUserLocked()
+    {
+        return self::getUserLockedStoreId() !== null;
+    }
+
+    /**
+     * Get stores the current user is allowed to access
+     * For locked users: returns only their assigned store
+     * For admin/unlocked users: returns all stores
+     */
+    public static function getAllowedStores($tenantId = null)
+    {
+        if (!$tenantId) $tenantId = Tenant::getId();
+
+        $lockedStoreId = self::getUserLockedStoreId();
+        if ($lockedStoreId !== null) {
+            $store = self::getById($lockedStoreId, $tenantId);
+            return $store ? [$store] : [];
+        }
+
+        return self::getAll($tenantId);
+    }
+
+    /**
+     * Set a user's locked store. Only callable by admin.
+     * Pass null to unlock the user (allow free switching).
+     */
+    public static function setUserLockedStore($userId, $storeId, $tenantId = null)
+    {
+        if (!$tenantId) $tenantId = Tenant::getId();
+        $db = Database::getInstance();
+
+        if ($storeId === null || $storeId === '' || $storeId === 0 || $storeId === '0') {
+            // Unlock the user
+            return $db->update('users', ['locked_store_id' => null], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
+        }
+
+        // Verify store belongs to this tenant
+        $store = self::getById($storeId, $tenantId);
+        if (!$store) {
+            return false;
+        }
+
+        return $db->update('users', ['locked_store_id' => (int)$storeId], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+ALTER TABLE users ADD COLUMN locked_store_id INT DEFAULT NULL COMMENT 'User is locked to this store (NULL=can switch freely)' AFTER current_store_id;<?php
 return [
     'welcome' => 'Welcome',
     'dashboard' => 'Dashboard',
@@ -408,6 +408,9 @@ return [
     'filter_by_store'         => 'Filter by Store',
     'sales_by_store'          => 'Sales by Store',
     'products_sold_by_store'  => 'Products Sold by Store',
+    'store_locked'            => 'Store Locked',
+    'store_locked_error'      => 'You are locked to your assigned store. Switching is not allowed.',
+    'store_locked_badge'      => 'Locked',
     'select_store'            => 'Select Store',
     'store'                   => 'Store',
     'edit_cashier'            => 'Edit Cashier',
