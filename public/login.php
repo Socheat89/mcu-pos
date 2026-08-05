@@ -254,7 +254,7 @@ if (Auth::check()) {
             font-weight: 600;
             margin-bottom: 1.25rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 8px;
         }
 
@@ -264,10 +264,31 @@ if (Auth::check()) {
             color: #dc2626;
         }
 
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
         .alert-success {
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
             color: #16a34a;
+        }
+
+        .lockout-countdown {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            display: inline-block;
+            margin-left: 4px;
+            color: #b91c1c;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         /* Footer */
@@ -321,10 +342,49 @@ if (Auth::check()) {
 
             <!-- Error Notification -->
             <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-error">
-                    <i class="ph-bold ph-warning-circle" style="font-size: 18px; flex-shrink: 0;"></i>
-                    <span><?php echo htmlspecialchars($_GET['error']); ?></span>
+                <?php $isLocked = !empty($_GET['locked']); ?>
+                <?php $remainingSec = isset($_GET['remaining']) ? (int)$_GET['remaining'] : 0; ?>
+                <div class="alert <?php echo $isLocked ? 'alert-warning' : 'alert-error'; ?>" id="loginAlert">
+                    <i class="ph-bold <?php echo $isLocked ? 'ph-lock' : 'ph-warning-circle'; ?>" style="font-size: 18px; flex-shrink: 0; margin-top: 1px;"></i>
+                    <div>
+                        <?php if ($isLocked && $remainingSec > 0): ?>
+                            <div>🔒 គណនីត្រូវបានចាក់សោបណ្ដោះអាសន្ន។ <br>សូមព្យាយាមម្ដងទៀតក្នុងរយៈពេល <span class="lockout-countdown" id="lockoutTimer"></span></div>
+                        <?php else: ?>
+                            <span><?php echo htmlspecialchars($_GET['error']); ?></span>
+                        <?php endif; ?>
+                    </div>
                 </div>
+                <?php if ($isLocked && $remainingSec > 0): ?>
+                <script>
+                    (function() {
+                        var remaining = <?php echo $remainingSec; ?>;
+                        var timerEl   = document.getElementById('lockoutTimer');
+                        var submitBtn = document.querySelector('.btn-submit');
+                        if (submitBtn) submitBtn.disabled = true;
+
+                        function formatTime(s) {
+                            var m = Math.floor(s / 60);
+                            var sec = s % 60;
+                            return m + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
+                        }
+
+                        if (timerEl) timerEl.textContent = formatTime(remaining);
+
+                        var interval = setInterval(function() {
+                            remaining--;
+                            if (remaining <= 0) {
+                                clearInterval(interval);
+                                if (timerEl) timerEl.textContent = '0m 00s';
+                                if (submitBtn) submitBtn.disabled = false;
+                                // Reload page to clear lockout state
+                                window.location.href = window.location.pathname;
+                            } else {
+                                if (timerEl) timerEl.textContent = formatTime(remaining);
+                            }
+                        }, 1000);
+                    })();
+                </script>
+                <?php endif; ?>
             <?php endif; ?>
 
             <!-- Success Notification -->

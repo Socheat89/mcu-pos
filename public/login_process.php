@@ -10,6 +10,91 @@ $urlPrefix = mc_base_path();
 
 $isAjax = isset($_POST['ajax']);
 
+// ── Login Brute-Force Protection ─────────────────────────────────────────────
+define('LOGIN_MAX_ATTEMPTS', 5);
+define('LOGIN_LOCKOUT_MINUTES', 30);
+
+/**
+ * Ensure the login_attempts table exists.
+ */
+function _ensure_login_attempts_table($db): void {
+    $db->execute("CREATE TABLE IF NOT EXISTS `login_attempts` (
+        `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `username`    VARCHAR(255) NOT NULL,
+        `ip_address`  VARCHAR(45)  NOT NULL DEFAULT '',
+        `attempted_at` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`),
+        KEY `idx_user_ip` (`username`, `ip_address`),
+        KEY `idx_attempted_at` (`attempted_at`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+}
+
+/**
+ * Return lockout info for a username/IP combination.
+ * Returns ['locked' => bool, 'remaining_seconds' => int, 'attempts' => int]
+ */
+function _get_login_lockout_info($db, string $username, string $ip): array {
+    try {
+        _ensure_login_attempts_table($db);
+
+        // Clean up old attempts beyond the lockout window
+        $db->execute(
+            "DELETE FROM login_attempts WHERE attempted_at < DATE_SUB(NOW(), INTERVAL ? MINUTE)",
+            [LOGIN_LOCKOUT_MINUTES]
+        );
+
+        // Count recent attempts for this username (IP-independent to prevent user enumeration bypass)
+        $row = $db->fetchOne(
+            "SELECT COUNT(*) as cnt, MAX(attempted_at) as last_attempt
+             FROM login_attempts
+             WHERE username = ? AND attempted_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)",
+            [$username, LOGIN_LOCKOUT_MINUTES]
+        );
+
+        $attempts = (int)($row['cnt'] ?? 0);
+
+        if ($attempts >= LOGIN_MAX_ATTEMPTS) {
+            // Calculate seconds remaining until the lockout expires
+            $lastAttempt = strtotime($row['last_attempt']);
+            $lockoutEnds = $lastAttempt + (LOGIN_LOCKOUT_MINUTES * 60);
+            $remaining   = max(0, $lockoutEnds - time());
+            return ['locked' => true, 'remaining_seconds' => $remaining, 'attempts' => $attempts];
+        }
+
+        return ['locked' => false, 'remaining_seconds' => 0, 'attempts' => $attempts];
+    } catch (Throwable $e) {
+        error_log("Login lockout check error: " . $e->getMessage());
+        return ['locked' => false, 'remaining_seconds' => 0, 'attempts' => 0];
+    }
+}
+
+/**
+ * Record a failed login attempt.
+ */
+function _record_failed_attempt($db, string $username, string $ip): void {
+    try {
+        _ensure_login_attempts_table($db);
+        $db->execute(
+            "INSERT INTO login_attempts (username, ip_address, attempted_at) VALUES (?, ?, NOW())",
+            [$username, $ip]
+        );
+    } catch (Throwable $e) {
+        error_log("Record login attempt error: " . $e->getMessage());
+    }
+}
+
+/**
+ * Clear all login attempts for a username (called on successful login).
+ */
+function _clear_login_attempts($db, string $username): void {
+    try {
+        _ensure_login_attempts_table($db);
+        $db->execute("DELETE FROM login_attempts WHERE username = ?", [$username]);
+    } catch (Throwable $e) {
+        error_log("Clear login attempts error: " . $e->getMessage());
+    }
+}
+
 if ($isAjax) {
     header('Content-Type: application/json');
 }
@@ -38,6 +123,31 @@ if (empty($username) || empty($password)) {
 try {
     // For login, we need to determine the tenant
     $db = Database::getInstance();
+
+    // ── Brute-force check ────────────────────────────────────────────────────
+    $clientIp   = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $clientIp   = trim(explode(',', $clientIp)[0]); // first IP if behind proxy
+    $lockoutInfo = _get_login_lockout_info($db, $username, $clientIp);
+
+    if ($lockoutInfo['locked']) {
+        $remainingMin = (int)ceil($lockoutInfo['remaining_seconds'] / 60);
+        $remainingSec = (int)$lockoutInfo['remaining_seconds'];
+        $errorMsg = 'Account temporarily locked. Too many failed login attempts. Please try again in ' . $remainingMin . ' minute(s).';
+
+        if ($isAjax) {
+            echo json_encode([
+                'success'          => false,
+                'error'            => $errorMsg,
+                'locked'           => true,
+                'remaining_seconds'=> $remainingSec,
+                'remaining_minutes'=> $remainingMin,
+            ]);
+            exit;
+        }
+        header("Location: $urlPrefix/login.php?error=" . urlencode($errorMsg) . "&locked=1&remaining=" . $remainingSec);
+        exit;
+    }
+
     $user = $db->fetchOne(
         "SELECT u.*, t.subdomain, r.name as role_name, r.level as role_level
          FROM users u
@@ -48,6 +158,9 @@ try {
     );
 
     if ($user && password_verify($password, $user['password_hash'])) {
+        // ── Successful login: clear any previous failed attempts ──────────────
+        _clear_login_attempts($db, $username);
+
         session_regenerate_id(true);
         $_SESSION['user_id']           = $user['id'];
         $_SESSION['tenant_id']         = $user['tenant_id'];
@@ -77,11 +190,38 @@ try {
         header('Location: ' . $redirect);
         exit;
     } else {
+        // ── Failed login: record the attempt ────────────────────────────────
+        _record_failed_attempt($db, $username, $clientIp);
+
+        // Re-check how many attempts remain
+        $newLockoutInfo  = _get_login_lockout_info($db, $username, $clientIp);
+        $attemptsUsed    = $newLockoutInfo['attempts'];
+        $attemptsLeft    = max(0, LOGIN_MAX_ATTEMPTS - $attemptsUsed);
+
+        if ($newLockoutInfo['locked']) {
+            $remainingMin = (int)ceil($newLockoutInfo['remaining_seconds'] / 60);
+            $remainingSec = (int)$newLockoutInfo['remaining_seconds'];
+            $errorMsg = 'Account locked for ' . LOGIN_LOCKOUT_MINUTES . ' minutes due to too many failed login attempts.';
+        } else {
+            $remainingSec = 0;
+            $errorMsg = 'Invalid username or password. ' . $attemptsLeft . ' attempt(s) remaining before lockout.';
+        }
+
         if ($isAjax) {
-            echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
+            echo json_encode([
+                'success'          => false,
+                'error'            => $errorMsg,
+                'locked'           => $newLockoutInfo['locked'],
+                'attempts_left'    => $attemptsLeft,
+                'remaining_seconds'=> $remainingSec,
+            ]);
             exit;
         }
-        header("Location: $urlPrefix/login.php?error=" . urlencode('Invalid username or password'));
+        $query = "error=" . urlencode($errorMsg);
+        if ($newLockoutInfo['locked']) {
+            $query .= "&locked=1&remaining=" . $remainingSec;
+        }
+        header("Location: $urlPrefix/login.php?" . $query);
         exit;
     }
 } catch (Throwable $e) {
