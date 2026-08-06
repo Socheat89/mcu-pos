@@ -33,6 +33,7 @@ function _ensure_login_attempts_table($db): void {
 
 /**
  * Return lockout info for a username/IP combination.
+ * Checks BOTH per-username AND per-IP to prevent bypass by switching usernames.
  * Returns ['locked' => bool, 'remaining_seconds' => int, 'attempts' => int]
  */
 function _get_login_lockout_info($db, string $username, string $ip): array {
@@ -45,24 +46,41 @@ function _get_login_lockout_info($db, string $username, string $ip): array {
             [LOGIN_LOCKOUT_MINUTES]
         );
 
-        // Count recent attempts for this username (IP-independent to prevent user enumeration bypass)
-        $row = $db->fetchOne(
+        // 1. Check per-username attempts
+        $rowUser = $db->fetchOne(
             "SELECT COUNT(*) as cnt, MAX(attempted_at) as last_attempt
              FROM login_attempts
              WHERE username = ? AND attempted_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)",
             [$username, LOGIN_LOCKOUT_MINUTES]
         );
 
-        $attempts = (int)($row['cnt'] ?? 0);
+        // 2. Check per-IP attempts (catches username-switching brute force)
+        $rowIp = $db->fetchOne(
+            "SELECT COUNT(*) as cnt, MAX(attempted_at) as last_attempt
+             FROM login_attempts
+             WHERE ip_address = ? AND attempted_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)",
+            [$ip, LOGIN_LOCKOUT_MINUTES]
+        );
 
-        if ($attempts >= LOGIN_MAX_ATTEMPTS) {
-            // Calculate seconds remaining until the lockout expires
-            $lastAttempt = strtotime($row['last_attempt']);
-            $lockoutEnds = $lastAttempt + (LOGIN_LOCKOUT_MINUTES * 60);
-            $remaining   = max(0, $lockoutEnds - time());
+        $attemptsUser = (int)($rowUser['cnt'] ?? 0);
+        $attemptsIp   = (int)($rowIp['cnt']   ?? 0);
+
+        // Lock if EITHER username OR IP has exceeded the threshold
+        $locked = ($attemptsUser >= LOGIN_MAX_ATTEMPTS) || ($attemptsIp >= LOGIN_MAX_ATTEMPTS);
+
+        if ($locked) {
+            // Use whichever triggered the lock to calculate remaining time
+            $lastAttemptUser = !empty($rowUser['last_attempt']) ? strtotime($rowUser['last_attempt']) : 0;
+            $lastAttemptIp   = !empty($rowIp['last_attempt'])   ? strtotime($rowIp['last_attempt'])   : 0;
+            $lastAttempt     = max($lastAttemptUser, $lastAttemptIp);
+            $lockoutEnds     = $lastAttempt + (LOGIN_LOCKOUT_MINUTES * 60);
+            $remaining       = max(0, $lockoutEnds - time());
+            $attempts        = max($attemptsUser, $attemptsIp);
             return ['locked' => true, 'remaining_seconds' => $remaining, 'attempts' => $attempts];
         }
 
+        // Return the higher attempt count so the UI shows the correct "X remaining"
+        $attempts = max($attemptsUser, $attemptsIp);
         return ['locked' => false, 'remaining_seconds' => 0, 'attempts' => $attempts];
     } catch (Throwable $e) {
         error_log("Login lockout check error: " . $e->getMessage());

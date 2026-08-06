@@ -547,4 +547,54 @@ try {
 } catch (Exception $e) {
     echo "Ingredient cost_price migration failed: " . $e->getMessage();
 }
+
+// ── Login Brute-Force Tables ──────────────────────────────
+try {
+    echo "<br>Ensuring 'login_attempts' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'login_attempts'");
+    if (empty($tableExists)) {
+        $db->getConnection()->exec("CREATE TABLE `login_attempts` (
+            `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `username`     VARCHAR(255) NOT NULL,
+            `ip_address`   VARCHAR(45)  NOT NULL DEFAULT '',
+            `attempted_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_user_ip`      (`username`, `ip_address`),
+            KEY `idx_ip`           (`ip_address`),
+            KEY `idx_attempted_at` (`attempted_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        echo "→ 'login_attempts' table created.<br>";
+    } else {
+        // Ensure ip_address index exists (for IP-based lockout)
+        $idxIp = $db->fetchAll("SHOW INDEX FROM login_attempts WHERE Key_name = 'idx_ip'");
+        if (empty($idxIp)) {
+            $db->getConnection()->exec("ALTER TABLE login_attempts ADD KEY `idx_ip` (`ip_address`)");
+            echo "→ 'login_attempts.idx_ip' index added.<br>";
+        }
+        echo "→ 'login_attempts' table already exists.<br>";
+    }
+
+    echo "Ensuring 'remember_tokens' table exists...<br>";
+    $tableExists = $db->fetchAll("SHOW TABLES LIKE 'remember_tokens'");
+    if (empty($tableExists)) {
+        $db->getConnection()->exec("CREATE TABLE `remember_tokens` (
+            `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `user_id`    INT UNSIGNED NOT NULL,
+            `token_hash` VARCHAR(64)  NOT NULL,
+            `expires_at` DATETIME     NOT NULL,
+            `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uq_token`  (`token_hash`),
+            KEY `idx_user`         (`user_id`),
+            KEY `idx_expires`      (`expires_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        echo "→ 'remember_tokens' table created.<br>";
+    } else {
+        echo "→ 'remember_tokens' table already exists.<br>";
+    }
+
+    echo "Login security tables done!";
+} catch (Exception $e) {
+    echo "Login security migration failed: " . $e->getMessage();
+}
 ?>
