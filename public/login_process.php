@@ -169,7 +169,7 @@ try {
     }
 
     // ── reCAPTCHA v2 Verification ────────────────────────────────────────────
-    $recaptchaSecret   = '6LdjN3gtAAAAAARProkKMbH-ZhbFS-jfyIwn7bd0';
+    $recaptchaSecret   = '6Lc1O3gtAAAAAFN1LuVUXSDwQeo_JYu37gGsjbtD';
     $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
 
     if (empty($recaptchaResponse)) {

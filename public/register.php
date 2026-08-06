@@ -22,8 +22,8 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Google reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"></script>
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         :root {
@@ -480,6 +480,11 @@
                 </div>
             </div>
 
+            <!-- reCAPTCHA v2 Checkbox -->
+            <div id="recaptcha_section" style="display:none; margin:1rem 0; justify-content:center;">
+                <div class="g-recaptcha" data-sitekey="6Lc1O3gtAAAAAPcAVQ7D0Fj8Kc96Ziqc0HM3h6TY"></div>
+            </div>
+
             <!-- Pay CTA -->
             <div class="payment-cta" id="payment_cta" style="display:none;">
                 <button type="button" class="btn btn-primary full-width" onclick="showModal()">
@@ -708,15 +713,15 @@
             if (rcSection) rcSection.style.display = 'flex';
         };
 
-        // Start Free Trial - redirect to setup (with reCAPTCHA v3)
+        // Start Free Trial - redirect to setup (with reCAPTCHA v2)
         window.startFreeTrial = function() {
             if (!selectedPlanCode) return;
-            grecaptcha.ready(function() {
-                grecaptcha.execute('6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA', {action: 'register'})
-                    .then(function(token) {
-                        window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(token)}`;
-                    });
-            });
+            var response = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!response) {
+                alert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
+                return;
+            }
+            window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(response)}`;
         };
 
         window.updateTotalPrice = function() {
@@ -758,16 +763,10 @@
 
         window.showModal = async function() {
             if (!selectedPlan) return;
-            // reCAPTCHA v3 — get token first
-            try {
-                await new Promise((resolve) => {
-                    grecaptcha.ready(resolve);
-                });
-                const rcToken = await grecaptcha.execute('6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA', {action: 'register'});
-                // Attach token to the QR request (passed via a hidden field or query string)
-                window._rcToken = rcToken;
-            } catch(e) {
-                console.warn('reCAPTCHA error:', e);
+            var response = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!response) {
+                alert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
+                return;
             }
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
