@@ -291,6 +291,25 @@ if (Auth::check()) {
             pointer-events: none;
         }
 
+        .form-input:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            border-color: #e2e8f0;
+        }
+
+        .lockout-overlay {
+            position: relative;
+        }
+        .lockout-overlay::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(241,245,249,0.5);
+            pointer-events: none;
+        }
+
         /* Footer */
         .auth-footer {
             margin-top: 1.5rem;
@@ -360,7 +379,32 @@ if (Auth::check()) {
                         var remaining = <?php echo $remainingSec; ?>;
                         var timerEl   = document.getElementById('lockoutTimer');
                         var submitBtn = document.querySelector('.btn-submit');
-                        if (submitBtn) submitBtn.disabled = true;
+                        var usernameInput = document.getElementById('username');
+                        var passwordInput = document.getElementById('password');
+                        var loginForm     = document.querySelector('form[action="login_process.php"]');
+
+                        // Lock everything
+                        function lockForm() {
+                            if (submitBtn)    { submitBtn.disabled = true; }
+                            if (usernameInput){ usernameInput.disabled = true; }
+                            if (passwordInput){ passwordInput.disabled = true; }
+                        }
+
+                        // Unlock everything
+                        function unlockForm() {
+                            if (submitBtn)    { submitBtn.disabled = false; }
+                            if (usernameInput){ usernameInput.disabled = false; usernameInput.focus(); }
+                            if (passwordInput){ passwordInput.disabled = false; }
+                        }
+
+                        // Block form submission during lockout
+                        if (loginForm) {
+                            loginForm.addEventListener('submit', function(e) {
+                                if (remaining > 0) { e.preventDefault(); }
+                            });
+                        }
+
+                        lockForm();
 
                         function formatTime(s) {
                             var m = Math.floor(s / 60);
@@ -375,7 +419,7 @@ if (Auth::check()) {
                             if (remaining <= 0) {
                                 clearInterval(interval);
                                 if (timerEl) timerEl.textContent = '0m 00s';
-                                if (submitBtn) submitBtn.disabled = false;
+                                unlockForm();
                                 // Reload page to clear lockout state
                                 window.location.href = window.location.pathname;
                             } else {
@@ -402,10 +446,11 @@ if (Auth::check()) {
                     <div class="form-label-row">
                         <label for="username" class="form-label">Username</label>
                     </div>
-                    <div class="input-wrapper">
+                    <div class="input-wrapper" id="usernameWrapper">
                         <i class="ph-bold ph-user input-icon"></i>
                         <input type="text" id="username" name="username" class="form-input" required 
-                               placeholder="Enter your username" autocomplete="username" autofocus>
+                               placeholder="Enter your username" autocomplete="username" autofocus
+                               <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
                     </div>
                 </div>
 
@@ -415,11 +460,13 @@ if (Auth::check()) {
                         <label for="password" class="form-label">Password</label>
                         <a href="<?php echo mc_url('forgot_password.php'); ?>" class="forgot-link">Forgot password?</a>
                     </div>
-                    <div class="input-wrapper">
+                    <div class="input-wrapper" id="passwordWrapper">
                         <i class="ph-bold ph-lock-key input-icon"></i>
                         <input type="password" id="password" name="password" class="form-input" required 
-                               placeholder="Enter your password" autocomplete="current-password">
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                               placeholder="Enter your password" autocomplete="current-password"
+                               <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility"
+                                <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
                             <i class="ph-bold ph-eye" id="toggleIcon"></i>
                         </button>
                     </div>
