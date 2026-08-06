@@ -172,14 +172,32 @@
                         </div>
 
                         <div class="pos-form-group">
-                            <label class="pos-form-label"><i class="fas fa-lock" style="margin-right:6px; color:var(--pos-primary);"></i>Password <span style="color:red;">*</span> <span style="color:var(--pos-text-muted); font-size:11px;">(min 6 chars)</span></label>
+                            <label class="pos-form-label"><i class="fas fa-lock" style="margin-right:6px; color:var(--pos-primary);"></i>Password <span style="color:red;">*</span></label>
                             <div style="position:relative;">
-                                <input type="password" name="password" id="newPwd" class="pos-form-control" placeholder="••••••••" required minlength="6" <?php echo !$canCreate ? 'disabled' : ''; ?> style="padding-right:44px;">
+                                <input type="password" name="password" id="newPwd" class="pos-form-control"
+                                       placeholder="••••••••" required minlength="8"
+                                       <?php echo !$canCreate ? 'disabled' : ''; ?>
+                                       oninput="checkPwdStrength(this.value)"
+                                       style="padding-right:44px;">
                                 <button type="button" onclick="togglePwd('newPwd',this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--pos-text-muted); cursor:pointer; font-size:14px; padding:0;">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <!-- Strength bar -->
+                            <div style="margin-top:8px;">
+                                <div style="height:4px; border-radius:4px; background:var(--pos-border); overflow:hidden;">
+                                    <div id="pwdStrengthBar" style="height:100%; width:0%; border-radius:4px; transition:width 0.3s, background 0.3s;"></div>
+                                </div>
+                                <div style="margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;" id="pwdRequirements">
+                                    <div id="req-len"  style="font-size:11px; color:var(--pos-text-muted);"><i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>Min 8 characters</div>
+                                    <div id="req-upper" style="font-size:11px; color:var(--pos-text-muted);"><i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>Uppercase (A-Z)</div>
+                                    <div id="req-lower" style="font-size:11px; color:var(--pos-text-muted);"><i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>Lowercase (a-z)</div>
+                                    <div id="req-num"  style="font-size:11px; color:var(--pos-text-muted);"><i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>Number (0-9)</div>
+                                    <div id="req-sym"  style="font-size:11px; color:var(--pos-text-muted);"><i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>Special char (!@#$%)</div>
+                                </div>
+                            </div>
                         </div>
+
 
                         <?php if (!empty($allStores)): ?>
                         <div class="pos-form-group">
@@ -475,6 +493,71 @@
             } else {
                 label.classList.remove('checked');
             }
+        }
+
+        // ── Password Strength Checker ────────────────────────────
+        function checkPwdStrength(val) {
+            var checks = {
+                len:   val.length >= 8,
+                upper: /[A-Z]/.test(val),
+                lower: /[a-z]/.test(val),
+                num:   /[0-9]/.test(val),
+                sym:   /[^A-Za-z0-9]/.test(val)
+            };
+            var passed = Object.values(checks).filter(Boolean).length;
+            var colors = ['#ef4444','#f97316','#eab308','#22c55e','#10b981'];
+            var bar = document.getElementById('pwdStrengthBar');
+            if (bar) {
+                bar.style.width  = (passed * 20) + '%';
+                bar.style.background = colors[passed - 1] || 'transparent';
+            }
+            var map = {len:'req-len', upper:'req-upper', lower:'req-lower', num:'req-num', sym:'req-sym'};
+            Object.keys(checks).forEach(function(k) {
+                var el = document.getElementById(map[k]);
+                if (!el) return;
+                if (checks[k]) {
+                    el.style.color = '#10b981';
+                    el.querySelector('i').className = 'fas fa-check-circle';
+                    el.style.fontSize = '11px';
+                } else {
+                    el.style.color = 'var(--pos-text-muted)';
+                    el.querySelector('i').className = 'fas fa-circle';
+                }
+            });
+            return passed === 5;
+        }
+
+        // Block form submit if password not strong enough
+        var createForm = document.getElementById('createCashierForm');
+        if (createForm) {
+            createForm.addEventListener('submit', function(e) {
+                var pwd = document.getElementById('newPwd');
+                if (pwd && !checkPwdStrength(pwd.value)) {
+                    e.preventDefault();
+                    pwd.focus();
+                    // Flash the requirements
+                    var req = document.getElementById('pwdRequirements');
+                    if (req) {
+                        req.style.outline = '2px solid #ef4444';
+                        req.style.borderRadius = '8px';
+                        req.style.padding = '6px';
+                        setTimeout(function() {
+                            req.style.outline = '';
+                            req.style.padding = '';
+                        }, 1500);
+                    }
+                }
+            });
+        }
+
+        // Reset password modal — also validate strong password
+        var resetForm = document.querySelector('form[data-action="reset_password"]');
+        if (!resetForm) {
+            // Find by hidden input value
+            document.querySelectorAll('form').forEach(function(f) {
+                var act = f.querySelector('input[name="_action"]');
+                if (act && act.value === 'reset_password') { resetForm = f; }
+            });
         }
     </script>
 

@@ -124,8 +124,16 @@ class CashierController {
 
                 if (!$username || !$email || !$password) {
                     $error = 'Please fill in all required fields.';
-                } elseif (strlen($password) < 6) {
-                    $error = 'Password must be at least 6 characters.';
+                } elseif (strlen($password) < 8) {
+                    $error = 'Password must be at least 8 characters.';
+                } elseif (!preg_match('/[A-Z]/', $password)) {
+                    $error = 'Password must contain at least one uppercase letter (A-Z).';
+                } elseif (!preg_match('/[a-z]/', $password)) {
+                    $error = 'Password must contain at least one lowercase letter (a-z).';
+                } elseif (!preg_match('/[0-9]/', $password)) {
+                    $error = 'Password must contain at least one number (0-9).';
+                } elseif (!preg_match('/[^A-Za-z0-9]/', $password)) {
+                    $error = 'Password must contain at least one special character (!@#$%^&* etc.).';
                 } else {
                     // Check duplicate username in tenant
                     $existing = $db->fetchOne(
@@ -203,7 +211,12 @@ class CashierController {
             if ($action === 'reset_password') {
                 $userId      = (int)($_POST['user_id'] ?? 0);
                 $newPassword = $_POST['new_password'] ?? '';
-                if ($userId && strlen($newPassword) >= 6) {
+                if ($userId && strlen($newPassword) >= 8
+                    && preg_match('/[A-Z]/', $newPassword)
+                    && preg_match('/[a-z]/', $newPassword)
+                    && preg_match('/[0-9]/', $newPassword)
+                    && preg_match('/[^A-Za-z0-9]/', $newPassword)
+                ) {
                     $hash = password_hash($newPassword, PASSWORD_DEFAULT);
                     $db->update('users', [
                         'password_hash' => $hash,
@@ -211,7 +224,7 @@ class CashierController {
                     ], 'id = ? AND tenant_id = ?', [$userId, $tenantId]);
                     $message = 'Password has been reset.';
                 } else {
-                    $error = 'Password must be at least 6 characters.';
+                    $error = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.';
                 }
             }
 
