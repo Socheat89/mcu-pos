@@ -82,6 +82,9 @@ $structuredData = [
     <!-- Styles -->
     <link rel="stylesheet" href="css/landing.css?v=5.1">
 
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     
     <!-- Favicon -->
     <link rel="icon" href="images/my-logo.jpg" type="image/jpeg">
@@ -151,6 +154,10 @@ $structuredData = [
                             </div>
                             <input type="password" id="modal-password" name="password" class="form-control" placeholder="Enter your password" required>
                         </div>
+                        <!-- reCAPTCHA v2 Checkbox -->
+                        <div class="mb-3 d-flex justify-content-center">
+                            <div class="g-recaptcha" data-sitekey="6Lc1O3gtAAAAAPcAVQ7D0Fj8Kc96Ziqc0HM3h6TY"></div>
+                        </div>
                         <button type="submit" id="signInBtn" class="btn btn-primary w-100">Sign In <i class="ph-bold ph-sign-in"></i></button>
                         <div class="text-center my-3 text-muted small">or</div>
                         <p class="text-center mb-0 small">New here? <a href="register.php" class="fw-semibold" style="color:var(--mc-primary)">Create an account</a></p>
@@ -215,7 +222,7 @@ $structuredData = [
                             </a></li>
                         </ul>
                     </div>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" class="nav-link" data-i18n="sign_in">Sign In</a>
+                    <a href="login.php" class="nav-link" data-i18n="sign_in">Sign In</a>
                     <a href="register.php" class="btn btn-primary btn-sm" data-i18n="get_started">Get Started</a>
                 </div>
             </div>
@@ -961,6 +968,14 @@ $structuredData = [
             const btn = document.getElementById('signInBtn');
             const errorDiv = document.getElementById('authError');
             
+            // Check reCAPTCHA
+            const rcResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!rcResponse) {
+                errorDiv.textContent = 'សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។';
+                errorDiv.classList.remove('d-none');
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Signing In...';
             errorDiv.classList.add('d-none');
@@ -988,13 +1003,15 @@ $structuredData = [
                     errorDiv.classList.remove('d-none');
                     btn.disabled = false;
                     btn.innerHTML = 'Sign In <i class="ph-bold ph-sign-in" style="margin-left: 8px;"></i>';
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 errorDiv.textContent = 'Connection error. Please try again.';
-                errorDiv.style.display = 'block';
+                errorDiv.classList.remove('d-none');
                 btn.disabled = false;
                 btn.innerHTML = 'Sign In <i class="ph-bold ph-sign-in" style="margin-left: 8px;"></i>';
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
             }
         }
 
