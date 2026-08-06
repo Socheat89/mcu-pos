@@ -385,6 +385,15 @@ try {
             .recaptcha-wrapper { transform: scale(0.88); }
         }
 
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-element {
+            animation: shakeError 0.4s ease-in-out;
+        }
+
         @media (max-width: 480px) {
             body.auth-page {
                 padding: 1rem;
@@ -559,9 +568,34 @@ try {
                 var response = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
                 if (!response) {
                     e.preventDefault();
-                    alert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
+                    showCustomAlert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។', document.querySelector('.recaptcha-wrapper'));
                 }
             });
+        }
+
+        function showCustomAlert(msg, elementToHighlight) {
+            var alertBox = document.getElementById('dynamicAlert');
+            if (!alertBox) {
+                alertBox = document.createElement('div');
+                alertBox.id = 'dynamicAlert';
+                alertBox.className = 'alert alert-error';
+                alertBox.style.cssText = 'display:flex; align-items:center; gap:8px; margin-bottom:1.25rem;';
+                alertBox.innerHTML = '<i class="ph-bold ph-warning-circle" style="font-size:18px; flex-shrink:0;"></i><span id="dynamicAlertMsg"></span>';
+                
+                var form = document.querySelector('form[action="login_process.php"]');
+                if (form) {
+                    form.parentNode.insertBefore(alertBox, form);
+                }
+            }
+            var msgSpan = document.getElementById('dynamicAlertMsg');
+            if (msgSpan) msgSpan.textContent = msg;
+            alertBox.style.display = 'flex';
+            
+            if (elementToHighlight) {
+                elementToHighlight.classList.remove('shake-element');
+                void elementToHighlight.offsetWidth;
+                elementToHighlight.classList.add('shake-element');
+            }
         }
     </script>
 </body>

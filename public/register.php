@@ -335,6 +335,15 @@
             .payment-amount { font-size: 1.8rem; }
             .plan-chip { font-size: 0.65rem; padding: 3px 8px; }
         }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-element {
+            animation: shakeError 0.4s ease-in-out;
+        }
     </style>
 </head>
 <body class="auth-page">
@@ -713,12 +722,38 @@
             if (rcSection) rcSection.style.display = 'flex';
         };
 
+        function showRegisterAlert(msg) {
+            var alertBox = document.getElementById('registerDynamicAlert');
+            if (!alertBox) {
+                alertBox = document.createElement('div');
+                alertBox.id = 'registerDynamicAlert';
+                alertBox.className = 'alert alert-error';
+                alertBox.style.cssText = 'display:flex; align-items:center; gap:8px; margin-bottom:1rem;';
+                alertBox.innerHTML = '<i class="ph-bold ph-warning-circle" style="font-size:18px; flex-shrink:0;"></i><span id="registerDynamicAlertMsg"></span>';
+                
+                var rcSection = document.getElementById('recaptcha_section');
+                if (rcSection) {
+                    rcSection.parentNode.insertBefore(alertBox, rcSection);
+                }
+            }
+            var msgSpan = document.getElementById('registerDynamicAlertMsg');
+            if (msgSpan) msgSpan.textContent = msg;
+            alertBox.style.display = 'flex';
+            
+            var rcSection = document.getElementById('recaptcha_section');
+            if (rcSection) {
+                rcSection.classList.remove('shake-element');
+                void rcSection.offsetWidth;
+                rcSection.classList.add('shake-element');
+            }
+        }
+
         // Start Free Trial - redirect to setup (with reCAPTCHA v2)
         window.startFreeTrial = function() {
             if (!selectedPlanCode) return;
             var response = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
             if (!response) {
-                alert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
+                showRegisterAlert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
                 return;
             }
             window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(response)}`;
@@ -765,7 +800,7 @@
             if (!selectedPlan) return;
             var response = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
             if (!response) {
-                alert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
+                showRegisterAlert('សូមបំពេញការផ្ទៀងផ្ទាត់ reCAPTCHA (I\'m not a robot) ជាមុនសិន។');
                 return;
             }
             updateStepper(3);
