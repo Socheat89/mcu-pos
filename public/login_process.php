@@ -18,7 +18,9 @@ define('LOGIN_LOCKOUT_MINUTES', 30);
  * Ensure the login_attempts table exists.
  */
 function _ensure_login_attempts_table($db): void {
-    $db->execute("CREATE TABLE IF NOT EXISTS `login_attempts` (
+    // Use exec() directly for DDL — PDO::prepare() on CREATE TABLE
+    // can silently fail on some MySQL/MariaDB configurations.
+    $db->getConnection()->exec("CREATE TABLE IF NOT EXISTS `login_attempts` (
         `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
         `username`    VARCHAR(255) NOT NULL,
         `ip_address`  VARCHAR(45)  NOT NULL DEFAULT '',
@@ -242,8 +244,8 @@ function _issue_remember_me_token(int $userId, $db): void {
     try {
         require_once __DIR__ . '/../core/classes/CookieCrypt.php';
 
-        // Auto-create table if not exists
-        $db->execute("CREATE TABLE IF NOT EXISTS `remember_tokens` (
+        // Use exec() for DDL — prepare() on CREATE TABLE can fail silently
+        $db->getConnection()->exec("CREATE TABLE IF NOT EXISTS `remember_tokens` (
             `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `user_id`    INT UNSIGNED NOT NULL,
             `token_hash` VARCHAR(64)  NOT NULL,
