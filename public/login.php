@@ -76,6 +76,9 @@ try {
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <style>
         :root {
             --primary: #0284c7;
@@ -372,6 +375,16 @@ try {
             text-decoration: underline;
         }
 
+        .recaptcha-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 1.25rem 0 0.5rem;
+            transform-origin: center;
+        }
+        @media (max-width: 380px) {
+            .recaptcha-wrapper { transform: scale(0.88); }
+        }
+
         @media (max-width: 480px) {
             body.auth-page {
                 padding: 1rem;
@@ -504,8 +517,16 @@ try {
                     </div>
                 </div>
 
+                <!-- reCAPTCHA v2 -->
+                <div class="recaptcha-wrapper">
+                    <div class="g-recaptcha" 
+                         data-sitekey="6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"
+                         <?php if ($isLocked): ?>data-callback="" style="pointer-events:none;opacity:0.4;"<?php endif; ?>>
+                    </div>
+                </div>
+
                 <!-- Submit Button -->
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" <?php if ($isLocked): ?>disabled<?php endif; ?>>
                     <i class="ph-bold ph-sign-in" style="font-size: 20px;"></i>
                     <span>Sign In</span>
                 </button>

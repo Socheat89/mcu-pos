@@ -21,7 +21,10 @@
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <style>
         :root {
             --brand: #308AC6;
@@ -477,6 +480,11 @@
                 </div>
             </div>
 
+            <!-- reCAPTCHA verification -->
+            <div id="recaptcha_section" style="display:none; margin:0 0 1rem; justify-content:center;">
+                <div class="g-recaptcha" data-sitekey="6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"></div>
+            </div>
+
             <!-- Pay CTA -->
             <div class="payment-cta" id="payment_cta" style="display:none;">
                 <button type="button" class="btn btn-primary full-width" onclick="showModal()">
@@ -700,12 +708,20 @@
                 updateStepper(2);
                 updateTotalPrice();
             }
+            // Show reCAPTCHA
+            var rcSection = document.getElementById('recaptcha_section');
+            if (rcSection) rcSection.style.display = 'flex';
         };
 
         // Start Free Trial - redirect to setup
         window.startFreeTrial = function() {
             if (!selectedPlanCode) return;
-            window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true`;
+            var rc = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!rc) {
+                alert('Please complete the reCAPTCHA verification first.');
+                return;
+            }
+            window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(rc)}`;
         };
 
         window.updateTotalPrice = function() {
@@ -747,6 +763,12 @@
 
         window.showModal = async function() {
             if (!selectedPlan) return;
+            // Check reCAPTCHA
+            var rc = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!rc) {
+                alert('Please complete the reCAPTCHA verification first.');
+                return;
+            }
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
             

@@ -168,6 +168,37 @@ try {
         exit;
     }
 
+    // ── reCAPTCHA v2 Verification ────────────────────────────────────────────
+    $recaptchaSecret   = '6LdjN3gtAAAAAARProkKMbH-ZhbFS-jfyIwn7bd0';
+    $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+
+    if (empty($recaptchaResponse)) {
+        $errorMsg = 'Please complete the reCAPTCHA verification.';
+        if ($isAjax) {
+            echo json_encode(['success' => false, 'error' => $errorMsg]);
+            exit;
+        }
+        header("Location: $urlPrefix/login.php?error=" . urlencode($errorMsg));
+        exit;
+    }
+
+    // Verify with Google
+    $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    $verifyData = http_build_query(['secret' => $recaptchaSecret, 'response' => $recaptchaResponse]);
+    $verifyOpts = ['http' => ['method' => 'POST', 'header' => 'Content-Type: application/x-www-form-urlencoded', 'content' => $verifyData]];
+    $verifyResult = @file_get_contents($verifyUrl, false, stream_context_create($verifyOpts));
+    $verifyJson   = $verifyResult ? json_decode($verifyResult, true) : null;
+
+    if (!$verifyJson || !($verifyJson['success'] ?? false)) {
+        $errorMsg = 'reCAPTCHA verification failed. Please try again.';
+        if ($isAjax) {
+            echo json_encode(['success' => false, 'error' => $errorMsg]);
+            exit;
+        }
+        header("Location: $urlPrefix/login.php?error=" . urlencode($errorMsg));
+        exit;
+    }
+
     $user = $db->fetchOne(
         "SELECT u.*, t.subdomain, r.name as role_name, r.level as role_level
          FROM users u
