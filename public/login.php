@@ -76,8 +76,8 @@ try {
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Google reCAPTCHA v2 -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"></script>
 
     <style>
         :root {
@@ -517,19 +517,12 @@ try {
                     </div>
                 </div>
 
-                <!-- reCAPTCHA v2 -->
-                <div class="recaptcha-wrapper">
-                    <div class="g-recaptcha" 
-                         data-sitekey="6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"
-                         <?php if ($isLocked): ?>data-callback="" style="pointer-events:none;opacity:0.4;"<?php endif; ?>>
-                    </div>
-                </div>
-
                 <!-- Submit Button -->
-                <button type="submit" class="btn-submit" <?php if ($isLocked): ?>disabled<?php endif; ?>>
+                <button type="submit" class="btn-submit" id="loginSubmitBtn" <?php if ($isLocked): ?>disabled<?php endif; ?>>
                     <i class="ph-bold ph-sign-in" style="font-size: 20px;"></i>
                     <span>Sign In</span>
                 </button>
+                <input type="hidden" name="g-recaptcha-response" id="loginRecaptchaToken">
             </form>
 
             <!-- Footer -->
@@ -550,6 +543,25 @@ try {
                 input.type = "password";
                 icon.className = "ph-bold ph-eye";
             }
+        }
+
+        // reCAPTCHA v3 — execute on form submit
+        var loginForm = document.querySelector('form[action="login_process.php"]');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                var tokenInput = document.getElementById('loginRecaptchaToken');
+                if (tokenInput && tokenInput.value) return; // already has token
+                e.preventDefault();
+                var btn = document.getElementById('loginSubmitBtn');
+                if (btn) { btn.disabled = true; btn.querySelector('span').textContent = 'Verifying...'; }
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA', {action: 'login'})
+                        .then(function(token) {
+                            if (tokenInput) tokenInput.value = token;
+                            loginForm.submit();
+                        });
+                });
+            });
         }
     </script>
 </body>

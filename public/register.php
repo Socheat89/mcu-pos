@@ -22,8 +22,8 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Google reCAPTCHA v2 -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"></script>
 
     <style>
         :root {
@@ -480,11 +480,6 @@
                 </div>
             </div>
 
-            <!-- reCAPTCHA verification -->
-            <div id="recaptcha_section" style="display:none; margin:0 0 1rem; justify-content:center;">
-                <div class="g-recaptcha" data-sitekey="6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA"></div>
-            </div>
-
             <!-- Pay CTA -->
             <div class="payment-cta" id="payment_cta" style="display:none;">
                 <button type="button" class="btn btn-primary full-width" onclick="showModal()">
@@ -713,15 +708,15 @@
             if (rcSection) rcSection.style.display = 'flex';
         };
 
-        // Start Free Trial - redirect to setup
+        // Start Free Trial - redirect to setup (with reCAPTCHA v3)
         window.startFreeTrial = function() {
             if (!selectedPlanCode) return;
-            var rc = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
-            if (!rc) {
-                alert('Please complete the reCAPTCHA verification first.');
-                return;
-            }
-            window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(rc)}`;
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA', {action: 'register'})
+                    .then(function(token) {
+                        window.location.href = `${basePublicUrl}setup.php?plan=${encodeURIComponent(selectedPlanCode)}&trial=true&g-recaptcha-response=${encodeURIComponent(token)}`;
+                    });
+            });
         };
 
         window.updateTotalPrice = function() {
@@ -763,11 +758,16 @@
 
         window.showModal = async function() {
             if (!selectedPlan) return;
-            // Check reCAPTCHA
-            var rc = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
-            if (!rc) {
-                alert('Please complete the reCAPTCHA verification first.');
-                return;
+            // reCAPTCHA v3 — get token first
+            try {
+                await new Promise((resolve) => {
+                    grecaptcha.ready(resolve);
+                });
+                const rcToken = await grecaptcha.execute('6LdjN3gtAAAAAKK5FjRu40mupbu-5sZnO4byqgUA', {action: 'register'});
+                // Attach token to the QR request (passed via a hidden field or query string)
+                window._rcToken = rcToken;
+            } catch(e) {
+                console.warn('reCAPTCHA error:', e);
             }
             updateStepper(3);
             document.getElementById('modalAmount').textContent = '$' + totalPrice.toFixed(2);
