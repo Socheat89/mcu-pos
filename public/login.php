@@ -15,6 +15,46 @@ if (Auth::check()) {
         exit;
     }
 }
+
+// ── Server-side lockout check (by IP) — cannot be bypassed by URL editing ──
+define('_LOGIN_MAX_ATTEMPTS', 5);
+define('_LOGIN_LOCKOUT_MINUTES', 30);
+
+$serverLocked       = false;
+$serverRemainingSec = 0;
+
+try {
+    $db       = Database::getInstance();
+    $clientIp = trim(explode(',', ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0')))[0];
+
+    // Ensure table exists
+    $db->getConnection()->exec("CREATE TABLE IF NOT EXISTS `login_attempts` (
+        `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `username`     VARCHAR(255) NOT NULL,
+        `ip_address`   VARCHAR(45)  NOT NULL DEFAULT '',
+        `attempted_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`),
+        KEY `idx_user_ip`      (`username`, `ip_address`),
+        KEY `idx_ip`           (`ip_address`),
+        KEY `idx_attempted_at` (`attempted_at`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Check IP-based lockout
+    $rowIp = $db->fetchOne(
+        "SELECT COUNT(*) as cnt, MAX(attempted_at) as last_attempt
+         FROM login_attempts
+         WHERE ip_address = ? AND attempted_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)",
+        [$clientIp, _LOGIN_LOCKOUT_MINUTES]
+    );
+
+    if ((int)($rowIp['cnt'] ?? 0) >= _LOGIN_MAX_ATTEMPTS) {
+        $serverLocked       = true;
+        $lastAttempt        = strtotime($rowIp['last_attempt']);
+        $serverRemainingSec = max(0, ($lastAttempt + (_LOGIN_LOCKOUT_MINUTES * 60)) - time());
+    }
+} catch (Throwable $e) {
+    error_log("Login page lockout check error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -359,21 +399,19 @@ if (Auth::check()) {
                 <p class="welcome-subtitle">Sign in to your account</p>
             </div>
 
-            <!-- Error Notification -->
-            <?php if (isset($_GET['error'])): ?>
-                <?php $isLocked = !empty($_GET['locked']); ?>
-                <?php $remainingSec = isset($_GET['remaining']) ? (int)$_GET['remaining'] : 0; ?>
-                <div class="alert <?php echo $isLocked ? 'alert-warning' : 'alert-error'; ?>" id="loginAlert">
-                    <i class="ph-bold <?php echo $isLocked ? 'ph-lock' : 'ph-warning-circle'; ?>" style="font-size: 18px; flex-shrink: 0; margin-top: 1px;"></i>
-                    <div>
-                        <?php if ($isLocked && $remainingSec > 0): ?>
-                            <div>🔒 គណនីត្រូវបានចាក់សោបណ្ដោះអាសន្ន។ <br>សូមព្យាយាមម្ដងទៀតក្នុងរយៈពេល <span class="lockout-countdown" id="lockoutTimer"></span></div>
-                        <?php else: ?>
-                            <span><?php echo htmlspecialchars($_GET['error']); ?></span>
-                        <?php endif; ?>
-                    </div>
+            <!-- Error / Lockout Notification -->
+            <?php
+                // Determine lockout: prefer server DB check, fallback to URL param
+                $isLocked     = $serverLocked || !empty($_GET['locked']);
+                $remainingSec = $serverLocked ? $serverRemainingSec
+                                             : (isset($_GET['remaining']) ? (int)$_GET['remaining'] : 0);
+            ?>
+
+            <?php if ($isLocked && $remainingSec > 0): ?>
+                <div class="alert alert-warning" id="loginAlert">
+                    <i class="ph-bold ph-lock" style="font-size: 18px; flex-shrink: 0; margin-top: 1px;"></i>
+                    <div>🔒 គណនីត្រូវបានចាក់សោបណ្ដោះអាសន្ន។ <br>សូមព្យាយាមម្ដងទៀតក្នុងរយៈពេល <span class="lockout-countdown" id="lockoutTimer"></span></div>
                 </div>
-                <?php if ($isLocked && $remainingSec > 0): ?>
                 <script>
                     (function() {
                         var remaining = <?php echo $remainingSec; ?>;
@@ -383,44 +421,34 @@ if (Auth::check()) {
                         var passwordInput = document.getElementById('password');
                         var loginForm     = document.querySelector('form[action="login_process.php"]');
 
-                        // Lock everything
                         function lockForm() {
                             if (submitBtn)    { submitBtn.disabled = true; }
                             if (usernameInput){ usernameInput.disabled = true; }
                             if (passwordInput){ passwordInput.disabled = true; }
                         }
-
-                        // Unlock everything
                         function unlockForm() {
                             if (submitBtn)    { submitBtn.disabled = false; }
                             if (usernameInput){ usernameInput.disabled = false; usernameInput.focus(); }
                             if (passwordInput){ passwordInput.disabled = false; }
                         }
-
-                        // Block form submission during lockout
                         if (loginForm) {
                             loginForm.addEventListener('submit', function(e) {
                                 if (remaining > 0) { e.preventDefault(); }
                             });
                         }
-
                         lockForm();
-
                         function formatTime(s) {
                             var m = Math.floor(s / 60);
                             var sec = s % 60;
                             return m + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
                         }
-
                         if (timerEl) timerEl.textContent = formatTime(remaining);
-
                         var interval = setInterval(function() {
                             remaining--;
                             if (remaining <= 0) {
                                 clearInterval(interval);
                                 if (timerEl) timerEl.textContent = '0m 00s';
                                 unlockForm();
-                                // Reload page to clear lockout state
                                 window.location.href = window.location.pathname;
                             } else {
                                 if (timerEl) timerEl.textContent = formatTime(remaining);
@@ -428,7 +456,11 @@ if (Auth::check()) {
                         }, 1000);
                     })();
                 </script>
-                <?php endif; ?>
+            <?php elseif (isset($_GET['error']) && !$isLocked): ?>
+                <div class="alert alert-error" id="loginAlert">
+                    <i class="ph-bold ph-warning-circle" style="font-size: 18px; flex-shrink: 0; margin-top: 1px;"></i>
+                    <span><?php echo htmlspecialchars($_GET['error']); ?></span>
+                </div>
             <?php endif; ?>
 
             <!-- Success Notification -->
@@ -450,7 +482,7 @@ if (Auth::check()) {
                         <i class="ph-bold ph-user input-icon"></i>
                         <input type="text" id="username" name="username" class="form-input" required 
                                placeholder="Enter your username" autocomplete="username" autofocus
-                               <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
+                               <?php if ($isLocked): ?>disabled<?php endif; ?>>
                     </div>
                 </div>
 
@@ -464,9 +496,9 @@ if (Auth::check()) {
                         <i class="ph-bold ph-lock-key input-icon"></i>
                         <input type="password" id="password" name="password" class="form-input" required 
                                placeholder="Enter your password" autocomplete="current-password"
-                               <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
+                               <?php if ($isLocked): ?>disabled<?php endif; ?>>
                         <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility"
-                                <?php if (!empty($_GET['locked'])): ?>disabled<?php endif; ?>>
+                                <?php if ($isLocked): ?>disabled<?php endif; ?>>
                             <i class="ph-bold ph-eye" id="toggleIcon"></i>
                         </button>
                     </div>
