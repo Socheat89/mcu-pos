@@ -1,5 +1,19 @@
 <?php
 // core/classes/Tenant.php
+
+/**
+ * Thrown when a tenant slug/subdomain cannot be resolved to an active tenant.
+ * Caught in index.php to render a clean 404 page — never a system/DB error.
+ */
+class TenantNotFoundException extends RuntimeException
+{
+    public function __construct(string $slug = '')
+    {
+        $message = $slug !== '' ? "Tenant not found: {$slug}" : 'Tenant not found';
+        parent::__construct($message, 404);
+    }
+}
+
 class Tenant {
     private static $currentTenant = null;
 
@@ -8,7 +22,7 @@ class Tenant {
             return self::$currentTenant;
         }
 
-        $host = $_SERVER['HTTP_HOST'];
+        $host = $_SERVER['HTTP_HOST'] ?? '';
         $requestUri = $_SERVER['REQUEST_URI'];
 
         // Check for subdomain (e.g., shop1.mysaas.com)
@@ -41,8 +55,9 @@ class Tenant {
             }
         }
 
-        // Default tenant or error
-        throw new Exception('Tenant not found');
+        // No active tenant matched — throw a typed exception so the router
+        // can serve a clean 404 without leaking server internals.
+        throw new TenantNotFoundException((string)($tenantSlug ?? ''));
     }
 
     private static function findBySubdomain($subdomain) {

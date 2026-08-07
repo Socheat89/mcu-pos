@@ -1,8 +1,30 @@
 <?php
 // index.php - Front Controller (PHP 8.2 Optimized)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+
+// ---------------------------------------------------------------------------
+// Environment detection  (must happen BEFORE any output or error config)
+// ---------------------------------------------------------------------------
+$_host_early = isset($_SERVER['HTTP_HOST']) ? strtolower(str_replace('www.', '', $_SERVER['HTTP_HOST'])) : '';
+$_isProduction = (
+    strpos($_host_early, 'mekongcyberunit.app') !== false ||
+    strpos($_host_early, 'mekongcy') !== false
+);
+
+// ---------------------------------------------------------------------------
+// PHP error configuration — NEVER expose errors to browser on Production
+// ---------------------------------------------------------------------------
+if ($_isProduction) {
+    error_reporting(E_ALL);           // Capture everything ...
+    ini_set('display_errors', '0');   // ... but NEVER show it in the browser
+    ini_set('display_startup_errors', '0');
+    ini_set('log_errors', '1');       // Write to server error log instead
+} else {
+    // Local / development: full visibility
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+}
+
 
 try {
     $baseDir = dirname(__FILE__);
@@ -114,7 +136,15 @@ try {
         // List of reserved words to skip tenant detection
         $reserved = ['admin', 'public', 'core', 'middleware', 'config', 'modules', 'api'];
         if (!in_array($tenantSlug, $reserved)) {
-            Tenant::detect($tenantSlug);
+            try {
+                Tenant::detect($tenantSlug);
+            } catch (TenantNotFoundException $e) {
+                // Log the lookup failure server-side (slug is safe to log)
+                error_log('[MCU-POS] Tenant not found for slug "' . $tenantSlug . '" — IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+                http_response_code(404);
+                include $baseDir . '/public/404.php';
+                exit;
+            }
             
             if ($module === 'dashboard') {
                 include $baseDir . '/tenant/dashboard.php';
@@ -263,15 +293,65 @@ try {
 
     // 4. Default 404
     http_response_code(404);
-    echo "<h1>404 - Page Not Found</h1>";
-    echo "Path: " . htmlspecialchars($path);
+    if (file_exists($baseDir . '/public/404.php')) {
+        include $baseDir . '/public/404.php';
+    } else {
+        echo "<h1>404 &mdash; Page Not Found</h1>";
+    }
+
+} catch (TenantNotFoundException $e) {
+    // Tenant 404s that bubble up from outside the routing block (edge case)
+    error_log('[MCU-POS] TenantNotFoundException (outer): ' . $e->getMessage() . ' | IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    http_response_code(404);
+    $baseDir = $baseDir ?? dirname(__FILE__);
+    if (file_exists($baseDir . '/public/404.php')) {
+        include $baseDir . '/public/404.php';
+    } else {
+        echo "<h1>404 &mdash; Store Not Found</h1>";
+    }
 
 } catch (Throwable $e) {
-    echo "<div style='padding:20px; background:#fff1f2; color:#be123c; border:1px solid #fda4af; border-radius:8px; font-family:sans-serif; margin:20px; line-height:1.5;'>";
-    echo "<h2 style='margin-top:0; border-bottom:1px solid #fda4af; padding-bottom:10px;'>System Error (Captured)</h2>";
-    echo "<strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "<br>";
-    echo "<strong>File:</strong> " . htmlspecialchars($e->getFile()) . " (Line: " . $e->getLine() . ")<br>";
-    echo "<details style='margin-top:10px;'><summary>Click for Stack Trace</summary><pre style='font-size:12px; overflow:auto;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre></details>";
-    echo "</div>";
+    // ---------------------------------------------------------------------------
+    // SECURE CATCH-ALL — log full detail server-side, show nothing sensitive
+    // ---------------------------------------------------------------------------
+    $logMessage = sprintf(
+        '[MCU-POS] Uncaught %s: %s in %s on line %d%sStack trace:%s%s',
+        get_class($e),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine(),
+        PHP_EOL,
+        PHP_EOL,
+        $e->getTraceAsString()
+    );
+    error_log($logMessage);
+
+    if ($isProduction ?? $_isProduction) {
+        // Production: generic error page — zero internal details exposed
+        if (!headers_sent()) {
+            http_response_code(500);
+        }
+        $baseDir = $baseDir ?? dirname(__FILE__);
+        if (file_exists($baseDir . '/public/500.php')) {
+            include $baseDir . '/public/500.php';
+        } else {
+            echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Service Unavailable</title></head>";
+            echo "<body style='font-family:sans-serif;text-align:center;padding:60px;'>"
+                . "<h1 style='color:#c0392b;'>Something went wrong</h1>"
+                . "<p>We&rsquo;re working on it. Please try again shortly.</p>"
+                . "</body></html>";
+        }
+    } else {
+        // Development: full details in a styled panel
+        if (!headers_sent()) http_response_code(500);
+        echo "<div style='padding:20px;background:#fff1f2;color:#be123c;border:1px solid #fda4af;border-radius:8px;font-family:monospace;margin:20px;line-height:1.6;'>";
+        echo "<h2 style='margin-top:0;border-bottom:1px solid #fda4af;padding-bottom:10px;'>&#9888; System Error (Dev Mode)</h2>";
+        echo "<strong>Type:</strong> " . htmlspecialchars(get_class($e)) . "<br>";
+        echo "<strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "<br>";
+        echo "<strong>File:</strong> " . htmlspecialchars($e->getFile()) . " (Line: " . $e->getLine() . ")<br>";
+        echo "<details style='margin-top:10px;'><summary style='cursor:pointer;'>&#9660; Stack Trace</summary>";
+        echo "<pre style='font-size:12px;overflow:auto;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:4px;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre></details>";
+        echo "</div>";
+    }
 }
 ?>

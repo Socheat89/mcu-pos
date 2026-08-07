@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 &mdash; Store Not Found | MCU POS</title>
+    <title>500 &mdash; Service Unavailable | MCU POS</title>
     <meta name="robots" content="noindex, nofollow">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,21 +19,20 @@
             overflow: hidden;
         }
 
-        /* Subtle animated background */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(168,85,247,0.12) 0%, transparent 60%);
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(239,68,68,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(249,115,22,0.08) 0%, transparent 60%);
             pointer-events: none;
         }
 
         .card {
             position: relative;
             background: rgba(30, 41, 59, 0.85);
-            border: 1px solid rgba(99,102,241,0.25);
+            border: 1px solid rgba(239,68,68,0.20);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-radius: 20px;
@@ -67,7 +66,7 @@
             font-size: 80px;
             font-weight: 800;
             letter-spacing: -2px;
-            background: linear-gradient(135deg, #818cf8, #c084fc);
+            background: linear-gradient(135deg, #f87171, #fb923c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -92,14 +91,14 @@
         .btn {
             display: inline-block;
             padding: 12px 28px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #ef4444, #f97316);
             color: #fff;
             text-decoration: none;
             border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             transition: opacity 0.2s, transform 0.15s;
-            box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+            box-shadow: 0 4px 15px rgba(239,68,68,0.35);
         }
 
         .btn:hover {
@@ -109,7 +108,7 @@
 
         .divider {
             border: none;
-            border-top: 1px solid rgba(99,102,241,0.15);
+            border-top: 1px solid rgba(239,68,68,0.12);
             margin: 28px 0;
         }
 
@@ -123,12 +122,12 @@
 </head>
 <body>
     <div class="card" role="main">
-        <span class="icon" aria-hidden="true">🏪</span>
-        <div class="code" aria-hidden="true">404</div>
-        <h1>Store Not Found</h1>
+        <span class="icon" aria-hidden="true">⚙️</span>
+        <div class="code" aria-hidden="true">500</div>
+        <h1>Something Went Wrong</h1>
         <p>
-            The store you&rsquo;re looking for doesn&rsquo;t exist or may have been deactivated.
-            Please check the URL and try again.
+            We&rsquo;re experiencing a temporary issue. Our team has been notified and is
+            working on it. Please try again in a few moments.
         </p>
         <a href="/" class="btn" id="btn-go-home">&#8592; Back to Homepage</a>
         <hr class="divider">
