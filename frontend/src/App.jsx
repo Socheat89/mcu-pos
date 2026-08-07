@@ -377,8 +377,8 @@ export default function App() {
     phone_number: '85516367859',
     store_label: 'Mekong CyberUnit',
     pos_method_cash_enabled: '1',
-    pos_method_khqr_enabled: '1',
     pos_method_card_enabled: '1',
+    pos_custom_methods: ['ABA', 'ACLEDA', 'Wing', 'TrueMoney'],
     exchange_rate_usd_khr: '4100',
     price_decimal_places: 2
   };
@@ -1799,47 +1799,26 @@ export default function App() {
                     <span className="text-[10px] font-bold">{t('cash', 'សាច់ប្រាក់')}</span>
                   </button>
                 )}
-                {settings.pos_method_khqr_enabled === '1' && (
-                  <button
-                    onClick={() => { setPaymentMethod('aba'); setSelectedBank('aba'); }}
-                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
-                      paymentMethod === 'aba'
-                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black">ABA</span>
-                  </button>
-                )}
-                <button
-                  onClick={() => { setPaymentMethod('acleda'); setSelectedBank('acleda'); }}
-                  className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
-                    paymentMethod === 'acleda'
-                      ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
-                      : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
-                  }`}
-                >
-                  <span className="text-[10px] font-black">ACLEDA</span>
-                </button>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {['wing', 'truemoney', 'other'].map(bank => (
-                  <button
-                    key={bank}
-                    onClick={() => { setPaymentMethod(bank); setSelectedBank(bank); }}
-                    className={`p-2.5 rounded-lg border text-center flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
-                      paymentMethod === bank
-                        ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black">{bank === 'wing' ? 'Wing' : bank === 'truemoney' ? 'TrueMoney' : currentLang === 'km' ? 'ផ្សេងៗ' : 'Other'}</span>
-                  </button>
-                ))}
+                {(Array.isArray(settings.pos_custom_methods) ? settings.pos_custom_methods : []).map(method => {
+                  const methodKey = method.toLowerCase().replace(/\s+/g, '_');
+                  return (
+                    <button
+                      key={methodKey}
+                      onClick={() => { setPaymentMethod(methodKey); setSelectedBank(methodKey); }}
+                      className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
+                        paymentMethod === methodKey
+                          ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black">{method}</span>
+                    </button>
+                  );
+                })}
                 {settings.pos_method_card_enabled === '1' && (
                   <button
                     onClick={() => { setPaymentMethod('card'); setSelectedBank(''); }}
-                    className={`p-2.5 rounded-lg border text-center flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ${
                       paymentMethod === 'card'
                         ? 'border-brand-cyan bg-brand-cyan text-white font-extrabold shadow-sm'
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'
@@ -1958,14 +1937,17 @@ export default function App() {
                 </div>
               )}
 
-              {(paymentMethod === 'aba' || paymentMethod === 'acleda' || paymentMethod === 'wing' || paymentMethod === 'truemoney' || paymentMethod === 'other') && (
+              {(paymentMethod !== 'cash' && paymentMethod !== 'card') && (
                 <div className="text-center space-y-4 animate-fade-in p-4 rounded-2xl border border-brand-cyan/20 bg-brand-cyan/5">
                   <div className="h-12 w-12 mx-auto rounded-2xl bg-brand-cyan/15 flex items-center justify-center">
                     <QrCode className="h-6 w-6 text-brand-cyan" />
                   </div>
                   <div>
                     <p className="text-sm font-black text-brand-cyan">
-                      {paymentMethod === 'aba' ? 'ABA Bank' : paymentMethod === 'acleda' ? 'ACLEDA Bank' : paymentMethod === 'wing' ? 'Wing Bank' : paymentMethod === 'truemoney' ? 'TrueMoney' : currentLang === 'km' ? 'ធនាគារផ្សេងៗ' : 'Other Bank'}
+                      {/* Show the original method name from the list */}
+                      {(Array.isArray(settings.pos_custom_methods) ? settings.pos_custom_methods : []).find(
+                        m => m.toLowerCase().replace(/\s+/g, '_') === paymentMethod
+                      ) || paymentMethod.toUpperCase()}
                     </p>
                     <p className="text-[10px] text-brand-muted font-bold mt-1">
                       {currentLang === 'km' ? 'សូមឱ្យអតិថិជនស្កែន QR ដើម្បីទូទាត់' : 'Ask customer to scan & pay'}

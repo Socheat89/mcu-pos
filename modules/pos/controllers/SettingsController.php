@@ -44,10 +44,9 @@ class SettingsController {
             'company_tax_id' => '',
             'company_website' => '',
             'pos_method_cash_enabled' => '1',
-            'pos_method_khqr_enabled' => '1',
-            'pos_method_khqr_image' => mc_url('public/images/khqr_preview.png'),
             'pos_method_card_enabled' => '1',
             'pos_method_transfer_enabled' => '1',
+            'pos_custom_methods' => '["ABA","ACLEDA","Wing","TrueMoney"]',
             'exchange_rate_usd_khr' => '4100', // Default: 1 USD = 4100 KHR
             'price_decimal_places' => '2',
             'business_type' => 'coffee', // 'coffee' or 'mart'
@@ -104,7 +103,6 @@ class SettingsController {
 
              $checkboxes = [
                  'pos_method_cash_enabled',
-                 'pos_method_khqr_enabled',
                  'pos_method_card_enabled',
                  'pos_method_transfer_enabled'
              ];
@@ -170,6 +168,18 @@ class SettingsController {
                  } catch (Throwable $e) {
                      error_log('KHQR image upload error: ' . $e->getMessage());
                  }
+             }
+
+             // Save custom payment methods (JSON list)
+             $rawCustom = $_POST['pos_custom_methods'] ?? '[]';
+             $customArr = json_decode($rawCustom, true);
+             if (is_array($customArr)) {
+                 // Sanitize: trim + strip tags on each name, keep non-empty, limit to 20
+                 $customArr = array_values(array_filter(
+                     array_map(fn($m) => substr(trim(strip_tags($m)), 0, 40), $customArr)
+                 ));
+                 $customArr = array_slice($customArr, 0, 20);
+                 Settings::set('pos_custom_methods', json_encode($customArr), $tenantId);
              }
 
              // Redirect back

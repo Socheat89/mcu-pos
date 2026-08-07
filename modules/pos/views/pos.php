@@ -100,19 +100,22 @@ $dashboardUrl = $posBase . '/dashboard';
             ];
         }, $pendingMenuOrders)); ?>;
 
-        window.SETTINGS = <?php echo json_encode([
-            'bank_account' => $settings['bank_account'] ?? '',
-            'merchant_name' => $settings['merchant_name'] ?? '',
-            'merchant_city' => $settings['merchant_city'] ?? '',
-            'phone_number' => $settings['phone_number'] ?? '',
-            'store_label' => $settings['store_label'] ?? '',
-            'pos_method_cash_enabled' => $settings['pos_method_cash_enabled'] ?? '1',
-            'pos_method_khqr_enabled' => $settings['pos_method_khqr_enabled'] ?? '1',
-            'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1',
-            'exchange_rate_usd_khr' => $settings['exchange_rate_usd_khr'] ?? '4100',
-            'payment_qr_path' => $settings['payment_qr_path'] ?? ($settings['pos_method_khqr_image'] ?? ''),
-            'price_decimal_places' => (int)($settings['price_decimal_places'] ?? 2),
-        ]); ?>;
+        window.SETTINGS = <?php
+            $customMethodsRaw = $settings['pos_custom_methods'] ?? '["ABA","ACLEDA","Wing","TrueMoney"]';
+            $customMethodsArr = json_decode($customMethodsRaw, true);
+            if (!is_array($customMethodsArr)) $customMethodsArr = ['ABA','ACLEDA','Wing','TrueMoney'];
+            echo json_encode([
+                'bank_account' => $settings['bank_account'] ?? '',
+                'merchant_name' => $settings['merchant_name'] ?? '',
+                'merchant_city' => $settings['merchant_city'] ?? '',
+                'phone_number' => $settings['phone_number'] ?? '',
+                'store_label' => $settings['store_label'] ?? '',
+                'pos_method_cash_enabled' => $settings['pos_method_cash_enabled'] ?? '1',
+                'pos_method_card_enabled' => $settings['pos_method_card_enabled'] ?? '1',
+                'pos_custom_methods' => $customMethodsArr,
+                'exchange_rate_usd_khr' => $settings['exchange_rate_usd_khr'] ?? '4100',
+                'price_decimal_places' => (int)($settings['price_decimal_places'] ?? 2),
+            ]); ?>;
 
         window.CURRENT_LANG = "<?php echo Language::getCurrentLang(); ?>";
         window.ACTIVE_SESSION_ID = <?php echo (int)($activeSession['id'] ?? 0); ?>;

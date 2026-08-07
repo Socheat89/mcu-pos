@@ -474,7 +474,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                                     </div>
                                 </div>
                                 
-                                <div style="text-align: center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px;">
+                                <div style="text-align: center; margin-top: 15px; border-bottom: 1px dashed #000; padding-bottom: 15px;">
                                     <p id="preview-footer" style="white-space: pre-wrap; margin: 0;"><?php echo htmlspecialchars($settings['receipt_footer_text']); ?></p>
                                 </div>
                                 
@@ -500,7 +500,6 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
                                     <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--pos-border); display: grid; place-items: center; color: var(--pos-primary);"><i class="fas fa-money-bill-wave"></i></div>
-
                                     <div>
                                         <div style="font-weight: 700;">Cash Payment</div>
                                         <div class="pos-small">Accept physical currency</div>
@@ -514,23 +513,7 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
 
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); display: grid; place-items: center; color: var(--pos-danger);"><i class="fas fa-qrcode"></i></div>
-
-                                    <div>
-                                        <div style="font-weight: 700;">QR Code Payment</div>
-                                        <div class="pos-small">Scan to pay with mobile banking app</div>
-                                    </div>
-                                </div>
-                                <label class="pos-toggle">
-                                    <input type="checkbox" name="pos_method_khqr_enabled" <?php echo ($settings['pos_method_khqr_enabled'] == '1') ? 'checked' : ''; ?>>
-                                    <span class="pos-toggle-slider"></span>
-                                </label>
-                            </label>
-
-                            <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
-                                <div style="display:flex; align-items:center; gap:12px;">
                                     <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); display: grid; place-items: center; color: var(--pos-secondary);"><i class="fas fa-credit-card"></i></div>
-
                                     <div>
                                         <div style="font-weight: 700;">Credit / Debit Card</div>
                                         <div class="pos-small">Visa, Mastercard, etc.</div>
@@ -545,7 +528,6 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                             <label class="pos-card" style="padding: 15px; display: flex; align-items: center; justify-content: space-between; border-color: var(--pos-border); cursor: pointer;">
                                 <div style="display:flex; align-items:center; gap:12px;">
                                     <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: grid; place-items: center; color: var(--pos-success);"><i class="fas fa-university"></i></div>
-
                                     <div>
                                         <div style="font-weight: 700;">Bank Transfer</div>
                                         <div class="pos-small">Direct bank-to-bank transfer</div>
@@ -559,27 +541,60 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
                         </div>
                     </div>
 
+                    <!-- Custom Payment Methods Manager -->
                     <div style="background: var(--pos-card); backdrop-filter: blur(12px); border: 1px solid var(--pos-border); border-radius: 16px; padding: 24px;">
-                        <p class="pos-card-title">QR Code Payment Configuration</p>
-                        <p class="pos-card-sub" style="margin-bottom: 20px;">Upload your store payment QR Code image for customers to scan.</p>
-                        
-                        <div style="text-align: center; background: #f9fafb; padding: 20px; border-radius: 16px; border: 1px dashed var(--pos-border); margin-bottom: 20px;">
-                            <img src="<?php echo htmlspecialchars($settings['pos_method_khqr_image']); ?>" style="width: 200px; height: 200px; object-fit: contain; background: white; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: block; margin: 0 auto; box-shadow: var(--pos-shadow-sm);">
+                        <p class="pos-card-title"><i class="fas fa-plus-circle" style="color: var(--pos-primary);"></i> Custom Payment Methods</p>
+                        <p class="pos-card-sub" style="margin-bottom: 20px;">Add bank or e-wallet names that cashiers can select during checkout (e.g. ABA, ACLEDA, Wing).</p>
 
-                            <div style="margin-top: 15px;">
-                                <input type="file" name="khqr_upload" class="pos-form-control" accept="image/*" style="max-width: 250px; font-size: 12px; padding: 8px;">
+                        <?php
+                        $rawMethods = $settings['pos_custom_methods'] ?? '[]';
+                        $customMethods = json_decode($rawMethods, true);
+                        if (!is_array($customMethods)) $customMethods = [];
+                        ?>
+
+                        <!-- Current methods list -->
+                        <div id="custom-methods-list" style="display: flex; flex-wrap: wrap; gap: 10px; min-height: 48px; margin-bottom: 20px;">
+                            <?php foreach ($customMethods as $method): ?>
+                            <div class="custom-method-tag" style="display: flex; align-items: center; gap: 8px; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 7px 12px; font-weight: 700; font-size: 13px; color: var(--pos-text);">
+                                <i class="fas fa-university" style="font-size: 11px; color: var(--pos-secondary);"></i>
+                                <span><?php echo htmlspecialchars($method); ?></span>
+                                <button type="button" onclick="removeCustomMethod(this)" data-method="<?php echo htmlspecialchars($method); ?>"
+                                    style="background: none; border: none; cursor: pointer; color: var(--pos-danger); font-size: 13px; line-height: 1; padding: 0; margin-left: 2px;" title="Remove">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
                             </div>
+                            <?php endforeach; ?>
+                            <?php if (empty($customMethods)): ?>
+                            <div id="no-methods-hint" style="color: var(--pos-text-muted); font-size: 13px; font-style: italic; align-self: center;">No custom methods yet. Add one below.</div>
+                            <?php endif; ?>
                         </div>
-                        
-                        <div style="display: flex; gap: 12px; background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2); color: var(--pos-warning);">
-                            <i class="fas fa-lightbulb" style="font-size: 18px;"></i>
-                            <p class="pos-small" style="color: var(--pos-warning); margin: 0; line-height: 1.4;">
-                                This QR code will be displayed in the checkout modal when 'QR Code' is selected as the payment method.
+
+                        <!-- Hidden input to submit the JSON -->
+                        <input type="hidden" name="pos_custom_methods" id="pos-custom-methods-input" value="<?php echo htmlspecialchars($rawMethods); ?>">
+
+                        <!-- Add new method -->
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="new-method-input" placeholder="e.g. ABA, Wing, Bakong..."
+                                style="flex: 1; background: var(--pos-elevated); border: 1px solid var(--pos-border); border-radius: 10px; padding: 10px 14px; color: var(--pos-text); font-size: 14px; font-weight: 600; outline: none;"
+                                maxlength="40"
+                                onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomMethod();}">
+                            <button type="button" onclick="addCustomMethod()"
+                                style="background: var(--pos-primary); color: white; border: none; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; transition: opacity 0.2s;"
+                                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+
+                        <div style="margin-top: 16px; display: flex; gap: 10px; background: rgba(245, 158, 11, 0.08); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.18); color: var(--pos-warning); align-items: flex-start;">
+                            <i class="fas fa-lightbulb" style="font-size: 15px; margin-top: 1px;"></i>
+                            <p class="pos-small" style="color: var(--pos-warning); margin: 0; line-height: 1.5;">
+                                These methods appear as selectable buttons in the POS checkout screen. Save settings after adding or removing methods.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <!-- General Settings Tab (Exchange Rate) -->
             <div id="tab-general" class="tab-content">
@@ -975,6 +990,66 @@ $subdomain = Tenant::getCurrent()['subdomain'] ?? '';
             } else {
                 notice.style.cssText = 'margin-top:12px; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:700; background:rgba(var(--pos-primary-rgb),0.07); color:var(--pos-primary); border:1px solid rgba(var(--pos-primary-rgb),0.2);';
                 notice.innerHTML = '☕ Coffee/Cafe Mode: មុខងារពេញលេញ — Ingredients, Sizes, Sessions, Reports';
+            }
+        }
+
+        // ── Custom Payment Methods ─────────────────────────────────────────
+        function getCustomMethodsArray() {
+            const input = document.getElementById('pos-custom-methods-input');
+            try { return JSON.parse(input.value) || []; } catch(e) { return []; }
+        }
+
+        function syncCustomMethodsInput(arr) {
+            document.getElementById('pos-custom-methods-input').value = JSON.stringify(arr);
+        }
+
+        function addCustomMethod() {
+            const inp = document.getElementById('new-method-input');
+            const name = inp.value.trim();
+            if (!name) return;
+
+            const arr = getCustomMethodsArray();
+            if (arr.includes(name)) {
+                inp.value = '';
+                inp.focus();
+                return;
+            }
+            arr.push(name);
+            syncCustomMethodsInput(arr);
+
+            // Remove the "no methods" hint if present
+            const hint = document.getElementById('no-methods-hint');
+            if (hint) hint.remove();
+
+            // Append tag to DOM
+            const list = document.getElementById('custom-methods-list');
+            const tag = document.createElement('div');
+            tag.className = 'custom-method-tag';
+            tag.style.cssText = 'display:flex;align-items:center;gap:8px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--pos-text);animation:fadeIn 0.2s ease;';
+            tag.innerHTML = `<i class="fas fa-university" style="font-size:11px;color:var(--pos-secondary);"></i>
+                <span>${name.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                <button type="button" onclick="removeCustomMethod(this)" data-method="${name.replace(/"/g,'&quot;')}"
+                    style="background:none;border:none;cursor:pointer;color:var(--pos-danger);font-size:13px;line-height:1;padding:0;margin-left:2px;" title="Remove">
+                    <i class="fas fa-times-circle"></i>
+                </button>`;
+            list.appendChild(tag);
+            inp.value = '';
+            inp.focus();
+        }
+
+        function removeCustomMethod(btn) {
+            const methodName = btn.getAttribute('data-method');
+            let arr = getCustomMethodsArray();
+            arr = arr.filter(m => m !== methodName);
+            syncCustomMethodsInput(arr);
+
+            // Remove tag from DOM
+            btn.closest('.custom-method-tag').remove();
+
+            // Show hint if list is now empty
+            const list = document.getElementById('custom-methods-list');
+            if (list.querySelectorAll('.custom-method-tag').length === 0) {
+                list.innerHTML = '<div id="no-methods-hint" style="color:var(--pos-text-muted);font-size:13px;font-style:italic;align-self:center;">No custom methods yet. Add one below.</div>';
             }
         }
 
